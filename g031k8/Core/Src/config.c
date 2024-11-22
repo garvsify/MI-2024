@@ -1,5 +1,10 @@
 #include "config.h"
 
+ADC_HandleTypeDef hadc1;
+DMA_HandleTypeDef hdma_adc1;
+TIM_HandleTypeDef htim1;
+UART_HandleTypeDef huart2;
+
 /**
   * @brief System Clock Configuration
   * @retval None

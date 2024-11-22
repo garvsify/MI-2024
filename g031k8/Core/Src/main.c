@@ -21,7 +21,7 @@ int main(void)
   {
 	  HAL_GPIO_TogglePin(LD3_GPIO_Port, LD3_Pin);
 
-	  HAL_Delay(1000);
+	  HAL_Delay(5000);
 
   }
 }
