@@ -307,6 +307,36 @@ void MX_GPIO_Init(void)
   //GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LD3_GPIO_Port, &GPIO_InitStruct);
 
+  /*Configure GPIO pin : ADC Ch0 Pin */
+  GPIO_InitStruct.Pin = ADC_CH_0_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(ADC_CH_0_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : ADC Ch1 Pin */
+  GPIO_InitStruct.Pin = ADC_CH_1_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(ADC_CH_1_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : ADC Ch4 Pin */
+  GPIO_InitStruct.Pin = ADC_CH_4_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(ADC_CH_4_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : ADC Ch5 Pin */
+  GPIO_InitStruct.Pin = ADC_CH_5_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(ADC_CH_5_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : TIM1 Ch4 Pin (PWM Output) */
+  GPIO_InitStruct.Pin = TIM1_CH_4_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(TIM1_CH_4_GPIO_Port, &GPIO_InitStruct);
+
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
 }
