@@ -1,0 +1,53 @@
+TIM1 - PWM generator with 10-bit resolution (1024 duty cycles)
+
+TIM2 - frequency generation (upon its interrupt select and condition the next duty cycle to load)
+
+TIM3 - ADC single channel conversion (these are stepped through for the 4 channels)
+
+
+
+
+
+Making sure we can reuse the STM32G031K8 instead of the PIC16F1824
+
+
+PIC16F1824 TMR0 Frequency of oscillation equation:
+
+Fosc/4/prescaler/(256-TMR0)/NUM_SAMPLES_IN_WAVE
+
+
+
+The original PIC16F1824 code limits TMR0 to 0-127. 
+
+TMR0 is a START FROM VALUE (!!!), i.e. loading a value into TMR0 on its overflow causes counting to begin again from that value, until it reaches 255 and overflows
+
+This means that the extremes of actual number of count values are 256-0, i.e. 256, and 256-127, i.e. 128.
+
+
+
+Notice that:
+
+	Although we do not use TMR0 = 128, it will make sense in a minute:
+
+	32000000/4/2/(256-128)/512 = 61Hz
+
+	But by changing TMR0 to 0 and changing the prescaler to 1 we get:
+
+	32000000/4/1/(256-0)/512 = 61Hz
+
+	THEREFORE, if TMR0 'would' equal 128, we instead decrease the prescaler and set TMR0 to zero instead.
+	
+	
+
+
+
+
+
+So...... can we transfer this to the STM32G031K8?
+
+
+I think to make any timer equivalent to an 8-bit timer we would set the AUTO-RELOAD-REGISTER (ARR) to 255, and then instead of calculating what value
+TMR0 would be, we work out what value to set the Count Register to, which will be between 0 and 127. The auto-reload register can be set to preload so 
+we don't have to continually keep telling it to be an 8-bit timer, but we will of course need to update the count register (and tell the timer to start
+counting again if it turns off or whatever on overflow) upon an interrupt
+
