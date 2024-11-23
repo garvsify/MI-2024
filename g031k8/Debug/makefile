@@ -60,8 +60,8 @@ all: main-build
 main-build: g031k8.elf secondary-outputs
 
 # Tool invocations
-g031k8.elf g031k8.map: $(OBJS) $(USER_OBJS) /Users/jamesgarvey/Documents/Git/NUCLEO-G031K8/NUCLEO-G031K8\ WORKSPACE/g031k8/STM32G031K8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "g031k8.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0plus -T"/Users/jamesgarvey/Documents/Git/NUCLEO-G031K8/NUCLEO-G031K8 WORKSPACE/g031k8/STM32G031K8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="g031k8.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+g031k8.elf g031k8.map: $(OBJS) $(USER_OBJS) C:\Users\James\ Garvey\git\MI-2024\g031k8\STM32G031K8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "g031k8.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0plus -T"C:\Users\James Garvey\git\MI-2024\g031k8\STM32G031K8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="g031k8.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

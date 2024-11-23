@@ -28,7 +28,6 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32g0xx_hal.h"
-#include "config.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -72,16 +71,6 @@ void Error_Handler(void);
 #define T_JTMS_GPIO_Port GPIOA
 #define T_JTCK_Pin GPIO_PIN_14
 #define T_JTCK_GPIO_Port GPIOA
-#define ADC_CH_0_Pin GPIO_PIN_0
-#define ADC_CH_0_GPIO_Port GPIOA
-#define ADC_CH_1_Pin GPIO_PIN_1
-#define ADC_CH_1_GPIO_Port GPIOA
-#define ADC_CH_4_Pin GPIO_PIN_4
-#define ADC_CH_4_GPIO_Port GPIOA
-#define ADC_CH_5_Pin GPIO_PIN_5
-#define ADC_CH_5_GPIO_Port GPIOA
-#define TIM1_CH_4_Pin GPIO_PIN_9
-#define TIM1_CH_4_GPIO_Port GPIOA
 
 /* USER CODE BEGIN Private defines */
 
