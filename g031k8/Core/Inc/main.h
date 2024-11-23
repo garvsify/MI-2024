@@ -24,6 +24,21 @@ void Error_Handler(void);
 #define T_JTCK_Pin GPIO_PIN_14
 #define T_JTCK_GPIO_Port GPIOA
 
+#define ADC_CH0_Pin GPIO_PIN_0
+#define ADC_CH0_GPIO_Port GPIOA
+
+#define ADC_CH1_Pin GPIO_PIN_1
+#define ADC_CH1_GPIO_Port GPIOA
+
+#define ADC_CH4_Pin GPIO_PIN_4
+#define ADC_CH4_GPIO_Port GPIOA
+
+#define ADC_CH5_Pin GPIO_PIN_5
+#define ADC_CH5_GPIO_Port GPIOA
+
+#define TIM14_CH1_Pin GPIO_PIN_7
+#define TIM14_CH1_GPIO_Port GPIOA
+
 #ifdef __cplusplus
 }
 #endif
