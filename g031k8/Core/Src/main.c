@@ -17,7 +17,7 @@ int main(void)
 	//START ADC TRIG. TIMER
 	__HAL_TIM_SET_COUNTER(&htim17, 0); //set counter to 0
 	__HAL_TIM_ENABLE(&htim17); //enable TIM17
-	HAL_TIM_OC_Start(&htim17, TIM_CHANNEL_1); //enable ADC triggering
+	HAL_TIM_OC_Start(&htim17, TIM_CHANNEL_1); //enable ADC triggering - if this doesn't work use HAL_TIM_Base_Start()
 
 	//WAIT
 	while(initial_ADC_conversion_complete == 0){}; //wait while first ADC conversion is ongoing
@@ -31,7 +31,7 @@ int main(void)
 	__HAL_TIM_ENABLE(&htim14); //enable TIM14
 	__HAL_TIM_ENABLE(&htim16); //enable TIM16
 	HAL_TIM_PWM_Start(&htim14, TIM_CHANNEL_1); //start PWM
-	HAL_TIM_OC_Start(&htim16, TIM_CHANNEL_1); //start freq. gen
+	HAL_TIM_OC_Start(&htim16, TIM_CHANNEL_1); //start freq. gen - if this doesn't work use HAL_TIM_Base_Start()
 
 	while (1)
 	{
