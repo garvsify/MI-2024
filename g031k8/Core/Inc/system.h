@@ -64,7 +64,6 @@ extern const uint16_t tri_table_one_quadrant[129];
 extern const uint16_t TIM16_prescaler_divisors[9];
 
 //VARIABLES
-volatile extern uint32_t final_TMR0;
 volatile extern uint8_t TMR0_prescaler_adjust;
 volatile extern uint32_t raw_TMR0;
 volatile extern uint8_t base_prescaler_bits_index;
@@ -85,6 +84,8 @@ volatile extern uint8_t prescaler_final_index;
 volatile extern uint8_t dutyL;
 volatile extern uint8_t dutyH;
 volatile extern uint8_t current_depthL;
+volatile extern uint16_t ADCResultsDMA[4];
+const extern uint8_t num_ADC_conversions;
 
 //CUSTOM TYPES
 enum Polarity{

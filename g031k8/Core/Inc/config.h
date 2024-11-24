@@ -38,6 +38,7 @@ extern TIM_HandleTypeDef htim16;
 extern TIM_HandleTypeDef htim17;
 extern UART_HandleTypeDef huart2;
 
+void System_Init(void);
 void SystemClock_Config(void);
 void MX_GPIO_Init(void);
 void MX_DMA_Init(void);
