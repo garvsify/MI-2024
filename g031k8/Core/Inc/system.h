@@ -4,7 +4,6 @@
 //INCLUDES
 #include "config.h"
 #include <stdint.h>
-#include "TIMx_callbacks.h"
 
 //MACROS
 #define MAX_QUADRANT_INDEX 128
