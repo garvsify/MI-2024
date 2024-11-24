@@ -38,6 +38,7 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	}
 
 #if DEPTH_ON_OR_OFF == 1
+
 	//Apply Depth
 	if(current_depth == 255){
 		duty = 1023 - duty;
@@ -49,6 +50,7 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	else{
 		duty = 1023; //if depth is 0, just output 1023
 	}
+
 #endif
 
 	//Write Duty
@@ -106,20 +108,28 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 
 
 	//GET DEPTH
-	current_depth = ADCResultsDMA[2] >> 4; //convert to 8-bit
+	#if DEPTH_ON_OR_OFF == ON
 
-
-
-	//GET SYMMETRY
-	#if SYMMETRY_RESOLUTION == 12
-
-		current_symmetry = ADCResultsDMA[3];
+		current_depth = ADCResultsDMA[2] >> 4; //convert to 8-bit
 
 	#endif
 
-	#if SYMMETRY_RESOLUTION == 8
 
-		current_symmetry = ADCResultsDMA[3] >> 4;
+	//GET SYMMETRY
+	#if SYMMETRY_ON_OR_OFF == ON
+
+		#if SYMMETRY_RESOLUTION == 12
+
+			current_symmetry = ADCResultsDMA[3];
+
+		#endif
+
+		#if SYMMETRY_RESOLUTION == 8
+
+			current_symmetry = ADCResultsDMA[3] >> 4;
+
+		#endif
+
 	#endif
 
 	__HAL_TIM_SET_COUNTER(&htim17, 0); //set counter to 0
