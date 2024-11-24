@@ -1,11 +1,10 @@
 #include "TIMx_callbacks.h"
 
-void TIM16_callback(TIM_HandleTypeDef *htim){
+void TIM16_callback(TIM_HandleTypeDef *htim)
+{
+	__HAL_TIM_SET_COUNTER(&htim16, (uint16_t)TIM16_final_start_value); //this line must go here, or at least very near the beginning!
 
-	//TMR0H = (uint8_t)final_TMR0; //this line must go here, or at least very near the beginning!
-
-	//LATC5 = 1; //start ISR length measurement
-	//TMR0IF = 0; //clear TMR0 interrupt flag
+	//interrupt flag is already cleared by stm32g0xx_it.c
 
 	if(current_waveshape == TRIANGLE_MODE){
 		duty = tri_table_one_quadrant[current_one_quadrant_index];
@@ -53,46 +52,19 @@ void TIM16_callback(TIM_HandleTypeDef *htim){
 #endif
 
 	//Write Duty
-	//CCP1_LoadDutyValue(duty); //-to be sorted
-
-	//Finish Up
-	//LATC5 = 0; //finish ISR length measurement //-to be sorted
+	__HAL_TIM_SET_COMPARE(&htim14, TIM_CHANNEL_1, duty); //updates the CCR register of TIM14, which sets duty
 }
 
-/*uint8_t multiply_duty_by_current_depth_and_divide_by_256(void){ //-to be sorted
-
-	volatile uint8_t res0 = 0;
-	volatile uint8_t res1 = 0;
-	volatile uint8_t res2 = 0;
-	volatile uint8_t res3 = 0;
-	volatile uint8_t dutyL = 0;
-	volatile uint8_t dutyH = 0;
-	volatile uint8_t current_depthL = 0;
-	volatile uint16_t result_of_low_by_low = 0;
-	volatile uint32_t result_of_low_by_high = 0;
+uint8_t multiply_duty_by_current_depth_and_divide_by_256(void)
+{
 	volatile uint32_t multiply_product = 0;
 
-    dutyL = (uint8_t)duty;
-    dutyH = duty >> 8;
-    current_depthL = (uint8_t)current_depth;
-
-    asm("MOVF _current_depthL, W");
-    asm("MULWF _dutyL");
-    asm("MOVFF PRODH, _res1");
-    asm("MOVFF PRODL, _res0");
-    result_of_low_by_low = (uint16_t)((uint16_t)(res1 << 8) | res0);
-
-    asm("MOVF _current_depthL, W");
-    asm("MULWF _dutyH");
-    asm("MOVFF PRODH, _res3");
-    asm("MOVFF PRODL, _res2");
-    result_of_low_by_high = (uint32_t)(((uint32_t)(res3 << 8) | (uint32_t)res2) << 8);
-
-    multiply_product = result_of_low_by_high + result_of_low_by_low;
+	//Perform: (duty*current_depth) / 256
+	multiply_product = duty * current_depth; //compiler should compile this as a hardware multiplication, but need to check
     duty = 1023 - (uint16_t)(multiply_product >> 8);
 
     return 1;
-}*/
+}
 
 void TIM17_callback(TIM_HandleTypeDef *htim)
 {
