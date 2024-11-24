@@ -65,9 +65,9 @@ extern const uint16_t TIM16_prescaler_divisors[9];
 
 //VARIABLES
 volatile extern uint8_t TIM16_prescaler_adjust;
-volatile extern uint32_t TIM16_raw_CCR;
-volatile extern uint32_t TIM16_final_CCR;
-volatile extern uint8_t TIM16_base_prescaler_bits_index;
+volatile extern uint32_t TIM16_raw_start_value;
+volatile extern uint32_t TIM16_final_start_value;
+volatile extern uint8_t TIM16_base_prescaler_divisors_index;
 volatile extern uint16_t duty;
 volatile extern uint8_t current_waveshape;
 volatile extern uint16_t current_speed_linear;
@@ -78,7 +78,7 @@ volatile extern uint8_t current_one_quadrant_index;
 volatile extern uint8_t current_halfcycle;
 volatile extern uint8_t current_quadrant;
 volatile extern uint8_t TIM16_prescaler_overflow_flag;
-volatile extern uint8_t TIM16_prescaler_final_index;
+volatile extern uint8_t TIM16_prescaler_divisors_final_index;
 volatile extern uint16_t ADCResultsDMA[4];
 const extern uint8_t num_ADC_conversions;
 
@@ -102,8 +102,8 @@ enum Validate{
 };
 
 //FUNCTION DECLARATIONS
-uint8_t process_TIM16_raw_CCR_and_prescaler(void);
-uint8_t process_TIM16_final_CCR_and_prescaler_adjust(void);
+uint8_t process_TIM16_raw_start_value_and_prescaler(void);
+uint8_t process_TIM16_final_start_value_and_prescaler_adjust(void);
 uint8_t adjust_and_set_TIM16_prescaler(void);
 uint8_t shorten_period(void);
 uint8_t lengthen_period(void);
