@@ -16,20 +16,17 @@ volatile uint32_t current_symmetry = 0;
 volatile uint8_t current_one_quadrant_index = 0;
 volatile uint8_t current_halfcycle = 0;
 volatile uint8_t current_quadrant = 0;
-volatile uint32_t final_TMR0 = 0;
-volatile uint8_t TMR0_prescaler_adjust = 0;
-volatile uint32_t raw_TMR0 = 0;
-volatile uint8_t TMR0_base_prescaler_bits_index = 0;
-volatile uint8_t symmetry_status = 0;
-volatile uint8_t duty_low_byte;
-volatile uint8_t duty_high_byte;
+volatile uint32_t TIM16_final_CCR = 0;
+volatile uint8_t TIM16_prescaler_adjust = 0;
+volatile uint32_t TIM16_raw_CCR = 0;
+volatile uint8_t TIM16_base_prescaler_bits_index = 0;
 volatile uint16_t duty = 0;
-volatile uint8_t TMR0_prescaler_overflow_flag = 0;
-volatile uint8_t TMR0_prescaler_final_index = 0;
+volatile uint8_t TIM16_prescaler_overflow_flag = 0;
+volatile uint8_t TIM16_prescaler_final_index = 0;
 volatile uint16_t ADCResultsDMA[4] = {0};
 
 //FUNCTION DEFINITIONS
-uint8_t process_TMR0_raw_and_prescaler(void){
+uint8_t process_TIM16_raw_CCR_and_prescaler(void){
 
 	uint16_t speed_control = 0;
 	uint32_t speed_control_32 = 0;
@@ -41,37 +38,37 @@ uint8_t process_TMR0_raw_and_prescaler(void){
     speed_control = (uint16_t) speed_control_32;
     //speed_control = (speed_adc_10_bit/1024)*883
         if(speed_control <= (127-12)){ //inequality is correct!
-            raw_TMR0 = (uint8_t) speed_control + 12; //set TMR0
-            TMR0_base_prescaler_bits_index = 1;
+            TIM16_raw_CCR = (uint8_t) speed_control + 12; //set CCR
+            TIM16_base_prescaler_bits_index = 1;
         }
         else{ 	//(speed_control > (127-12))
             uint16_t speed_control_subtracted;
             speed_control_subtracted = speed_control - (127-12);
             how_many_128 = (uint8_t)(speed_control_subtracted >> 7); //divide by 128, i.e. return how many 128s go into the speed_control
-            raw_TMR0 = (uint8_t)(speed_control_subtracted - (uint16_t)(how_many_128 << 7)); //how_many_128*128, set TMR0
+            TIM16_raw_CCR = (uint8_t)(speed_control_subtracted - (uint16_t)(how_many_128 << 7)); //how_many_128*128, set TMR0
             //biggest how_many_128 for NUMBER_OF_FREQUENCY_STEPS == 600 is 3
             //biggest base_prescaler_bits_index == 5 for NUMBER_OF_FREQUENCY_STEPS == 600
-            TMR0_base_prescaler_bits_index = (uint8_t)(how_many_128 + 2);
+            TIM16_base_prescaler_bits_index = (uint8_t)(how_many_128 + 2);
         }
     return 1;
 }
 
 
-uint8_t adjust_and_set_TMR0_prescaler(void){
+uint8_t adjust_and_set_TIM16_prescaler(void){
 
-    if(TMR0_prescaler_adjust == DIVIDE_BY_TWO){
-        TMR0_prescaler_final_index = TMR0_base_prescaler_bits_index + 1;
+    if(TIM16_prescaler_adjust == DIVIDE_BY_TWO){
+        TIM16_prescaler_final_index = TIM16_base_prescaler_bits_index + 1;
     }
-    else if(TMR0_prescaler_adjust == DIVIDE_BY_FOUR){
-        TMR0_prescaler_final_index = TMR0_base_prescaler_bits_index + 2;
+    else if(TIM16_prescaler_adjust == DIVIDE_BY_FOUR){
+        TIM16_prescaler_final_index = TIM16_base_prescaler_bits_index + 2;
     }
-    else if(TMR0_prescaler_adjust == MULTIPLY_BY_TWO){
-        TMR0_prescaler_final_index = TMR0_base_prescaler_bits_index - 1;
+    else if(TIM16_prescaler_adjust == MULTIPLY_BY_TWO){
+        TIM16_prescaler_final_index = TIM16_base_prescaler_bits_index - 1;
     }
-    else if(TMR0_prescaler_adjust == DO_NOTHING){
-        TMR0_prescaler_final_index = TMR0_base_prescaler_bits_index;
+    else if(TIM16_prescaler_adjust == DO_NOTHING){
+        TIM16_prescaler_final_index = TIM16_base_prescaler_bits_index;
     }
-    //T0CON1bits.CKPS = TMR0_prescaler_bits[TMR0_prescaler_final_index]; //just so it builds for now
+    __HAL_TIM_SET_PRESCALER(&htim16, (TIM16_prescaler_divisors[TIM16_prescaler_final_index] - 1)); //have to take one off the divisor
     return 1;
 }
 
@@ -80,45 +77,45 @@ uint8_t adjust_and_set_TMR0_prescaler(void){
 
     uint8_t shorten_period(void){
         #if SYMMETRY_ADC_RESOLUTION == 8
-            uint32_t twofiftysix_minus_TMR0_final = (((256-raw_TMR0)*(SHORTEN_POWER_OF_TWO_CONSTANT_8_BIT_SYM+(24*current_symmetry)))>>SHORTEN_POWER_OF_TWO_DIVISOR_8_BIT_SYM);
+            uint32_t twofiftysix_minus_CCR_final = (((256-TIM16_raw_CCR)*(SHORTEN_POWER_OF_TWO_CONSTANT_8_BIT_SYM+(24*current_symmetry)))>>SHORTEN_POWER_OF_TWO_DIVISOR_8_BIT_SYM);
         #endif
         #if SYMMETRY_ADC_RESOLUTION == 10
-            uint32_t twofiftysix_minus_TMR0_final = (((256-raw_TMR0)*(SHORTEN_POWER_OF_TWO_CONSTANT_10_BIT_SYM+(24*current_symmetry)))>>SHORTEN_POWER_OF_TWO_DIVISOR_10_BIT_SYM);
+            uint32_t twofiftysix_minus_CCR_final = (((256-TIM16_raw_CCR)*(SHORTEN_POWER_OF_TWO_CONSTANT_10_BIT_SYM+(24*current_symmetry)))>>SHORTEN_POWER_OF_TWO_DIVISOR_10_BIT_SYM);
         #endif
 
-        final_TMR0 = (256-twofiftysix_minus_TMR0_final);
-        TMR0_prescaler_adjust = DO_NOTHING;
+        TIM16_final_CCR = (256-twofiftysix_minus_CCR_final);
+        TIM16_prescaler_adjust = DO_NOTHING;
         return 1;
     }
 
     uint8_t lengthen_period(void){
         #if SYMMETRY_ADC_RESOLUTION == 8
-            uint32_t twofiftysix_minus_TMR0_final = (((256-raw_TMR0)*(LENGTHEN_CONSTANT_8_BIT_SYM-(3*current_symmetry)))>>LENGTHEN_POWER_OF_TWO_DIVISOR_8_BIT_SYM);
+            uint32_t twofiftysix_minus_CCR_final = (((256-TIM16_raw_CCR)*(LENGTHEN_CONSTANT_8_BIT_SYM-(3*current_symmetry)))>>LENGTHEN_POWER_OF_TWO_DIVISOR_8_BIT_SYM);
         #endif
         #if SYMMETRY_ADC_RESOLUTION == 10
-            uint32_t twofiftysix_minus_TMR0_final = (((256-raw_TMR0)*(LENGTHEN_CONSTANT_10_BIT_SYM-(3*current_symmetry)))>>LENGTHEN_POWER_OF_TWO_DIVISOR_10_BIT_SYM);
+            uint32_t twofiftysix_minus_CCR_final = (((256-TIM16_raw_CCR)*(LENGTHEN_CONSTANT_10_BIT_SYM-(3*current_symmetry)))>>LENGTHEN_POWER_OF_TWO_DIVISOR_10_BIT_SYM);
         #endif
 
-        if(twofiftysix_minus_TMR0_final > 256){
-            twofiftysix_minus_TMR0_final = (twofiftysix_minus_TMR0_final >> 1);
-            final_TMR0 = (256-twofiftysix_minus_TMR0_final);
-            TMR0_prescaler_adjust = MULTIPLY_BY_TWO;
+        if(twofiftysix_minus_CCR_final > 256){
+            twofiftysix_minus_CCR_final = (twofiftysix_minus_CCR_final >> 1);
+            TIM16_final_CCR = (256-twofiftysix_minus_CCR_final);
+            TIM16_prescaler_adjust = MULTIPLY_BY_TWO;
         }
         else{
-            final_TMR0 = 256-twofiftysix_minus_TMR0_final;
-            TMR0_prescaler_adjust = DO_NOTHING;
+            TIM16_final_CCR = 256-twofiftysix_minus_CCR_final;
+            TIM16_prescaler_adjust = DO_NOTHING;
         }
         return 1;
     }
 #endif
 
 
-uint8_t process_TMR0_final_and_prescaler_adjust(void){
+uint8_t process_TIM16_final_CCR_and_prescaler_adjust(void){
 
     #if SYMMETRY_ON_OR_OFF == 1
         if(current_symmetry == SYMMETRY_ADC_HALF_SCALE){
-            final_TMR0 = raw_TMR0;
-            TMR0_prescaler_adjust = DO_NOTHING;
+            TIM16_final_CCR = TIM16_raw_CCR;
+            TIM16_prescaler_adjust = DO_NOTHING;
         }
         else{
             uint8_t symmetry_status = CCW;
@@ -144,22 +141,22 @@ uint8_t process_TMR0_final_and_prescaler_adjust(void){
             }
         }
 
-        adjust_and_set_TMR0_prescaler();
+        adjust_and_set_TIM16_prescaler();
 
         //Adjust TMR0 for 2 instruction tick delay on update (for low prescaler values)
-        if(TMR0_prescaler_final_index == 8){//prescaler is 1:1
-            final_TMR0 = final_TMR0 + 2; //(256-TMR0_final) needs to be 2 counts less
+        if(TIM16_prescaler_final_index == 8){//prescaler is 1:1
+            TIM16_final_CCR = TIM16_final_CCR + 2; //(256-TMR0_final) needs to be 2 counts less
         }
-        else if(TMR0_prescaler_final_index == 7){//prescaler is 2:1
-            final_TMR0 = final_TMR0 + 1; //(256-TMR0_final) needs to be 1 counts less
+        else if(TIM16_prescaler_final_index == 7){//prescaler is 2:1
+            TIM16_final_CCR = TIM16_final_CCR + 1; //(256-TMR0_final) needs to be 1 counts less
         }
 
     #endif
 
     #if SYMMETRY_ON_OR_OFF == 0
-        final_TMR0 = raw_TMR0;
-        TMR0_prescaler_adjust = DO_NOTHING;
-        adjust_and_set_TMR0_prescaler();
+        TIM16_final_CCR = TIM16_raw_CCR;
+        TIM16_prescaler_adjust = DO_NOTHING;
+        adjust_and_set_TIM16_prescaler();
     #endif
 
     return 1;

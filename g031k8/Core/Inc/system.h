@@ -64,13 +64,11 @@ extern const uint16_t tri_table_one_quadrant[129];
 extern const uint16_t TIM16_prescaler_divisors[9];
 
 //VARIABLES
-volatile extern uint8_t TMR0_prescaler_adjust;
-volatile extern uint32_t raw_TMR0;
-volatile extern uint8_t base_prescaler_bits_index;
-volatile extern uint8_t symmetry_status;
+volatile extern uint8_t TIM16_prescaler_adjust;
+volatile extern uint32_t TIM16_raw_CCR;
+volatile extern uint32_t TIM16_final_CCR;
+volatile extern uint8_t TIM16_base_prescaler_bits_index;
 volatile extern uint16_t duty;
-volatile extern uint8_t duty_low_byte;
-volatile extern uint8_t duty_high_byte;
 volatile extern uint8_t current_waveshape;
 volatile extern uint16_t current_speed_linear;
 volatile extern uint32_t current_speed_linear_32;
@@ -79,11 +77,8 @@ volatile extern uint32_t current_symmetry;
 volatile extern uint8_t current_one_quadrant_index;
 volatile extern uint8_t current_halfcycle;
 volatile extern uint8_t current_quadrant;
-volatile extern uint8_t prescaler_overflow_flag;
-volatile extern uint8_t prescaler_final_index;
-volatile extern uint8_t dutyL;
-volatile extern uint8_t dutyH;
-volatile extern uint8_t current_depthL;
+volatile extern uint8_t TIM16_prescaler_overflow_flag;
+volatile extern uint8_t TIM16_prescaler_final_index;
 volatile extern uint16_t ADCResultsDMA[4];
 const extern uint8_t num_ADC_conversions;
 
@@ -107,13 +102,10 @@ enum Validate{
 };
 
 //FUNCTION DECLARATIONS
-uint8_t process_TMR0_raw_and_prescaler(void);
-uint8_t turn_TMR0_prescaler_OFF(void);
-uint8_t turn_TMR0_prescaler_ON(void);
-uint8_t adjust_TMR0(void);
-uint8_t adjust_and_set_TMR0_prescaler(void);
+uint8_t process_TIM16_raw_CCR_and_prescaler(void);
+uint8_t process_TIM16_final_CCR_and_prescaler_adjust(void);
+uint8_t adjust_and_set_TIM16_prescaler(void);
 uint8_t shorten_period(void);
 uint8_t lengthen_period(void);
-uint8_t process_TMR0_final_and_prescaler_adjust(void);
 
 #endif

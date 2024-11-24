@@ -1,8 +1,6 @@
 //INCLUDES
 #include "system.h"
 
-//insert generic change here for fake commit
-
 int main(void)
 {
 	System_Init();
