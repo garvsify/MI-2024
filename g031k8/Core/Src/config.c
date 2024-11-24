@@ -1,5 +1,5 @@
+#include <custom_callbacks.h>
 #include "config.h"
-#include "TIMx_callbacks.h"
 
 
 //VARIABLES
@@ -402,17 +402,20 @@ void System_Init(void){
 	MX_TIM16_Init();
 	MX_TIM17_Init();
 
-	//Set callback function for TIM16 (freq. gen.) to the callback function in TIMx_callback.c for TIM16.
+	//Set custom callback function for TIM16 (freq. gen.) to the callback function in TIMx_callback.c for TIM16.
 	//I believe the correct CallbackID is HAL_TIM_OC_DELAY_ELAPSED_CB_ID, but if this doesn't work maybe
 	//HAL_TIM_PERIOD_ELAPSED_CB_ID will work. This should be basically the same because we've set up TIM16
 	//in Output Compare mode, where the ARR and CRR are the same.
 	HAL_TIM_RegisterCallback(&htim16, HAL_TIM_OC_DELAY_ELAPSED_CB_ID, &TIM16_callback);
 
-	//Set callback function for TIM16 (adc trig.) to the callback function in TIMx_callback.c for TIM17.
+	//Set custom callback function for TIM16 (adc trig.) to the callback function in TIMx_callback.c for TIM17.
 	//I believe the correct CallbackID is HAL_TIM_OC_DELAY_ELAPSED_CB_ID, but if this doesn't work maybe
 	//HAL_TIM_PERIOD_ELAPSED_CB_ID will work. This should be basically the same because we've set up TIM16
 	//in Output Compare mode, where the ARR and CRR are the same.
 	HAL_TIM_RegisterCallback(&htim17, HAL_TIM_OC_DELAY_ELAPSED_CB_ID, &TIM17_callback);
+
+	//Set custom callback function for ADC (DMA) conversion complete.
+	HAL_ADC_RegisterCallback(&hadc1, HAL_ADC_CONVERSION_COMPLETE_CB_ID, &ADC_DMA_conversion_complete_callback);
 }
 
 #ifdef  USE_FULL_ASSERT

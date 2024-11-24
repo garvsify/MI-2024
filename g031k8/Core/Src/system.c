@@ -24,6 +24,7 @@ volatile uint16_t duty = 0;
 volatile uint8_t TIM16_prescaler_overflow_flag = 0;
 volatile uint8_t TIM16_prescaler_divisors_final_index = 0;
 volatile uint16_t ADCResultsDMA[4] = {0};
+volatile uint8_t initial_ADC_conversion_complete = 0;
 
 //FUNCTION DEFINITIONS
 uint8_t process_TIM16_raw_start_value_and_prescaler(void){

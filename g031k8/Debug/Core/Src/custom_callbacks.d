@@ -1,5 +1,5 @@
-Core/Src/TIMx_callbacks.o: ../Core/Src/TIMx_callbacks.c \
- ../Core/Inc/TIMx_callbacks.h ../Core/Inc/system.h ../Core/Inc/config.h \
+Core/Src/custom_callbacks.o: ../Core/Src/custom_callbacks.c \
+ ../Core/Inc/custom_callbacks.h ../Core/Inc/system.h ../Core/Inc/config.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal.h \
  ../Core/Inc/stm32g0xx_hal_conf.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_rcc.h \
@@ -35,7 +35,7 @@ Core/Src/TIMx_callbacks.o: ../Core/Src/TIMx_callbacks.c \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_tim_ex.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart_ex.h
-../Core/Inc/TIMx_callbacks.h:
+../Core/Inc/custom_callbacks.h:
 ../Core/Inc/system.h:
 ../Core/Inc/config.h:
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal.h:

@@ -1,4 +1,4 @@
-#include "TIMx_callbacks.h"
+#include "custom_callbacks.h"
 
 void TIM16_callback(TIM_HandleTypeDef *htim)
 {
@@ -52,7 +52,7 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 #endif
 
 	//Write Duty
-	__HAL_TIM_SET_COMPARE(&htim14, TIM_CHANNEL_1, duty); //updates the CCR register of TIM14, which sets duty
+	__HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_1, duty); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
 }
 
 uint8_t multiply_duty_by_current_depth_and_divide_by_256(void)
@@ -71,10 +71,57 @@ void TIM17_callback(TIM_HandleTypeDef *htim)
 	//Start ADC (in scan mode) conversion
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions);
 
-	//TMR1_Stop(); //-to be sorted
+	__HAL_TIM_DISABLE(htim); //disable TIM17
+}
 
-	//size_t tmr3_value = TMR3_OVERFLOW_COUNT; //-to be sorted
+void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
+{
+	HAL_ADC_Stop_DMA(hadc); //disable ADC DMA
+	if(initial_ADC_conversion_complete == 0){
 
-	//TMR3_Write(tmr3_value); //-to be sorted
-	//TMR3_Start(); //time delay to allow ADCC conversion to complete, DMA is triggered on overflow. //-to be sorted
+		initial_ADC_conversion_complete = 1;
+	}
+
+	//GET WAVESHAPE
+	uint16_t ADC_result = ADCResultsDMA[0]; //set ADC_Result to waveshape index value
+
+	if(ADC_result <= TRIANGLE_MODE_ADC_THRESHOLD){
+		current_waveshape = TRIANGLE_MODE; //triangle wave
+	}
+	else if (ADC_result <= SINE_MODE_ADC_THRESHOLD){
+		current_waveshape = SINE_MODE; //sine wave
+	}
+	else if (ADC_result <= SQUARE_MODE_ADC_THRESHOLD){
+		current_waveshape = SQUARE_MODE; //square wave
+	}
+	else{
+		current_waveshape = SINE_MODE; //if error, return sine
+	}
+
+
+
+	//GET SPEED
+	current_speed_linear = ADCResultsDMA[1] >> 2; //convert to 10-bit
+
+
+
+	//GET DEPTH
+	current_depth = ADCResultsDMA[2] >> 4; //convert to 8-bit
+
+
+
+	//GET SYMMETRY
+	#if SYMMETRY_RESOLUTION == 12
+
+		current_symmetry = ADCResultsDMA[3];
+
+	#endif
+
+	#if SYMMETRY_RESOLUTION == 8
+
+		current_symmetry = ADCResultsDMA[3] >> 4;
+	#endif
+
+	__HAL_TIM_SET_COUNTER(&htim17, 0); //set counter to 0
+	__HAL_TIM_ENABLE(&htim17); //enable TIM17
 }

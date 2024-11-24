@@ -5,9 +5,27 @@ int main(void)
 {
 	System_Init();
 
+	__HAL_TIM_DISABLE(&htim14); //enable TIM14
+	__HAL_TIM_DISABLE(&htim16); //enable TIM16
+	__HAL_TIM_DISABLE(&htim17); //enable TIM17
+	__HAL_TIM_MOE_DISABLE(&htim14); //enable main output of TIM14 - i.e. PWM output OFF
+
+	__enable_irq(); //enable interrupts
+	__HAL_TIM_SET_COUNTER(&htim17, 0); //set counter to 0
+	__HAL_TIM_ENABLE(&htim17); //enable TIM17
+
+	while(initial_ADC_conversion_complete == 0){}; //wait while first adc conversion is ongoing
+
+	__HAL_TIM_SET_COUNTER(&htim14, 0); //set TIM14 counter to 0
+	__HAL_TIM_ENABLE(&htim14); //enable TIM14
+	__HAL_TIM_SET_COUNTER(&htim14, 0); //set TIM16 counter to 0
+	__HAL_TIM_ENABLE(&htim16); //enable TIM16
+	__HAL_TIM_MOE_ENABLE(&htim14); //enable main output of TIM14 - i.e. PWM output ON
+
 	while (1)
 	{
-
+		process_TIM16_raw_start_value_and_prescaler();
+		process_TIM16_final_start_value_and_prescaler_adjust();
 	}
 	return 1;
 }

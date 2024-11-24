@@ -29,10 +29,12 @@
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_ll_adc.h:5291:22:LL_ADC_DisableIT_AWD1	1
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_ll_adc.h:5302:22:LL_ADC_DisableIT_AWD2	1
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_ll_adc.h:5313:22:LL_ADC_DisableIT_AWD3	1
-../Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_adc.c:379:19:HAL_ADC_Init	21
-../Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_adc.c:733:19:HAL_ADC_DeInit	4
+../Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_adc.c:379:19:HAL_ADC_Init	22
+../Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_adc.c:733:19:HAL_ADC_DeInit	5
 ../Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_adc.c:862:13:HAL_ADC_MspInit	1
 ../Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_adc.c:879:13:HAL_ADC_MspDeInit	1
+../Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_adc.c:911:19:HAL_ADC_RegisterCallback	16
+../Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_adc.c:1026:19:HAL_ADC_UnRegisterCallback	15
 ../Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_adc.c:1146:19:HAL_ADC_Start	4
 ../Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_adc.c:1213:19:HAL_ADC_Stop	4
 ../Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_adc.c:1264:19:HAL_ADC_PollForConversion	13

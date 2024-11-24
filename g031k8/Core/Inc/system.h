@@ -81,6 +81,7 @@ volatile extern uint8_t TIM16_prescaler_overflow_flag;
 volatile extern uint8_t TIM16_prescaler_divisors_final_index;
 volatile extern uint16_t ADCResultsDMA[4];
 const extern uint8_t num_ADC_conversions;
+volatile extern uint8_t initial_ADC_conversion_complete;
 
 //CUSTOM TYPES
 enum Polarity{
