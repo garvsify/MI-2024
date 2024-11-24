@@ -1,4 +1,3 @@
-
 //INCLUDES
 #include "system.h"
 
@@ -30,6 +29,19 @@ int main(void)
   MX_TIM14_Init();
   MX_TIM16_Init();
   MX_TIM17_Init();
+
+  //Set callback function for TIM16 (freq. gen.) to the callback function in TIMx_callback.c for TIM16.
+  //I believe the correct CallbackID is HAL_TIM_OC_DELAY_ELAPSED_CB_ID, but if this doesn't work maybe
+  //HAL_TIM_PERIOD_ELAPSED_CB_ID will work. This should be basically the same because we've set up TIM16
+  //in Output Compare mode, where the ARR and CRR are the same.
+  HAL_TIM_RegisterCallback(&htim16, HAL_TIM_OC_DELAY_ELAPSED_CB_ID, &TIM16_callback);
+
+  //Set callback function for TIM16 (adc trig.) to the callback function in TIMx_callback.c for TIM17.
+  //I believe the correct CallbackID is HAL_TIM_OC_DELAY_ELAPSED_CB_ID, but if this doesn't work maybe
+  //HAL_TIM_PERIOD_ELAPSED_CB_ID will work. This should be basically the same because we've set up TIM16
+  //in Output Compare mode, where the ARR and CRR are the same.
+  HAL_TIM_RegisterCallback(&htim17, HAL_TIM_OC_DELAY_ELAPSED_CB_ID, &TIM17_callback);
+
 
   while (1)
   {
