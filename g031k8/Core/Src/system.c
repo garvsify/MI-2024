@@ -15,23 +15,23 @@ volatile uint32_t current_symmetry = 0;
 volatile uint8_t current_one_quadrant_index = 0;
 volatile uint8_t current_halfcycle = 0;
 volatile uint8_t current_quadrant = 0;
-volatile uint8_t how_many_128 = 0;
 volatile uint32_t final_TMR0 = 0;
 volatile uint8_t TMR0_prescaler_adjust = 0;
 volatile uint32_t raw_TMR0 = 0;
 volatile uint8_t TMR0_base_prescaler_bits_index = 0;
 volatile uint8_t symmetry_status = 0;
-volatile uint16_t speed_control = 0;
-volatile uint32_t speed_control_32 = 0;
 volatile uint8_t duty_low_byte;
 volatile uint8_t duty_high_byte;
 volatile uint16_t duty = 0;
 volatile uint8_t TMR0_prescaler_overflow_flag = 0;
 volatile uint8_t TMR0_prescaler_final_index = 0;
-volatile uint8_t ADC_type_flag = 0;
 
 //FUNCTION DEFINITIONS
 uint8_t process_TMR0_raw_and_prescaler(void){
+
+	uint16_t speed_control = 0;
+	uint32_t speed_control_32 = 0;
+	uint8_t how_many_128 = 0;
 
     current_speed_linear_32 = current_speed_linear;
     speed_control_32 = current_speed_linear_32 * NUMBER_OF_FREQUENCY_STEPS;

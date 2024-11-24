@@ -173,7 +173,7 @@ void DMA1_Ch4_5_DMAMUX1_OVR_IRQHandler(void)
 /**
   * @brief This function handles TIM16 global interrupt.
   */
-void TIM16_IRQHandler(void)
+void TIM16_IRQHandler(void) //ISR for frequency gen
 {
   /* USER CODE BEGIN TIM16_IRQn 0 */
 
@@ -187,7 +187,7 @@ void TIM16_IRQHandler(void)
 /**
   * @brief This function handles TIM17 global interrupt.
   */
-void TIM17_IRQHandler(void)
+void TIM17_IRQHandler(void) //ISR for adc
 {
   /* USER CODE BEGIN TIM17_IRQn 0 */
 
