@@ -6,9 +6,9 @@ int main(void)
 	System_Init();
 
 	//DISABLE TIMERS and PWM OUTPUT
-	__HAL_TIM_DISABLE(&htim14); //enable TIM14
-	__HAL_TIM_DISABLE(&htim16); //enable TIM16
-	__HAL_TIM_DISABLE(&htim17); //enable TIM17
+	__HAL_TIM_DISABLE(&htim14); //disable TIM14
+	__HAL_TIM_DISABLE(&htim16); //disable TIM16
+	__HAL_TIM_DISABLE(&htim17); //disable TIM17
 	__HAL_TIM_MOE_DISABLE(&htim14); //disable main output of TIM14 - i.e. PWM output OFF
 
 	__enable_irq(); //enable interrupts
@@ -18,7 +18,7 @@ int main(void)
 	__HAL_TIM_ENABLE(&htim17); //enable TIM17
 
 	//WAIT
-	while(initial_ADC_conversion_complete == 0){}; //wait while first adc conversion is ongoing
+	while(initial_ADC_conversion_complete == 0){}; //wait while first ADC conversion is ongoing
 
 	//START FREQ. GEN and PWM GEN TIMERS and ENABLE PWM OUTPUT
 	__HAL_TIM_SET_COUNTER(&htim14, 0); //set TIM14 counter to 0

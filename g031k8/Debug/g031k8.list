@@ -2167,7 +2167,8 @@ int main(void)
 	System_Init();
  8000df8:	f7ff fea8 	bl	8000b4c <System_Init>
 
-	__HAL_TIM_DISABLE(&htim14); //enable TIM14
+	//DISABLE TIMERS and PWM OUTPUT
+	__HAL_TIM_DISABLE(&htim14); //disable TIM14
  8000dfc:	4b45      	ldr	r3, [pc, #276]	@ (8000f14 <main+0x120>)
  8000dfe:	681b      	ldr	r3, [r3, #0]
  8000e00:	6a1b      	ldr	r3, [r3, #32]
@@ -2188,7 +2189,7 @@ int main(void)
  8000e1e:	2101      	movs	r1, #1
  8000e20:	438a      	bics	r2, r1
  8000e22:	601a      	str	r2, [r3, #0]
-	__HAL_TIM_DISABLE(&htim16); //enable TIM16
+	__HAL_TIM_DISABLE(&htim16); //disable TIM16
  8000e24:	4b3e      	ldr	r3, [pc, #248]	@ (8000f20 <main+0x12c>)
  8000e26:	681b      	ldr	r3, [r3, #0]
  8000e28:	6a1b      	ldr	r3, [r3, #32]
@@ -2209,7 +2210,7 @@ int main(void)
  8000e46:	2101      	movs	r1, #1
  8000e48:	438a      	bics	r2, r1
  8000e4a:	601a      	str	r2, [r3, #0]
-	__HAL_TIM_DISABLE(&htim17); //enable TIM17
+	__HAL_TIM_DISABLE(&htim17); //disable TIM17
  8000e4c:	4b35      	ldr	r3, [pc, #212]	@ (8000f24 <main+0x130>)
  8000e4e:	681b      	ldr	r3, [r3, #0]
  8000e50:	6a1b      	ldr	r3, [r3, #32]
@@ -2230,7 +2231,7 @@ int main(void)
  8000e6e:	2101      	movs	r1, #1
  8000e70:	438a      	bics	r2, r1
  8000e72:	601a      	str	r2, [r3, #0]
-	__HAL_TIM_MOE_DISABLE(&htim14); //enable main output of TIM14 - i.e. PWM output OFF
+	__HAL_TIM_MOE_DISABLE(&htim14); //disable main output of TIM14 - i.e. PWM output OFF
  8000e74:	4b27      	ldr	r3, [pc, #156]	@ (8000f14 <main+0x120>)
  8000e76:	681b      	ldr	r3, [r3, #0]
  8000e78:	6a1b      	ldr	r3, [r3, #32]
@@ -2257,6 +2258,8 @@ int main(void)
  8000e9e:	46c0      	nop			@ (mov r8, r8)
 
 	__enable_irq(); //enable interrupts
+
+	//START ADC TRIG. TIMER
 	__HAL_TIM_SET_COUNTER(&htim17, 0); //set counter to 0
  8000ea0:	4b20      	ldr	r3, [pc, #128]	@ (8000f24 <main+0x130>)
  8000ea2:	681b      	ldr	r3, [r3, #0]
@@ -2272,7 +2275,8 @@ int main(void)
  8000eb4:	430a      	orrs	r2, r1
  8000eb6:	601a      	str	r2, [r3, #0]
 
-	while(initial_ADC_conversion_complete == 0){}; //wait while first adc conversion is ongoing
+	//WAIT
+	while(initial_ADC_conversion_complete == 0){}; //wait while first ADC conversion is ongoing
  8000eb8:	46c0      	nop			@ (mov r8, r8)
  8000eba:	4b1c      	ldr	r3, [pc, #112]	@ (8000f2c <main+0x138>)
  8000ebc:	781b      	ldrb	r3, [r3, #0]
@@ -2280,6 +2284,7 @@ int main(void)
  8000ec0:	2b00      	cmp	r3, #0
  8000ec2:	d0fa      	beq.n	8000eba <main+0xc6>
 
+	//START FREQ. GEN and PWM GEN TIMERS and ENABLE PWM OUTPUT
 	__HAL_TIM_SET_COUNTER(&htim14, 0); //set TIM14 counter to 0
  8000ec4:	4b13      	ldr	r3, [pc, #76]	@ (8000f14 <main+0x120>)
  8000ec6:	681b      	ldr	r3, [r3, #0]
