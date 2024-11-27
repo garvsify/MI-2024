@@ -154,7 +154,7 @@ void MX_TIM14_Init(void)
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 45;
+  sConfigOC.Pulse = 1000;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
   if (HAL_TIM_PWM_ConfigChannel(&htim14, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
@@ -368,10 +368,10 @@ void MX_GPIO_Init(void)
   HAL_GPIO_Init(ADC_CH5_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : TIM14_CH1_Pin */
-  GPIO_InitStruct.Pin = TIM14_CH1_Pin;
+  /*GPIO_InitStruct.Pin = TIM14_CH1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(TIM14_CH1_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(TIM14_CH1_GPIO_Port, &GPIO_InitStruct);*/
 }
 
 void Error_Handler(void)
