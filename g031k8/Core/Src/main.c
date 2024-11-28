@@ -6,7 +6,7 @@ int main(void)
 	__enable_irq(); //enable interrupts
 	System_Init();
 
-	HAL_TIM_PWM_Start(&htim14, TIM_CHANNEL_1); //start PWM
+	Start_PWM(&htim14, TIM_CHANNEL_1);
 
 	//HAL_GPIO_TogglePin(LD3_GPIO_Port, LD3_Pin);
 
