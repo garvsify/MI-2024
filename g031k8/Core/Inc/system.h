@@ -81,7 +81,6 @@ volatile extern uint8_t TIM16_prescaler_overflow_flag;
 volatile extern uint16_t ADCResultsDMA[4];
 const extern uint8_t num_ADC_conversions;
 volatile extern uint8_t initial_ADC_conversion_complete;
-volatile extern uint8_t TIM16_final_start_value_and_adjusted_prescaler_are_ready;
 volatile extern uint8_t processing_TIM16_final_start_value_and_prescaler;
 volatile extern uint8_t TIM16_callback_active;
 volatile extern uint32_t exit_TIM16_final_start_value;

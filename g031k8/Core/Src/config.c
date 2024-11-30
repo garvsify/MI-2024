@@ -242,7 +242,7 @@ void MX_TIM17_Init(void)
   htim17.Instance = TIM17;
   htim17.Init.Prescaler = 0;
   htim17.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim17.Init.Period = 40000;
+  htim17.Init.Period = 20000;
   htim17.Init.ClockDivision = TIM_CLOCKDIVISION_DIV2;
   htim17.Init.RepetitionCounter = 0;
   htim17.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
@@ -255,7 +255,7 @@ void MX_TIM17_Init(void)
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_TIMING;
-  sConfigOC.Pulse = 40000;
+  sConfigOC.Pulse = 20000;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCNPolarity = TIM_OCNPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
@@ -367,11 +367,11 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(ADC_CH5_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : TIM14_CH1_Pin */
-  /*GPIO_InitStruct.Pin = TIM14_CH1_Pin;
+  /*Configure GPIO pin : ISR measurement pin */
+  GPIO_InitStruct.Pin = ISR_MEAS_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(TIM14_CH1_GPIO_Port, &GPIO_InitStruct);*/
+  HAL_GPIO_Init(ISR_MEAS_GPIO_Port, &GPIO_InitStruct);
 }
 
 void Error_Handler(void)

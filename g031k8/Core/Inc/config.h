@@ -31,6 +31,9 @@
 #define TIM14_CH1_Pin GPIO_PIN_7
 #define TIM14_CH1_GPIO_Port GPIOA
 
+#define ISR_MEAS_Pin GPIO_PIN_12
+#define ISR_MEAS_GPIO_Port GPIOA
+
 extern ADC_HandleTypeDef hadc1;
 extern DMA_HandleTypeDef hdma_adc1;
 extern TIM_HandleTypeDef htim14;

@@ -26,7 +26,6 @@ volatile uint8_t TIM16_prescaler_overflow_flag = 0;
 volatile uint8_t TIM16_prescaler_divisors_final_index = 0;
 volatile uint16_t ADCResultsDMA[4] = {0};
 volatile uint8_t initial_ADC_conversion_complete = 0;
-volatile uint8_t TIM16_final_start_value_and_adjusted_prescaler_are_ready = NO;
 volatile uint8_t processing_TIM16_final_start_value_and_prescaler = NO;
 volatile uint8_t TIM16_callback_active = NO;
 volatile uint32_t exit_TIM16_final_start_value = 0;

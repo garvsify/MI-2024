@@ -4,6 +4,8 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 {
 	//interrupt flag is already cleared by stm32g0xx_it.c
 
+	HAL_GPIO_TogglePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin);
+
 	TIM16_callback_active = YES;
 
 	if(processing_TIM16_final_start_value_and_prescaler == YES){
@@ -67,6 +69,7 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	//Write Duty
 	__HAL_TIM_SET_COMPARE(&htim14, TIM_CHANNEL_1, duty); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
 	TIM16_callback_active = NO;
+	HAL_GPIO_TogglePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin);
 }
 
 uint8_t Multiply_Duty_By_Current_Depth_and_Divide_By_256(void)
