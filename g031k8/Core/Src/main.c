@@ -15,10 +15,8 @@ int main(void)
 	while(initial_ADC_conversion_complete == 0){}; //wait while first ADC conversion is ongoing
 
 	//PROCESS RAW AND FINAL FREQ. GEN. TIMER START VALUES AND PRESCALER
-	TIM16_final_start_value_and_adjusted_prescaler_are_ready = NO;
 	Process_TIM16_Raw_Start_Value_and_Raw_Prescaler();
 	Process_TIM16_Final_Start_Value_and_Prescaler_Adjust();
-	TIM16_final_start_value_and_adjusted_prescaler_are_ready = YES;
 
 	//START FREQ. GEN and PWM GEN TIMERS and ENABLE PWM OUTPUT
 	Start_PWM_Gen_Timer();
@@ -26,10 +24,18 @@ int main(void)
 
 	while (1)
 	{
-		TIM16_final_start_value_and_adjusted_prescaler_are_ready = NO;
-		Process_TIM16_Raw_Start_Value_and_Raw_Prescaler();
-		Process_TIM16_Final_Start_Value_and_Prescaler_Adjust();
-		TIM16_final_start_value_and_adjusted_prescaler_are_ready = YES;
+		if(TIM16_callback_active == NO){
+
+			processing_TIM16_final_start_value_and_prescaler = YES;
+
+			exit_TIM16_final_start_value = TIM16_final_start_value;
+			exit_TIM16_prescaler_adjust = TIM16_prescaler_adjust;
+
+			Process_TIM16_Raw_Start_Value_and_Raw_Prescaler();
+			Process_TIM16_Final_Start_Value_and_Prescaler_Adjust();
+
+			processing_TIM16_final_start_value_and_prescaler = NO;
+		}
 	}
 	return 1;
 }

@@ -27,6 +27,10 @@ volatile uint8_t TIM16_prescaler_divisors_final_index = 0;
 volatile uint16_t ADCResultsDMA[4] = {0};
 volatile uint8_t initial_ADC_conversion_complete = 0;
 volatile uint8_t TIM16_final_start_value_and_adjusted_prescaler_are_ready = NO;
+volatile uint8_t processing_TIM16_final_start_value_and_prescaler = NO;
+volatile uint8_t TIM16_callback_active = NO;
+volatile uint32_t exit_TIM16_final_start_value = 0;
+volatile uint8_t exit_TIM16_prescaler_adjust = 0;
 
 //FUNCTION DEFINITIONS
 uint8_t Global_Interrupt_Enable(void){
@@ -144,18 +148,18 @@ uint8_t Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(void){
 }
 
 
-uint8_t Adjust_and_Set_TIM16_Prescaler(void){
+uint8_t Adjust_and_Set_TIM16_Prescaler(uint8_t TIM16_prescaler_adjust_arg){
 
-    if(TIM16_prescaler_adjust == DIVIDE_BY_TWO){
+    if(TIM16_prescaler_adjust_arg == DIVIDE_BY_TWO){
         TIM16_prescaler_divisors_final_index = TIM16_base_prescaler_divisors_index + 1;
     }
-    else if(TIM16_prescaler_adjust == DIVIDE_BY_FOUR){
-    	TIM16_prescaler_divisors_final_index = TIM16_base_prescaler_divisors_index + 2;
+    else if(TIM16_prescaler_adjust_arg == DIVIDE_BY_FOUR){
+    	TIM16_prescaler_divisors_final_index= TIM16_base_prescaler_divisors_index + 2;
     }
-    else if(TIM16_prescaler_adjust == MULTIPLY_BY_TWO){
+    else if(TIM16_prescaler_adjust_arg == MULTIPLY_BY_TWO){
     	TIM16_prescaler_divisors_final_index = TIM16_base_prescaler_divisors_index - 1;
     }
-    else if(TIM16_prescaler_adjust == DO_NOTHING){
+    else if(TIM16_prescaler_adjust_arg == DO_NOTHING){
     	TIM16_prescaler_divisors_final_index = TIM16_base_prescaler_divisors_index;
     }
     __HAL_TIM_SET_PRESCALER(&htim16, (TIM16_prescaler_divisors[TIM16_prescaler_divisors_final_index]) - 1); //have to take one off the divisor

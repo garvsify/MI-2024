@@ -40,7 +40,7 @@
 #define OFF 0
 
 		//TURN ON/OFF SYMMETRY and SET RESOLUTION
-		#define SYMMETRY_ADC_RESOLUTION 8
+		#define SYMMETRY_ADC_RESOLUTION 10
 		#define SYMMETRY_ON_OR_OFF ON
 
 		#if SYMMETRY_ADC_RESOLUTION == 10
@@ -78,11 +78,14 @@ volatile extern uint8_t current_one_quadrant_index;
 volatile extern uint8_t current_halfcycle;
 volatile extern uint8_t current_quadrant;
 volatile extern uint8_t TIM16_prescaler_overflow_flag;
-volatile extern uint8_t TIM16_prescaler_divisors_final_index;
 volatile extern uint16_t ADCResultsDMA[4];
 const extern uint8_t num_ADC_conversions;
 volatile extern uint8_t initial_ADC_conversion_complete;
 volatile extern uint8_t TIM16_final_start_value_and_adjusted_prescaler_are_ready;
+volatile extern uint8_t processing_TIM16_final_start_value_and_prescaler;
+volatile extern uint8_t TIM16_callback_active;
+volatile extern uint32_t exit_TIM16_final_start_value;
+volatile extern uint8_t exit_TIM16_prescaler_adjust;
 
 //CUSTOM TYPES
 enum Polarity{
@@ -114,7 +117,7 @@ uint8_t Start_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel);
 uint8_t Stop_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel);
 uint8_t Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(void);
 uint8_t Process_TIM16_Final_Start_Value_and_Prescaler_Adjust(void);
-uint8_t Adjust_and_Set_TIM16_Prescaler(void);
+uint8_t Adjust_and_Set_TIM16_Prescaler(uint8_t TIM16_prescaler_adjust_arg);
 uint8_t Shorten_Period(void);
 uint8_t Lengthen_Period(void);
 

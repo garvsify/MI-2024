@@ -4,10 +4,16 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 {
 	//interrupt flag is already cleared by stm32g0xx_it.c
 
-	//if(TIM16_final_start_value_and_adjusted_prescaler_are_ready == YES){
+	TIM16_callback_active = YES;
+
+	if(processing_TIM16_final_start_value_and_prescaler == YES){
+		__HAL_TIM_SET_COUNTER(&htim16, (uint16_t)exit_TIM16_final_start_value); //this line must go here, or at least very near the beginning!
+		Adjust_and_Set_TIM16_Prescaler(exit_TIM16_prescaler_adjust);
+	}
+	else{
 		__HAL_TIM_SET_COUNTER(&htim16, (uint16_t)TIM16_final_start_value); //this line must go here, or at least very near the beginning!
-		Adjust_and_Set_TIM16_Prescaler();
-	//}
+		Adjust_and_Set_TIM16_Prescaler(TIM16_prescaler_adjust);
+	}
 
 	if(current_waveshape == TRIANGLE_MODE){
 		duty = tri_table_one_quadrant[current_one_quadrant_index];
@@ -22,15 +28,9 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 		current_quadrant = SECOND_QUADRANT;
 	}
 	else if(current_one_quadrant_index == MIN_QUADRANT_INDEX){
-		if((current_halfcycle == FIRST_HALFCYCLE) && (current_quadrant == FIRST_QUADRANT)){
-			//do nothing
-		}
-		else if((current_halfcycle == FIRST_HALFCYCLE) && (current_quadrant == SECOND_QUADRANT)){
+		if((current_halfcycle == FIRST_HALFCYCLE) && (current_quadrant == SECOND_QUADRANT)){
 			current_halfcycle = SECOND_HALFCYCLE;
 			current_quadrant = FIRST_QUADRANT;
-		}
-		else if((current_halfcycle == SECOND_HALFCYCLE) && (current_quadrant == FIRST_QUADRANT)){
-			//do nothing
 		}
 		else if((current_halfcycle == SECOND_HALFCYCLE) && (current_quadrant == SECOND_QUADRANT)){
 			current_halfcycle = FIRST_HALFCYCLE;
@@ -66,6 +66,7 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 
 	//Write Duty
 	__HAL_TIM_SET_COMPARE(&htim14, TIM_CHANNEL_1, duty); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
+	TIM16_callback_active = NO;
 }
 
 uint8_t Multiply_Duty_By_Current_Depth_and_Divide_By_256(void)
