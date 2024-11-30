@@ -120,7 +120,7 @@ uint8_t adjust_and_set_TIM16_prescaler(void){
     else if(TIM16_prescaler_adjust == DO_NOTHING){
     	TIM16_prescaler_divisors_final_index = TIM16_base_prescaler_divisors_index;
     }
-    __HAL_TIM_SET_PRESCALER(&htim16, (TIM16_prescaler_divisors[TIM16_prescaler_divisors_final_index] - 1)); //have to take one off the divisor
+    __HAL_TIM_SET_PRESCALER(&htim16, (TIM16_prescaler_divisors[TIM16_prescaler_divisors_final_index]) - 1); //have to take one off the divisor
     return 1;
 }
 

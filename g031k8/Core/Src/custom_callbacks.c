@@ -62,7 +62,7 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 #endif
 
 	//Write Duty
-	__HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_1, duty); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
+	__HAL_TIM_SET_COMPARE(&htim14, TIM_CHANNEL_1, duty); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
 }
 
 uint8_t multiply_duty_by_current_depth_and_divide_by_256(void)
