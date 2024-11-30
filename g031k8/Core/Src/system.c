@@ -115,7 +115,7 @@ uint8_t Stop_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t OC_TIM_channel){
 	return ok;
 }
 
-uint8_t process_TIM16_raw_start_value_and_prescaler(void){
+uint8_t Process_TIM16_Raw_Start_Value_and_Prescaler(void){
 
 	uint16_t speed_control = 0;
 	uint32_t speed_control_32 = 0;
@@ -143,7 +143,7 @@ uint8_t process_TIM16_raw_start_value_and_prescaler(void){
 }
 
 
-uint8_t adjust_and_set_TIM16_prescaler(void){
+uint8_t Adjust_and_Set_TIM16_Prescaler(void){
 
     if(TIM16_prescaler_adjust == DIVIDE_BY_TWO){
         TIM16_prescaler_divisors_final_index = TIM16_base_prescaler_divisors_index + 1;
@@ -199,7 +199,7 @@ uint8_t adjust_and_set_TIM16_prescaler(void){
 #endif
 
 
-uint8_t process_TIM16_final_start_value_and_prescaler_adjust(void){
+uint8_t Process_TIM16_Final_Start_Value_and_Prescaler_Adjust(void){
 
     #if SYMMETRY_ON_OR_OFF == 1
         if(current_symmetry == SYMMETRY_ADC_HALF_SCALE){
@@ -214,23 +214,23 @@ uint8_t process_TIM16_final_start_value_and_prescaler_adjust(void){
             }
             if(current_halfcycle == FIRST_HALFCYCLE){
                 if(symmetry_status == CCW){
-                    shorten_period();
+                    Shorten_Period();
                 }
                 else{
-                    lengthen_period();
+                    Lengthen_Period();
                 }
             }
             else if(current_halfcycle == SECOND_HALFCYCLE){
                 if(symmetry_status == CW){
-                    shorten_period();
+                    Shorten_Period();
                 }
                 else{
-                    lengthen_period();
+                    Lengthen_Period();
                 }
             }
         }
 
-        adjust_and_set_TIM16_prescaler();
+        Adjust_and_Set_TIM16_Prescaler();
 
         //Adjust TMR0 for 2 instruction tick delay on update (for low prescaler values)
         if(TIM16_prescaler_divisors_final_index == 8){//prescaler is 1:1
@@ -245,7 +245,7 @@ uint8_t process_TIM16_final_start_value_and_prescaler_adjust(void){
     #if SYMMETRY_ON_OR_OFF == 0
         TIM16_final_start_value = TIM16_raw_start_value;
         TIM16_prescaler_adjust = DO_NOTHING;
-        adjust_and_set_TIM16_prescaler();
+        Adjust_and_Set_TIM16_Prescaler();
     #endif
 
     return 1;

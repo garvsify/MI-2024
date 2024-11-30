@@ -56,7 +56,7 @@
 		#endif
 
 		//TURN ON/OFF DEPTH
-		#define DEPTH_ON_OR_OFF OFF
+		#define DEPTH_ON_OR_OFF ON
 
 //CONSTANTS
 extern const uint16_t sine_table_one_quadrant[129];
@@ -111,10 +111,10 @@ uint8_t Start_Freq_Gen_Timer(void);
 uint8_t Start_PWM_TIM(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel);
 uint8_t Start_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel);
 uint8_t Stop_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel);
-uint8_t process_TIM16_raw_start_value_and_prescaler(void);
-uint8_t process_TIM16_final_start_value_and_prescaler_adjust(void);
-uint8_t adjust_and_set_TIM16_prescaler(void);
-uint8_t shorten_period(void);
-uint8_t lengthen_period(void);
+uint8_t Process_TIM16_Raw_Start_Value_and_Prescaler(void);
+uint8_t Process_TIM16_Final_Start_Value_and_Prescaler_Adjust(void);
+uint8_t Adjust_and_Set_TIM16_Prescaler(void);
+uint8_t Shorten_Period(void);
+uint8_t Lengthen_Period(void);
 
 #endif

@@ -53,7 +53,7 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	}
 	else if(current_depth != 0){
 		//duty = 1023 - duty*(current_depth >> 8);
-		multiply_duty_by_current_depth_and_divide_by_256();
+		Multiply_Duty_By_Current_Depth_and_Divide_By_256();
 	}
 	else{
 		duty = 1023; //if depth is 0, just output 1023
@@ -65,7 +65,7 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	__HAL_TIM_SET_COMPARE(&htim14, TIM_CHANNEL_1, duty); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
 }
 
-uint8_t multiply_duty_by_current_depth_and_divide_by_256(void)
+uint8_t Multiply_Duty_By_Current_Depth_and_Divide_By_256(void)
 {
 	volatile uint32_t multiply_product = 0;
 
