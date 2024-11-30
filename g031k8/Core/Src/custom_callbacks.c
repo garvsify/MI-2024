@@ -23,8 +23,6 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	}
 	else{*/ //DO NOT COMMENT BACK IN - FUCKS IT UP
 
-	__HAL_TIM_SET_COUNTER(&htim16, (uint16_t)TIM16_final_start_value_locked); //this line must go here, or at least very near the beginning!
-	Adjust_and_Set_TIM16_Prescaler(TIM16_prescaler_adjust_locked);
 	//}
 
 	if(current_waveshape == TRIANGLE_MODE){
@@ -77,6 +75,8 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	}
 
 #endif
+	__HAL_TIM_SET_COUNTER(&htim16, (uint16_t)TIM16_final_start_value_locked); //this line must go here, or at least very near the beginning!
+	Adjust_and_Set_TIM16_Prescaler(TIM16_prescaler_adjust_locked);
 	//Write Duty
 	__HAL_TIM_SET_COMPARE(&htim14, TIM_CHANNEL_1, duty); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
 	TIM16_callback_active = NO;
