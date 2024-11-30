@@ -8,14 +8,24 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 
 	TIM16_callback_active = YES;
 
-	if(processing_TIM16_final_start_value_and_prescaler == YES){
-		__HAL_TIM_SET_COUNTER(&htim16, (uint16_t)exit_TIM16_final_start_value); //this line must go here, or at least very near the beginning!
-		Adjust_and_Set_TIM16_Prescaler(exit_TIM16_prescaler_adjust);
+	if((current_quadrant == SECOND_QUADRANT) && (current_one_quadrant_index == SYMMETRY_PROCESSING_QUADRANT_THRESHOLD)){
+			halfcycle_is_about_to_change = YES;
+			HAL_GPIO_WritePin(SYM_PROC_GPIO_Port, SYM_PROC_Pin, 1);
+			TIM16_final_start_value_locked = TIM16_final_start_value;
+			TIM16_prescaler_adjust_locked = TIM16_prescaler_adjust;
+			HAL_GPIO_TogglePin(SYM_PROC_GPIO_Port, SYM_PROC_Pin);
+			halfcycle_is_about_to_change = NO;
 	}
-	else{
-		__HAL_TIM_SET_COUNTER(&htim16, (uint16_t)TIM16_final_start_value); //this line must go here, or at least very near the beginning!
-		Adjust_and_Set_TIM16_Prescaler(TIM16_prescaler_adjust);
+
+	/*if(processing_TIM16_final_start_value_and_prescaler == YES){
+		__HAL_TIM_SET_COUNTER(&htim16, (uint16_t)exit_TIM16_final_start_value_locked); //this line must go here, or at least very near the beginning!
+		Adjust_and_Set_TIM16_Prescaler(exit_TIM16_prescaler_adjust_locked);
 	}
+	else{*/ //DO NOT COMMENT BACK IN - FUCKS IT UP
+
+	__HAL_TIM_SET_COUNTER(&htim16, (uint16_t)TIM16_final_start_value_locked); //this line must go here, or at least very near the beginning!
+	Adjust_and_Set_TIM16_Prescaler(TIM16_prescaler_adjust_locked);
+	//}
 
 	if(current_waveshape == TRIANGLE_MODE){
 		duty = tri_table_one_quadrant[current_one_quadrant_index];
@@ -33,12 +43,13 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 		if((current_halfcycle == FIRST_HALFCYCLE) && (current_quadrant == SECOND_QUADRANT)){
 			current_halfcycle = SECOND_HALFCYCLE;
 			current_quadrant = FIRST_QUADRANT;
+			halfcycle_has_changed = YES;
 		}
 		else if((current_halfcycle == SECOND_HALFCYCLE) && (current_quadrant == SECOND_QUADRANT)){
 			current_halfcycle = FIRST_HALFCYCLE;
 			current_quadrant = FIRST_QUADRANT;
+			halfcycle_has_changed = YES;
 		}
-		halfcycle_has_changed = YES;
 	}
 
 	if(current_quadrant == FIRST_QUADRANT){
@@ -66,11 +77,11 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	}
 
 #endif
-
 	//Write Duty
 	__HAL_TIM_SET_COMPARE(&htim14, TIM_CHANNEL_1, duty); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
 	TIM16_callback_active = NO;
 	HAL_GPIO_TogglePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin);
+	HAL_GPIO_WritePin(SYM_PROC_GPIO_Port, SYM_PROC_Pin, 0);
 }
 
 uint8_t Multiply_Duty_By_Current_Depth_and_Divide_By_256(void)

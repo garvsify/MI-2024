@@ -36,12 +36,12 @@
 #define TWELVEBITMINUSONE 4095
 #define TENBITMINUSONE 1023
 #define EIGHTBITMINUSONE 255
-#define SYMMETRY_PROCESING_QUADRANT_THRESHOLD 10
+#define SYMMETRY_PROCESSING_QUADRANT_THRESHOLD 2
 #define ON 1
 #define OFF 0
 
 		//TURN ON/OFF SYMMETRY and SET RESOLUTION
-		#define SYMMETRY_ADC_RESOLUTION 8
+		#define SYMMETRY_ADC_RESOLUTION 10
 		#define SYMMETRY_ON_OR_OFF ON
 
 		#if SYMMETRY_ADC_RESOLUTION == 10
@@ -84,9 +84,12 @@ const extern uint8_t num_ADC_conversions;
 volatile extern uint8_t initial_ADC_conversion_complete;
 volatile extern uint8_t processing_TIM16_final_start_value_and_prescaler;
 volatile extern uint8_t TIM16_callback_active;
-volatile extern uint32_t exit_TIM16_final_start_value;
-volatile extern uint8_t exit_TIM16_prescaler_adjust;
+volatile extern uint32_t exit_TIM16_final_start_value_locked;
+volatile extern uint8_t exit_TIM16_prescaler_adjust_locked;
 volatile extern uint8_t halfcycle_has_changed;
+volatile extern uint8_t halfcycle_is_about_to_change;
+volatile extern uint32_t TIM16_final_start_value_locked;
+volatile extern uint8_t TIM16_prescaler_adjust_locked;
 
 //CUSTOM TYPES
 enum Polarity{

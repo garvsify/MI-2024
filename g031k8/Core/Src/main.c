@@ -30,17 +30,13 @@ int main(void)
 
 			processing_TIM16_final_start_value_and_prescaler = YES;
 
-			exit_TIM16_final_start_value = TIM16_final_start_value; //TIM16 may interrupt during calculation of timer start value and prescaler value, so 'exit' values are stored in case they need to be used
-			exit_TIM16_prescaler_adjust = TIM16_prescaler_adjust;
+			exit_TIM16_final_start_value_locked = TIM16_final_start_value_locked; //TIM16 may interrupt during calculation of timer start value and prescaler value, so 'exit' values are stored in case they need to be used
+			exit_TIM16_prescaler_adjust_locked = TIM16_prescaler_adjust_locked;
 
 			Global_Interrupt_Enable();
 
-			if(halfcycle_has_changed == YES){
-
-				Process_TIM16_Raw_Start_Value_and_Raw_Prescaler();
-				Process_TIM16_Final_Start_Value_and_Prescaler_Adjust();
-				halfcycle_has_changed = NO;
-			}
+			Process_TIM16_Raw_Start_Value_and_Raw_Prescaler();
+			Process_TIM16_Final_Start_Value_and_Prescaler_Adjust();
 
 			processing_TIM16_final_start_value_and_prescaler = NO;
 		}
