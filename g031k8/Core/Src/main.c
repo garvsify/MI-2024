@@ -18,11 +18,24 @@ int main(void)
 
 	//START FREQ. GEN and PWM GEN TIMERS and ENABLE PWM OUTPUT
 	Start_PWM_TIM(&htim14, TIM_CHANNEL_1); //start PWM
-	Start_OC_TIM(&htim16, TIM_CHANNEL_1); //start freq. gen.
+	//DEBUG//Start_OC_TIM(&htim16, TIM_CHANNEL_1); //start freq. gen.
 	while (1)
 	{
-		process_TIM16_raw_start_value_and_prescaler();
-		process_TIM16_final_start_value_and_prescaler_adjust();
+		//DEBUG//process_TIM16_raw_start_value_and_prescaler();
+		//DEBUG//process_TIM16_final_start_value_and_prescaler_adjust();
+
+
+		HAL_Delay(500);
+		uint8_t x = 50;
+		if((duty + x) > 1023){
+			duty = 0;
+		}
+		else{
+			duty += x;
+		}
+		__HAL_TIM_SET_COMPARE(&htim14, TIM_CHANNEL_1, duty);
+		//htim14.Instance->CCR1 = duty;
+
 	}
 	return 1;
 }
