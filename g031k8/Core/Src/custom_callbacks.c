@@ -18,10 +18,23 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	if(current_one_quadrant_index == MAX_QUADRANT_INDEX){
 		current_quadrant = SECOND_QUADRANT;
 	}
-	else if((current_one_quadrant_index == MIN_QUADRANT_INDEX) && (current_quadrant == SECOND_QUADRANT)){
-		current_quadrant = FIRST_QUADRANT;
-		current_halfcycle = SECOND_HALFCYCLE;
+	else if(current_one_quadrant_index == MIN_QUADRANT_INDEX){
+		if((current_halfcycle == FIRST_HALFCYCLE) && (current_quadrant == FIRST_QUADRANT)){
+			//do nothing
+		}
+		else if((current_halfcycle == FIRST_HALFCYCLE) && (current_quadrant == SECOND_QUADRANT)){
+			current_halfcycle = SECOND_HALFCYCLE;
+			current_quadrant = FIRST_QUADRANT;
+		}
+		else if((current_halfcycle == SECOND_HALFCYCLE) && (current_quadrant == FIRST_QUADRANT)){
+			//do nothing
+		}
+		else if((current_halfcycle == SECOND_HALFCYCLE) && (current_quadrant == SECOND_QUADRANT)){
+			current_halfcycle = FIRST_HALFCYCLE;
+			current_quadrant = FIRST_QUADRANT;
+		}
 	}
+
 	if(current_quadrant == FIRST_QUADRANT){
 		current_one_quadrant_index++;
 	}
