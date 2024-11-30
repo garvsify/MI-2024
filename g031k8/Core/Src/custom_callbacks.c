@@ -38,6 +38,7 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 			current_halfcycle = FIRST_HALFCYCLE;
 			current_quadrant = FIRST_QUADRANT;
 		}
+		halfcycle_has_changed = YES;
 	}
 
 	if(current_quadrant == FIRST_QUADRANT){
@@ -48,10 +49,6 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	}
 	if(current_halfcycle == SECOND_HALFCYCLE){
 		duty = 1023 - duty;
-	}
-
-	if((current_one_quadrant_index == SYMMETRY_PROCESING_QUADRANT_THRESHOLD) && (current_quadrant == SECOND_QUADRANT)){
-		halfcycle_is_about_to_change = YES;
 	}
 
 #if DEPTH_ON_OR_OFF == 1

@@ -36,7 +36,7 @@
 #define TWELVEBITMINUSONE 4095
 #define TENBITMINUSONE 1023
 #define EIGHTBITMINUSONE 255
-#define SYMMETRY_PROCESING_QUADRANT_THRESHOLD 100
+#define SYMMETRY_PROCESING_QUADRANT_THRESHOLD 10
 #define ON 1
 #define OFF 0
 
@@ -86,7 +86,7 @@ volatile extern uint8_t processing_TIM16_final_start_value_and_prescaler;
 volatile extern uint8_t TIM16_callback_active;
 volatile extern uint32_t exit_TIM16_final_start_value;
 volatile extern uint8_t exit_TIM16_prescaler_adjust;
-volatile extern uint8_t halfcycle_is_about_to_change;
+volatile extern uint8_t halfcycle_has_changed;
 
 //CUSTOM TYPES
 enum Polarity{

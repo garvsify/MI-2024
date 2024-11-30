@@ -30,7 +30,7 @@ volatile uint8_t processing_TIM16_final_start_value_and_prescaler = NO;
 volatile uint8_t TIM16_callback_active = NO;
 volatile uint32_t exit_TIM16_final_start_value = 0;
 volatile uint8_t exit_TIM16_prescaler_adjust = 0;
-volatile uint8_t halfcycle_is_about_to_change = NO;
+volatile uint8_t halfcycle_has_changed = NO;
 
 //FUNCTION DEFINITIONS
 uint8_t Global_Interrupt_Enable(void){
@@ -132,7 +132,7 @@ uint8_t Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(void){
     speed_control = (uint16_t) speed_control_32;
     //speed_control = (speed_adc_10_bit/1024)*883
         if(speed_control <= (127-12)){ //inequality is correct!
-            TIM16_raw_start_value = (uint8_t) speed_control + 12; //set CCR
+            TIM16_raw_start_value = (uint8_t) speed_control + 12;
             TIM16_base_prescaler_divisors_index = 1;
         }
         else{ 	//(speed_control > (127-12))
