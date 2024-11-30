@@ -164,7 +164,7 @@ uint8_t Adjust_and_Set_TIM16_Prescaler(void){
 
 #if SYMMETRY_ON_OR_OFF == 1
 
-    uint8_t shorten_period(void){
+    uint8_t Shorten_Period(void){
         #if SYMMETRY_ADC_RESOLUTION == 8
             uint32_t twofiftysix_minus_start_value_final = (((256-TIM16_raw_start_value)*(SHORTEN_POWER_OF_TWO_CONSTANT_8_BIT_SYM+(24*current_symmetry)))>>SHORTEN_POWER_OF_TWO_DIVISOR_8_BIT_SYM);
         #endif
@@ -172,12 +172,12 @@ uint8_t Adjust_and_Set_TIM16_Prescaler(void){
             uint32_t twofiftysix_minus_start_value_final = (((256-TIM16_raw_start_value)*(SHORTEN_POWER_OF_TWO_CONSTANT_10_BIT_SYM+(24*current_symmetry)))>>SHORTEN_POWER_OF_TWO_DIVISOR_10_BIT_SYM);
         #endif
 
-        TIM16_final_CCR = (256-twofiftysix_minus_start_value_final);
+        TIM16_final_start_value = (256-twofiftysix_minus_start_value_final);
         TIM16_prescaler_adjust = DO_NOTHING;
         return 1;
     }
 
-    uint8_t lengthen_period(void){
+    uint8_t Lengthen_Period(void){
         #if SYMMETRY_ADC_RESOLUTION == 8
             uint32_t twofiftysix_minus_start_value_final = (((256-TIM16_raw_start_value)*(LENGTHEN_CONSTANT_8_BIT_SYM-(3*current_symmetry)))>>LENGTHEN_POWER_OF_TWO_DIVISOR_8_BIT_SYM);
         #endif
@@ -185,13 +185,13 @@ uint8_t Adjust_and_Set_TIM16_Prescaler(void){
             uint32_t twofiftysix_minus_start_value_final = (((256-TIM16_raw_start_value)*(LENGTHEN_CONSTANT_10_BIT_SYM-(3*current_symmetry)))>>LENGTHEN_POWER_OF_TWO_DIVISOR_10_BIT_SYM);
         #endif
 
-        if(twofiftysix_minus_CCR_final > 256){
+        if(twofiftysix_minus_start_value_final > 256){
             twofiftysix_minus_start_value_final = (twofiftysix_minus_start_value_final >> 1);
             TIM16_final_start_value = (256-twofiftysix_minus_start_value_final);
             TIM16_prescaler_adjust = MULTIPLY_BY_TWO;
         }
         else{
-            TIM16_final_start_value = 256-twofiftysix_minus_CCR_final;
+            TIM16_final_start_value = 256-twofiftysix_minus_start_value_final;
             TIM16_prescaler_adjust = DO_NOTHING;
         }
         return 1;
