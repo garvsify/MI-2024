@@ -79,10 +79,6 @@ void TIM17_callback(TIM_HandleTypeDef *htim)
 void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 {
 	HAL_ADC_Stop_DMA(hadc); //disable ADC DMA
-	if(initial_ADC_conversion_complete == 0){
-
-		initial_ADC_conversion_complete = 1;
-	}
 
 	//GET WAVESHAPE
 	uint16_t ADC_result = ADCResultsDMA[0]; //set ADC_Result to waveshape index value
@@ -100,12 +96,8 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 		current_waveshape = SINE_MODE; //if error, return sine
 	}
 
-
-
 	//GET SPEED
 	current_speed_linear = ADCResultsDMA[1] >> 2; //convert to 10-bit
-
-
 
 	//GET DEPTH
 	#if DEPTH_ON_OR_OFF == ON
@@ -113,7 +105,6 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 		current_depth = ADCResultsDMA[2] >> 4; //convert to 8-bit
 
 	#endif
-
 
 	//GET SYMMETRY
 	#if SYMMETRY_ON_OR_OFF == ON
@@ -132,6 +123,12 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 
 	#endif
 
+	//after initial conversion is complete, set the conversion complete flag
+	if(initial_ADC_conversion_complete == 0){
+
+		initial_ADC_conversion_complete = 1;
+	}
+
 	__HAL_TIM_SET_COUNTER(&htim17, 0); //set counter to 0
-	__HAL_TIM_ENABLE(&htim17); //enable TIM17
+	//__HAL_TIM_ENABLE(&htim17); //enable TIM17
 }

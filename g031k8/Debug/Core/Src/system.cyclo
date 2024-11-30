@@ -1,4 +1,5 @@
-../Core/Src/system.c:30:9:Start_PWM	1
-../Core/Src/system.c:39:9:process_TIM16_raw_start_value_and_prescaler	2
-../Core/Src/system.c:67:9:adjust_and_set_TIM16_prescaler	5
-../Core/Src/system.c:123:9:process_TIM16_final_start_value_and_prescaler_adjust	1
+../Core/Src/system.c:30:9:Start_PWM_TIM	1
+../Core/Src/system.c:39:9:Start_OC_TIM	1
+../Core/Src/system.c:47:9:process_TIM16_raw_start_value_and_prescaler	2
+../Core/Src/system.c:75:9:adjust_and_set_TIM16_prescaler	5
+../Core/Src/system.c:131:9:process_TIM16_final_start_value_and_prescaler_adjust	1

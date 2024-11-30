@@ -27,12 +27,20 @@ volatile uint16_t ADCResultsDMA[4] = {0};
 volatile uint8_t initial_ADC_conversion_complete = 0;
 
 //FUNCTION DEFINITIONS
-uint8_t Start_PWM(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel){
+uint8_t Start_PWM_TIM(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel){
 
 	uint8_t ok = 0;
 	ok = HAL_TIM_Base_Start(TIM);
 	ok = HAL_TIM_PWM_Start(TIM, PWM_TIM_channel);
 
+	return ok;
+}
+
+uint8_t Start_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t OC_TIM_channel){
+
+	uint8_t ok = 0;
+	ok = HAL_TIM_Base_Start(TIM);
+	ok = HAL_TIM_OC_Start(TIM, OC_TIM_channel);
 	return ok;
 }
 
