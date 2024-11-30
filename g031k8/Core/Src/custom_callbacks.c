@@ -130,5 +130,5 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 	}
 
 	__HAL_TIM_SET_COUNTER(&htim17, 0); //set counter to 0
-	//__HAL_TIM_ENABLE(&htim17); //enable TIM17
+	__HAL_TIM_ENABLE(&htim17); //enable TIM17
 }

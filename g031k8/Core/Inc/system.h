@@ -103,6 +103,8 @@ enum Validate{
 };
 
 //FUNCTION DECLARATIONS
+uint8_t global_interrupt_enable(void);
+uint8_t global_interrupt_disable(void);
 uint8_t Start_PWM_TIM(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel);
 uint8_t Start_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel);
 uint8_t process_TIM16_raw_start_value_and_prescaler(void);

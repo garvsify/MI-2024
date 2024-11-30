@@ -27,6 +27,18 @@ volatile uint16_t ADCResultsDMA[4] = {0};
 volatile uint8_t initial_ADC_conversion_complete = 0;
 
 //FUNCTION DEFINITIONS
+uint8_t global_interrupt_enable(void){
+
+	__enable_irq();
+	return 1;
+}
+
+uint8_t global_interrupt_disable(void){
+
+	__disable_irq();
+	return 1;
+}
+
 uint8_t Start_PWM_TIM(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel){
 
 	uint8_t ok = 0;
@@ -39,8 +51,8 @@ uint8_t Start_PWM_TIM(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel){
 uint8_t Start_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t OC_TIM_channel){
 
 	uint8_t ok = 0;
-	ok = HAL_TIM_Base_Start(TIM);
-	ok = HAL_TIM_OC_Start(TIM, OC_TIM_channel);
+	ok = HAL_TIM_OC_Start_IT(TIM, OC_TIM_channel); //_IT variant of function
+	//means the timer will generate an interrupt on delay_elapsed (CNT = CCR) condition
 	return ok;
 }
 
