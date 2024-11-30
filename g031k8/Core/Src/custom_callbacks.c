@@ -117,13 +117,13 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 	//GET SYMMETRY
 	#if SYMMETRY_ON_OR_OFF == ON
 
-		#if SYMMETRY_RESOLUTION == 12
+		#if SYMMETRY_ADC_RESOLUTION == 10
 
-			current_symmetry = ADCResultsDMA[3];
+			current_symmetry = ADCResultsDMA[3] >> 2;
 
 		#endif
 
-		#if SYMMETRY_RESOLUTION == 8
+		#if SYMMETRY_ADC_RESOLUTION == 8
 
 			current_symmetry = ADCResultsDMA[3] >> 4;
 
