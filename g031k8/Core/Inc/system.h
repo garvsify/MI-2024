@@ -90,6 +90,7 @@ volatile extern uint8_t halfcycle_has_changed;
 volatile extern uint8_t halfcycle_is_about_to_change;
 volatile extern uint32_t TIM16_final_start_value_locked;
 volatile extern uint8_t TIM16_prescaler_adjust_locked;
+volatile extern uint16_t prev_duty;
 
 //CUSTOM TYPES
 enum Polarity{

@@ -5,8 +5,12 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	//interrupt flag is already cleared by stm32g0xx_it.c
 
 	HAL_GPIO_TogglePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin);
-
 	TIM16_callback_active = YES;
+
+	__HAL_TIM_SET_COUNTER(&htim16, (uint16_t)TIM16_final_start_value_locked); //this line must go here, or at least very near the beginning!
+	Adjust_and_Set_TIM16_Prescaler(TIM16_prescaler_adjust_locked);
+	//Write Duty
+	__HAL_TIM_SET_COMPARE(&htim14, TIM_CHANNEL_1, prev_duty); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
 
 	if((current_quadrant == SECOND_QUADRANT) && (current_one_quadrant_index == SYMMETRY_PROCESSING_QUADRANT_THRESHOLD)){
 			halfcycle_is_about_to_change = YES;
@@ -73,12 +77,10 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	else{
 		duty = 1023; //if depth is 0, just output 1023
 	}
+	prev_duty = duty;
 
 #endif
-	__HAL_TIM_SET_COUNTER(&htim16, (uint16_t)TIM16_final_start_value_locked); //this line must go here, or at least very near the beginning!
-	Adjust_and_Set_TIM16_Prescaler(TIM16_prescaler_adjust_locked);
-	//Write Duty
-	__HAL_TIM_SET_COMPARE(&htim14, TIM_CHANNEL_1, duty); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
+
 	TIM16_callback_active = NO;
 	HAL_GPIO_TogglePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin);
 	HAL_GPIO_WritePin(SYM_PROC_GPIO_Port, SYM_PROC_Pin, 0);
