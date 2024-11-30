@@ -1210,7 +1210,7 @@ void MX_TIM17_Init(void)
  8000844:	4b37      	ldr	r3, [pc, #220]	@ (8000924 <MX_TIM17_Init+0x110>)
  8000846:	2200      	movs	r2, #0
  8000848:	609a      	str	r2, [r3, #8]
-  htim17.Init.Period = 20000;
+  htim17.Init.Period = 10000;
  800084a:	4b36      	ldr	r3, [pc, #216]	@ (8000924 <MX_TIM17_Init+0x110>)
  800084c:	4a37      	ldr	r2, [pc, #220]	@ (800092c <MX_TIM17_Init+0x118>)
  800084e:	60da      	str	r2, [r3, #12]
@@ -1252,7 +1252,7 @@ void MX_TIM17_Init(void)
  8000886:	187b      	adds	r3, r7, r1
  8000888:	2200      	movs	r2, #0
  800088a:	601a      	str	r2, [r3, #0]
-  sConfigOC.Pulse = 20000;
+  sConfigOC.Pulse = 10000;
  800088c:	187b      	adds	r3, r7, r1
  800088e:	4a27      	ldr	r2, [pc, #156]	@ (800092c <MX_TIM17_Init+0x118>)
  8000890:	605a      	str	r2, [r3, #4]
@@ -1354,7 +1354,7 @@ void MX_TIM17_Init(void)
  8000922:	46c0      	nop			@ (mov r8, r8)
  8000924:	20000284 	.word	0x20000284
  8000928:	40014800 	.word	0x40014800
- 800092c:	00004e20 	.word	0x00004e20
+ 800092c:	00002710 	.word	0x00002710
 
 08000930 <MX_USART2_UART_Init>:
 

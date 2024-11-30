@@ -234,9 +234,9 @@ uint8_t Process_TIM16_Final_Start_Value_and_Prescaler_Adjust(void){
             }
         }
 
-        //Adjust_and_Set_TIM16_Prescaler();
+        //Adjust_and_Set_TIM16_Prescaler(); //DO NOT COMMENT BACK IN
 
-        //DONT NEED AS PRESCALERS ARE MUCH BIGGER NOW
+        //DONT NEED AS PRESCALERS ARE MUCH BIGGER NOW - DO NOT COMMENT BACK IN
         /*//Adjust TMR0 for 2 instruction tick delay on update (for low prescaler values)
         if(TIM16_prescaler_divisors_final_index == 8){//prescaler is 1:1
             TIM16_final_start_value = TIM16_final_start_value + 2; //(256-TMR0_final) needs to be 2 counts less
