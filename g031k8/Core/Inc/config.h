@@ -34,7 +34,7 @@
 #define ISR_MEAS_Pin GPIO_PIN_12
 #define ISR_MEAS_GPIO_Port GPIOA
 
-#define SYM_PROC_Pin GPIO_PIN_1
+#define SYM_PROC_Pin GPIO_PIN_11
 #define SYM_PROC_GPIO_Port GPIOA
 
 extern ADC_HandleTypeDef hadc1;

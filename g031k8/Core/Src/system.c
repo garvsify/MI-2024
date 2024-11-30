@@ -30,7 +30,7 @@ volatile uint8_t processing_TIM16_final_start_value_and_prescaler = NO;
 volatile uint8_t TIM16_callback_active = NO;
 volatile uint32_t exit_TIM16_final_start_value = 0;
 volatile uint8_t exit_TIM16_prescaler_adjust = 0;
-volatile uint8_t halfcycle_has_changed = NO;
+volatile uint8_t halfcycle_is_about_to_change = NO;
 
 //FUNCTION DEFINITIONS
 uint8_t Global_Interrupt_Enable(void){
