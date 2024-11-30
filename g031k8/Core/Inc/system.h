@@ -40,7 +40,7 @@
 #define OFF 0
 
 		//TURN ON/OFF SYMMETRY and SET RESOLUTION
-		#define SYMMETRY_ADC_RESOLUTION 10
+		#define SYMMETRY_ADC_RESOLUTION 8
 		#define SYMMETRY_ON_OR_OFF ON
 
 		#if SYMMETRY_ADC_RESOLUTION == 10
@@ -85,6 +85,7 @@ volatile extern uint8_t processing_TIM16_final_start_value_and_prescaler;
 volatile extern uint8_t TIM16_callback_active;
 volatile extern uint32_t exit_TIM16_final_start_value;
 volatile extern uint8_t exit_TIM16_prescaler_adjust;
+volatile extern uint8_t halfcycle_has_changed;
 
 //CUSTOM TYPES
 enum Polarity{

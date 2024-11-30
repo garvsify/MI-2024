@@ -30,6 +30,7 @@ volatile uint8_t processing_TIM16_final_start_value_and_prescaler = NO;
 volatile uint8_t TIM16_callback_active = NO;
 volatile uint32_t exit_TIM16_final_start_value = 0;
 volatile uint8_t exit_TIM16_prescaler_adjust = 0;
+volatile uint8_t halfcycle_has_changed = NO;
 
 //FUNCTION DEFINITIONS
 uint8_t Global_Interrupt_Enable(void){
@@ -205,7 +206,7 @@ uint8_t Adjust_and_Set_TIM16_Prescaler(uint8_t TIM16_prescaler_adjust_arg){
 
 uint8_t Process_TIM16_Final_Start_Value_and_Prescaler_Adjust(void){
 
-    #if SYMMETRY_ON_OR_OFF == 1
+    #if SYMMETRY_ON_OR_OFF == ON
         if(current_symmetry == SYMMETRY_ADC_HALF_SCALE){
             TIM16_final_start_value = TIM16_raw_start_value;
             TIM16_prescaler_adjust = DO_NOTHING;
@@ -225,11 +226,11 @@ uint8_t Process_TIM16_Final_Start_Value_and_Prescaler_Adjust(void){
                 }
             }
             else if(current_halfcycle == SECOND_HALFCYCLE){
-                if(symmetry_status == CW){
-                    Shorten_Period();
+                if(symmetry_status == CCW){
+                    Lengthen_Period();
                 }
                 else{
-                    Lengthen_Period();
+                    Shorten_Period();
                 }
             }
         }
@@ -247,10 +248,10 @@ uint8_t Process_TIM16_Final_Start_Value_and_Prescaler_Adjust(void){
 
     #endif
 
-    #if SYMMETRY_ON_OR_OFF == 0
+    #if SYMMETRY_ON_OR_OFF == OFF
         TIM16_final_start_value = TIM16_raw_start_value;
         TIM16_prescaler_adjust = DO_NOTHING;
-        //Adjust_and_Set_TIM16_Prescaler();
+        //Adjust_and_Set_TIM16_Prescaler(); //DO NOT COMMENT BACK IN
     #endif
 
     return 1;

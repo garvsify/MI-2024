@@ -35,8 +35,26 @@ int main(void)
 
 			Global_Interrupt_Enable();
 
-			Process_TIM16_Raw_Start_Value_and_Raw_Prescaler();
-			Process_TIM16_Final_Start_Value_and_Prescaler_Adjust();
+			#if SYMMETRY_ON_OR_OFF == ON
+
+				if(halfcycle_has_changed == YES){
+
+					HAL_GPIO_WritePin(SYM_PROC_GPIO_Port, SYM_PROC_Pin, 1);
+					Process_TIM16_Raw_Start_Value_and_Raw_Prescaler();
+					Process_TIM16_Final_Start_Value_and_Prescaler_Adjust();
+					HAL_GPIO_WritePin(SYM_PROC_GPIO_Port, SYM_PROC_Pin, 0);
+
+					halfcycle_has_changed = NO;
+				}
+
+			#endif
+
+			#if SYMMETRY_ON_OR_OFF == OFF
+
+				Process_TIM16_Raw_Start_Value_and_Raw_Prescaler();
+				Process_TIM16_Final_Start_Value_and_Prescaler_Adjust();
+
+			#endif
 
 			processing_TIM16_final_start_value_and_prescaler = NO;
 		}

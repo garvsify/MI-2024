@@ -33,10 +33,12 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 		if((current_halfcycle == FIRST_HALFCYCLE) && (current_quadrant == SECOND_QUADRANT)){
 			current_halfcycle = SECOND_HALFCYCLE;
 			current_quadrant = FIRST_QUADRANT;
+			halfcycle_has_changed = YES;
 		}
 		else if((current_halfcycle == SECOND_HALFCYCLE) && (current_quadrant == SECOND_QUADRANT)){
 			current_halfcycle = FIRST_HALFCYCLE;
 			current_quadrant = FIRST_QUADRANT;
+			halfcycle_has_changed = YES;
 		}
 	}
 
