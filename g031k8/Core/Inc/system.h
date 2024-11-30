@@ -11,7 +11,7 @@
 #define TRIANGLE_MODE 0
 #define SINE_MODE 1
 #define SQUARE_MODE 2
-#define NUMBER_OF_FREQUENCY_STEPS 600; //883 in calcs, seems to be wrong, but 650 gives 15Hz max freq.
+#define NUMBER_OF_FREQUENCY_STEPS 700; //883 in calcs, seems to be wrong, but 650 gives 15Hz max freq.
 #define FIRST_HALFCYCLE 0
 #define SECOND_HALFCYCLE 1
 #define FIRST_QUADRANT 0
@@ -105,6 +105,9 @@ enum Validate{
 //FUNCTION DECLARATIONS
 uint8_t Global_Interrupt_Enable(void);
 uint8_t Global_Interrupt_Disable(void);
+uint8_t Start_ADC_Trig_Timer(void);
+uint8_t Start_PWM_Gen_Timer(void);
+uint8_t Start_Freq_Gen_Timer(void);
 uint8_t Start_PWM_TIM(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel);
 uint8_t Start_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel);
 uint8_t Stop_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel);
