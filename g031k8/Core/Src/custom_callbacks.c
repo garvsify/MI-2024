@@ -18,14 +18,9 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	if(current_one_quadrant_index == MAX_QUADRANT_INDEX){
 		current_quadrant = SECOND_QUADRANT;
 	}
-	else if(current_one_quadrant_index == MIN_QUADRANT_INDEX){
+	else if((current_one_quadrant_index == MIN_QUADRANT_INDEX) && (current_quadrant == SECOND_QUADRANT)){
 		current_quadrant = FIRST_QUADRANT;
-		if(current_halfcycle == FIRST_HALFCYCLE){
-			current_halfcycle = SECOND_HALFCYCLE;
-		}
-		else{
-			current_halfcycle = FIRST_HALFCYCLE;
-		}
+		current_halfcycle = SECOND_HALFCYCLE;
 	}
 	if(current_quadrant == FIRST_QUADRANT){
 		current_one_quadrant_index++;
@@ -73,7 +68,7 @@ void TIM17_callback(TIM_HandleTypeDef *htim)
 	//Start ADC (in scan mode) conversion
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions);
 
-	__HAL_TIM_DISABLE(htim); //disable TIM17
+	Stop_OC_TIM(htim, TIM_CHANNEL_1); //disable TIM17
 }
 
 void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
@@ -130,5 +125,5 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 	}
 
 	__HAL_TIM_SET_COUNTER(&htim17, 0); //set counter to 0
-	__HAL_TIM_ENABLE(&htim17); //enable TIM17
+	Start_OC_TIM(&htim17, TIM_CHANNEL_1);
 }

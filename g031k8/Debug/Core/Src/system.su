@@ -1,7 +1,8 @@
-../Core/Src/system.c:30:9:global_interrupt_enable	8	static,ignoring_inline_asm
-../Core/Src/system.c:36:9:global_interrupt_disable	8	static,ignoring_inline_asm
+../Core/Src/system.c:30:9:Global_Interrupt_Enable	8	static,ignoring_inline_asm
+../Core/Src/system.c:36:9:Global_Interrupt_Disable	8	static,ignoring_inline_asm
 ../Core/Src/system.c:42:9:Start_PWM_TIM	32	static
-../Core/Src/system.c:51:9:Start_OC_TIM	32	static
-../Core/Src/system.c:59:9:process_TIM16_raw_start_value_and_prescaler	24	static
-../Core/Src/system.c:87:9:adjust_and_set_TIM16_prescaler	8	static
-../Core/Src/system.c:143:9:process_TIM16_final_start_value_and_prescaler_adjust	8	static
+../Core/Src/system.c:56:9:Start_OC_TIM	32	static
+../Core/Src/system.c:69:9:Stop_OC_TIM	32	static
+../Core/Src/system.c:81:9:process_TIM16_raw_start_value_and_prescaler	24	static
+../Core/Src/system.c:109:9:adjust_and_set_TIM16_prescaler	8	static
+../Core/Src/system.c:165:9:process_TIM16_final_start_value_and_prescaler_adjust	8	static

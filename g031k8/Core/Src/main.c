@@ -5,7 +5,7 @@ int main(void)
 {
 	System_Init();
 
-	global_interrupt_enable();
+	Global_Interrupt_Enable();
 
 	//START ADC TRIG. TIMER
 	Start_OC_TIM(&htim17, TIM_CHANNEL_1); //start adc trig.
