@@ -13,33 +13,21 @@ int main(void)
 	//WAIT
 	while(initial_ADC_conversion_complete == 0){}; //wait while first ADC conversion is ongoing
 
-	//process_TIM16_raw_start_value_and_prescaler();
-	//process_TIM16_final_start_value_and_prescaler_adjust();
+	process_TIM16_raw_start_value_and_prescaler();
+	process_TIM16_final_start_value_and_prescaler_adjust();
 
-	TIM16_final_start_value = 100;
+	/*TIM16_final_start_value = 100;
 	TIM16_prescaler_divisors_final_index = 1;
-	__HAL_TIM_SET_PRESCALER(&htim16, (TIM16_prescaler_divisors[TIM16_prescaler_divisors_final_index]) - 1); //have to take one off the divisor
+	__HAL_TIM_SET_PRESCALER(&htim16, (TIM16_prescaler_divisors[TIM16_prescaler_divisors_final_index]) - 1); //have to take one off the divisor*/
 
 	//START FREQ. GEN and PWM GEN TIMERS and ENABLE PWM OUTPUT
 	Start_PWM_TIM(&htim14, TIM_CHANNEL_1); //start PWM
 	Start_OC_TIM(&htim16, TIM_CHANNEL_1); //start freq. gen.
 	while (1)
 	{
-		//DEBUG//process_TIM16_raw_start_value_and_prescaler();
-		//DEBUG//process_TIM16_final_start_value_and_prescaler_adjust();
+		process_TIM16_raw_start_value_and_prescaler();
+		process_TIM16_final_start_value_and_prescaler_adjust();
 
-		/*
-		HAL_Delay(500);
-		uint8_t x = 50;
-		if((duty + x) > 1023){
-			duty = 0;
-		}
-		else{
-			duty += x;
-		}
-		__HAL_TIM_SET_COMPARE(&htim14, TIM_CHANNEL_1, duty);
-		//htim14.Instance->CCR1 = duty;
-		*/
 	}
 	return 1;
 }
