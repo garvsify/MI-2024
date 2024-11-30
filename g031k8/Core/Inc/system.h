@@ -40,7 +40,7 @@
 #define OFF 0
 
 		//TURN ON/OFF SYMMETRY and SET RESOLUTION
-		#define SYMMETRY_ADC_RESOLUTION 10
+		#define SYMMETRY_ADC_RESOLUTION 8
 		#define SYMMETRY_ON_OR_OFF ON
 
 		#if SYMMETRY_ADC_RESOLUTION == 10
@@ -82,6 +82,7 @@ volatile extern uint8_t TIM16_prescaler_divisors_final_index;
 volatile extern uint16_t ADCResultsDMA[4];
 const extern uint8_t num_ADC_conversions;
 volatile extern uint8_t initial_ADC_conversion_complete;
+volatile extern uint8_t TIM16_final_start_value_and_adjusted_prescaler_are_ready;
 
 //CUSTOM TYPES
 enum Polarity{
@@ -111,7 +112,7 @@ uint8_t Start_Freq_Gen_Timer(void);
 uint8_t Start_PWM_TIM(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel);
 uint8_t Start_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel);
 uint8_t Stop_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel);
-uint8_t Process_TIM16_Raw_Start_Value_and_Prescaler(void);
+uint8_t Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(void);
 uint8_t Process_TIM16_Final_Start_Value_and_Prescaler_Adjust(void);
 uint8_t Adjust_and_Set_TIM16_Prescaler(void);
 uint8_t Shorten_Period(void);

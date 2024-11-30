@@ -26,6 +26,7 @@ volatile uint8_t TIM16_prescaler_overflow_flag = 0;
 volatile uint8_t TIM16_prescaler_divisors_final_index = 0;
 volatile uint16_t ADCResultsDMA[4] = {0};
 volatile uint8_t initial_ADC_conversion_complete = 0;
+volatile uint8_t TIM16_final_start_value_and_adjusted_prescaler_are_ready = NO;
 
 //FUNCTION DEFINITIONS
 uint8_t Global_Interrupt_Enable(void){
@@ -115,7 +116,7 @@ uint8_t Stop_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t OC_TIM_channel){
 	return ok;
 }
 
-uint8_t Process_TIM16_Raw_Start_Value_and_Prescaler(void){
+uint8_t Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(void){
 
 	uint16_t speed_control = 0;
 	uint32_t speed_control_32 = 0;

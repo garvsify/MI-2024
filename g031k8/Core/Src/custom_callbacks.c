@@ -2,10 +2,12 @@
 
 void TIM16_callback(TIM_HandleTypeDef *htim)
 {
-	__HAL_TIM_SET_COUNTER(&htim16, (uint16_t)TIM16_final_start_value); //this line must go here, or at least very near the beginning!
-	Adjust_and_Set_TIM16_Prescaler();
-
 	//interrupt flag is already cleared by stm32g0xx_it.c
+
+	//if(TIM16_final_start_value_and_adjusted_prescaler_are_ready == YES){
+		__HAL_TIM_SET_COUNTER(&htim16, (uint16_t)TIM16_final_start_value); //this line must go here, or at least very near the beginning!
+		Adjust_and_Set_TIM16_Prescaler();
+	//}
 
 	if(current_waveshape == TRIANGLE_MODE){
 		duty = tri_table_one_quadrant[current_one_quadrant_index];
