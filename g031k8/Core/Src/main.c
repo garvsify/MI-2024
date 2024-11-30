@@ -5,6 +5,7 @@ int main(void)
 {
 	System_Init();
 
+	//ENABLE INTERRUPTS
 	Global_Interrupt_Enable();
 
 	//START ADC TRIG. TIMER
@@ -13,6 +14,7 @@ int main(void)
 	//WAIT
 	while(initial_ADC_conversion_complete == 0){}; //wait while first ADC conversion is ongoing
 
+	//Process RAW AND FINAL FREQ. GEN. TIMER START VALUES AND PRESCALER
 	Process_TIM16_Raw_Start_Value_and_Prescaler();
 	Process_TIM16_Final_Start_Value_and_Prescaler_Adjust();
 

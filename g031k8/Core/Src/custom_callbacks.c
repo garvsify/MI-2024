@@ -3,6 +3,7 @@
 void TIM16_callback(TIM_HandleTypeDef *htim)
 {
 	__HAL_TIM_SET_COUNTER(&htim16, (uint16_t)TIM16_final_start_value); //this line must go here, or at least very near the beginning!
+	Adjust_and_Set_TIM16_Prescaler();
 
 	//interrupt flag is already cleared by stm32g0xx_it.c
 
