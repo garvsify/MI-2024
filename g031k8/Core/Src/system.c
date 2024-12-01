@@ -175,35 +175,80 @@ uint8_t Adjust_and_Set_TIM16_Prescaler(uint8_t TIM16_prescaler_adjust_arg){
 #if SYMMETRY_ON_OR_OFF == ON
 
     uint8_t Shorten_Period(void){
-        #if SYMMETRY_ADC_RESOLUTION == 8
-            uint32_t twofiftysix_minus_start_value_final = (((256-TIM16_raw_start_value)*(SHORTEN_POWER_OF_TWO_CONSTANT_8_BIT_SYM+(24*current_symmetry)))>>SHORTEN_POWER_OF_TWO_DIVISOR_8_BIT_SYM);
-        #endif
-        #if SYMMETRY_ADC_RESOLUTION == 10
-            uint32_t twofiftysix_minus_start_value_final = (((256-TIM16_raw_start_value)*(SHORTEN_POWER_OF_TWO_CONSTANT_10_BIT_SYM+(24*current_symmetry)))>>SHORTEN_POWER_OF_TWO_DIVISOR_10_BIT_SYM);
-        #endif
 
-        TIM16_final_start_value = (256-twofiftysix_minus_start_value_final);
-        TIM16_prescaler_adjust = DO_NOTHING;
+		#if SYMMETRY_ADC_RESOLUTION == 8 || SYMMETRY_ADC_RESOLUTION == 10
+			#if SYMMETRY_ADC_RESOLUTION == 8
+				uint32_t twofiftysix_minus_start_value_final = (((256-TIM16_raw_start_value)*(SHORTEN_POWER_OF_TWO_CONSTANT_8_BIT_SYM+(24*current_symmetry)))>>SHORTEN_POWER_OF_TWO_DIVISOR_8_BIT_SYM);
+			#endif
+			#if SYMMETRY_ADC_RESOLUTION == 10
+				uint32_t twofiftysix_minus_start_value_final = (((256-TIM16_raw_start_value)*(SHORTEN_POWER_OF_TWO_CONSTANT_10_BIT_SYM+(24*current_symmetry)))>>SHORTEN_POWER_OF_TWO_DIVISOR_10_BIT_SYM);
+			#endif
+
+			TIM16_final_start_value = (256-twofiftysix_minus_start_value_final);
+			TIM16_prescaler_adjust = DO_NOTHING;
+		#endif
+
+		#if SYMMETRY_ADC_RESOLUTION == 12
+
+			//overall: TIM16_final_start_value_new * 2 * (current_symmetry/128)
+			/*uint16_t TIM16_final_start_value_new = (uint16_t)((uint8_t)TIM16_raw_start_value << 2); //multiply by 2
+			TIM16_final_start_value_new = TIM16_final_start_value_new * (uint16_t)current_symmetry; //multiply by numerator //probs don't need uin32_t anymore
+			TIM16_final_start_value_new = (uint32_t)(TIM16_final_start_value_new >> SYMMETRY_ADC_HALF_SCALE_NO_BITS); //divide by half scale //probs don't need uin32_t anymore*/
+
+			uint32_t TIM16_final_start_value_new = ((TIM16_raw_start_value * current_symmetry) << 2) >> SYMMETRY_ADC_HALF_SCALE_NO_BITS;
+
+			if(TIM16_final_start_value_new > 127){
+				TIM16_final_start_value = (uint32_t)(TIM16_final_start_value_new - 127); //probs don't need uin32_t anymore
+				TIM16_prescaler_adjust = MULTIPLY_BY_TWO;
+			}
+			else{
+				TIM16_final_start_value = (uint32_t)TIM16_final_start_value_new; //probs don't need uin32_t anymore
+				TIM16_prescaler_adjust = DO_NOTHING;
+			}
+
+		#endif
+
         return 1;
     }
 
     uint8_t Lengthen_Period(void){
-        #if SYMMETRY_ADC_RESOLUTION == 8
-            uint32_t twofiftysix_minus_start_value_final = (((256-TIM16_raw_start_value)*(LENGTHEN_CONSTANT_8_BIT_SYM-(3*current_symmetry)))>>LENGTHEN_POWER_OF_TWO_DIVISOR_8_BIT_SYM);
-        #endif
-        #if SYMMETRY_ADC_RESOLUTION == 10
-            uint32_t twofiftysix_minus_start_value_final = (((256-TIM16_raw_start_value)*(LENGTHEN_CONSTANT_10_BIT_SYM-(3*current_symmetry)))>>LENGTHEN_POWER_OF_TWO_DIVISOR_10_BIT_SYM);
-        #endif
 
-        if(twofiftysix_minus_start_value_final > 256){
-            twofiftysix_minus_start_value_final = (twofiftysix_minus_start_value_final >> 1);
-            TIM16_final_start_value = (256-twofiftysix_minus_start_value_final);
-            TIM16_prescaler_adjust = MULTIPLY_BY_TWO;
-        }
-        else{
-            TIM16_final_start_value = 256-twofiftysix_minus_start_value_final;
-            TIM16_prescaler_adjust = DO_NOTHING;
-        }
+		#if SYMMETRY_ADC_RESOLUTION == 8 || SYMMETRY_ADC_RESOLUTION == 10
+
+			#if SYMMETRY_ADC_RESOLUTION == 8
+				uint32_t twofiftysix_minus_start_value_final = (((256-TIM16_raw_start_value)*(LENGTHEN_CONSTANT_8_BIT_SYM-(3*current_symmetry)))>>LENGTHEN_POWER_OF_TWO_DIVISOR_8_BIT_SYM);
+			#endif
+			#if SYMMETRY_ADC_RESOLUTION == 10
+				uint32_t twofiftysix_minus_start_value_final = (((256-TIM16_raw_start_value)*(LENGTHEN_CONSTANT_10_BIT_SYM-(3*current_symmetry)))>>LENGTHEN_POWER_OF_TWO_DIVISOR_10_BIT_SYM);
+			#endif
+
+			if(twofiftysix_minus_start_value_final > 256){
+				twofiftysix_minus_start_value_final = (twofiftysix_minus_start_value_final >> 1);
+				TIM16_final_start_value = (256-twofiftysix_minus_start_value_final);
+				TIM16_prescaler_adjust = MULTIPLY_BY_TWO;
+			}
+			else{
+				TIM16_final_start_value = 256-twofiftysix_minus_start_value_final;
+				TIM16_prescaler_adjust = DO_NOTHING;
+			}
+		#endif
+
+
+		#if SYMMETRY_ADC_RESOLUTION == 12
+
+			//overall: TIM16_final_start_value_new * (2/3) * (current_symmetry/128)
+			/*uint16_t TIM16_final_start_value_new = (uint16_t)((uint8_t)TIM16_raw_start_value << 2); //multiply by 2
+			TIM16_final_start_value_new = TIM16_final_start_value_new / 3; //divide by 3 (see if the compiler doesn't care?)
+			TIM16_final_start_value_new = TIM16_final_start_value_new * (uint16_t)current_symmetry; //multiply by numerator //probs don't need uin32_t anymore
+			TIM16_final_start_value_new = (uint32_t)(TIM16_final_start_value_new >> SYMMETRY_ADC_HALF_SCALE_NO_BITS); //divide by half scale //probs don't need uin32_t anymore
+
+			TIM16_final_start_value = (uint32_t)TIM16_final_start_value_new; //probs don't need uin32_t anymore*/
+
+			TIM16_final_start_value = (TIM16_raw_start_value * (2/3) * current_symmetry) >> SYMMETRY_ADC_HALF_SCALE_NO_BITS;
+			TIM16_prescaler_adjust = DO_NOTHING;
+
+		#endif
+
         return 1;
     }
 #endif
@@ -219,7 +264,7 @@ uint8_t Process_TIM16_Final_Start_Value_and_Prescaler_Adjust(void){
         else{
             uint8_t symmetry_status = CCW;
             if(current_symmetry > SYMMETRY_ADC_HALF_SCALE){
-                current_symmetry = SYMMETRY_ADC_FULL_SCALE - current_symmetry; //converts current_symmetry to 128 -> 0 range (same range as CCW regime, more or less)
+                current_symmetry = SYMMETRY_ADC_FULL_SCALE - current_symmetry; //converts current_symmetry to 128 -> 0 range (same range as CCW regime, more or less) (in 8 bit, obvs different for other resolutions)
                 symmetry_status = CW;
             }
             if(current_halfcycle == FIRST_HALFCYCLE){

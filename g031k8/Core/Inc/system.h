@@ -46,7 +46,8 @@
 #define OFF 0
 
 		//TURN ON/OFF SYMMETRY and SET RESOLUTION
-		#define SYMMETRY_ADC_RESOLUTION 8
+		//set SYMMETRY_ADC_RESOLUTION to either 8, 10, or 12. 8 and 10 use the old equations, 12 uses the new equations.
+		#define SYMMETRY_ADC_RESOLUTION 12
 		#define SYMMETRY_ON_OR_OFF ON
 
 		#if SYMMETRY_ADC_RESOLUTION == 10
@@ -59,6 +60,12 @@
 			#define SYMMETRY_ADC_HALF_SCALE_NO_BITS 7
 			#define SYMMETRY_ADC_FULL_SCALE 255
 			#define SYMMETRY_ADC_HALF_SCALE 128
+		#endif
+
+		#if SYMMETRY_ADC_RESOLUTION == 12
+			#define SYMMETRY_ADC_FULL_SCALE 4095
+			#define SYMMETRY_ADC_HALF_SCALE_NO_BITS 11
+			#define SYMMETRY_ADC_HALF_SCALE 2048
 		#endif
 
 		//TURN ON/OFF DEPTH

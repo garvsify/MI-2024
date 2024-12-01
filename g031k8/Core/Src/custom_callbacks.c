@@ -157,6 +157,11 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 
 		#endif
 
+		#if SYMMETRY_ADC_RESOLUTION == 12
+			current_symmetry = ADCResultsDMA[3];
+
+		#endif
+
 	#endif
 
 	//after initial conversion is complete, set the conversion complete flag
