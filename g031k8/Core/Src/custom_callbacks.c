@@ -35,8 +35,11 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	else if((current_waveshape == SQUARE_MODE) && (current_index < SECOND_QUADRANT_START_INDEX)){
 		duty = 1023;
 	}
-	else if((current_waveshape == SQUARE_MODE) && (current_index >= SECOND_QUADRANT_START_INDEX)){
-		duty = 0;
+	else if((current_waveshape == SQUARE_MODE) && (current_index >= SECOND_QUADRANT_START_INDEX) && (current_index < FOURTH_QUADRANT_START_INDEX)){
+			duty = 0;
+	}
+	else if((current_waveshape == SQUARE_MODE) && (current_index >= FOURTH_QUADRANT_START_INDEX)){
+		duty = 1023;
 	}
 	/// I HAVE INCORRECTLY PUT THE SYMMETRY ADJUSTMENT AT HALFWAY THROUGH THE HALFCYCLES RATHER THAN AT THEIR BEGINNINGS
 	/// BUT I QUITE LIKE IT AND IT WORKS BETTER SO I MIGHT JUST LEAVE IT
@@ -52,6 +55,7 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 		current_quadrant = SECOND_QUADRANT;
 		current_halfcycle = FIRST_HALFCYCLE;
 		halfcycle_has_changed = YES; //it is not the halfcycle changing here, but for the sake of the new symmetry thing i'm doing, this is in aid of that
+		HAL_GPIO_TogglePin(SYM_PROC_GPIO_Port, SYM_PROC_Pin);
 	}
 	else if(current_index == THIRD_QUADRANT_START_INDEX){
 		current_quadrant = FIRST_QUADRANT;
@@ -65,6 +69,7 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 		current_quadrant = SECOND_QUADRANT;
 		current_halfcycle = SECOND_HALFCYCLE;
 		halfcycle_has_changed = YES; //it is not the halfcycle changing here, but for the sake of the new symmetry thing i'm doing, this is in aid of that
+		HAL_GPIO_TogglePin(SYM_PROC_GPIO_Port, SYM_PROC_Pin);
 	}
 
 	#if DEPTH_ON_OR_OFF == 1

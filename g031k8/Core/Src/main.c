@@ -43,7 +43,7 @@ int main(void)
 
 					if(halfcycle_has_changed == YES){
 
-						HAL_GPIO_TogglePin(SYM_PROC_GPIO_Port, SYM_PROC_Pin);
+						//HAL_GPIO_TogglePin(SYM_PROC_GPIO_Port, SYM_PROC_Pin);
 
 						TIM16_final_start_value_locked = TIM16_final_start_value;
 						TIM16_prescaler_adjust_locked = TIM16_prescaler_adjust;
@@ -51,7 +51,6 @@ int main(void)
 					}
 				}
 				halfcycle_is_about_to_change = NO;
-				//HAL_GPIO_WritePin(SYM_PROC_GPIO_Port, SYM_PROC_Pin, 0);
 			}
 		}
 	}
