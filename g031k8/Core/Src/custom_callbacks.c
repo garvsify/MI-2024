@@ -2,88 +2,82 @@
 
 void TIM16_callback(TIM_HandleTypeDef *htim)
 {
-	//interrupt flag is already cleared by stm32g0xx_it.c
+	//TIM16 interrupt flag is already cleared by stm32g0xx_it.c
 
+	Global_Interrupt_Disable();
 	HAL_GPIO_TogglePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin);
 	TIM16_callback_active = YES;
 
-	__HAL_TIM_SET_COUNTER(&htim16, (uint16_t)TIM16_final_start_value_locked); //this line must go here, or at least very near the beginning!
-	Adjust_and_Set_TIM16_Prescaler(TIM16_prescaler_adjust_locked);
-	//Write Duty
+	//////////////////////////
+	//SET THE CURRENT(prev) VALUES//
+	//////////////////////////
+	__HAL_TIM_SET_COUNTER(&htim16, (uint16_t)TIM16_final_start_value); //this line must go here, or at least very near the beginning!
+	Adjust_and_Set_TIM16_Prescaler(TIM16_prescaler_adjust);
 	__HAL_TIM_SET_COMPARE(&htim14, TIM_CHANNEL_1, prev_duty); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
 
-	if((current_quadrant == SECOND_QUADRANT) && (current_one_quadrant_index == SYMMETRY_PROCESSING_QUADRANT_THRESHOLD)){
-			halfcycle_is_about_to_change = YES;
-			HAL_GPIO_WritePin(SYM_PROC_GPIO_Port, SYM_PROC_Pin, 1);
-			TIM16_final_start_value_locked = TIM16_final_start_value;
-			TIM16_prescaler_adjust_locked = TIM16_prescaler_adjust;
-			HAL_GPIO_TogglePin(SYM_PROC_GPIO_Port, SYM_PROC_Pin);
-			halfcycle_is_about_to_change = NO;
-	}
+	/////////////////////////////
+	//CALCULATE THE NEXT VALUES//
+	/////////////////////////////
+	current_index++;
 
-	/*if(processing_TIM16_final_start_value_and_prescaler == YES){
-		__HAL_TIM_SET_COUNTER(&htim16, (uint16_t)exit_TIM16_final_start_value_locked); //this line must go here, or at least very near the beginning!
-		Adjust_and_Set_TIM16_Prescaler(exit_TIM16_prescaler_adjust_locked);
+	if(current_index == FINAL_INDEX + 1){
+		current_quadrant = FIRST_QUADRANT;
+		current_halfcycle = FIRST_HALFCYCLE;
+		current_index = 0;
 	}
-	else{*/ //DO NOT COMMENT BACK IN - FUCKS IT UP
-
-	//}
 
 	if(current_waveshape == TRIANGLE_MODE){
-		duty = tri_table_one_quadrant[current_one_quadrant_index];
+		duty = tri_wavetable[current_index];
 	}
 	else if(current_waveshape == SINE_MODE){
-		duty = sine_table_one_quadrant[current_one_quadrant_index];
+		duty = sine_wavetable[current_index];
 	}
-	else if(current_waveshape == SQUARE_MODE){
+	else if((current_waveshape == SQUARE_MODE) && (current_index < THIRD_QUADRANT_START_INDEX)){
 		duty = 1023;
 	}
-	if(current_one_quadrant_index == MAX_QUADRANT_INDEX){
+	else if((current_waveshape == SQUARE_MODE) && (current_index >= THIRD_QUADRANT_START_INDEX)){
+		duty = 0;
+	}
+
+	if(current_index == FIRST_QUADRANT_START_INDEX){
+		current_quadrant = FIRST_QUADRANT;
+		current_halfcycle = FIRST_HALFCYCLE;
+	}
+	else if(current_index == SECOND_QUADRANT_START_INDEX){
 		current_quadrant = SECOND_QUADRANT;
+		current_halfcycle = FIRST_HALFCYCLE;
 	}
-	else if(current_one_quadrant_index == MIN_QUADRANT_INDEX){
-		if((current_halfcycle == FIRST_HALFCYCLE) && (current_quadrant == SECOND_QUADRANT)){
-			current_halfcycle = SECOND_HALFCYCLE;
-			current_quadrant = FIRST_QUADRANT;
-			halfcycle_has_changed = YES;
+	else if(current_index == THIRD_QUADRANT_START_INDEX){
+		current_quadrant = FIRST_QUADRANT;
+		current_halfcycle = SECOND_HALFCYCLE;
+	}
+	else if(current_index == FOURTH_QUADRANT_START_INDEX){
+		current_quadrant = SECOND_QUADRANT;
+		current_halfcycle = SECOND_HALFCYCLE;
+	}
+
+	#if DEPTH_ON_OR_OFF == 1
+
+		//Apply Depth
+		if(current_depth == 255){
+			duty = 1023 - duty;
 		}
-		else if((current_halfcycle == SECOND_HALFCYCLE) && (current_quadrant == SECOND_QUADRANT)){
-			current_halfcycle = FIRST_HALFCYCLE;
-			current_quadrant = FIRST_QUADRANT;
-			halfcycle_has_changed = YES;
+		else if(current_depth != 0){
+			//duty = 1023 - duty*(current_depth >> 8);
+			Multiply_Duty_By_Current_Depth_and_Divide_By_256();
 		}
-	}
+		else{
+			duty = 1023; //if depth is 0, just output 1023
+		}
 
-	if(current_quadrant == FIRST_QUADRANT){
-		current_one_quadrant_index++;
-	}
-	else{
-		current_one_quadrant_index--;
-	}
-	if(current_halfcycle == SECOND_HALFCYCLE){
-		duty = 1023 - duty;
-	}
+	#endif
 
-#if DEPTH_ON_OR_OFF == 1
-
-	//Apply Depth
-	if(current_depth == 255){
-		duty = 1023 - duty;
-	}
-	else if(current_depth != 0){
-		//duty = 1023 - duty*(current_depth >> 8);
-		Multiply_Duty_By_Current_Depth_and_Divide_By_256();
-	}
-	else{
-		duty = 1023; //if depth is 0, just output 1023
-	}
 	prev_duty = duty;
 
-#endif
+	Global_Interrupt_Enable();
 
 	TIM16_callback_active = NO;
 	HAL_GPIO_TogglePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin);
-	HAL_GPIO_WritePin(SYM_PROC_GPIO_Port, SYM_PROC_Pin, 0);
 }
 
 uint8_t Multiply_Duty_By_Current_Depth_and_Divide_By_256(void)
@@ -130,7 +124,6 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 
 	//GET DEPTH
 	#if DEPTH_ON_OR_OFF == ON
-
 		current_depth = ADCResultsDMA[2] >> 4; //convert to 8-bit
 
 	#endif
@@ -139,13 +132,11 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 	#if SYMMETRY_ON_OR_OFF == ON
 
 		#if SYMMETRY_ADC_RESOLUTION == 10
-
 			current_symmetry = ADCResultsDMA[3] >> 2;
 
 		#endif
 
 		#if SYMMETRY_ADC_RESOLUTION == 8
-
 			current_symmetry = ADCResultsDMA[3] >> 4;
 
 		#endif
@@ -154,7 +145,6 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 
 	//after initial conversion is complete, set the conversion complete flag
 	if(initial_ADC_conversion_complete == 0){
-
 		initial_ADC_conversion_complete = 1;
 	}
 

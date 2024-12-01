@@ -222,8 +222,10 @@ void MX_TIM16_Init(void)
   }
   /* USER CODE BEGIN TIM16_Init 2 */
 
-  /* USER CODE END TIM16_Init 2 */
+  HAL_NVIC_SetPriority(TIM16_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(TIM16_IRQn);
 
+  /* USER CODE END TIM16_Init 2 */
 }
 
 void MX_TIM17_Init(void)
@@ -242,7 +244,7 @@ void MX_TIM17_Init(void)
   htim17.Instance = TIM17;
   htim17.Init.Prescaler = 0;
   htim17.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim17.Init.Period = 10000;
+  htim17.Init.Period = 20000;
   htim17.Init.ClockDivision = TIM_CLOCKDIVISION_DIV2;
   htim17.Init.RepetitionCounter = 0;
   htim17.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
@@ -255,7 +257,7 @@ void MX_TIM17_Init(void)
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_TIMING;
-  sConfigOC.Pulse = 10000;
+  sConfigOC.Pulse = 20000;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCNPolarity = TIM_OCNPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
@@ -311,10 +313,10 @@ void MX_DMA_Init(void)
 
   /* DMA interrupt init */
   /* DMA1_Channel1_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 3, 3);
   HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
   /* DMA1_Ch4_5_DMAMUX1_OVR_IRQn interrupt configuration */ //- i think to do with scan mode adc
-  HAL_NVIC_SetPriority(DMA1_Ch4_5_DMAMUX1_OVR_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(DMA1_Ch4_5_DMAMUX1_OVR_IRQn, 3, 3);
   HAL_NVIC_EnableIRQ(DMA1_Ch4_5_DMAMUX1_OVR_IRQn);
 
 }

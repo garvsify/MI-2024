@@ -6,8 +6,11 @@
 #include <stdint.h>
 
 //MACROS
-#define MAX_QUADRANT_INDEX 128
-#define MIN_QUADRANT_INDEX 0
+#define FIRST_QUADRANT_START_INDEX 0
+#define SECOND_QUADRANT_START_INDEX 128
+#define THIRD_QUADRANT_START_INDEX 256
+#define FOURTH_QUADRANT_START_INDEX 384
+#define FINAL_INDEX 511
 #define TRIANGLE_MODE 0
 #define SINE_MODE 1
 #define SQUARE_MODE 2
@@ -60,8 +63,8 @@
 		#define DEPTH_ON_OR_OFF ON
 
 //CONSTANTS
-extern const uint16_t sine_table_one_quadrant[129];
-extern const uint16_t tri_table_one_quadrant[129];
+extern const uint16_t sine_wavetable[512];
+extern const uint16_t tri_wavetable[512];
 extern const uint16_t TIM16_prescaler_divisors[9];
 
 //VARIABLES
@@ -75,7 +78,7 @@ volatile extern uint16_t current_speed_linear;
 volatile extern uint32_t current_speed_linear_32;
 volatile extern uint16_t current_depth;
 volatile extern uint32_t current_symmetry;
-volatile extern uint8_t current_one_quadrant_index;
+volatile extern uint16_t current_index;
 volatile extern uint8_t current_halfcycle;
 volatile extern uint8_t current_quadrant;
 volatile extern uint8_t TIM16_prescaler_overflow_flag;

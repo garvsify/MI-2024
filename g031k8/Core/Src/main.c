@@ -26,17 +26,12 @@ int main(void)
 	{
 		if(TIM16_callback_active == NO){
 
-			Global_Interrupt_Disable();
-
 			processing_TIM16_final_start_value_and_prescaler = YES;
 
-			exit_TIM16_final_start_value_locked = TIM16_final_start_value_locked; //TIM16 may interrupt during calculation of timer start value and prescaler value, so 'exit' values are stored in case they need to be used
-			exit_TIM16_prescaler_adjust_locked = TIM16_prescaler_adjust_locked;
-
-			Global_Interrupt_Enable();
-
+			//HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 1);
 			Process_TIM16_Raw_Start_Value_and_Raw_Prescaler();
 			Process_TIM16_Final_Start_Value_and_Prescaler_Adjust();
+			//HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 0);
 
 			processing_TIM16_final_start_value_and_prescaler = NO;
 		}

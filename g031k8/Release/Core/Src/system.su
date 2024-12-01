@@ -1,0 +1,11 @@
+../Core/Src/system.c:40:9:Global_Interrupt_Enable	0	static,ignoring_inline_asm
+../Core/Src/system.c:46:9:Global_Interrupt_Disable	0	static,ignoring_inline_asm
+../Core/Src/system.c:88:9:Start_PWM_TIM	16	static
+../Core/Src/system.c:64:9:Start_PWM_Gen_Timer	8	static
+../Core/Src/system.c:102:9:Start_OC_TIM	8	static
+../Core/Src/system.c:52:9:Start_ADC_Trig_Timer	8	static
+../Core/Src/system.c:76:9:Start_Freq_Gen_Timer	8	static
+../Core/Src/system.c:115:9:Stop_OC_TIM	8	static
+../Core/Src/system.c:127:9:Process_TIM16_Raw_Start_Value_and_Raw_Prescaler	8	static
+../Core/Src/system.c:155:9:Adjust_and_Set_TIM16_Prescaler	4	static
+../Core/Src/system.c:211:9:Process_TIM16_Final_Start_Value_and_Prescaler_Adjust	0	static
