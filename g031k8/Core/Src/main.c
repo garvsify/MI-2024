@@ -32,14 +32,18 @@ int main(void)
 
 					processing_TIM16_final_start_value_and_prescaler = YES;
 
-					HAL_GPIO_TogglePin(SYM_PROC_GPIO_Port, SYM_PROC_Pin);
+					Global_Interrupt_Disable(); //DO NOT DELETE
 
 					Process_TIM16_Raw_Start_Value_and_Raw_Prescaler();
 					Process_TIM16_Final_Start_Value_and_Prescaler_Adjust();
 
+					Global_Interrupt_Enable(); //DO NIT DELETE
+
 					processing_TIM16_final_start_value_and_prescaler = NO;
 
 					if(halfcycle_has_changed == YES){
+
+						HAL_GPIO_TogglePin(SYM_PROC_GPIO_Port, SYM_PROC_Pin);
 
 						TIM16_final_start_value_locked = TIM16_final_start_value;
 						TIM16_prescaler_adjust_locked = TIM16_prescaler_adjust;

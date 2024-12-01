@@ -32,10 +32,10 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	else if(current_waveshape == SINE_MODE){
 		duty = sine_wavetable[current_index];
 	}
-	else if((current_waveshape == SQUARE_MODE) && (current_index < THIRD_QUADRANT_START_INDEX)){
+	else if((current_waveshape == SQUARE_MODE) && (current_index < SECOND_QUADRANT_START_INDEX)){
 		duty = 1023;
 	}
-	else if((current_waveshape == SQUARE_MODE) && (current_index >= THIRD_QUADRANT_START_INDEX)){
+	else if((current_waveshape == SQUARE_MODE) && (current_index >= SECOND_QUADRANT_START_INDEX)){
 		duty = 0;
 	}
 	/// I HAVE INCORRECTLY PUT THE SYMMETRY ADJUSTMENT AT HALFWAY THROUGH THE HALFCYCLES RATHER THAN AT THEIR BEGINNINGS
@@ -43,28 +43,28 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	if(current_index == FIRST_QUADRANT_START_INDEX){
 		current_quadrant = FIRST_QUADRANT;
 		current_halfcycle = FIRST_HALFCYCLE;
-		halfcycle_has_changed = YES;
 	}
 	else if(current_index - DELAY == SECOND_QUADRANT_START_INDEX - HALFCYCLE_WINDOW){
-		halfcycle_is_about_to_change = YES;
+		halfcycle_is_about_to_change = YES; //it is not the halfcycle changing here, but for the sake of the new symmetry thing i'm doing, this is in aid of that
 		values_locked = NO;
 	}
 	else if(current_index == SECOND_QUADRANT_START_INDEX){
 		current_quadrant = SECOND_QUADRANT;
 		current_halfcycle = FIRST_HALFCYCLE;
+		halfcycle_has_changed = YES; //it is not the halfcycle changing here, but for the sake of the new symmetry thing i'm doing, this is in aid of that
 	}
 	else if(current_index == THIRD_QUADRANT_START_INDEX){
 		current_quadrant = FIRST_QUADRANT;
 		current_halfcycle = SECOND_HALFCYCLE;
-		halfcycle_has_changed = YES;
 	}
-	else if(current_index - DELAY == FOURTH_QUADRANT_START_INDEX - HALFCYCLE_WINDOW){
-		halfcycle_is_about_to_change = YES;
+	else if(current_index - DELAY_2 == FOURTH_QUADRANT_START_INDEX - HALFCYCLE_WINDOW){
+		halfcycle_is_about_to_change = YES; //it is not the halfcycle changing here, but for the sake of the new symmetry thing i'm doing, this is in aid of that
 		values_locked = NO;
 	}
 	else if(current_index == FOURTH_QUADRANT_START_INDEX){
 		current_quadrant = SECOND_QUADRANT;
 		current_halfcycle = SECOND_HALFCYCLE;
+		halfcycle_has_changed = YES; //it is not the halfcycle changing here, but for the sake of the new symmetry thing i'm doing, this is in aid of that
 	}
 
 	#if DEPTH_ON_OR_OFF == 1

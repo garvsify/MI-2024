@@ -39,8 +39,9 @@
 #define TWELVEBITMINUSONE 4095
 #define TENBITMINUSONE 1023
 #define EIGHTBITMINUSONE 255
-#define HALFCYCLE_WINDOW 10
-#define DELAY 10
+#define HALFCYCLE_WINDOW 2
+#define DELAY 0
+#define DELAY_2 0
 #define ON 1
 #define OFF 0
 
