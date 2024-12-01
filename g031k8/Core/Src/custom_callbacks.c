@@ -38,13 +38,14 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	else if((current_waveshape == SQUARE_MODE) && (current_index >= THIRD_QUADRANT_START_INDEX)){
 		duty = 0;
 	}
-
+	/// I HAVE INCORRECTLY PUT THE SYMMETRY ADJUSTMENT AT HALFWAY THROUGH THE HALFCYCLES RATHER THAN AT THEIR BEGINNINGS
+	/// BUT I QUITE LIKE IT AND IT WORKS BETTER SO I MIGHT JUST LEAVE IT
 	if(current_index == FIRST_QUADRANT_START_INDEX){
 		current_quadrant = FIRST_QUADRANT;
 		current_halfcycle = FIRST_HALFCYCLE;
 		halfcycle_has_changed = YES;
 	}
-	else if(current_index == SECOND_QUADRANT_START_INDEX - HALFCYCLE_WINDOW){
+	else if(current_index - DELAY == SECOND_QUADRANT_START_INDEX - HALFCYCLE_WINDOW){
 		halfcycle_is_about_to_change = YES;
 		values_locked = NO;
 	}
@@ -57,7 +58,7 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 		current_halfcycle = SECOND_HALFCYCLE;
 		halfcycle_has_changed = YES;
 	}
-	else if(current_index == FOURTH_QUADRANT_START_INDEX - HALFCYCLE_WINDOW){
+	else if(current_index - DELAY == FOURTH_QUADRANT_START_INDEX - HALFCYCLE_WINDOW){
 		halfcycle_is_about_to_change = YES;
 		values_locked = NO;
 	}
