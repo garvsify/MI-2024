@@ -264,16 +264,16 @@ uint8_t Process_TIM16_Final_Start_Value_and_Prescaler_Adjust_Slow_Speeds(void)
                 current_symmetry = SYMMETRY_ADC_FULL_SCALE - current_symmetry; //converts current_symmetry to 128 -> 0 range (same range as CCW regime, more or less)
                 symmetry_status = CW;
             }
-            if(current_halfcycle == FIRST_HALFCYCLE){
-                if(symmetry_status == CCW){
+            if(((current_quadrant == FIRST_QUADRANT) && (current_halfcycle == FIRST_HALFCYCLE)) || ((current_quadrant == SECOND_QUADRANT) && (current_halfcycle == SECOND_HALFCYCLE))){
+                if(symmetry_status == CW){
                     Shorten_Period();
                 }
                 else{
                     Lengthen_Period();
                 }
             }
-            else if(current_halfcycle == SECOND_HALFCYCLE){
-                if(symmetry_status == CCW){
+            else if(((current_quadrant == SECOND_QUADRANT) && (current_halfcycle == FIRST_HALFCYCLE)) || ((current_quadrant == FIRST_QUADRANT) && (current_halfcycle == SECOND_HALFCYCLE))){
+                if(symmetry_status == CW){
                     Lengthen_Period();
                 }
                 else{
