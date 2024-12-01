@@ -30,27 +30,29 @@ int main(void)
 
 				if(values_locked == NO){
 
-					processing_TIM16_final_start_value_and_prescaler = YES;
-
-					Global_Interrupt_Disable(); //DO NOT DELETE
-
-					Process_TIM16_Raw_Start_Value_and_Raw_Prescaler();
-					Process_TIM16_Final_Start_Value_and_Prescaler_Adjust();
-
-					Global_Interrupt_Enable(); //DO NIT DELETE
-
-					processing_TIM16_final_start_value_and_prescaler = NO;
-
 					if(halfcycle_has_changed == YES){
+
+						processing_TIM16_final_start_value_and_prescaler = YES;
+
+						Global_Interrupt_Disable(); //DO NOT DELETE
+
+						Process_TIM16_Raw_Start_Value_and_Raw_Prescaler();
+						Process_TIM16_Final_Start_Value_and_Prescaler_Adjust();
+
+						Global_Interrupt_Enable(); //DO NIT DELETE
+
+						processing_TIM16_final_start_value_and_prescaler = NO;
 
 						//HAL_GPIO_TogglePin(SYM_PROC_GPIO_Port, SYM_PROC_Pin);
 
 						TIM16_final_start_value_locked = TIM16_final_start_value;
 						TIM16_prescaler_adjust_locked = TIM16_prescaler_adjust;
+
+						halfcycle_has_changed = NO;
+						halfcycle_is_about_to_change = NO;
 						values_locked = YES;
 					}
 				}
-				halfcycle_is_about_to_change = NO;
 			}
 		}
 	}
