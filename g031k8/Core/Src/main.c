@@ -26,31 +26,49 @@ int main(void)
 	{
 		if(TIM16_callback_active == NO){
 
-			if(halfcycle_is_about_to_change == YES){
+			if(current_speed_linear < 512){
 
-				if(values_locked == NO){
+				Global_Interrupt_Disable(); //DO NOT DELETE
 
-					if(halfcycle_has_changed == YES){
+				Process_TIM16_Raw_Start_Value_and_Raw_Prescaler();
+				Process_TIM16_Final_Start_Value_and_Prescaler_Adjust_Slow_Speeds();
+				TIM16_final_start_value_locked = TIM16_final_start_value;
+				TIM16_prescaler_adjust_locked = TIM16_prescaler_adjust;
 
-						processing_TIM16_final_start_value_and_prescaler = YES;
+				halfcycle_has_changed = NO;
+				halfcycle_is_about_to_change = NO;
+				values_locked = YES;
 
-						Global_Interrupt_Disable(); //DO NOT DELETE
+				Global_Interrupt_Enable(); //DO NIT DELETE
+			}
+			else{
 
-						Process_TIM16_Raw_Start_Value_and_Raw_Prescaler();
-						Process_TIM16_Final_Start_Value_and_Prescaler_Adjust();
+				if(halfcycle_is_about_to_change == YES){
 
-						Global_Interrupt_Enable(); //DO NIT DELETE
+					if(values_locked == NO){
 
-						processing_TIM16_final_start_value_and_prescaler = NO;
+						if(halfcycle_has_changed == YES){
 
-						//HAL_GPIO_TogglePin(SYM_PROC_GPIO_Port, SYM_PROC_Pin);
+							processing_TIM16_final_start_value_and_prescaler = YES;
 
-						TIM16_final_start_value_locked = TIM16_final_start_value;
-						TIM16_prescaler_adjust_locked = TIM16_prescaler_adjust;
+							Global_Interrupt_Disable(); //DO NOT DELETE
 
-						halfcycle_has_changed = NO;
-						halfcycle_is_about_to_change = NO;
-						values_locked = YES;
+							Process_TIM16_Raw_Start_Value_and_Raw_Prescaler();
+							Process_TIM16_Final_Start_Value_and_Prescaler_Adjust();
+
+							Global_Interrupt_Enable(); //DO NIT DELETE
+
+							processing_TIM16_final_start_value_and_prescaler = NO;
+
+							//HAL_GPIO_TogglePin(SYM_PROC_GPIO_Port, SYM_PROC_Pin);
+
+							TIM16_final_start_value_locked = TIM16_final_start_value;
+							TIM16_prescaler_adjust_locked = TIM16_prescaler_adjust;
+
+							halfcycle_has_changed = NO;
+							halfcycle_is_about_to_change = NO;
+							values_locked = YES;
+						}
 					}
 				}
 			}

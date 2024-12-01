@@ -129,6 +129,7 @@ uint8_t Stop_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel);
 uint8_t Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(void);
 uint8_t Process_TIM16_Final_Start_Value_and_Prescaler_Adjust(void);
 uint8_t Adjust_and_Set_TIM16_Prescaler(uint8_t TIM16_prescaler_adjust_arg);
+uint8_t Process_TIM16_Final_Start_Value_and_Prescaler_Adjust_Slow_Speeds(void);
 uint8_t Shorten_Period(void);
 uint8_t Lengthen_Period(void);
 

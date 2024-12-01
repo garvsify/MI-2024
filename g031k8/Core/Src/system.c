@@ -251,4 +251,46 @@ uint8_t Process_TIM16_Final_Start_Value_and_Prescaler_Adjust(void){
     return 1;
 }
 
+uint8_t Process_TIM16_Final_Start_Value_and_Prescaler_Adjust_Slow_Speeds(void)
+{
+	#if SYMMETRY_ON_OR_OFF == ON
+        if(current_symmetry == SYMMETRY_ADC_HALF_SCALE){
+            TIM16_final_start_value = TIM16_raw_start_value;
+            TIM16_prescaler_adjust = DO_NOTHING;
+        }
+        else{
+            uint8_t symmetry_status = CCW;
+            if(current_symmetry > SYMMETRY_ADC_HALF_SCALE){
+                current_symmetry = SYMMETRY_ADC_FULL_SCALE - current_symmetry; //converts current_symmetry to 128 -> 0 range (same range as CCW regime, more or less)
+                symmetry_status = CW;
+            }
+            if(current_halfcycle == FIRST_HALFCYCLE){
+                if(symmetry_status == CCW){
+                    Shorten_Period();
+                }
+                else{
+                    Lengthen_Period();
+                }
+            }
+            else if(current_halfcycle == SECOND_HALFCYCLE){
+                if(symmetry_status == CCW){
+                    Lengthen_Period();
+                }
+                else{
+                    Shorten_Period();
+                }
+            }
+        }
+
+    #endif
+
+    #if SYMMETRY_ON_OR_OFF == OFF
+        TIM16_final_start_value = TIM16_raw_start_value;
+        TIM16_prescaler_adjust = DO_NOTHING;
+        //Adjust_and_Set_TIM16_Prescaler(); //DO NOT COMMENT BACK IN
+    #endif
+
+    return 1;
+
+}
 
