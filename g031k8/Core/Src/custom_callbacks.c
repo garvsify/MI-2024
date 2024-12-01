@@ -11,8 +11,8 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	//////////////////////////
 	//SET THE CURRENT(prev) VALUES//
 	//////////////////////////
-	__HAL_TIM_SET_COUNTER(&htim16, (uint16_t)TIM16_final_start_value); //this line must go here, or at least very near the beginning!
-	Adjust_and_Set_TIM16_Prescaler(TIM16_prescaler_adjust);
+	__HAL_TIM_SET_COUNTER(&htim16, (uint16_t)TIM16_final_start_value_locked); //this line must go here, or at least very near the beginning!
+	Adjust_and_Set_TIM16_Prescaler(TIM16_prescaler_adjust_locked);
 	__HAL_TIM_SET_COMPARE(&htim14, TIM_CHANNEL_1, prev_duty); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
 
 	/////////////////////////////
@@ -42,6 +42,11 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	if(current_index == FIRST_QUADRANT_START_INDEX){
 		current_quadrant = FIRST_QUADRANT;
 		current_halfcycle = FIRST_HALFCYCLE;
+		halfcycle_has_changed = YES;
+	}
+	else if(current_index == SECOND_QUADRANT_START_INDEX - HALFCYCLE_WINDOW){
+		halfcycle_is_about_to_change = YES;
+		values_locked = NO;
 	}
 	else if(current_index == SECOND_QUADRANT_START_INDEX){
 		current_quadrant = SECOND_QUADRANT;
@@ -50,6 +55,11 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	else if(current_index == THIRD_QUADRANT_START_INDEX){
 		current_quadrant = FIRST_QUADRANT;
 		current_halfcycle = SECOND_HALFCYCLE;
+		halfcycle_has_changed = YES;
+	}
+	else if(current_index == FOURTH_QUADRANT_START_INDEX - HALFCYCLE_WINDOW){
+		halfcycle_is_about_to_change = YES;
+		values_locked = NO;
 	}
 	else if(current_index == FOURTH_QUADRANT_START_INDEX){
 		current_quadrant = SECOND_QUADRANT;

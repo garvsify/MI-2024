@@ -39,7 +39,7 @@
 #define TWELVEBITMINUSONE 4095
 #define TENBITMINUSONE 1023
 #define EIGHTBITMINUSONE 255
-#define SYMMETRY_PROCESSING_QUADRANT_THRESHOLD 2
+#define HALFCYCLE_WINDOW 10
 #define ON 1
 #define OFF 0
 
@@ -94,6 +94,7 @@ volatile extern uint8_t halfcycle_is_about_to_change;
 volatile extern uint32_t TIM16_final_start_value_locked;
 volatile extern uint8_t TIM16_prescaler_adjust_locked;
 volatile extern uint16_t prev_duty;
+volatile extern uint8_t values_locked;
 
 //CUSTOM TYPES
 enum Polarity{
