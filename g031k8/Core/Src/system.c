@@ -246,11 +246,11 @@ uint8_t Adjust_and_Set_TIM16_Prescaler(uint8_t TIM16_prescaler_adjust_arg){
 			TIM16_final_start_value_new = (uint32_t)(TIM16_final_start_value_new >> SYMMETRY_ADC_HALF_SCALE_NO_BITS); //divide by half scale //probs don't need uin32_t anymore
 
 			TIM16_final_start_value = (uint32_t)TIM16_final_start_value_new; //probs don't need uin32_t anymore*/
-
-			uint32_t twofiftyfive_minus_TIM16_final_start_value = (((255 - TIM16_raw_start_value) * current_symmetry) * (2/3)) >> SYMMETRY_ADC_HALF_SCALE_NO_BITS;
+			//22369621 = (2^24)*(2/1.5) -> not 2/3 because (2/1.5)/2 = 2/3 (so we just divide by a further power of 2 later, i.e. 2^(24+1)
+			uint64_t twofiftyfive_minus_TIM16_final_start_value = (uint64_t)((255 - (uint64_t)TIM16_raw_start_value) * (uint64_t)current_symmetry * 22369621) >> (SYMMETRY_ADC_HALF_SCALE_NO_BITS + 24 + 1);
 			uint32_t TIM16_final_start_value_new = 0;
 
-			TIM16_final_start_value_new = 255 - twofiftyfive_minus_TIM16_final_start_value;
+			TIM16_final_start_value_new = 255 - (uint8_t)twofiftyfive_minus_TIM16_final_start_value;
 
 			TIM16_final_start_value = (uint32_t)TIM16_final_start_value_new; //probs don't need uin32_t anymore
 			TIM16_prescaler_adjust = DO_NOTHING;
