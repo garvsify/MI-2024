@@ -11,7 +11,7 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	//////////////////////////
 	//SET THE CURRENT(prev) VALUES//
 	//////////////////////////
-	__HAL_TIM_SET_COUNTER(&htim16, (uint16_t)TIM16_final_start_value_locked); //this line must go here, or at least very near the beginning!
+	__HAL_TIM_SET_COUNTER(&htim16, TIM16_final_start_value_locked); //this line must go here, or at least very near the beginning!
 	Adjust_and_Set_TIM16_Prescaler(TIM16_prescaler_adjust_locked);
 	__HAL_TIM_SET_COMPARE(&htim14, TIM_CHANNEL_1, prev_duty); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
 
@@ -66,6 +66,7 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 		HAL_GPIO_TogglePin(SYM_PROC_GPIO_Port, SYM_PROC_Pin);
 	}
 
+	//APPLY DEPTH
 	#if DEPTH_ON_OR_OFF == 1
 
 		//Apply Depth

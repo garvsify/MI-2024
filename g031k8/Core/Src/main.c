@@ -12,7 +12,7 @@ int main(void)
 	Start_ADC_Trig_Timer();
 
 	//WAIT
-	while(initial_ADC_conversion_complete == 0){}; //wait while first ADC conversion is ongoing
+	while(initial_ADC_conversion_complete == NO){}; //wait while first ADC conversion is ongoing
 
 	//PROCESS RAW AND FINAL FREQ. GEN. TIMER START VALUES AND PRESCALER
 	Process_TIM16_Raw_Start_Value_and_Raw_Prescaler();
