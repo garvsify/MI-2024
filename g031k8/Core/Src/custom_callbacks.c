@@ -18,6 +18,7 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	/////////////////////////////
 	//CALCULATE THE NEXT VALUES//
 	/////////////////////////////
+	all_parameters_required_for_next_TIM16_interrupt_calculated = NO;
 	current_index++;
 
 	if(current_index == FINAL_INDEX + 1){
@@ -47,28 +48,21 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 		current_quadrant = FIRST_QUADRANT;
 		current_halfcycle = FIRST_HALFCYCLE;
 	}
-	else if(current_index - DELAY == SECOND_QUADRANT_START_INDEX - HALFCYCLE_WINDOW){
-		halfcycle_is_about_to_change = YES; //it is not the halfcycle changing here, but for the sake of the new symmetry thing i'm doing, this is in aid of that
-		values_locked = NO;
-	}
+	/*else if(current_index - DELAY == SECOND_QUADRANT_START_INDEX - HALFCYCLE_WINDOW){
+	}*/
 	else if(current_index == SECOND_QUADRANT_START_INDEX){
 		current_quadrant = SECOND_QUADRANT;
 		current_halfcycle = FIRST_HALFCYCLE;
-		halfcycle_has_changed = YES; //it is not the halfcycle changing here, but for the sake of the new symmetry thing i'm doing, this is in aid of that
-		HAL_GPIO_TogglePin(SYM_PROC_GPIO_Port, SYM_PROC_Pin);
 	}
 	else if(current_index == THIRD_QUADRANT_START_INDEX){
 		current_quadrant = FIRST_QUADRANT;
 		current_halfcycle = SECOND_HALFCYCLE;
 	}
-	else if(current_index - DELAY_2 == FOURTH_QUADRANT_START_INDEX - HALFCYCLE_WINDOW){
-		halfcycle_is_about_to_change = YES; //it is not the halfcycle changing here, but for the sake of the new symmetry thing i'm doing, this is in aid of that
-		values_locked = NO;
-	}
+	/*else if(current_index - DELAY_2 == FOURTH_QUADRANT_START_INDEX - HALFCYCLE_WINDOW){
+	}*/
 	else if(current_index == FOURTH_QUADRANT_START_INDEX){
 		current_quadrant = SECOND_QUADRANT;
 		current_halfcycle = SECOND_HALFCYCLE;
-		halfcycle_has_changed = YES; //it is not the halfcycle changing here, but for the sake of the new symmetry thing i'm doing, this is in aid of that
 		HAL_GPIO_TogglePin(SYM_PROC_GPIO_Port, SYM_PROC_Pin);
 	}
 
@@ -165,8 +159,8 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 	#endif
 
 	//after initial conversion is complete, set the conversion complete flag
-	if(initial_ADC_conversion_complete == 0){
-		initial_ADC_conversion_complete = 1;
+	if(initial_ADC_conversion_complete == NO){
+		initial_ADC_conversion_complete = YES;
 	}
 
 	__HAL_TIM_SET_COUNTER(&htim17, 0); //set counter to 0

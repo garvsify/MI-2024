@@ -1,0 +1,110 @@
+uint8_t pot_rotation_corrected = 0;
+
+if(symmetry_status == CCW){
+	pot_rotation_corrected = ADC_HALF_SCALE - 1 - current_symmetry;
+}
+else{
+	pot_rotation_corrected = ADC_HALF_SCALE - 1 - (ADC_FULL_SCALE - current_symmetry);
+}
+
+//HAVE TO BE uin16_t FOR 1ST AND 3RD VARIABLES HERE BECAUSE A uint8_t IS LIMITED TO 255!
+uint16_t two_fifty_six_minus_TIM16_raw_start_value = 256 - TIM16_raw_start_value;
+
+uint16_t two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC = two_fifty_six_minus_TIM16_raw_start_value * pot_rotation_corrected;
+
+uint16_t two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC_and_shifted_by_ADC_bits = (uint8_t)(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC >> ADC_NO_BITS);
+
+
+//HAVE TO BE uin16_t HERE BECAUSE A uint8_t IS LIMITED TO 255!
+uint16_t manipulated_period_shorten = two_fifty_six_minus_TIM16_raw_start_value - two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC_and_shifted_by_ADC_bits; //manipulated shorten will always be less than 256
+
+uint16_t manipulated_period_lengthen = two_fifty_six_minus_TIM16_raw_start_value + two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC_and_shifted_by_ADC_bits; //manipulated lengthen can be greater than 256 up to 381
+
+
+
+if((manipulated_period_lengthen < 256) || ((manipulated_period_lengthen == 256) && (two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC % 256 == 0))){
+
+	if(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC % 256 == 128){ //remainder is 128, which means two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC_and_shifted_by_ADC_bits ends in 0.5
+		
+		//manipulated_period_shorten should oscillate over the halfperiod between manipulated_period_shorten and manipulated_period_shorten - 1; //DONE
+		//manipulated_period_lengthen should oscillate over the halfperiod between manipulated_period_lengthen and manipulated_period_lengthen + 1; //DONE
+	}
+	else if(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC % 256 < 128){ //remainder is less than 128, which means two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC_and_shifted_by_ADC_bits ends in less than 0.5
+		
+		manipulated_period_shorten = manipulated_period_shorten; //do nothing //DONE
+		manipulated_period_lengthen = manipulated_period_lengthen; //do nothing //DONE
+	}
+	else if(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC % 256 > 128){ //remainder is greater than 128, which means two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC_and_shifted_by_ADC_bits ends in more than 0.5
+		
+		manipulated_period_shorten = manipulated_period_shorten - 1; //DONE
+		manipulated_period_lengthen = manipulated_period_lengthen + 1; //DONE
+	}
+}
+
+else if((manipulated_period_lengthen > 256) || ((manipulated_period_lengthen == 256) && (two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC % 256 > 0))){
+
+	if(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC % 256 == 128){
+	
+		manipulated_period_shorten = manipulated_period_shorten - 1; //DONE
+		//NO NEED TO CHECK IF MANIPULATED_PERIOD_SHORTEN ENDS IN 0.5 AS IN THIS SPECIFIC CONDITION, WE HAVE ELIMINATED THAT POSSIBILITY
+		manipulated_period_lengthen = manipulated_period_lengthen + 1; //DONE
+
+		if(manipulated_period_lengthen % 2 == 0){
+
+			manipulated_period_lengthen = manipulated_period_lengthen >> 2; //DONE
+			//DO NOT OSCILLATE BETWEEN VALUES //DONE
+			//prescaler during lengthened halfperiod should be set to half //DONE
+		}
+		else{
+
+			manipulated_period_lengthen = manipulated_period_lengthen >> 2; //DONE
+			//prescaler during lengthened halfperiod should be set to half //DONE
+			//manipulated period_lengthened should oscillate over the halfperiod between manipulated_period_lengthen and manipulated_period_lengthen + 1. //DONE
+		}		
+	}
+	else if(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC % 256 < 128){
+		
+		manipulated_period_shorten = manipulated_period_shorten; //do nothing// //DONE
+		//NO NEED TO CHECK IF MANIPULATED_PERIOD_SHORTEN ENDS IN 0.5 AS IN THIS SPECIFIC CONDITION, WE HAVE ELIMINATED THAT POSSIBILITY
+		manipulated_period_lengthen = manipulated_period_lengthen; //do nothing //DONE
+
+		if(manipulated_period_lengthen % 2 == 0){
+
+			manipulated_period_lengthen = manipulated_period_lengthen >> 2; //DONE
+			//DO NOT OSCILLATE BETWEEN VALUES //DONE
+			//prescaler during lengthened halfperiod should be set to half //DONE
+		}
+		else{
+
+			manipulated_period_lengthen = manipulated_period_lengthen >> 2; //DONE
+			//prescaler during lengthened halfperiod should be set to half //DONE
+			//manipulated period_lengthened should oscillate over the halfperiod between manipulated_period_lengthen and manipulated_period_lengthen + 1. //DONE
+		}		
+	}
+	else if(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC % 256 > 128){
+	
+		manipulated_period_shorten = manipulated_period_shorten - 1; //DONE
+		//NO NEED TO CHECK IF MANIPULATED_PERIOD_SHORTEN ENDS IN 0.5 AS IN THIS SPECIFIC CONDITION, WE HAVE ELIMINATED THAT POSSIBILITY
+		manipulated_period_lengthen = manipulated_period_lengthen + 1; //DONE
+
+		if(manipulated_period_lengthen % 2 == 0){
+
+			manipulated_period_lengthen = manipulated_period_lengthen >> 2; //DONE
+			//DO NOT OSCILLATE BETWEEN VALUES //DONE
+			//prescaler during lengthened halfperiod should be set to half //DONE
+		}
+		else{
+
+			manipulated_period_lengthen = manipulated_period_lengthen >> 2; //DONE
+			//prescaler during lengthened halfperiod should be set to half //DONE
+			//manipulated period_lengthened should oscillate over the halfperiod between manipulated_period_lengthen and manipulated_period_lengthen + 1. //DONE
+	}
+}
+
+
+
+
+
+
+
+

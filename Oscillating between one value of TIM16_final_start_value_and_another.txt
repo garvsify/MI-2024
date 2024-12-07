@@ -1,0 +1,11 @@
+We have cases where manipulated_period needs to oscillate between manipulated_period_x and manipulated_period_x - 1 or manipulated_period_x + 1 every timer overflow.
+The oscillation_+1_mode or oscillation_-1_mode only operate on a halfcycle basis. The determination of whether to load manipulated_period_x or manipulated_period_x + 1 if we are in
+oscillation_+1_mode COULD be done outside the ISR since we could align the unshifted manipulated_period_x with even values of halfcycle index, and manipulated_period_x + 1 values
+with odd values of halfcycle index, and set the value of TIM16_final_start_value based on that, and when the TIM16 counter interrupts it just uses that value (rather than by
+working this stuff out in the ISR - because we want to impart minimum delay before changing the TIM16_final_start_value, and for that matter the prescaler). 
+
+
+
+
+
+

@@ -18,24 +18,20 @@ volatile uint16_t current_index = 0;
 volatile uint8_t current_halfcycle = 0;
 volatile uint8_t current_quadrant = 0;
 volatile uint32_t TIM16_final_start_value = 0;
-volatile uint8_t TIM16_prescaler_adjust = 0;
+volatile enum Adjust_Prescaler_Action TIM16_prescaler_adjust = 0;
 volatile uint32_t TIM16_raw_start_value = 0;
 volatile uint8_t TIM16_base_prescaler_divisors_index = 0;
 volatile uint16_t duty = 0;
 volatile uint8_t TIM16_prescaler_overflow_flag = 0;
 volatile uint8_t TIM16_prescaler_divisors_final_index = 0;
 volatile uint16_t ADCResultsDMA[4] = {0};
-volatile uint8_t initial_ADC_conversion_complete = 0;
-volatile uint8_t processing_TIM16_final_start_value_and_prescaler = NO;
-volatile uint8_t TIM16_callback_active = NO;
-volatile uint32_t exit_TIM16_final_start_value_locked = 0;
-volatile uint8_t exit_TIM16_prescaler_adjust_locked = 0;
-volatile uint8_t halfcycle_has_changed = NO;
-volatile uint8_t halfcycle_is_about_to_change = NO;
+volatile enum Validate initial_ADC_conversion_complete = NO;
+volatile enum Validate processing_TIM16_final_start_value_and_prescaler = NO;
+volatile enum Validate TIM16_callback_active = NO;
 volatile uint32_t TIM16_final_start_value_locked = 0;
 volatile uint8_t TIM16_prescaler_adjust_locked = 0;
 volatile uint16_t prev_duty = 0;
-volatile uint8_t values_locked = NO;
+volatile enum Validate all_parameters_required_for_next_TIM16_interrupt_calculated = YES;
 
 //FUNCTION DEFINITIONS
 uint8_t Global_Interrupt_Enable(void){
@@ -152,7 +148,6 @@ uint8_t Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(void){
     return 1;
 }
 
-
 uint8_t Adjust_and_Set_TIM16_Prescaler(uint8_t TIM16_prescaler_adjust_arg){
 
     if(TIM16_prescaler_adjust_arg == DIVIDE_BY_TWO){
@@ -171,127 +166,172 @@ uint8_t Adjust_and_Set_TIM16_Prescaler(uint8_t TIM16_prescaler_adjust_arg){
     return 1;
 }
 
-
-#if SYMMETRY_ON_OR_OFF == ON
-
-    uint8_t Shorten_Period(void){
-
-		#if SYMMETRY_ADC_RESOLUTION == 8 || SYMMETRY_ADC_RESOLUTION == 10
-			#if SYMMETRY_ADC_RESOLUTION == 8
-				uint32_t twofiftysix_minus_start_value_final = (((256-TIM16_raw_start_value)*(SHORTEN_POWER_OF_TWO_CONSTANT_8_BIT_SYM+(24*current_symmetry)))>>SHORTEN_POWER_OF_TWO_DIVISOR_8_BIT_SYM);
-			#endif
-			#if SYMMETRY_ADC_RESOLUTION == 10
-				uint32_t twofiftysix_minus_start_value_final = (((256-TIM16_raw_start_value)*(SHORTEN_POWER_OF_TWO_CONSTANT_10_BIT_SYM+(24*current_symmetry)))>>SHORTEN_POWER_OF_TWO_DIVISOR_10_BIT_SYM);
-			#endif
-
-			TIM16_final_start_value = (256-twofiftysix_minus_start_value_final);
-			TIM16_prescaler_adjust = DO_NOTHING;
-		#endif
-
-		#if SYMMETRY_ADC_RESOLUTION == 12
-
-			//overall: TIM16_final_start_value_new * 2 * (current_symmetry/128)
-			/*uint16_t TIM16_final_start_value_new = (uint16_t)((uint8_t)TIM16_raw_start_value << 2); //multiply by 2
-			TIM16_final_start_value_new = TIM16_final_start_value_new * (uint16_t)current_symmetry; //multiply by numerator //probs don't need uin32_t anymore
-			TIM16_final_start_value_new = (uint32_t)(TIM16_final_start_value_new >> SYMMETRY_ADC_HALF_SCALE_NO_BITS); //divide by half scale //probs don't need uin32_t anymore*/
-
-			uint32_t twofiftyfive_minus_TIM16_final_start_value = (((255 - TIM16_raw_start_value) * current_symmetry) << 2) >> SYMMETRY_ADC_HALF_SCALE_NO_BITS;
-			uint32_t TIM16_final_start_value_new = 0;
-
-			TIM16_final_start_value_new = 255 - twofiftyfive_minus_TIM16_final_start_value;
-
-			if(TIM16_final_start_value_new > 127){
-				TIM16_final_start_value = (uint32_t)(TIM16_final_start_value_new - 127); //probs don't need uin32_t anymore
-				TIM16_prescaler_adjust = MULTIPLY_BY_TWO;
-			}
-			else{
-				TIM16_final_start_value = (uint32_t)TIM16_final_start_value_new; //probs don't need uin32_t anymore
-				TIM16_prescaler_adjust = DO_NOTHING;
-			}
-
-		#endif
-
-        return 1;
-    }
-
-    uint8_t Lengthen_Period(void){
-
-		#if SYMMETRY_ADC_RESOLUTION == 8 || SYMMETRY_ADC_RESOLUTION == 10
-
-			#if SYMMETRY_ADC_RESOLUTION == 8
-				uint32_t twofiftysix_minus_start_value_final = (((256-TIM16_raw_start_value)*(LENGTHEN_CONSTANT_8_BIT_SYM-(3*current_symmetry)))>>LENGTHEN_POWER_OF_TWO_DIVISOR_8_BIT_SYM);
-			#endif
-			#if SYMMETRY_ADC_RESOLUTION == 10
-				uint32_t twofiftysix_minus_start_value_final = (((256-TIM16_raw_start_value)*(LENGTHEN_CONSTANT_10_BIT_SYM-(3*current_symmetry)))>>LENGTHEN_POWER_OF_TWO_DIVISOR_10_BIT_SYM);
-			#endif
-
-			if(twofiftysix_minus_start_value_final > 256){
-				twofiftysix_minus_start_value_final = (twofiftysix_minus_start_value_final >> 1);
-				TIM16_final_start_value = (256-twofiftysix_minus_start_value_final);
-				TIM16_prescaler_adjust = MULTIPLY_BY_TWO;
-			}
-			else{
-				TIM16_final_start_value = 256-twofiftysix_minus_start_value_final;
-				TIM16_prescaler_adjust = DO_NOTHING;
-			}
-		#endif
-
-
-		#if SYMMETRY_ADC_RESOLUTION == 12
-
-			//overall: TIM16_final_start_value_new * (2/3) * (current_symmetry/128)
-			/*uint16_t TIM16_final_start_value_new = (uint16_t)((uint8_t)TIM16_raw_start_value << 2); //multiply by 2
-			TIM16_final_start_value_new = TIM16_final_start_value_new / 3; //divide by 3 (see if the compiler doesn't care?)
-			TIM16_final_start_value_new = TIM16_final_start_value_new * (uint16_t)current_symmetry; //multiply by numerator //probs don't need uin32_t anymore
-			TIM16_final_start_value_new = (uint32_t)(TIM16_final_start_value_new >> SYMMETRY_ADC_HALF_SCALE_NO_BITS); //divide by half scale //probs don't need uin32_t anymore
-
-			TIM16_final_start_value = (uint32_t)TIM16_final_start_value_new; //probs don't need uin32_t anymore*/
-			//22369621 = (2^24)*(2/1.5) -> not 2/3 because (2/1.5)/2 = 2/3 (so we just divide by a further power of 2 later, i.e. 2^(24+1)
-			uint64_t twofiftyfive_minus_TIM16_final_start_value = (uint64_t)((255 - (uint64_t)TIM16_raw_start_value) * (uint64_t)current_symmetry * 22369621) >> (SYMMETRY_ADC_HALF_SCALE_NO_BITS + 24 + 1);
-			uint32_t TIM16_final_start_value_new = 0;
-
-			TIM16_final_start_value_new = 255 - (uint8_t)twofiftyfive_minus_TIM16_final_start_value;
-
-			TIM16_final_start_value = (uint32_t)TIM16_final_start_value_new; //probs don't need uin32_t anymore
-			TIM16_prescaler_adjust = DO_NOTHING;
-
-		#endif
-
-        return 1;
-    }
-#endif
-
-
 uint8_t Process_TIM16_Final_Start_Value_and_Prescaler_Adjust(void){
 
     #if SYMMETRY_ON_OR_OFF == ON
-        if(current_symmetry == SYMMETRY_ADC_HALF_SCALE){
-            TIM16_final_start_value = TIM16_raw_start_value;
-            TIM16_prescaler_adjust = DO_NOTHING;
-        }
-        else{
-            uint8_t symmetry_status = CCW;
-            if(current_symmetry > SYMMETRY_ADC_HALF_SCALE){
-                current_symmetry = SYMMETRY_ADC_FULL_SCALE - current_symmetry; //converts current_symmetry to 128 -> 0 range (same range as CCW regime, more or less) (in 8 bit, obvs different for other resolutions)
-                symmetry_status = CW;
-            }
-            if(current_halfcycle == FIRST_HALFCYCLE){
-                if(symmetry_status == CCW){
-                    Shorten_Period();
-                }
-                else{
-                    Lengthen_Period();
-                }
-            }
-            else if(current_halfcycle == SECOND_HALFCYCLE){
-                if(symmetry_status == CCW){
-                    Lengthen_Period();
-                }
-                else{
-                    Shorten_Period();
-                }
-            }
-        }
+
+		enum TIM16_final_start_value_Oscillation_Mode TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
+		enum Symmetry_Type symmetry_type_for_halfcycle = SHORTEN;
+
+		uint8_t pot_rotation_corrected = 0;
+		uint8_t symmetry_status = CW;
+
+		if(current_symmetry < SYMMETRY_ADC_HALF_SCALE){ //adc = 0-127
+			symmetry_status = CW;
+		}
+		else{ //adc is 128-255
+			symmetry_status = CCW;
+		}
+
+		if(((current_quadrant == SECOND_QUADRANT && current_halfcycle == SECOND_HALFCYCLE) || (current_quadrant == FIRST_QUADRANT && current_halfcycle == FIRST_HALFCYCLE)) && (symmetry_status = CW)){
+			symmetry_type_for_halfcycle = SHORTEN;
+		}
+		else if(((current_quadrant == SECOND_QUADRANT && current_halfcycle == SECOND_HALFCYCLE) || (current_quadrant == FIRST_QUADRANT && current_halfcycle == FIRST_HALFCYCLE)) && (symmetry_status = CCW)){
+			symmetry_type_for_halfcycle = LENGTHEN;
+		}
+		else if(((current_quadrant == FIRST_QUADRANT && current_halfcycle == SECOND_HALFCYCLE) || (current_quadrant == SECOND_QUADRANT && current_halfcycle == FIRST_HALFCYCLE)) && (symmetry_status = CW)){
+			symmetry_type_for_halfcycle = LENGTHEN;
+		}
+		else if(((current_quadrant == FIRST_QUADRANT && current_halfcycle == SECOND_HALFCYCLE) || (current_quadrant == SECOND_QUADRANT && current_halfcycle == FIRST_HALFCYCLE)) && (symmetry_status = CCW)){
+			symmetry_type_for_halfcycle = SHORTEN;
+		}
+
+		if(symmetry_status == CW){
+			pot_rotation_corrected = SYMMETRY_ADC_HALF_SCALE - 1 - current_symmetry;
+		}
+		else if(symmetry_status == CCW){
+			pot_rotation_corrected = SYMMETRY_ADC_HALF_SCALE - 1 - (SYMMETRY_ADC_FULL_SCALE - current_symmetry);
+		}
+
+		//HAVE TO BE uin16_t FOR 1ST AND 3RD VARIABLES HERE BECAUSE A uint8_t IS LIMITED TO 255!
+		uint16_t two_fifty_six_minus_TIM16_raw_start_value = 256 - TIM16_raw_start_value;
+
+		uint16_t two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC = two_fifty_six_minus_TIM16_raw_start_value * pot_rotation_corrected;
+
+		uint16_t two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC_and_shifted_by_ADC_bits = (uint16_t)(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC >> SYMMETRY_ADC_NUM_BITS);
+
+
+		//HAVE TO BE uin16_t HERE BECAUSE A uint8_t IS LIMITED TO 255!
+		uint16_t manipulated_period_shorten = two_fifty_six_minus_TIM16_raw_start_value - two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC_and_shifted_by_ADC_bits; //manipulated shorten will always be less than 256
+
+		uint16_t manipulated_period_lengthen = two_fifty_six_minus_TIM16_raw_start_value + two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC_and_shifted_by_ADC_bits; //manipulated lengthen can be greater than 256 up to 381
+
+
+		if((manipulated_period_lengthen < 256) || ((manipulated_period_lengthen == 256) && (unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) == 0))){
+
+			if(unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) == 128){
+
+				//remainder is 128, which means two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC_and_shifted_by_ADC_bits ends in 0.5
+
+				//manipulated_period_shorten should oscillate over the halfperiod between manipulated_period_shorten and manipulated_period_shorten - 1; //DONE
+				//manipulated_period_lengthen should oscillate over the halfperiod between manipulated_period_lengthen and manipulated_period_lengthen + 1; //DONE
+
+				if(symmetry_type_for_halfcycle = SHORTEN){
+					TIM16_final_start_value_oscillation_mode = OSCILLATE_DOWNWARDS;
+				}
+				else if(symmetry_type_for_halfcycle = LENGTHEN){
+					TIM16_final_start_value_oscillation_mode = OSCILLATE_UPWARDS;
+				}
+			}
+			else if(unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) == 0){
+
+				//remainder is zero, which means both shortened and lengthened manipulated periods have no no remainder
+
+				manipulated_period_shorten = manipulated_period_shorten; //do nothing //DONE
+				manipulated_period_lengthen = manipulated_period_lengthen; //do nothing //DONE
+			}
+			else if(unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) < 128){
+
+				//remainder is less than 128, which means two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC_and_shifted_by_ADC_bits ends in less than 0.5
+
+				manipulated_period_shorten = manipulated_period_shorten; //do nothing //DONE
+				manipulated_period_lengthen = manipulated_period_lengthen; //do nothing //DONE
+			}
+			else if(unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) > 128){
+
+				//remainder is greater than 128, which means two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC_and_shifted_by_ADC_bits ends in more than 0.5
+
+				manipulated_period_shorten = manipulated_period_shorten - 1; //DONE
+				manipulated_period_lengthen = manipulated_period_lengthen + 1; //DONE
+			}
+		}
+
+		else if((manipulated_period_lengthen > 256) || ((manipulated_period_lengthen == 256) && (unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) > 0))){
+
+			if(unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) == 128){
+
+				manipulated_period_shorten = manipulated_period_shorten - 1; //DONE
+				//NO NEED TO CHECK IF MANIPULATED_PERIOD_SHORTEN ENDS IN 0.5 AS IN THIS SPECIFIC CONDITION, WE HAVE ELIMINATED THAT POSSIBILITY
+				manipulated_period_lengthen = manipulated_period_lengthen + 1; //DONE
+
+				if(unsigned_bitwise_modulo(manipulated_period_lengthen, 2) == 0){
+
+					manipulated_period_lengthen = manipulated_period_lengthen >> 1; //DONE
+					//DO NOT OSCILLATE BETWEEN VALUES //DONE
+					//prescaler during lengthened halfperiod should be set to half //DONE
+				}
+				else{
+
+					manipulated_period_lengthen = manipulated_period_lengthen >> 1; //DONE
+					//prescaler during lengthened halfperiod should be set to half //DONE
+					//manipulated period_lengthened should oscillate over the halfperiod between manipulated_period_lengthen and manipulated_period_lengthen + 1. //DONE
+				}
+			}
+			else if(unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) == 0){
+
+				manipulated_period_shorten = manipulated_period_shorten; //do nothing// //DONE
+				if(manipulated_period_lengthen % 2 == 0){
+
+					manipulated_period_lengthen = manipulated_period_lengthen >> 1; //DONE
+					//DO NOT OSCILLATE BETWEEN VALUES //DONE
+					//prescaler during lengthened halfperiod should be set to half //DONE
+				}
+				else{
+
+					manipulated_period_lengthen = manipulated_period_lengthen >> 1; //DONE
+					//prescaler during lengthened halfperiod should be set to half //DONE
+					//manipulated period_lengthened should oscillate over the halfperiod between manipulated_period_lengthen and manipulated_period_lengthen + 1. //DONE
+				}
+			}
+			else if(unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) < 128){
+
+				manipulated_period_shorten = manipulated_period_shorten; //do nothing// //DONE
+				//NO NEED TO CHECK IF MANIPULATED_PERIOD_SHORTEN ENDS IN 0.5 AS IN THIS SPECIFIC CONDITION, WE HAVE ELIMINATED THAT POSSIBILITY
+				manipulated_period_lengthen = manipulated_period_lengthen; //do nothing //DONE
+
+				if(unsigned_bitwise_modulo(manipulated_period_lengthen, 2) == 0){
+
+					manipulated_period_lengthen = manipulated_period_lengthen >> 1; //DONE
+					//DO NOT OSCILLATE BETWEEN VALUES //DONE
+					//prescaler during lengthened halfperiod should be set to half //DONE
+				}
+				else{
+
+					manipulated_period_lengthen = manipulated_period_lengthen >> 1; //DONE
+					//prescaler during lengthened halfperiod should be set to half //DONE
+					//manipulated period_lengthened should oscillate over the halfperiod between manipulated_period_lengthen and manipulated_period_lengthen + 1. //DONE
+				}
+			}
+			else if(unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) > 128){
+
+				manipulated_period_shorten = manipulated_period_shorten - 1; //DONE
+				//NO NEED TO CHECK IF MANIPULATED_PERIOD_SHORTEN ENDS IN 0.5 AS IN THIS SPECIFIC CONDITION, WE HAVE ELIMINATED THAT POSSIBILITY
+				manipulated_period_lengthen = manipulated_period_lengthen + 1; //DONE
+
+				if(unsigned_bitwise_modulo(manipulated_period_lengthen, 2) == 0){
+
+					manipulated_period_lengthen = manipulated_period_lengthen >> 1; //DONE
+					//DO NOT OSCILLATE BETWEEN VALUES //DONE
+					//prescaler during lengthened halfperiod should be set to half //DONE
+				}
+				else{
+
+					manipulated_period_lengthen = manipulated_period_lengthen >> 1; //DONE
+					//prescaler during lengthened halfperiod should be set to half //DONE
+					//manipulated period_lengthened should oscillate over the halfperiod between manipulated_period_lengthen and manipulated_period_lengthen + 1. //DONE
+				}
+			}
+		}
 
     #endif
 
@@ -304,46 +344,8 @@ uint8_t Process_TIM16_Final_Start_Value_and_Prescaler_Adjust(void){
     return 1;
 }
 
-uint8_t Process_TIM16_Final_Start_Value_and_Prescaler_Adjust_Slow_Speeds(void)
-{
-	#if SYMMETRY_ON_OR_OFF == ON
-        if(current_symmetry == SYMMETRY_ADC_HALF_SCALE){
-            TIM16_final_start_value = TIM16_raw_start_value;
-            TIM16_prescaler_adjust = DO_NOTHING;
-        }
-        else{
-            uint8_t symmetry_status = CCW;
-            if(current_symmetry > SYMMETRY_ADC_HALF_SCALE){
-                current_symmetry = SYMMETRY_ADC_FULL_SCALE - current_symmetry; //converts current_symmetry to 128 -> 0 range (same range as CCW regime, more or less)
-                symmetry_status = CW;
-            }
-            if(((current_quadrant == FIRST_QUADRANT) && (current_halfcycle == FIRST_HALFCYCLE)) || ((current_quadrant == SECOND_QUADRANT) && (current_halfcycle == SECOND_HALFCYCLE))){
-                if(symmetry_status == CW){
-                    Shorten_Period();
-                }
-                else{
-                    Lengthen_Period();
-                }
-            }
-            else if(((current_quadrant == SECOND_QUADRANT) && (current_halfcycle == FIRST_HALFCYCLE)) || ((current_quadrant == FIRST_QUADRANT) && (current_halfcycle == SECOND_HALFCYCLE))){
-                if(symmetry_status == CW){
-                    Lengthen_Period();
-                }
-                else{
-                    Shorten_Period();
-                }
-            }
-        }
+uint32_t unsigned_bitwise_modulo(uint32_t dividend, uint8_t base_2_exponent){
 
-    #endif
-
-    #if SYMMETRY_ON_OR_OFF == OFF
-        TIM16_final_start_value = TIM16_raw_start_value;
-        TIM16_prescaler_adjust = DO_NOTHING;
-        //Adjust_and_Set_TIM16_Prescaler(); //DO NOT COMMENT BACK IN
-    #endif
-
-    return 1;
-
+    return dividend & ((1 << base_2_exponent) - 1);
 }
 

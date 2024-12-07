@@ -22,50 +22,37 @@
 #define TRIANGLE_MODE_ADC_THRESHOLD 1365
 #define SINE_MODE_ADC_THRESHOLD 2730
 #define SQUARE_MODE_ADC_THRESHOLD 4095
-#define CW 1
-#define CCW 0
-#define MAX_SYMMETRY_TOTAL 361
-#define SHORTEN_PERIOD_FRACTION_16_BIT_NUMBER 47926
-#define LENGTHEN_PERIOD_FRACTION_16_BIT_NUMBER 17609
-#define RESOLUTION_OF_TOTAL_SYMMETRY_FRACTION 16
-#define SHORTEN_POWER_OF_TWO_CONSTANT_8_BIT_SYM 1024
-#define SHORTEN_POWER_OF_TWO_DIVISOR_8_BIT_SYM 12
-#define SHORTEN_POWER_OF_TWO_CONSTANT_10_BIT_SYM 4096
-#define SHORTEN_POWER_OF_TWO_DIVISOR_10_BIT_SYM 14
-#define LENGTHEN_CONSTANT_8_BIT_SYM 896
-#define LENGTHEN_POWER_OF_TWO_DIVISOR_8_BIT_SYM 9
-#define LENGTHEN_CONSTANT_10_BIT_SYM 3584
-#define LENGTHEN_POWER_OF_TWO_DIVISOR_10_BIT_SYM 11
 #define TWELVEBITMINUSONE 4095
 #define TENBITMINUSONE 1023
 #define EIGHTBITMINUSONE 255
 #define HALFCYCLE_WINDOW 2
-#define DELAY 0
-#define DELAY_2 0
 #define ON 1
 #define OFF 0
 
 		//TURN ON/OFF SYMMETRY and SET RESOLUTION
-		//set SYMMETRY_ADC_RESOLUTION to either 8, 10, or 12. 8 and 10 use the old equations, 12 uses the new equations.
-		#define SYMMETRY_ADC_RESOLUTION 12
+		//set SYMMETRY_ADC_RESOLUTION to either 8, 10, or 12
+		#define SYMMETRY_ADC_RESOLUTION 8
 		#define SYMMETRY_ON_OR_OFF ON
 
 		#if SYMMETRY_ADC_RESOLUTION == 10
 			#define SYMMETRY_ADC_HALF_SCALE_NO_BITS 9
 			#define SYMMETRY_ADC_FULL_SCALE 1023
 			#define SYMMETRY_ADC_HALF_SCALE 511
+			#define SYMMETRY_ADC_NUM_BITS 10
 		#endif
 
 		#if SYMMETRY_ADC_RESOLUTION == 8
 			#define SYMMETRY_ADC_HALF_SCALE_NO_BITS 7
 			#define SYMMETRY_ADC_FULL_SCALE 255
 			#define SYMMETRY_ADC_HALF_SCALE 128
+			#define SYMMETRY_ADC_NUM_BITS 8
 		#endif
 
 		#if SYMMETRY_ADC_RESOLUTION == 12
 			#define SYMMETRY_ADC_FULL_SCALE 4095
 			#define SYMMETRY_ADC_HALF_SCALE_NO_BITS 11
 			#define SYMMETRY_ADC_HALF_SCALE 2048
+			#define SYMMETRY_ADC_NUM_BITS 12
 		#endif
 
 		//TURN ON/OFF DEPTH
@@ -75,35 +62,6 @@
 extern const uint16_t sine_wavetable[512];
 extern const uint16_t tri_wavetable[512];
 extern const uint16_t TIM16_prescaler_divisors[9];
-
-//VARIABLES
-volatile extern uint8_t TIM16_prescaler_adjust;
-volatile extern uint32_t TIM16_raw_start_value;
-volatile extern uint32_t TIM16_final_start_value;
-volatile extern uint8_t TIM16_base_prescaler_divisors_index;
-volatile extern uint16_t duty;
-volatile extern uint8_t current_waveshape;
-volatile extern uint16_t current_speed_linear;
-volatile extern uint32_t current_speed_linear_32;
-volatile extern uint16_t current_depth;
-volatile extern uint32_t current_symmetry;
-volatile extern uint16_t current_index;
-volatile extern uint8_t current_halfcycle;
-volatile extern uint8_t current_quadrant;
-volatile extern uint8_t TIM16_prescaler_overflow_flag;
-volatile extern uint16_t ADCResultsDMA[4];
-const extern uint8_t num_ADC_conversions;
-volatile extern uint8_t initial_ADC_conversion_complete;
-volatile extern uint8_t processing_TIM16_final_start_value_and_prescaler;
-volatile extern uint8_t TIM16_callback_active;
-volatile extern uint32_t exit_TIM16_final_start_value_locked;
-volatile extern uint8_t exit_TIM16_prescaler_adjust_locked;
-volatile extern uint8_t halfcycle_has_changed;
-volatile extern uint8_t halfcycle_is_about_to_change;
-volatile extern uint32_t TIM16_final_start_value_locked;
-volatile extern uint8_t TIM16_prescaler_adjust_locked;
-volatile extern uint16_t prev_duty;
-volatile extern uint8_t values_locked;
 
 //CUSTOM TYPES
 enum Polarity{
@@ -124,6 +82,47 @@ enum Validate{
 	YES
 };
 
+enum TIM16_final_start_value_Oscillation_Mode{
+	DO_NOT_OSCILLATE,
+	OSCILLATE_UPWARDS,
+	OSCILLATE_DOWNWARDS
+};
+
+enum Symmetry_Status{
+	CW,
+	CCW
+};
+
+enum Symmetry_Type{
+	SHORTEN,
+	LENGTHEN
+};
+
+//VARIABLES
+volatile extern enum Adjust_Prescaler_Action TIM16_prescaler_adjust;
+volatile extern uint32_t TIM16_raw_start_value;
+volatile extern uint32_t TIM16_final_start_value;
+volatile extern uint8_t TIM16_base_prescaler_divisors_index;
+volatile extern uint16_t duty;
+volatile extern uint8_t current_waveshape;
+volatile extern uint16_t current_speed_linear;
+volatile extern uint32_t current_speed_linear_32;
+volatile extern uint16_t current_depth;
+volatile extern uint32_t current_symmetry;
+volatile extern uint16_t current_index;
+volatile extern uint8_t current_halfcycle;
+volatile extern uint8_t current_quadrant;
+volatile extern uint8_t TIM16_prescaler_overflow_flag;
+volatile extern uint16_t ADCResultsDMA[4];
+const extern uint8_t num_ADC_conversions;
+volatile enum Validate initial_ADC_conversion_complete;
+volatile enum Validate processing_TIM16_final_start_value_and_prescaler;
+volatile enum Validate TIM16_callback_active;
+volatile extern uint32_t TIM16_final_start_value_locked;
+volatile extern uint8_t TIM16_prescaler_adjust_locked;
+volatile extern uint16_t prev_duty;
+volatile extern enum Validate all_parameters_required_for_next_TIM16_interrupt_calculated;
+
 //FUNCTION DECLARATIONS
 uint8_t Global_Interrupt_Enable(void);
 uint8_t Global_Interrupt_Disable(void);
@@ -136,8 +135,6 @@ uint8_t Stop_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel);
 uint8_t Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(void);
 uint8_t Process_TIM16_Final_Start_Value_and_Prescaler_Adjust(void);
 uint8_t Adjust_and_Set_TIM16_Prescaler(uint8_t TIM16_prescaler_adjust_arg);
-uint8_t Process_TIM16_Final_Start_Value_and_Prescaler_Adjust_Slow_Speeds(void);
-uint8_t Shorten_Period(void);
-uint8_t Lengthen_Period(void);
+uint32_t unsigned_bitwise_modulo(uint32_t dividend, uint8_t base_2_exponent);
 
 #endif
