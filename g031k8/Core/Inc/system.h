@@ -64,30 +64,20 @@ extern const uint16_t tri_wavetable[512];
 extern const uint16_t TIM16_prescaler_divisors[9];
 
 //VARIABLES
-volatile extern enum Adjust_Prescaler_Action TIM16_prescaler_adjust;
-volatile extern uint16_t TIM16_raw_start_value;
 volatile extern uint16_t TIM16_final_start_value;
-volatile extern uint8_t TIM16_base_prescaler_divisors_index;
 volatile extern uint16_t duty;
 volatile extern uint8_t current_waveshape;
 volatile extern uint16_t current_speed_linear;
-volatile extern uint32_t current_speed_linear_32;
 volatile extern uint16_t current_depth;
 volatile extern uint32_t current_symmetry;
 volatile extern uint16_t current_index;
 volatile extern uint8_t current_halfcycle;
 volatile extern uint8_t current_quadrant;
-volatile extern uint8_t TIM16_prescaler_overflow_flag;
 volatile extern uint16_t ADCResultsDMA[4];
 const extern uint8_t num_ADC_conversions;
 volatile extern enum Validate initial_ADC_conversion_complete;
-volatile extern enum Validate processing_TIM16_final_start_value_and_prescaler;
 volatile extern enum Validate TIM16_callback_active;
-volatile extern uint16_t TIM16_final_start_value_locked;
-volatile extern uint8_t TIM16_prescaler_adjust_locked;
 volatile extern uint16_t prev_duty;
-volatile extern enum Validate all_parameters_required_for_next_TIM16_interrupt_calculated;
-volatile extern uint8_t pot_rotation_corrected_global;
 
 //CUSTOM TYPES
 enum Polarity{
@@ -124,13 +114,30 @@ enum Symmetry_Type{
 	LENGTHEN
 };
 
-struct Speed_Param_Struct{
+struct Speed_Params_Struct{
+
+	//raw values
 	uint16_t TIM16_raw_start_value;
+	uint8_t TIM16_base_prescaler_divisors_index;
+
+	//symmetry-adjusted values //within a given interrupt window, the final calculated values.
 	uint16_t TIM16_final_start_value;
+	enum Adjust_Prescaler_Action TIM16_prescaler_adjust;
+	uint8_t TIM16_prescaler_divisors_final_index;
+
+	//pot_rotation value - used for debugging against the Excel S/S
 	uint8_t pot_rotation_corrected;
+
+	enum Validate calculating_raw_values;
+	enum Validate calculating_symmetry_adjusted_values;
+
+	enum Validate raw_values_calculated;
+	enum Validate symmetry_adjusted_values_calculated;
+
+	enum Validate ADC_values_ready;
 };
 
-extern struct Speed_Param_Struct speed_parameters;
+volatile extern struct Speed_Params_Struct speed_parameters;
 
 //FUNCTION DECLARATIONS
 uint8_t Global_Interrupt_Enable(void);
@@ -141,9 +148,9 @@ uint8_t Start_Freq_Gen_Timer(void);
 uint8_t Start_PWM_TIM(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel);
 uint8_t Start_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel);
 uint8_t Stop_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel);
-uint8_t Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(void);
-uint8_t Process_TIM16_Final_Start_Value_and_Prescaler_Adjust(void);
-uint8_t Adjust_and_Set_TIM16_Prescaler(uint8_t TIM16_prescaler_adjust_arg);
+uint8_t Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(volatile struct Speed_Params_Struct* speed_params);
+uint8_t Process_TIM16_Final_Start_Value_and_Prescaler_Adjust(volatile struct Speed_Params_Struct* speed_params);
+uint8_t Process_TIM16_Prescaler(volatile struct Speed_Params_Struct* speed_params);
 uint32_t unsigned_bitwise_modulo(uint32_t dividend, uint8_t base_2_exponent);
 
 #endif

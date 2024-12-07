@@ -11,14 +11,17 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	//////////////////////////
 	//SET THE CURRENT(prev) VALUES//
 	//////////////////////////
-	__HAL_TIM_SET_COUNTER(&htim16, TIM16_final_start_value_locked); //this line must go here, or at least very near the beginning!
-	Adjust_and_Set_TIM16_Prescaler(TIM16_prescaler_adjust_locked);
+	__HAL_TIM_SET_COUNTER(&htim16, speed_parameters.TIM16_final_start_value); //this line must go here, or at least very near the beginning!
+	__HAL_TIM_SET_PRESCALER(&htim16, (TIM16_prescaler_divisors[speed_parameters.TIM16_prescaler_divisors_final_index]) - 1); //have to take one off the divisor
 	__HAL_TIM_SET_COMPARE(&htim14, TIM_CHANNEL_1, prev_duty); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
 
 	/////////////////////////////
 	//CALCULATE THE NEXT VALUES//
 	/////////////////////////////
-	all_parameters_required_for_next_TIM16_interrupt_calculated = NO;
+	speed_parameters.ADC_values_ready = NO;
+	speed_parameters.raw_values_calculated = NO;
+	speed_parameters.symmetry_adjusted_values_calculated = NO;
+
 	current_index++;
 
 	if(current_index == FINAL_INDEX + 1){
@@ -86,6 +89,10 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 
 	Global_Interrupt_Enable();
 
+	//restart ADC counter
+	__HAL_TIM_SET_COUNTER(&htim17, 0); //set counter to 0
+	Start_OC_TIM(&htim17, TIM_CHANNEL_1);
+
 	TIM16_callback_active = NO;
 	HAL_GPIO_TogglePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin);
 }
@@ -103,6 +110,7 @@ uint8_t Multiply_Duty_By_Current_Depth_and_Divide_By_256(void)
 
 void TIM17_callback(TIM_HandleTypeDef *htim)
 {
+	HAL_GPIO_TogglePin(SYM_PROC_GPIO_Port, SYM_PROC_Pin);
 	//Start ADC (in scan mode) conversion
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions);
 
@@ -111,6 +119,7 @@ void TIM17_callback(TIM_HandleTypeDef *htim)
 
 void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 {
+	HAL_GPIO_TogglePin(SYM_PROC_GPIO_Port, SYM_PROC_Pin);
 	HAL_ADC_Stop_DMA(hadc); //disable ADC DMA
 
 	//GET WAVESHAPE
@@ -163,6 +172,8 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 		initial_ADC_conversion_complete = YES;
 	}
 
-	__HAL_TIM_SET_COUNTER(&htim17, 0); //set counter to 0
-	Start_OC_TIM(&htim17, TIM_CHANNEL_1);
+	speed_parameters.ADC_values_ready = YES;
+
+	//__HAL_TIM_SET_COUNTER(&htim17, 0); //set counter to 0
+	//Start_OC_TIM(&htim17, TIM_CHANNEL_1);
 }
