@@ -183,17 +183,23 @@ uint8_t Process_TIM16_Final_Start_Value_and_Prescaler_Adjust(void){
 			symmetry_status = CCW;
 		}
 
-		if(((current_quadrant == SECOND_QUADRANT && current_halfcycle == SECOND_HALFCYCLE) || (current_quadrant == FIRST_QUADRANT && current_halfcycle == FIRST_HALFCYCLE)) && (symmetry_status = CW)){
-			symmetry_type_for_halfcycle = SHORTEN;
+		if((current_halfcycle == FIRST_HALFCYCLE && current_quadrant == FIRST_QUADRANT) || (current_halfcycle == SECOND_HALFCYCLE && current_quadrant == SECOND_QUADRANT)){
+
+			if(symmetry_status == CW){
+				symmetry_type_for_halfcycle = LENGTHEN;
+			}
+			else{
+				symmetry_type_for_halfcycle = SHORTEN;
+			}
 		}
-		else if(((current_quadrant == SECOND_QUADRANT && current_halfcycle == SECOND_HALFCYCLE) || (current_quadrant == FIRST_QUADRANT && current_halfcycle == FIRST_HALFCYCLE)) && (symmetry_status = CCW)){
-			symmetry_type_for_halfcycle = LENGTHEN;
-		}
-		else if(((current_quadrant == FIRST_QUADRANT && current_halfcycle == SECOND_HALFCYCLE) || (current_quadrant == SECOND_QUADRANT && current_halfcycle == FIRST_HALFCYCLE)) && (symmetry_status = CW)){
-			symmetry_type_for_halfcycle = LENGTHEN;
-		}
-		else if(((current_quadrant == FIRST_QUADRANT && current_halfcycle == SECOND_HALFCYCLE) || (current_quadrant == SECOND_QUADRANT && current_halfcycle == FIRST_HALFCYCLE)) && (symmetry_status = CCW)){
-			symmetry_type_for_halfcycle = SHORTEN;
+		else if((current_halfcycle == FIRST_HALFCYCLE && current_quadrant == SECOND_QUADRANT) || (current_halfcycle == SECOND_HALFCYCLE && current_quadrant == FIRST_QUADRANT)){
+
+			if(symmetry_status == CW){
+				symmetry_type_for_halfcycle = SHORTEN;
+			}
+			else{
+				symmetry_type_for_halfcycle = LENGTHEN;
+			}
 		}
 
 		if(symmetry_status == CW){
