@@ -33,6 +33,7 @@ volatile uint8_t TIM16_prescaler_adjust_locked = 0;
 volatile uint16_t prev_duty = 0;
 volatile enum Validate all_parameters_required_for_next_TIM16_interrupt_calculated = YES;
 volatile uint8_t pot_rotation_corrected_global = 0;
+volatile enum Validate adc_values_ready = NO;
 
 //FUNCTION DEFINITIONS
 uint8_t Global_Interrupt_Enable(void){

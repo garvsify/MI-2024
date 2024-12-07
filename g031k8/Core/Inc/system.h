@@ -14,7 +14,7 @@
 #define TRIANGLE_MODE 0
 #define SINE_MODE 1
 #define SQUARE_MODE 2
-#define NUMBER_OF_FREQUENCY_STEPS 700; //883 in calcs, seems to be wrong, but 650 gives 15Hz max freq.
+#define NUMBER_OF_FREQUENCY_STEPS 650; //883 in calcs, seems to be wrong, but 650 gives 15Hz max freq.
 #define FIRST_HALFCYCLE 0
 #define SECOND_HALFCYCLE 1
 #define FIRST_QUADRANT 0
@@ -88,6 +88,7 @@ volatile extern uint8_t TIM16_prescaler_adjust_locked;
 volatile extern uint16_t prev_duty;
 volatile extern enum Validate all_parameters_required_for_next_TIM16_interrupt_calculated;
 volatile extern uint8_t pot_rotation_corrected_global;
+volatile extern enum Validate adc_values_ready;
 
 //CUSTOM TYPES
 enum Polarity{

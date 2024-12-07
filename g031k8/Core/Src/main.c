@@ -9,7 +9,8 @@ int main(void)
 	Global_Interrupt_Enable();
 
 	//START ADC TRIG. TIMER
-	Start_ADC_Trig_Timer();
+	//Start_ADC_Trig_Timer();
+	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions);
 
 	//WAIT
 	while(initial_ADC_conversion_complete == NO){}; //wait while first ADC conversion is ongoing
@@ -28,21 +29,28 @@ int main(void)
 
 			if(all_parameters_required_for_next_TIM16_interrupt_calculated == NO){
 
-				Global_Interrupt_Disable(); //DO NOT DELETE
+				if(adc_values_ready == YES){
 
-				processing_TIM16_final_start_value_and_prescaler = YES;
+					Global_Interrupt_Disable(); //DO NOT DELETE
 
-				Process_TIM16_Raw_Start_Value_and_Raw_Prescaler();
-				Process_TIM16_Final_Start_Value_and_Prescaler_Adjust();
+					HAL_GPIO_TogglePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin);
 
-				TIM16_final_start_value_locked = TIM16_final_start_value;
-				TIM16_prescaler_adjust_locked = TIM16_prescaler_adjust;
+					processing_TIM16_final_start_value_and_prescaler = YES;
 
-				processing_TIM16_final_start_value_and_prescaler = NO;
+					Process_TIM16_Raw_Start_Value_and_Raw_Prescaler();
+					Process_TIM16_Final_Start_Value_and_Prescaler_Adjust();
 
-				all_parameters_required_for_next_TIM16_interrupt_calculated = YES;
+					TIM16_final_start_value_locked = TIM16_final_start_value;
+					TIM16_prescaler_adjust_locked = TIM16_prescaler_adjust;
 
-				Global_Interrupt_Enable(); //DO NOT DELETE
+					processing_TIM16_final_start_value_and_prescaler = NO;
+
+					all_parameters_required_for_next_TIM16_interrupt_calculated = YES;
+
+					HAL_GPIO_TogglePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin);
+
+					Global_Interrupt_Enable(); //DO NOT DELETE
+					}
 			}
 		}
 	}
