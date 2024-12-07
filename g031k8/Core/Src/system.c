@@ -32,6 +32,7 @@ volatile uint16_t TIM16_final_start_value_locked = 0;
 volatile uint8_t TIM16_prescaler_adjust_locked = 0;
 volatile uint16_t prev_duty = 0;
 volatile enum Validate all_parameters_required_for_next_TIM16_interrupt_calculated = YES;
+volatile uint8_t pot_rotation_corrected_global = 0;
 
 //FUNCTION DEFINITIONS
 uint8_t Global_Interrupt_Enable(void){
@@ -208,6 +209,8 @@ uint8_t Process_TIM16_Final_Start_Value_and_Prescaler_Adjust(void){
 		else{ //CCW
 			pot_rotation_corrected = SYMMETRY_ADC_HALF_SCALE - 1 - (SYMMETRY_ADC_FULL_SCALE - current_symmetry);
 		}
+
+		pot_rotation_corrected_global = pot_rotation_corrected;
 
 		//HAVE TO BE uin16_t FOR 1ST AND 3RD VARIABLES HERE BECAUSE A uint8_t IS LIMITED TO 255!
 		uint16_t two_fifty_six_minus_TIM16_raw_start_value = 256 - TIM16_raw_start_value;

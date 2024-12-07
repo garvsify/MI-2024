@@ -28,9 +28,9 @@ int main(void)
 
 			if(all_parameters_required_for_next_TIM16_interrupt_calculated == NO){
 
-				processing_TIM16_final_start_value_and_prescaler = YES;
-
 				Global_Interrupt_Disable(); //DO NOT DELETE
+
+				processing_TIM16_final_start_value_and_prescaler = YES;
 
 				Process_TIM16_Raw_Start_Value_and_Raw_Prescaler();
 				Process_TIM16_Final_Start_Value_and_Prescaler_Adjust();

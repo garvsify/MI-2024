@@ -87,6 +87,7 @@ volatile extern uint16_t TIM16_final_start_value_locked;
 volatile extern uint8_t TIM16_prescaler_adjust_locked;
 volatile extern uint16_t prev_duty;
 volatile extern enum Validate all_parameters_required_for_next_TIM16_interrupt_calculated;
+volatile extern uint8_t pot_rotation_corrected_global;
 
 //CUSTOM TYPES
 enum Polarity{
