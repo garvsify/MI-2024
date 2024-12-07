@@ -124,6 +124,14 @@ enum Symmetry_Type{
 	LENGTHEN
 };
 
+struct Speed_Param_Struct{
+	uint16_t TIM16_raw_start_value;
+	uint16_t TIM16_final_start_value;
+	uint8_t pot_rotation_corrected;
+};
+
+extern struct Speed_Param_Struct speed_parameters;
+
 //FUNCTION DECLARATIONS
 uint8_t Global_Interrupt_Enable(void);
 uint8_t Global_Interrupt_Disable(void);

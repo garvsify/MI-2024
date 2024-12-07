@@ -28,6 +28,8 @@ int main(void)
 
 			if(all_parameters_required_for_next_TIM16_interrupt_calculated == NO){
 
+				HAL_GPIO_TogglePin(SYM_PROC_GPIO_Port, SYM_PROC_Pin);
+
 				Global_Interrupt_Disable(); //DO NOT DELETE
 
 				processing_TIM16_final_start_value_and_prescaler = YES;
@@ -41,6 +43,8 @@ int main(void)
 				processing_TIM16_final_start_value_and_prescaler = NO;
 
 				all_parameters_required_for_next_TIM16_interrupt_calculated = YES;
+
+				HAL_GPIO_TogglePin(SYM_PROC_GPIO_Port, SYM_PROC_Pin);
 
 				Global_Interrupt_Enable(); //DO NOT DELETE
 			}

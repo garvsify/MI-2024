@@ -63,7 +63,6 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	else if(current_index == FOURTH_QUADRANT_START_INDEX){
 		current_quadrant = SECOND_QUADRANT;
 		current_halfcycle = SECOND_HALFCYCLE;
-		HAL_GPIO_TogglePin(SYM_PROC_GPIO_Port, SYM_PROC_Pin);
 	}
 
 	//APPLY DEPTH
