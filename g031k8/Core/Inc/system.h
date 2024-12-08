@@ -32,7 +32,7 @@
 		//TURN ON/OFF SYMMETRY and SET RESOLUTION
 		//set SYMMETRY_ADC_RESOLUTION to either 8, 10, or 12
 		#define SYMMETRY_ADC_RESOLUTION 8
-		#define SYMMETRY_ON_OR_OFF OFF
+		#define SYMMETRY_ON_OR_OFF ON
 
 		#if SYMMETRY_ADC_RESOLUTION == 8
 			#define SYMMETRY_ADC_HALF_SCALE_NO_BITS 7
@@ -61,7 +61,7 @@
 //CONSTANTS
 extern const uint16_t sine_wavetable[512];
 extern const uint16_t tri_wavetable[512];
-extern const uint16_t TIM16_prescaler_divisors[9];
+extern const uint16_t TIM16_prescaler_divisors[12];
 
 //VARIABLES
 volatile extern enum Adjust_Prescaler_Action TIM16_prescaler_adjust;
@@ -85,6 +85,8 @@ volatile extern enum Validate processing_TIM16_final_start_value_and_prescaler;
 volatile extern enum Validate TIM16_callback_active;
 volatile extern uint16_t TIM16_final_start_value_locked;
 volatile extern uint8_t TIM16_prescaler_adjust_locked;
+volatile extern uint8_t TIM16_prescaler_divisors_final_index_locked;
+volatile extern uint8_t TIM16_prescaler_divisors_final_index;
 volatile extern uint16_t prev_duty;
 volatile extern enum Validate all_parameters_required_for_next_TIM16_interrupt_calculated;
 volatile extern uint8_t pot_rotation_corrected_global;

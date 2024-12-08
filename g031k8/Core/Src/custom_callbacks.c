@@ -12,7 +12,7 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	//SET THE CURRENT(prev) VALUES//
 	//////////////////////////
 	__HAL_TIM_SET_COUNTER(&htim16, TIM16_final_start_value_locked); //this line must go here, or at least very near the beginning!
-	Adjust_and_Set_TIM16_Prescaler(TIM16_prescaler_adjust_locked);
+	__HAL_TIM_SET_PRESCALER(&htim16, (TIM16_prescaler_divisors[TIM16_prescaler_divisors_final_index_locked]) - 1); //have to take one off the divisor
 	__HAL_TIM_SET_COMPARE(&htim14, TIM_CHANNEL_1, prev_duty); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
 
 	/////////////////////////////

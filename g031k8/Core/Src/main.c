@@ -15,8 +15,6 @@ int main(void)
 	//ENABLE INTERRUPTS
 	Global_Interrupt_Enable();
 
-	//START ADC TRIG. TIMER
-	//Start_ADC_Trig_Timer();
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions);
 
 	//WAIT
@@ -31,7 +29,7 @@ int main(void)
 	Start_Freq_Gen_Timer();
 
 	while (1)
-	{//token change
+	{
 		if(TIM16_callback_active == NO){
 
 			if(all_parameters_required_for_next_TIM16_interrupt_calculated == NO){
@@ -48,7 +46,7 @@ int main(void)
 					Process_TIM16_Final_Start_Value_and_Prescaler_Adjust();
 
 					TIM16_final_start_value_locked = TIM16_final_start_value;
-					TIM16_prescaler_adjust_locked = TIM16_prescaler_adjust;
+					TIM16_prescaler_divisors_final_index_locked = TIM16_prescaler_divisors_final_index;
 
 					processing_TIM16_final_start_value_and_prescaler = NO;
 
@@ -57,7 +55,7 @@ int main(void)
 					HAL_GPIO_TogglePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin);
 
 					Global_Interrupt_Enable(); //DO NOT DELETE
-					}
+				}
 			}
 		}
 	}
