@@ -1,3 +1,10 @@
+/*NOTES ON THIS BUILD:
+WHEN IT WORKS IT WORKS PERFECTLY lol - i.e. if you tweak the speed into an area where it works, it works. In comparing the frequency of the wave at this tweaked-speed
+symmetry-adjusted wave to the frequency of the wave where the symmetry is turned off, the frequencies are identical!!!
+
+Thus, I just need to see in the algorithm in the symmetry-adjust function, where things are going wrong!
+*/
+
 //INCLUDES
 #include "system.h"
 
