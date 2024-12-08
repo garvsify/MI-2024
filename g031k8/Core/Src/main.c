@@ -3,6 +3,8 @@ WHEN IT WORKS IT WORKS PERFECTLY lol - i.e. if you tweak the speed into an area 
 symmetry-adjusted wave to the frequency of the wave where the symmetry is turned off, the frequencies are identical!!!
 
 Thus, I just need to see in the algorithm in the symmetry-adjust function, where things are going wrong!
+
+Have checked that the scheduling is working exactly correctly. ISR -> ADC -> start value processing. This seems to be a maths issue but no idea why!
 */
 
 //INCLUDES
@@ -38,7 +40,7 @@ int main(void)
 
 					Global_Interrupt_Disable(); //DO NOT DELETE
 
-					HAL_GPIO_TogglePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin);
+					HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 1);
 
 					processing_TIM16_final_start_value_and_prescaler = YES;
 
@@ -52,7 +54,7 @@ int main(void)
 
 					all_parameters_required_for_next_TIM16_interrupt_calculated = YES;
 
-					HAL_GPIO_TogglePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin);
+					HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 0);
 
 					Global_Interrupt_Enable(); //DO NOT DELETE
 				}

@@ -4,9 +4,9 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 {
 	//TIM16 interrupt flag is already cleared by stm32g0xx_it.c
 
-	Global_Interrupt_Disable();
-	//HAL_GPIO_TogglePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin);
 	TIM16_callback_active = YES;
+	Global_Interrupt_Disable();
+	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 1);
 
 	//////////////////////////
 	//SET THE CURRENT(prev) VALUES//
@@ -43,14 +43,11 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	else if((current_waveshape == SQUARE_MODE) && (current_index >= FOURTH_QUADRANT_START_INDEX)){
 		duty = 1023;
 	}
-	/// I HAVE INCORRECTLY PUT THE SYMMETRY ADJUSTMENT AT HALFWAY THROUGH THE HALFCYCLES RATHER THAN AT THEIR BEGINNINGS
-	/// BUT I QUITE LIKE IT AND IT WORKS BETTER SO I MIGHT JUST LEAVE IT
+
 	if(current_index == FIRST_QUADRANT_START_INDEX){
 		current_quadrant = FIRST_QUADRANT;
 		current_halfcycle = FIRST_HALFCYCLE;
 	}
-	/*else if(current_index - DELAY == SECOND_QUADRANT_START_INDEX - HALFCYCLE_WINDOW){
-	}*/
 	else if(current_index == SECOND_QUADRANT_START_INDEX){
 		current_quadrant = SECOND_QUADRANT;
 		current_halfcycle = FIRST_HALFCYCLE;
@@ -59,8 +56,6 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 		current_quadrant = FIRST_QUADRANT;
 		current_halfcycle = SECOND_HALFCYCLE;
 	}
-	/*else if(current_index - DELAY_2 == FOURTH_QUADRANT_START_INDEX - HALFCYCLE_WINDOW){
-	}*/
 	else if(current_index == FOURTH_QUADRANT_START_INDEX){
 		current_quadrant = SECOND_QUADRANT;
 		current_halfcycle = SECOND_HALFCYCLE;
@@ -86,11 +81,11 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	prev_duty = duty;
 
 	Global_Interrupt_Enable();
-
+	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 0);
 	TIM16_callback_active = NO;
-	//HAL_GPIO_TogglePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin);
-	HAL_GPIO_WritePin(SYM_PROC_GPIO_Port, SYM_PROC_Pin, 1);
-	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions);
+
+	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions); //this function takes ages to execute!
+	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 1);
 }
 
 uint8_t Multiply_Duty_By_Current_Depth_and_Divide_By_256(void)
@@ -165,9 +160,6 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 	if(initial_ADC_conversion_complete == NO){
 		initial_ADC_conversion_complete = YES;
 	}
-	HAL_GPIO_WritePin(SYM_PROC_GPIO_Port, SYM_PROC_Pin, 0);
+	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 0);
 	adc_values_ready = YES;
-
-	//__HAL_TIM_SET_COUNTER(&htim17, 0); //set counter to 0
-	//Start_OC_TIM(&htim17, TIM_CHANNEL_1);
 }
