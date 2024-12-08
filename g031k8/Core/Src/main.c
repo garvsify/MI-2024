@@ -1,10 +1,8 @@
 /*NOTES ON THIS BUILD:
-WHEN IT WORKS IT WORKS PERFECTLY lol - i.e. if you tweak the speed into an area where it works, it works. In comparing the frequency of the wave at this tweaked-speed
-symmetry-adjusted wave to the frequency of the wave where the symmetry is turned off, the frequencies are identical!!!
+Every works basically perfectly until the speed is decreased through half_scale, at which point you can no longer control the speed!
 
-Thus, I just need to see in the algorithm in the symmetry-adjust function, where things are going wrong!
-
-Have checked that the scheduling is working exactly correctly. ISR -> ADC -> start value processing. This seems to be a maths issue but no idea why!
+Also literally the only issue with the symmetry with the speed above half-scale is that it gets slightly quicker when the symmetry increases (both CW and CCW equally)
+so I imagine that the shortened period needs to be increased, because it is too quick, or the lengthened period needs to be increased because it is too quick.
 */
 
 //INCLUDES
