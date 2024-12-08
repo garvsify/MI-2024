@@ -307,11 +307,12 @@ uint8_t Process_TIM16_Final_Start_Value_and_Prescaler_Adjust(void){
 
 					if(symmetry_type_for_halfcycle == SHORTEN){
 						TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
+						TIM16_prescaler_adjust = DO_NOTHING;
 					}
 					else if(symmetry_type_for_halfcycle == LENGTHEN){
 						TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
+						TIM16_prescaler_adjust = MULTIPLY_BY_TWO;
 					}
-					TIM16_prescaler_adjust = MULTIPLY_BY_TWO;
 				}
 				else{
 
@@ -321,11 +322,12 @@ uint8_t Process_TIM16_Final_Start_Value_and_Prescaler_Adjust(void){
 
 					if(symmetry_type_for_halfcycle == SHORTEN){
 						TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
+						TIM16_prescaler_adjust = DO_NOTHING;
 					}
 					else if(symmetry_type_for_halfcycle == LENGTHEN){
 						TIM16_final_start_value_oscillation_mode = OSCILLATE_UPWARDS;
+						TIM16_prescaler_adjust = MULTIPLY_BY_TWO;
 					}
-					TIM16_prescaler_adjust = MULTIPLY_BY_TWO;
 				}
 			}
 			else if(unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) == 0){
@@ -340,11 +342,12 @@ uint8_t Process_TIM16_Final_Start_Value_and_Prescaler_Adjust(void){
 
 					if(symmetry_type_for_halfcycle == SHORTEN){
 						TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
+						TIM16_prescaler_adjust = DO_NOTHING;
 					}
 					else if(symmetry_type_for_halfcycle == LENGTHEN){
 						TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
+						TIM16_prescaler_adjust = MULTIPLY_BY_TWO;
 					}
-					TIM16_prescaler_adjust = MULTIPLY_BY_TWO;
 				}
 				else{
 
@@ -354,11 +357,12 @@ uint8_t Process_TIM16_Final_Start_Value_and_Prescaler_Adjust(void){
 
 					if(symmetry_type_for_halfcycle == SHORTEN){
 						TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
+						TIM16_prescaler_adjust = DO_NOTHING;
 					}
 					else if(symmetry_type_for_halfcycle == LENGTHEN){
 						TIM16_final_start_value_oscillation_mode = OSCILLATE_UPWARDS;
+						TIM16_prescaler_adjust = MULTIPLY_BY_TWO;
 					}
-					TIM16_prescaler_adjust = MULTIPLY_BY_TWO;
 				}
 			}
 			else if(unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) < 128){
@@ -375,11 +379,12 @@ uint8_t Process_TIM16_Final_Start_Value_and_Prescaler_Adjust(void){
 
 					if(symmetry_type_for_halfcycle == SHORTEN){
 						TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
+						TIM16_prescaler_adjust = DO_NOTHING;
 					}
 					else if(symmetry_type_for_halfcycle == LENGTHEN){
 						TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
+						TIM16_prescaler_adjust = MULTIPLY_BY_TWO;
 					}
-					TIM16_prescaler_adjust = MULTIPLY_BY_TWO;
 				}
 				else{
 
@@ -389,11 +394,12 @@ uint8_t Process_TIM16_Final_Start_Value_and_Prescaler_Adjust(void){
 
 					if(symmetry_type_for_halfcycle == SHORTEN){
 						TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
+						TIM16_prescaler_adjust = DO_NOTHING;
 					}
 					else if(symmetry_type_for_halfcycle == LENGTHEN){
 						TIM16_final_start_value_oscillation_mode = OSCILLATE_UPWARDS;
+						TIM16_prescaler_adjust = MULTIPLY_BY_TWO;
 					}
-					TIM16_prescaler_adjust = MULTIPLY_BY_TWO;
 				}
 			}
 			else if(unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) > 128){
@@ -410,11 +416,12 @@ uint8_t Process_TIM16_Final_Start_Value_and_Prescaler_Adjust(void){
 
 					if(symmetry_type_for_halfcycle == SHORTEN){
 						TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
+						TIM16_prescaler_adjust = DO_NOTHING;
 					}
 					else if(symmetry_type_for_halfcycle == LENGTHEN){
 						TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
+						TIM16_prescaler_adjust = MULTIPLY_BY_TWO;
 					}
-					TIM16_prescaler_adjust = MULTIPLY_BY_TWO;
 				}
 				else{
 
@@ -424,11 +431,12 @@ uint8_t Process_TIM16_Final_Start_Value_and_Prescaler_Adjust(void){
 
 					if(symmetry_type_for_halfcycle == SHORTEN){
 						TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
+						TIM16_prescaler_adjust = DO_NOTHING;
 					}
 					else if(symmetry_type_for_halfcycle == LENGTHEN){
 						TIM16_final_start_value_oscillation_mode = OSCILLATE_UPWARDS;
+						TIM16_prescaler_adjust = MULTIPLY_BY_TWO;
 					}
-					TIM16_prescaler_adjust = MULTIPLY_BY_TWO;
 				}
 			}
 		}
