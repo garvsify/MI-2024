@@ -30,11 +30,11 @@ int main(void)
 
 	while (1)
 	{
-		if(TIM16_callback_active == NO){
+		//if(TIM16_callback_active == NO){
 
-			if(all_parameters_required_for_next_TIM16_interrupt_calculated == NO){
+			//if(all_parameters_required_for_next_TIM16_interrupt_calculated == NO){
 
-				if(adc_values_ready == YES){
+				//if(adc_values_ready == YES){
 
 					Global_Interrupt_Disable(); //DO NOT DELETE
 
@@ -55,9 +55,9 @@ int main(void)
 					HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 0);
 
 					Global_Interrupt_Enable(); //DO NOT DELETE
-				}
-			}
-		}
+				//}
+			//}
+		//}
 	}
 	return 1;
 }

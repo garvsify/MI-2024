@@ -134,12 +134,16 @@ uint8_t Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(void){
     speed_control_32 = current_speed_linear_32 * NUMBER_OF_FREQUENCY_STEPS;
     speed_control_32 = speed_control_32 >> 10;
     speed_control = (uint16_t) speed_control_32;
+
     //speed_control = (speed_adc_10_bit/1024)*883
+
         if(speed_control <= (127-12)){ //inequality is correct!
+
             TIM16_raw_start_value = (uint8_t) speed_control + 12;
             TIM16_base_prescaler_divisors_index = 1;
         }
         else{ 	//(speed_control > (127-12))
+
             uint16_t speed_control_subtracted;
             speed_control_subtracted = speed_control - (127-12);
             how_many_128 = (uint8_t)(speed_control_subtracted >> 7); //divide by 128, i.e. return how many 128s go into the speed_control
@@ -188,26 +192,32 @@ uint8_t Process_TIM16_Final_Start_Value_and_Prescaler_Adjust(void){
 		if((current_halfcycle == FIRST_HALFCYCLE && current_quadrant == FIRST_QUADRANT) || (current_halfcycle == SECOND_HALFCYCLE && current_quadrant == SECOND_QUADRANT)){
 
 			if(symmetry_status == CW){
+
 				symmetry_type_for_halfcycle = LENGTHEN;
 			}
 			else{
+
 				symmetry_type_for_halfcycle = SHORTEN;
 			}
 		}
 		else if((current_halfcycle == FIRST_HALFCYCLE && current_quadrant == SECOND_QUADRANT) || (current_halfcycle == SECOND_HALFCYCLE && current_quadrant == FIRST_QUADRANT)){
 
 			if(symmetry_status == CW){
+
 				symmetry_type_for_halfcycle = SHORTEN;
 			}
 			else{
+
 				symmetry_type_for_halfcycle = LENGTHEN;
 			}
 		}
 
 		if(symmetry_status == CW){
+
 			pot_rotation_corrected = SYMMETRY_ADC_HALF_SCALE - 1 - current_symmetry;
 		}
 		else{ //CCW
+
 			pot_rotation_corrected = SYMMETRY_ADC_HALF_SCALE - 1 - (SYMMETRY_ADC_FULL_SCALE - current_symmetry);
 		}
 
@@ -237,9 +247,11 @@ uint8_t Process_TIM16_Final_Start_Value_and_Prescaler_Adjust(void){
 				//manipulated_period_lengthen should oscillate over the halfperiod between manipulated_period_lengthen and manipulated_period_lengthen + 1; //DONE
 
 				if(symmetry_type_for_halfcycle == SHORTEN){
+
 					TIM16_final_start_value_oscillation_mode = OSCILLATE_DOWNWARDS;
 				}
 				else if(symmetry_type_for_halfcycle == LENGTHEN){
+
 					TIM16_final_start_value_oscillation_mode = OSCILLATE_UPWARDS;
 				}
 				TIM16_prescaler_adjust = DO_NOTHING;
