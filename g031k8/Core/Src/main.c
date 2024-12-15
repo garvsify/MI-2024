@@ -30,35 +30,9 @@ int main(void)
 
 	while (1)
 	{
-		//if(TIM16_callback_active == NO){
 
-			//if(all_parameters_required_for_next_TIM16_interrupt_calculated == NO){
-
-				//if(adc_values_ready == YES){
-
-					Global_Interrupt_Disable(); //DO NOT DELETE
-
-					HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 1);
-
-					processing_TIM16_final_start_value_and_prescaler = YES;
-
-					Process_TIM16_Raw_Start_Value_and_Raw_Prescaler();
-					Process_TIM16_Final_Start_Value_and_Prescaler_Adjust();
-
-					TIM16_final_start_value_locked = TIM16_final_start_value;
-					TIM16_prescaler_divisors_final_index_locked = TIM16_prescaler_divisors_final_index;
-
-					processing_TIM16_final_start_value_and_prescaler = NO;
-
-					all_parameters_required_for_next_TIM16_interrupt_calculated = YES;
-
-					HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 0);
-
-					Global_Interrupt_Enable(); //DO NOT DELETE
-				//}
-			//}
-		//}
 	}
+
 	return 1;
 }
 

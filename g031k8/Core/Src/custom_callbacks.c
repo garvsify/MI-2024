@@ -14,11 +14,10 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	__HAL_TIM_SET_COUNTER(&htim16, TIM16_final_start_value_locked); //this line must go here, or at least very near the beginning!
 	__HAL_TIM_SET_PRESCALER(&htim16, (TIM16_prescaler_divisors[TIM16_prescaler_divisors_final_index_locked]) - 1); //have to take one off the divisor
 	__HAL_TIM_SET_COMPARE(&htim14, TIM_CHANNEL_1, prev_duty); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
+
 	/////////////////////////////
 	//CALCULATE THE NEXT VALUES//
 	/////////////////////////////
-	all_parameters_required_for_next_TIM16_interrupt_calculated = NO;
-	adc_values_ready = NO;
 	current_index++;
 
 	if(current_index == FINAL_INDEX + 1){
@@ -81,6 +80,7 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 
 	Global_Interrupt_Enable();
 	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 0);
+
 	TIM16_callback_active = NO;
 
 	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 1);
@@ -98,7 +98,7 @@ uint8_t Multiply_Duty_By_Current_Depth_and_Divide_By_256(void)
     return 1;
 }
 
-void TIM17_callback(TIM_HandleTypeDef *htim)
+void TIM17_callback(TIM_HandleTypeDef *htim) //Not used anymore
 {
 	//Start ADC (in scan mode) conversion
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions);
@@ -108,6 +108,8 @@ void TIM17_callback(TIM_HandleTypeDef *htim)
 
 void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 {
+	Global_Interrupt_Disable(); //DO NOT DELETE
+
 	HAL_ADC_Stop_DMA(hadc); //disable ADC DMA
 
 	//GET WAVESHAPE
@@ -159,6 +161,18 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 	if(initial_ADC_conversion_complete == NO){
 		initial_ADC_conversion_complete = YES;
 	}
+
 	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 0);
-	adc_values_ready = YES;
+
+	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 1);
+
+	Process_TIM16_Raw_Start_Value_and_Raw_Prescaler();
+	Process_TIM16_Final_Start_Value_and_Prescaler_Adjust();
+
+	TIM16_final_start_value_locked = TIM16_final_start_value;
+	TIM16_prescaler_divisors_final_index_locked = TIM16_prescaler_divisors_final_index;
+
+	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 0);
+
+	Global_Interrupt_Enable(); //DO NOT DELETE
 }
