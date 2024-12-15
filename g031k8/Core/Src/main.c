@@ -30,7 +30,19 @@ int main(void)
 
 	while (1)
 	{
+		if(isr_done && adc_done){
 
+			HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 1);
+			HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 0);
+			HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 1);
+			HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 0);
+			HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 1);
+
+			Process_TIM16_Raw_Start_Value_and_Raw_Prescaler();
+			Process_TIM16_Final_Start_Value_and_Prescaler_Adjust();
+
+			HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 0);
+		}
 	}
 
 	return 1;
