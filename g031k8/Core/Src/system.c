@@ -522,6 +522,7 @@ uint8_t Process_TIM16_Final_Start_Value_and_Prescaler_Adjust(void){
     #if SYMMETRY_ON_OR_OFF == OFF
         TIM16_final_start_value = TIM16_raw_start_value;
         TIM16_prescaler_adjust = DO_NOTHING;
+        Adjust_TIM16_Prescaler(TIM16_prescaler_adjust);
     #endif
 
     return 1;
