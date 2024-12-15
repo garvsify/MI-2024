@@ -5,6 +5,15 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	//TIM16 interrupt flag is already cleared by stm32g0xx_it.c
 
 	TIM16_callback_active = YES;
+
+	if(ISR_triggered_whilst_processing == YES){
+
+		TIM16_final_start_value_locked = TIM16_final_start_value_exit_locked;
+		TIM16_prescaler_divisors_final_index_locked = TIM16_prescaler_divisors_final_index_exit_locked;
+	}
+
+	ISR_triggered_whilst_processing = NO;
+
 	Global_Interrupt_Disable();
 	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 1);
 
@@ -17,8 +26,6 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	/////////////////////////////
 	//CALCULATE THE NEXT VALUES//
 	/////////////////////////////
-	all_parameters_required_for_next_TIM16_interrupt_calculated = NO;
-	adc_values_ready = NO;
 	current_index++;
 
 	if(current_index == FINAL_INDEX + 1){
@@ -81,10 +88,13 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 
 	Global_Interrupt_Enable();
 	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 0);
-	TIM16_callback_active = NO;
 
 	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 1);
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions); //this function takes ages to execute!
+
+	freq_gen_isr_initiated_and_finished = YES;
+
+	TIM16_callback_active = NO;
 }
 
 uint8_t Multiply_Duty_By_Current_Depth_and_Divide_By_256(void)
@@ -160,5 +170,5 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 		initial_ADC_conversion_complete = YES;
 	}
 	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 0);
-	adc_values_ready = YES;
+	adc_conversion_initiated_and_values_ready = YES;
 }

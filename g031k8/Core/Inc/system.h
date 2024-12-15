@@ -87,10 +87,13 @@ volatile extern uint16_t TIM16_final_start_value_locked;
 volatile extern uint8_t TIM16_prescaler_adjust_locked;
 volatile extern uint8_t TIM16_prescaler_divisors_final_index_locked;
 volatile extern uint8_t TIM16_prescaler_divisors_final_index;
+volatile extern uint16_t TIM16_final_start_value_exit_locked;
+volatile extern uint8_t TIM16_prescaler_divisors_final_index_exit_locked;
 volatile extern uint16_t prev_duty;
-volatile extern enum Validate all_parameters_required_for_next_TIM16_interrupt_calculated;
+volatile extern enum Validate freq_gen_isr_initiated_and_finished;
 volatile extern uint8_t pot_rotation_corrected_global;
-volatile extern enum Validate adc_values_ready;
+volatile extern enum Validate adc_conversion_initiated_and_values_ready;
+volatile extern enum Validate ISR_triggered_whilst_processing;
 
 //CUSTOM TYPES
 enum Polarity{
