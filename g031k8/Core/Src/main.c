@@ -20,6 +20,8 @@ int main(void)
 	//WAIT
 	while(initial_ADC_conversion_complete == NO){}; //wait while first ADC conversion is ongoing
 
+	HAL_ADC_Stop_DMA(&hadc1);
+
 	//PROCESS RAW AND FINAL FREQ. GEN. TIMER START VALUES AND PRESCALER
 	Process_TIM16_Raw_Start_Value_and_Raw_Prescaler();
 	Process_TIM16_Final_Start_Value_and_Prescaler_Adjust();

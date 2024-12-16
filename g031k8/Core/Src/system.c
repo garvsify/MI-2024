@@ -140,7 +140,7 @@ uint8_t Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(void){
         if(speed_control <= (127-12)){ //inequality is correct!
 
             TIM16_raw_start_value = (uint8_t) speed_control + 12;
-            TIM16_base_prescaler_divisors_index = 1;
+            TIM16_base_prescaler_divisors_index = 2;
         }
         else{ 	//(speed_control > (127-12))
 
