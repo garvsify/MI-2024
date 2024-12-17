@@ -13,12 +13,11 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	//////////////////////////
 	__HAL_TIM_SET_COUNTER(&htim16, TIM16_final_start_value_locked); //this line must go here, or at least very near the beginning!
 	__HAL_TIM_SET_PRESCALER(&htim16, (TIM16_prescaler_divisors[TIM16_prescaler_divisors_final_index_locked]) - 1); //have to take one off the divisor
+	//htim16.Init.Prescaler = (TIM16_prescaler_divisors[TIM16_prescaler_divisors_final_index_locked]) - 1;
 	__HAL_TIM_SET_COMPARE(&htim14, TIM_CHANNEL_1, prev_duty); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
 	/////////////////////////////
 	//CALCULATE THE NEXT VALUES//
 	/////////////////////////////
-	all_parameters_required_for_next_TIM16_interrupt_calculated = NO;
-	adc_values_ready = NO;
 	current_index++;
 
 	if(current_index == FINAL_INDEX + 1){
@@ -85,7 +84,8 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 
 	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 1);
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions); //this function takes ages to execute!
-	//HAL_ADC_Start_IT(&hadc1);
+
+	isr_done = YES;
 }
 
 uint8_t Multiply_Duty_By_Current_Depth_and_Divide_By_256(void)

@@ -12,9 +12,6 @@ int main(void)
 {
 	System_Init();
 
-	//ENABLE INTERRUPTS
-	Global_Interrupt_Enable();
-
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions);
 
 	//WAIT
@@ -30,36 +27,34 @@ int main(void)
 	Start_PWM_Gen_Timer();
 	Start_Freq_Gen_Timer();
 
+	//ENABLE INTERRUPTS
+	Global_Interrupt_Enable();
+
 	while (1)
 	{
-		//if(TIM16_callback_active == NO){
+		if((isr_done == YES) && (adc_values_ready == YES)){
 
-			//if(all_parameters_required_for_next_TIM16_interrupt_calculated == NO){
+			Global_Interrupt_Disable(); //DO NOT DELETE
 
-				//if(adc_values_ready == YES){
+			HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 1);
 
-					Global_Interrupt_Disable(); //DO NOT DELETE
+			processing_TIM16_final_start_value_and_prescaler = YES;
 
-					HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 1);
+			Process_TIM16_Raw_Start_Value_and_Raw_Prescaler();
+			Process_TIM16_Final_Start_Value_and_Prescaler_Adjust();
 
-					processing_TIM16_final_start_value_and_prescaler = YES;
+			TIM16_final_start_value_locked = TIM16_final_start_value;
+			TIM16_prescaler_divisors_final_index_locked = TIM16_prescaler_divisors_final_index;
 
-					Process_TIM16_Raw_Start_Value_and_Raw_Prescaler();
-					Process_TIM16_Final_Start_Value_and_Prescaler_Adjust();
+			processing_TIM16_final_start_value_and_prescaler = NO;
 
-					TIM16_final_start_value_locked = TIM16_final_start_value;
-					TIM16_prescaler_divisors_final_index_locked = TIM16_prescaler_divisors_final_index;
+			HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 0);
 
-					processing_TIM16_final_start_value_and_prescaler = NO;
+			isr_done = NO;
+			adc_values_ready = NO;
 
-					all_parameters_required_for_next_TIM16_interrupt_calculated = YES;
-
-					HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 0);
-
-					Global_Interrupt_Enable(); //DO NOT DELETE
-				//}
-			//}
-		//}
+			Global_Interrupt_Enable(); //DO NOT DELETE
+		}
 	}
 	return 1;
 }

@@ -88,7 +88,7 @@ volatile extern uint8_t TIM16_prescaler_adjust_locked;
 volatile extern uint8_t TIM16_prescaler_divisors_final_index_locked;
 volatile extern uint8_t TIM16_prescaler_divisors_final_index;
 volatile extern uint16_t prev_duty;
-volatile extern enum Validate all_parameters_required_for_next_TIM16_interrupt_calculated;
+volatile extern enum Validate isr_done;
 volatile extern uint8_t pot_rotation_corrected_global;
 volatile extern enum Validate adc_values_ready;
 

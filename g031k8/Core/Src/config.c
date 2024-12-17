@@ -228,64 +228,6 @@ void MX_TIM16_Init(void)
   /* USER CODE END TIM16_Init 2 */
 }
 
-void MX_TIM17_Init(void)
-{
-
-  /* USER CODE BEGIN TIM17_Init 0 */
-
-  /* USER CODE END TIM17_Init 0 */
-
-  TIM_OC_InitTypeDef sConfigOC = {0};
-  TIM_BreakDeadTimeConfigTypeDef sBreakDeadTimeConfig = {0};
-
-  /* USER CODE BEGIN TIM17_Init 1 */
-
-  /* USER CODE END TIM17_Init 1 */
-  htim17.Instance = TIM17;
-  htim17.Init.Prescaler = 0;
-  htim17.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim17.Init.Period = 10000;
-  htim17.Init.ClockDivision = TIM_CLOCKDIVISION_DIV2;
-  htim17.Init.RepetitionCounter = 0;
-  htim17.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
-  if (HAL_TIM_Base_Init(&htim17) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  if (HAL_TIM_OC_Init(&htim17) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  sConfigOC.OCMode = TIM_OCMODE_TIMING;
-  sConfigOC.Pulse = 10000;
-  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
-  sConfigOC.OCNPolarity = TIM_OCNPOLARITY_HIGH;
-  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
-  sConfigOC.OCIdleState = TIM_OCIDLESTATE_RESET;
-  sConfigOC.OCNIdleState = TIM_OCNIDLESTATE_RESET;
-  if (HAL_TIM_OC_ConfigChannel(&htim17, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  __HAL_TIM_ENABLE_OCxPRELOAD(&htim17, TIM_CHANNEL_1);
-  sBreakDeadTimeConfig.OffStateRunMode = TIM_OSSR_DISABLE;
-  sBreakDeadTimeConfig.OffStateIDLEMode = TIM_OSSI_DISABLE;
-  sBreakDeadTimeConfig.LockLevel = TIM_LOCKLEVEL_OFF;
-  sBreakDeadTimeConfig.DeadTime = 0;
-  sBreakDeadTimeConfig.BreakState = TIM_BREAK_DISABLE;
-  sBreakDeadTimeConfig.BreakPolarity = TIM_BREAKPOLARITY_HIGH;
-  sBreakDeadTimeConfig.BreakFilter = 0;
-  sBreakDeadTimeConfig.AutomaticOutput = TIM_AUTOMATICOUTPUT_DISABLE;
-  if (HAL_TIMEx_ConfigBreakDeadTime(&htim17, &sBreakDeadTimeConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN TIM17_Init 2 */
-
-  /* USER CODE END TIM17_Init 2 */
-
-}
-
 void MX_USART2_UART_Init(void)
 {
   huart2.Instance = USART2;
@@ -313,10 +255,10 @@ void MX_DMA_Init(void)
 
   /* DMA interrupt init */
   /* DMA1_Channel1_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 2, 2);
   HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
   /* DMA1_Ch4_5_DMAMUX1_OVR_IRQn interrupt configuration */ //- i think to do with scan mode adc
-  HAL_NVIC_SetPriority(DMA1_Ch4_5_DMAMUX1_OVR_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(DMA1_Ch4_5_DMAMUX1_OVR_IRQn, 2, 2);
   HAL_NVIC_EnableIRQ(DMA1_Ch4_5_DMAMUX1_OVR_IRQn);
 
 }
@@ -408,19 +350,12 @@ void System_Init(void){
 	MX_ADC1_Init();
 	MX_TIM14_Init();
 	MX_TIM16_Init();
-	MX_TIM17_Init();
 
 	//Set custom callback function for TIM16 (freq. gen.) to the callback function in TIMx_callback.c for TIM16.
 	//I believe the correct CallbackID is HAL_TIM_OC_DELAY_ELAPSED_CB_ID, but if this doesn't work maybe
 	//HAL_TIM_PERIOD_ELAPSED_CB_ID will work. This should be basically the same because we've set up TIM16
 	//in Output Compare mode, where the ARR and CRR are the same.
 	HAL_TIM_RegisterCallback(&htim16, HAL_TIM_OC_DELAY_ELAPSED_CB_ID, &TIM16_callback);
-
-	//Set custom callback function for TIM16 (adc trig.) to the callback function in TIMx_callback.c for TIM17.
-	//I believe the correct CallbackID is HAL_TIM_OC_DELAY_ELAPSED_CB_ID, but if this doesn't work maybe
-	//HAL_TIM_PERIOD_ELAPSED_CB_ID will work. This should be basically the same because we've set up TIM16
-	//in Output Compare mode, where the ARR and CRR are the same.
-	HAL_TIM_RegisterCallback(&htim17, HAL_TIM_OC_DELAY_ELAPSED_CB_ID, &TIM17_callback);
 
 	//Set custom callback function for ADC (DMA) conversion complete.
 	HAL_ADC_RegisterCallback(&hadc1, HAL_ADC_CONVERSION_COMPLETE_CB_ID, &ADC_DMA_conversion_complete_callback);

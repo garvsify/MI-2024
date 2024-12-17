@@ -52,7 +52,6 @@ void MX_USART2_UART_Init(void);
 void MX_ADC1_Init(void);
 void MX_TIM14_Init(void);
 void MX_TIM16_Init(void);
-void MX_TIM17_Init(void);
 
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 
