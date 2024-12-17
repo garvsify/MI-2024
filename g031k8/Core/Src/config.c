@@ -81,6 +81,13 @@ void MX_ADC1_Init(void)
   hadc1.Init.SamplingTimeCommon2 = ADC_SAMPLETIME_1CYCLE_5;
   hadc1.Init.OversamplingMode = DISABLE;
   hadc1.Init.TriggerFrequencyMode = ADC_TRIGGER_FREQ_HIGH;
+
+  LL_ADC_EnableIT_EOS(ADC1);
+  //LL_ADC_EnableIT_EOC(ADC1);
+
+  HAL_NVIC_SetPriority(ADC1_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(ADC1_IRQn);
+
   if (HAL_ADC_Init(&hadc1) != HAL_OK)
   {
     Error_Handler();
@@ -345,7 +352,6 @@ void System_Init(void){
 
 	/* Initialize all configured peripherals */
 	MX_GPIO_Init();
-	MX_DMA_Init();
 	MX_USART2_UART_Init();
 	MX_ADC1_Init();
 	MX_TIM14_Init();

@@ -9,12 +9,14 @@ int main(void)
 {
 	System_Init();
 
-	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions);
+	//ENABLE INTERRUPTS
+	Global_Interrupt_Enable();
+
+	//HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions);
+	HAL_ADC_Start_IT(&hadc1);
 
 	//WAIT
 	while(initial_ADC_conversion_complete == NO){}; //wait while first ADC conversion is ongoing
-
-	HAL_ADC_Stop_DMA(&hadc1);
 
 	//PROCESS RAW AND FINAL FREQ. GEN. TIMER START VALUES AND PRESCALER
 	Process_TIM16_Raw_Start_Value_and_Raw_Prescaler();
@@ -23,9 +25,6 @@ int main(void)
 	//START FREQ. GEN and PWM GEN TIMERS and ENABLE PWM OUTPUT
 	Start_PWM_Gen_Timer();
 	Start_Freq_Gen_Timer();
-
-	//ENABLE INTERRUPTS
-	Global_Interrupt_Enable();
 
 	while (1)
 	{
