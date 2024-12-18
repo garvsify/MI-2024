@@ -177,10 +177,11 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 				HAL_ADC_Start_IT(&hadc1);
 			}
 			else if(adc_conv_num == 3){
+				adc_values_ready = YES;
 				if(initial_ADC_conversion_complete == NO){
+					adc_values_ready = NO; //adding as we don't want first conversion to set ADC VALUES READY
 					initial_ADC_conversion_complete = YES;
 				}
-				adc_values_ready = YES;
 				hadc1.Instance->CHSELR = ADC_CHANNEL_0;
 				adc_conv_num = 0;
 				HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 0);
