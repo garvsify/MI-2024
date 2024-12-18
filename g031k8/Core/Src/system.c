@@ -35,6 +35,7 @@ volatile uint16_t prev_duty = 0;
 volatile enum Validate isr_done = YES;
 volatile uint8_t pot_rotation_corrected_global = 0;
 volatile enum Validate adc_values_ready = NO;
+volatile uint8_t adc_conv_num = 0;
 
 //FUNCTION DEFINITIONS
 uint8_t Global_Interrupt_Enable(void){

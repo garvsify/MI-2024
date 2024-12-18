@@ -13,6 +13,7 @@ int main(void)
 	Global_Interrupt_Enable();
 
 	//HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions);
+	hadc1.Instance->CHSELR = ADC_CHANNEL_0;
 	HAL_ADC_Start_IT(&hadc1);
 
 	//WAIT

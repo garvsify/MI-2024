@@ -91,6 +91,7 @@ volatile extern uint16_t prev_duty;
 volatile extern enum Validate isr_done;
 volatile extern uint8_t pot_rotation_corrected_global;
 volatile extern enum Validate adc_values_ready;
+volatile extern uint8_t adc_conv_num;
 
 //CUSTOM TYPES
 enum Polarity{
