@@ -360,8 +360,6 @@ void System_Init(void){
 	//in Output Compare mode, where the ARR and CRR are the same.
 	HAL_TIM_RegisterCallback(&htim16, HAL_TIM_OC_DELAY_ELAPSED_CB_ID, &TIM16_callback);
 
-	//Set custom callback function for ADC (DMA) conversion complete.
-	HAL_ADC_RegisterCallback(&hadc1, HAL_ADC_CONVERSION_COMPLETE_CB_ID, &ADC_DMA_conversion_complete_callback);
 }
 
 #ifdef  USE_FULL_ASSERT

@@ -12,12 +12,60 @@ int main(void)
 	//ENABLE INTERRUPTS
 	Global_Interrupt_Enable();
 
-	//HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions);
-	hadc1.Instance->CHSELR = ADC_CHANNEL_0;
-	HAL_ADC_Start_IT(&hadc1);
 
-	//WAIT
-	while(initial_ADC_conversion_complete == NO){}; //wait while first ADC conversion is ongoing
+	hadc1.Instance->CHSELR = ADC_CHANNEL_0;
+	HAL_ADC_Start(&hadc1);
+	HAL_ADC_PollForConversion(&hadc1, 0.1);
+	uint16_t ADC_result = (uint16_t)HAL_ADC_GetValue(&hadc1); //set ADC_Result to waveshape index value
+
+	if(ADC_result <= TRIANGLE_MODE_ADC_THRESHOLD){
+		current_waveshape = TRIANGLE_MODE; //triangle wave
+	}
+	else if (ADC_result <= SINE_MODE_ADC_THRESHOLD){
+		current_waveshape = SINE_MODE; //sine wave
+	}
+	else if (ADC_result <= SQUARE_MODE_ADC_THRESHOLD){
+		current_waveshape = SQUARE_MODE; //square wave
+	}
+	else{
+		current_waveshape = SINE_MODE; //if error, return sine
+	}
+
+
+
+	hadc1.Instance->CHSELR = ADC_CHANNEL_1;
+	HAL_ADC_Start(&hadc1);
+	HAL_ADC_PollForConversion(&hadc1, 0.1);
+	current_speed_linear = (uint16_t)HAL_ADC_GetValue(&hadc1) >> 2; //convert to 10-bit
+
+
+
+	hadc1.Instance->CHSELR = ADC_CHANNEL_4;
+	HAL_ADC_Start(&hadc1);
+	HAL_ADC_PollForConversion(&hadc1, 0.1);
+	current_depth = (uint16_t)HAL_ADC_GetValue(&hadc1) >> 4; //convert to 8-bit
+
+
+
+	hadc1.Instance->CHSELR = ADC_CHANNEL_5;
+	HAL_ADC_Start(&hadc1);
+	HAL_ADC_PollForConversion(&hadc1, 0.1);
+	#if SYMMETRY_ADC_RESOLUTION == 10
+		current_symmetry = (uint16_t)HAL_ADC_GetValue(&hadc1) >> 2;
+
+	#endif
+
+	#if SYMMETRY_ADC_RESOLUTION == 8
+		current_symmetry = (uint16_t)HAL_ADC_GetValue(&hadc1) >> 4;
+
+	#endif
+
+	#if SYMMETRY_ADC_RESOLUTION == 12
+		current_symmetry = (uint16_t)HAL_ADC_GetValue(&hadc1);
+
+	#endif
+
+
 
 	//PROCESS RAW AND FINAL FREQ. GEN. TIMER START VALUES AND PRESCALER
 	Process_TIM16_Raw_Start_Value_and_Raw_Prescaler();
@@ -29,7 +77,7 @@ int main(void)
 
 	while (1)
 	{
-		if((isr_done == YES) && (adc_values_ready == YES)){
+		if(isr_done == YES){
 
 			Global_Interrupt_Disable(); //DO NOT DELETE
 
@@ -48,7 +96,6 @@ int main(void)
 			HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 0);
 
 			isr_done = NO;
-			adc_values_ready = NO;
 
 			Global_Interrupt_Enable(); //DO NOT DELETE
 		}

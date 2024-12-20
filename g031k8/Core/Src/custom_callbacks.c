@@ -78,14 +78,62 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 
 	prev_duty = duty;
 
-	Global_Interrupt_Enable();
-	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 0);
+
+
+	hadc1.Instance->CHSELR = ADC_CHANNEL_0;
+	HAL_ADC_Start(&hadc1);
+	HAL_ADC_PollForConversion(&hadc1, 0.1);
+	uint16_t ADC_result = (uint16_t)HAL_ADC_GetValue(&hadc1); //set ADC_Result to waveshape index value
+
+	if(ADC_result <= TRIANGLE_MODE_ADC_THRESHOLD){
+		current_waveshape = TRIANGLE_MODE; //triangle wave
+	}
+	else if (ADC_result <= SINE_MODE_ADC_THRESHOLD){
+		current_waveshape = SINE_MODE; //sine wave
+	}
+	else if (ADC_result <= SQUARE_MODE_ADC_THRESHOLD){
+		current_waveshape = SQUARE_MODE; //square wave
+	}
+	else{
+		current_waveshape = SINE_MODE; //if error, return sine
+	}
+
+
+
+	hadc1.Instance->CHSELR = ADC_CHANNEL_1;
+	HAL_ADC_Start(&hadc1);
+	HAL_ADC_PollForConversion(&hadc1, 0.1);
+	current_speed_linear = (uint16_t)HAL_ADC_GetValue(&hadc1) >> 2; //convert to 10-bit
+
+
+
+	hadc1.Instance->CHSELR = ADC_CHANNEL_4;
+	HAL_ADC_Start(&hadc1);
+	HAL_ADC_PollForConversion(&hadc1, 0.1);
+	current_depth = (uint16_t)HAL_ADC_GetValue(&hadc1) >> 4; //convert to 8-bit
+
+
+
+	hadc1.Instance->CHSELR = ADC_CHANNEL_5;
+	HAL_ADC_Start(&hadc1);
+	HAL_ADC_PollForConversion(&hadc1, 0.1);
+	#if SYMMETRY_ADC_RESOLUTION == 10
+		current_symmetry = (uint16_t)HAL_ADC_GetValue(&hadc1) >> 2;
+
+	#endif
+
+	#if SYMMETRY_ADC_RESOLUTION == 8
+		current_symmetry = (uint16_t)HAL_ADC_GetValue(&hadc1) >> 4;
+
+	#endif
+
+	#if SYMMETRY_ADC_RESOLUTION == 12
+		current_symmetry = (uint16_t)HAL_ADC_GetValue(&hadc1);
+
+	#endif
+
 	TIM16_callback_active = NO;
-
-	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 1);
-	//HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions); //this function takes ages to execute!
-	HAL_ADC_Start_IT(&hadc1);
-
+	Global_Interrupt_Enable();
 	isr_done = YES;
 }
 
@@ -98,94 +146,5 @@ uint8_t Multiply_Duty_By_Current_Depth_and_Divide_By_256(void)
     duty = 1023 - (uint16_t)(multiply_product >> 8);
 
     return 1;
-}
-
-void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
-{
-
-		//HAL_ADC_Stop_DMA(hadc); //disable ADC DMA
-			HAL_ADC_Stop_IT(&hadc1);
-
-			//GET WAVESHAPE
-			if(adc_conv_num == 0){
-
-				uint16_t ADC_result = (uint16_t)HAL_ADC_GetValue(&hadc1); //set ADC_Result to waveshape index value
-
-				if(ADC_result <= TRIANGLE_MODE_ADC_THRESHOLD){
-					current_waveshape = TRIANGLE_MODE; //triangle wave
-				}
-				else if (ADC_result <= SINE_MODE_ADC_THRESHOLD){
-					current_waveshape = SINE_MODE; //sine wave
-				}
-				else if (ADC_result <= SQUARE_MODE_ADC_THRESHOLD){
-					current_waveshape = SQUARE_MODE; //square wave
-				}
-				else{
-					current_waveshape = SINE_MODE; //if error, return sine
-				}
-			}
-
-			//GET SPEED
-			else if(adc_conv_num == 1){
-				current_speed_linear = (uint16_t)HAL_ADC_GetValue(&hadc1) >> 2; //convert to 10-bit
-			}
-
-			//GET DEPTH
-			#if DEPTH_ON_OR_OFF == ON
-				if(adc_conv_num == 2){
-					current_depth = (uint16_t)HAL_ADC_GetValue(&hadc1) >> 4; //convert to 8-bit
-				}
-			#endif
-
-			//GET SYMMETRY
-			#if SYMMETRY_ON_OR_OFF == ON
-
-				if(adc_conv_num == 3){
-
-				#if SYMMETRY_ADC_RESOLUTION == 10
-					current_symmetry = (uint16_t)HAL_ADC_GetValue(&hadc1) >> 2;
-
-				#endif
-
-				#if SYMMETRY_ADC_RESOLUTION == 8
-					current_symmetry = (uint16_t)HAL_ADC_GetValue(&hadc1) >> 4;
-
-				#endif
-
-				#if SYMMETRY_ADC_RESOLUTION == 12
-					current_symmetry = (uint16_t)HAL_ADC_GetValue(&hadc1);
-
-				#endif
-
-				}
-
-			#endif
-
-			if(adc_conv_num == 0){
-				hadc1.Instance->CHSELR = ADC_CHANNEL_1;
-				adc_conv_num++;
-				HAL_ADC_Start_IT(&hadc1);
-			}
-			else if(adc_conv_num == 1){
-				hadc1.Instance->CHSELR = ADC_CHANNEL_4;
-				adc_conv_num++;
-				HAL_ADC_Start_IT(&hadc1);
-			}
-			else if(adc_conv_num == 2){
-				hadc1.Instance->CHSELR = ADC_CHANNEL_5;
-				adc_conv_num++;
-				HAL_ADC_Start_IT(&hadc1);
-			}
-			else if(adc_conv_num == 3){
-				adc_values_ready = YES;
-				if(initial_ADC_conversion_complete == NO){
-					adc_values_ready = NO; //adding as we don't want first conversion to set ADC VALUES READY
-					initial_ADC_conversion_complete = YES;
-				}
-				hadc1.Instance->CHSELR = ADC_CHANNEL_0;
-				adc_conv_num = 0;
-				HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 0);
-			}
-
 }
 
