@@ -1,5 +1,7 @@
 #include "custom_callbacks.h"
 
+static ADC_ChannelConfTypeDef ADC_CH_Cfg = {0};
+
 void TIM16_callback(TIM_HandleTypeDef *htim)
 {
 	//TIM16 interrupt flag is already cleared by stm32g0xx_it.c
@@ -80,7 +82,8 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 
 
 
-	hadc1.Instance->CHSELR = ADC_CHANNEL_0;
+	ADC_CH_Cfg.Channel = ADC_CHANNEL_0;
+	HAL_ADC_ConfigChannel(&hadc1, &ADC_CH_Cfg);
 	HAL_ADC_Start(&hadc1);
 	HAL_ADC_PollForConversion(&hadc1, 0.1);
 	uint16_t ADC_result = (uint16_t)HAL_ADC_GetValue(&hadc1); //set ADC_Result to waveshape index value
@@ -98,23 +101,24 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 		current_waveshape = SINE_MODE; //if error, return sine
 	}
 
-
-
-	hadc1.Instance->CHSELR = ADC_CHANNEL_1;
+	ADC_CH_Cfg.Channel = ADC_CHANNEL_1;
+	HAL_ADC_ConfigChannel(&hadc1, &ADC_CH_Cfg);
 	HAL_ADC_Start(&hadc1);
 	HAL_ADC_PollForConversion(&hadc1, 0.1);
 	current_speed_linear = (uint16_t)HAL_ADC_GetValue(&hadc1) >> 2; //convert to 10-bit
 
 
 
-	hadc1.Instance->CHSELR = ADC_CHANNEL_4;
+	ADC_CH_Cfg.Channel = ADC_CHANNEL_4;
+	HAL_ADC_ConfigChannel(&hadc1, &ADC_CH_Cfg);
 	HAL_ADC_Start(&hadc1);
 	HAL_ADC_PollForConversion(&hadc1, 0.1);
 	current_depth = (uint16_t)HAL_ADC_GetValue(&hadc1) >> 4; //convert to 8-bit
 
 
 
-	hadc1.Instance->CHSELR = ADC_CHANNEL_5;
+	ADC_CH_Cfg.Channel = ADC_CHANNEL_5;
+	HAL_ADC_ConfigChannel(&hadc1, &ADC_CH_Cfg);
 	HAL_ADC_Start(&hadc1);
 	HAL_ADC_PollForConversion(&hadc1, 0.1);
 	#if SYMMETRY_ADC_RESOLUTION == 10
