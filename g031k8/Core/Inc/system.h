@@ -32,7 +32,7 @@
 		//TURN ON/OFF SYMMETRY and SET RESOLUTION
 		//set SYMMETRY_ADC_RESOLUTION to either 8, 10, or 12
 		#define SYMMETRY_ADC_RESOLUTION 8
-		#define SYMMETRY_ON_OR_OFF OFF
+		#define SYMMETRY_ON_OR_OFF ON
 
 		#if SYMMETRY_ADC_RESOLUTION == 8
 			#define SYMMETRY_ADC_HALF_SCALE_NO_BITS 7
@@ -56,7 +56,7 @@
 		#endif
 
 		//TURN ON/OFF DEPTH
-		#define DEPTH_ON_OR_OFF OFF
+		#define DEPTH_ON_OR_OFF ON
 
 //CONSTANTS
 extern const uint16_t sine_wavetable[512];
@@ -64,10 +64,6 @@ extern const uint16_t tri_wavetable[512];
 extern const uint16_t TIM16_prescaler_divisors[12];
 
 //VARIABLES
-volatile extern enum Adjust_Prescaler_Action TIM16_prescaler_adjust;
-volatile extern uint16_t TIM16_raw_start_value;
-volatile extern uint16_t TIM16_final_start_value;
-volatile extern uint8_t TIM16_base_prescaler_divisors_index;
 volatile extern uint16_t duty;
 volatile extern uint8_t current_waveshape;
 volatile extern uint16_t current_speed;
@@ -80,8 +76,11 @@ volatile extern uint16_t ADCResultsDMA[4];
 const extern uint8_t num_ADC_conversions;
 volatile extern enum Validate initial_ADC_conversion_complete;
 volatile extern enum Validate TIM16_callback_active;
+volatile extern uint16_t TIM16_raw_start_value;
+volatile extern uint16_t TIM16_final_start_value;
+volatile extern uint8_t TIM16_base_prescaler_divisors_index;
+volatile extern enum Adjust_Prescaler_Action TIM16_prescaler_adjust;
 volatile extern uint16_t TIM16_final_start_value_locked;
-volatile extern uint8_t TIM16_prescaler_adjust_locked;
 volatile extern uint8_t TIM16_prescaler_divisors_final_index_locked;
 volatile extern uint8_t TIM16_prescaler_divisors_final_index;
 volatile extern uint16_t prev_duty;
@@ -96,10 +95,7 @@ enum Polarity{
 
 enum Adjust_Prescaler_Action{
 	DO_NOTHING,
-	DIVIDE_BY_TWO,
 	MULTIPLY_BY_TWO,
-	DIVIDE_BY_FOUR,
-	DONT_CARE
 };
 
 enum Validate{
