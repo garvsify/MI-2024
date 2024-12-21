@@ -32,7 +32,7 @@
 		//TURN ON/OFF SYMMETRY and SET RESOLUTION
 		//set SYMMETRY_ADC_RESOLUTION to either 8, 10, or 12
 		#define SYMMETRY_ADC_RESOLUTION 8
-		#define SYMMETRY_ON_OR_OFF ON
+		#define SYMMETRY_ON_OR_OFF OFF
 
 		#if SYMMETRY_ADC_RESOLUTION == 8
 			#define SYMMETRY_ADC_HALF_SCALE_NO_BITS 7
@@ -56,7 +56,7 @@
 		#endif
 
 		//TURN ON/OFF DEPTH
-		#define DEPTH_ON_OR_OFF ON
+		#define DEPTH_ON_OR_OFF OFF
 
 //CONSTANTS
 extern const uint16_t sine_wavetable[512];
@@ -70,18 +70,15 @@ volatile extern uint16_t TIM16_final_start_value;
 volatile extern uint8_t TIM16_base_prescaler_divisors_index;
 volatile extern uint16_t duty;
 volatile extern uint8_t current_waveshape;
-volatile extern uint16_t current_speed_linear;
-volatile extern uint32_t current_speed_linear_32;
+volatile extern uint16_t current_speed;
 volatile extern uint16_t current_depth;
 volatile extern uint32_t current_symmetry;
 volatile extern uint16_t current_index;
 volatile extern uint8_t current_halfcycle;
 volatile extern uint8_t current_quadrant;
-volatile extern uint8_t TIM16_prescaler_overflow_flag;
 volatile extern uint16_t ADCResultsDMA[4];
 const extern uint8_t num_ADC_conversions;
 volatile extern enum Validate initial_ADC_conversion_complete;
-volatile extern enum Validate processing_TIM16_final_start_value_and_prescaler;
 volatile extern enum Validate TIM16_callback_active;
 volatile extern uint16_t TIM16_final_start_value_locked;
 volatile extern uint8_t TIM16_prescaler_adjust_locked;
@@ -89,7 +86,6 @@ volatile extern uint8_t TIM16_prescaler_divisors_final_index_locked;
 volatile extern uint8_t TIM16_prescaler_divisors_final_index;
 volatile extern uint16_t prev_duty;
 volatile extern enum Validate isr_done;
-volatile extern uint8_t pot_rotation_corrected_global;
 volatile extern enum Validate adc_values_ready;
 
 //CUSTOM TYPES

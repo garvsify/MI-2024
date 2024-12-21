@@ -11,7 +11,7 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	//////////////////////////
 	//SET THE CURRENT(prev) VALUES//
 	//////////////////////////
-	TIM16->EGR  |= TIM_EGR_UG;
+	TIM16->EGR |= TIM_EGR_UG; //DO NOT DELETE THIS LINE, IT LITERALLY MAKES OR BREAKS THE BASTARD - It triggers an 'update' event
 	__HAL_TIM_SET_COUNTER(&htim16, TIM16_final_start_value_locked); //this line must go here, or at least very near the beginning!
 	__HAL_TIM_SET_PRESCALER(&htim16, (TIM16_prescaler_divisors[TIM16_prescaler_divisors_final_index_locked]) - 1); //have to take one off the divisor
 	__HAL_TIM_SET_COMPARE(&htim14, TIM_CHANNEL_1, prev_duty); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
@@ -99,18 +99,9 @@ uint8_t Multiply_Duty_By_Current_Depth_and_Divide_By_256(void)
     return 1;
 }
 
-void TIM17_callback(TIM_HandleTypeDef *htim)
-{
-	//Start ADC (in scan mode) conversion
-	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions);
-
-	Stop_OC_TIM(htim, TIM_CHANNEL_1); //disable TIM17
-}
-
 void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 {
 	HAL_ADC_Stop_DMA(hadc); //disable ADC DMA
-	//HAL_ADC_Stop_IT(&hadc1);
 
 	//GET WAVESHAPE
 	uint16_t ADC_result = ADCResultsDMA[0]; //set ADC_Result to waveshape index value
@@ -129,7 +120,7 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 	}
 
 	//GET SPEED
-	current_speed_linear = ADCResultsDMA[1] >> 2; //convert to 10-bit
+	current_speed = ADCResultsDMA[1] >> 2; //convert to 10-bit
 
 	//GET DEPTH
 	#if DEPTH_ON_OR_OFF == ON

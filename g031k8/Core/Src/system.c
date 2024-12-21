@@ -10,8 +10,7 @@ const uint8_t num_ADC_conversions = sizeof(ADCResultsDMA) / sizeof(ADCResultsDMA
 
 //VARIABLE DEFINITIONS
 volatile uint8_t current_waveshape = 0;
-volatile uint16_t current_speed_linear = 0;
-volatile uint32_t current_speed_linear_32 = 0;
+volatile uint16_t current_speed = 0;
 volatile uint16_t current_depth = 0;
 volatile uint32_t current_symmetry = 0;
 volatile uint16_t current_index = 0;
@@ -22,18 +21,15 @@ volatile enum Adjust_Prescaler_Action TIM16_prescaler_adjust = 0;
 volatile uint16_t TIM16_raw_start_value = 0;
 volatile uint8_t TIM16_base_prescaler_divisors_index = 0;
 volatile uint16_t duty = 0;
-volatile uint8_t TIM16_prescaler_overflow_flag = 0;
 volatile uint8_t TIM16_prescaler_divisors_final_index = 0;
 volatile uint8_t TIM16_prescaler_divisors_final_index_locked = 0;
 volatile uint16_t ADCResultsDMA[4] = {0};
 volatile enum Validate initial_ADC_conversion_complete = NO;
-volatile enum Validate processing_TIM16_final_start_value_and_prescaler = NO;
 volatile enum Validate TIM16_callback_active = NO;
 volatile uint16_t TIM16_final_start_value_locked = 0;
 volatile uint8_t TIM16_prescaler_adjust_locked = 0;
 volatile uint16_t prev_duty = 0;
 volatile enum Validate isr_done = YES;
-volatile uint8_t pot_rotation_corrected_global = 0;
 volatile enum Validate adc_values_ready = NO;
 
 //FUNCTION DEFINITIONS
@@ -126,14 +122,11 @@ uint8_t Stop_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t OC_TIM_channel){
 
 uint8_t Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(void){
 
-	uint16_t speed_control = 0;
-	uint32_t speed_control_32 = 0;
+	uint32_t speed_control = 0;
 	uint8_t how_many_128 = 0;
 
-    current_speed_linear_32 = current_speed_linear;
-    speed_control_32 = current_speed_linear_32 * NUMBER_OF_FREQUENCY_STEPS;
-    speed_control_32 = speed_control_32 >> 10;
-    speed_control = (uint16_t) speed_control_32;
+    speed_control = current_speed * NUMBER_OF_FREQUENCY_STEPS;
+    speed_control = speed_control >> 10;
 
     //speed_control = (speed_adc_10_bit/1024)*883
 
@@ -220,8 +213,6 @@ uint8_t Process_TIM16_Final_Start_Value_and_Prescaler_Adjust(void){
 
 			pot_rotation_corrected = SYMMETRY_ADC_HALF_SCALE - 1 - (SYMMETRY_ADC_FULL_SCALE - current_symmetry);
 		}
-
-		pot_rotation_corrected_global = pot_rotation_corrected;
 
 		//HAVE TO BE uin16_t FOR 1ST AND 3RD VARIABLES HERE BECAUSE A uint8_t IS LIMITED TO 255!
 		uint16_t two_fifty_six_minus_TIM16_raw_start_value = 256 - TIM16_raw_start_value;
