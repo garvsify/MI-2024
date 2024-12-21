@@ -61,13 +61,13 @@
 //CONSTANTS
 extern const uint16_t sine_wavetable[512];
 extern const uint16_t tri_wavetable[512];
-extern const uint16_t TIM16_prescaler_divisors[12];
+extern const uint16_t TIM16_prescaler_divisors[6];
 
 //VARIABLES
 volatile extern enum Adjust_Prescaler_Action TIM16_prescaler_adjust;
-volatile extern uint16_t TIM16_raw_start_value;
+extern uint16_t TIM16_raw_start_value;
 volatile extern uint16_t TIM16_final_start_value;
-volatile extern uint8_t TIM16_base_prescaler_divisors_index;
+extern uint8_t TIM16_base_prescaler_divisors_index;
 volatile extern uint16_t duty;
 volatile extern uint8_t current_waveshape;
 volatile extern uint16_t current_speed_linear;
@@ -80,7 +80,6 @@ volatile extern uint8_t current_quadrant;
 volatile extern uint8_t TIM16_prescaler_overflow_flag;
 volatile extern uint16_t ADCResultsDMA[4];
 const extern uint8_t num_ADC_conversions;
-volatile extern enum Validate initial_ADC_conversion_complete;
 volatile extern enum Validate processing_TIM16_final_start_value_and_prescaler;
 volatile extern enum Validate TIM16_callback_active;
 volatile extern uint16_t TIM16_final_start_value_locked;
@@ -89,9 +88,6 @@ volatile extern uint8_t TIM16_prescaler_divisors_final_index_locked;
 volatile extern uint8_t TIM16_prescaler_divisors_final_index;
 volatile extern uint16_t prev_duty;
 volatile extern enum Validate isr_done;
-volatile extern uint8_t pot_rotation_corrected_global;
-volatile extern enum Validate adc_values_ready;
-volatile extern uint8_t adc_conv_num;
 
 //CUSTOM TYPES
 enum Polarity{

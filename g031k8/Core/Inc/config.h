@@ -47,8 +47,6 @@ extern UART_HandleTypeDef huart2;
 void System_Init(void);
 void SystemClock_Config(void);
 void MX_GPIO_Init(void);
-void MX_DMA_Init(void);
-void MX_USART2_UART_Init(void);
 void MX_ADC1_Init(void);
 void MX_TIM14_Init(void);
 void MX_TIM16_Init(void);

@@ -15,7 +15,6 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	//////////////////////////
 	__HAL_TIM_SET_COUNTER(&htim16, TIM16_final_start_value_locked); //this line must go here, or at least very near the beginning!
 	__HAL_TIM_SET_PRESCALER(&htim16, (TIM16_prescaler_divisors[TIM16_prescaler_divisors_final_index_locked]) - 1); //have to take one off the divisor
-	//htim16.Init.Prescaler = (TIM16_prescaler_divisors[TIM16_prescaler_divisors_final_index_locked]) - 1;
 	__HAL_TIM_SET_COMPARE(&htim14, TIM_CHANNEL_1, prev_duty); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
 	/////////////////////////////
 	//CALCULATE THE NEXT VALUES//
@@ -135,6 +134,15 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 		current_symmetry = (uint16_t)HAL_ADC_GetValue(&hadc1);
 
 	#endif
+
+
+
+
+	Process_TIM16_Raw_Start_Value_and_Raw_Prescaler();
+	Process_TIM16_Final_Start_Value_and_Prescaler_Adjust();
+
+	TIM16_final_start_value_locked = TIM16_final_start_value;
+	TIM16_prescaler_divisors_final_index_locked = TIM16_prescaler_divisors_final_index;
 
 	TIM16_callback_active = NO;
 	Global_Interrupt_Enable();
