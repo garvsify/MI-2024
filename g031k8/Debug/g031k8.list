@@ -7,23 +7,23 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
   1 .text         000063f8  080000bc  080000bc  000010bc  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .rodata       00000a10  080064b4  080064b4  000074b4  2**2
+  2 .rodata       00000a04  080064b4  080064b4  000074b4  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  3 .ARM.extab    00000000  08006ec4  08006ec4  00008010  2**0
+  3 .ARM.extab    00000000  08006eb8  08006eb8  00008010  2**0
                   CONTENTS
-  4 .ARM          00000008  08006ec4  08006ec4  00007ec4  2**2
+  4 .ARM          00000008  08006eb8  08006eb8  00007eb8  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  5 .preinit_array 00000000  08006ecc  08006ecc  00008010  2**0
+  5 .preinit_array 00000000  08006ec0  08006ec0  00008010  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  6 .init_array   00000004  08006ecc  08006ecc  00007ecc  2**2
+  6 .init_array   00000004  08006ec0  08006ec0  00007ec0  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  7 .fini_array   00000004  08006ed0  08006ed0  00007ed0  2**2
+  7 .fini_array   00000004  08006ec4  08006ec4  00007ec4  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  8 .data         00000010  20000000  08006ed4  00008000  2**2
+  8 .data         00000010  20000000  08006ec8  00008000  2**2
                   CONTENTS, ALLOC, LOAD, DATA
-  9 .bss          000003f8  20000010  08006ee4  00008010  2**2
+  9 .bss          000003f8  20000010  08006ed8  00008010  2**2
                   ALLOC
- 10 ._user_heap_stack 00000600  20000408  08006ee4  00008408  2**0
+ 10 ._user_heap_stack 00000600  20000408  08006ed8  00008408  2**0
                   ALLOC
  11 .ARM.attributes 00000028  00000000  00000000  00008010  2**0
                   CONTENTS, READONLY
@@ -1987,7 +1987,7 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
  8000d08:	080064b4 	.word	0x080064b4
  8000d0c:	000003ff 	.word	0x000003ff
  8000d10:	200003dc 	.word	0x200003dc
- 8000d14:	08006ccc 	.word	0x08006ccc
+ 8000d14:	08006cc0 	.word	0x08006cc0
  8000d18:	200003f4 	.word	0x200003f4
  8000d1c:	2000002c 	.word	0x2000002c
  8000d20:	20000000 	.word	0x20000000
@@ -2299,7 +2299,7 @@ int main(void)
 		if((isr_done == YES) && (adc_values_ready == YES)){
  8000ee8:	e7cc      	b.n	8000e84 <main+0x40>
  8000eea:	46c0      	nop			@ (mov r8, r8)
- 8000eec:	08006ccc 	.word	0x08006ccc
+ 8000eec:	08006cc0 	.word	0x08006cc0
  8000ef0:	200003f4 	.word	0x200003f4
  8000ef4:	2000002c 	.word	0x2000002c
  8000ef8:	200003fc 	.word	0x200003fc
@@ -4760,7 +4760,7 @@ LoopForever:
   ldr r1, =_edata
  8001c14:	20000010 	.word	0x20000010
   ldr r2, =_sidata
- 8001c18:	08006ed4 	.word	0x08006ed4
+ 8001c18:	08006ec8 	.word	0x08006ec8
   ldr r2, =_sbss
  8001c1c:	20000010 	.word	0x20000010
   ldr r4, =_ebss
@@ -6507,7 +6507,7 @@ HAL_StatusTypeDef HAL_ADC_RegisterCallback(ADC_HandleTypeDef *hadc, HAL_ADC_Call
  80024c6:	46bd      	mov	sp, r7
  80024c8:	b006      	add	sp, #24
  80024ca:	bd80      	pop	{r7, pc}
- 80024cc:	08006d30 	.word	0x08006d30
+ 80024cc:	08006d24 	.word	0x08006d24
 
 080024d0 <HAL_ADC_Start_DMA>:
   * @param pData Destination Buffer address.
@@ -11957,7 +11957,7 @@ HAL_StatusTypeDef HAL_RCC_ClockConfig(RCC_ClkInitTypeDef  *RCC_ClkInitStruct, ui
  800414c:	40021000 	.word	0x40021000
  8004150:	fffff0ff 	.word	0xfffff0ff
  8004154:	ffff8fff 	.word	0xffff8fff
- 8004158:	08006cd0 	.word	0x08006cd0
+ 8004158:	08006cc4 	.word	0x08006cc4
  800415c:	20000004 	.word	0x20000004
  8004160:	20000008 	.word	0x20000008
 
@@ -12195,7 +12195,7 @@ uint32_t HAL_RCC_GetPCLK1Freq(void)
  800429e:	46bd      	mov	sp, r7
  80042a0:	bdb0      	pop	{r4, r5, r7, pc}
  80042a2:	46c0      	nop			@ (mov r8, r8)
- 80042a4:	08006d10 	.word	0x08006d10
+ 80042a4:	08006d04 	.word	0x08006d04
 
 080042a8 <HAL_TIM_Base_Init>:
   *         Ex: call @ref HAL_TIM_Base_DeInit() before HAL_TIM_Base_Init()
@@ -14091,7 +14091,7 @@ HAL_StatusTypeDef HAL_TIM_OC_ConfigChannel(TIM_HandleTypeDef *htim,
  8004cd2:	46bd      	mov	sp, r7
  8004cd4:	b006      	add	sp, #24
  8004cd6:	bd80      	pop	{r7, pc}
- 8004cd8:	08006d5c 	.word	0x08006d5c
+ 8004cd8:	08006d50 	.word	0x08006d50
 
 08004cdc <HAL_TIM_PWM_ConfigChannel>:
   * @retval HAL status
@@ -14450,7 +14450,7 @@ HAL_StatusTypeDef HAL_TIM_PWM_ConfigChannel(TIM_HandleTypeDef *htim,
  8004ece:	b006      	add	sp, #24
  8004ed0:	bd80      	pop	{r7, pc}
  8004ed2:	46c0      	nop			@ (mov r8, r8)
- 8004ed4:	08006db0 	.word	0x08006db0
+ 8004ed4:	08006da4 	.word	0x08006da4
  8004ed8:	fffffbff 	.word	0xfffffbff
 
 08004edc <HAL_TIM_PeriodElapsedCallback>:
@@ -15141,8 +15141,8 @@ HAL_StatusTypeDef HAL_TIM_RegisterCallback(TIM_HandleTypeDef *htim, HAL_TIM_Call
  800517a:	b006      	add	sp, #24
  800517c:	bd80      	pop	{r7, pc}
  800517e:	46c0      	nop			@ (mov r8, r8)
- 8005180:	08006e04 	.word	0x08006e04
- 8005184:	08006e74 	.word	0x08006e74
+ 8005180:	08006df8 	.word	0x08006df8
+ 8005184:	08006e68 	.word	0x08006e68
 
 08005188 <TIM_Base_SetConfig>:
   * @param  TIMx TIM peripheral
@@ -17447,7 +17447,7 @@ HAL_StatusTypeDef UART_SetConfig(UART_HandleTypeDef *huart)
  8005e44:	40021000 	.word	0x40021000
  8005e48:	40004400 	.word	0x40004400
  8005e4c:	00f42400 	.word	0x00f42400
- 8005e50:	08006eac 	.word	0x08006eac
+ 8005e50:	08006ea0 	.word	0x08006ea0
       default:
         pclk = 0U;
  8005e54:	2300      	movs	r3, #0
@@ -17703,7 +17703,7 @@ HAL_StatusTypeDef UART_SetConfig(UART_HandleTypeDef *huart)
  8005fce:	b010      	add	sp, #64	@ 0x40
  8005fd0:	bdb0      	pop	{r4, r5, r7, pc}
  8005fd2:	46c0      	nop			@ (mov r8, r8)
- 8005fd4:	08006eac 	.word	0x08006eac
+ 8005fd4:	08006ea0 	.word	0x08006ea0
  8005fd8:	00f42400 	.word	0x00f42400
 
 08005fdc <UART_AdvFeatureConfig>:
@@ -18542,10 +18542,10 @@ static void UART_EndRxTransfer(UART_HandleTypeDef *huart)
  8006486:	4798      	blx	r3
  8006488:	3601      	adds	r6, #1
  800648a:	e7f2      	b.n	8006472 <__libc_init_array+0x1e>
- 800648c:	08006ecc 	.word	0x08006ecc
- 8006490:	08006ecc 	.word	0x08006ecc
- 8006494:	08006ed0 	.word	0x08006ed0
- 8006498:	08006ecc 	.word	0x08006ecc
+ 800648c:	08006ec0 	.word	0x08006ec0
+ 8006490:	08006ec0 	.word	0x08006ec0
+ 8006494:	08006ec4 	.word	0x08006ec4
+ 8006498:	08006ec0 	.word	0x08006ec0
 
 0800649c <_init>:
  800649c:	b5f8      	push	{r3, r4, r5, r6, r7, lr}

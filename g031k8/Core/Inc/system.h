@@ -61,7 +61,7 @@
 //CONSTANTS
 extern const uint16_t sine_wavetable[512];
 extern const uint16_t tri_wavetable[512];
-extern const uint16_t TIM16_prescaler_divisors[12];
+extern const uint16_t TIM16_prescaler_divisors[6];
 
 //VARIABLES
 volatile extern uint16_t duty;
