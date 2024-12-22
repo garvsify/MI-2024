@@ -41,14 +41,11 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	else if(current_waveshape == SINE_MODE){
 		duty = sine_wavetable[current_index];
 	}
-	else if((current_waveshape == SQUARE_MODE) && (current_index < SECOND_QUADRANT_START_INDEX)){
+	else if((current_waveshape == SQUARE_MODE) && (current_index < THIRD_QUADRANT_START_INDEX)){
 		duty = 1023;
 	}
-	else if((current_waveshape == SQUARE_MODE) && (current_index >= SECOND_QUADRANT_START_INDEX) && (current_index < FOURTH_QUADRANT_START_INDEX)){
+	else if((current_waveshape == SQUARE_MODE) && (current_index >= THIRD_QUADRANT_START_INDEX)){
 			duty = 0;
-	}
-	else if((current_waveshape == SQUARE_MODE) && (current_index >= FOURTH_QUADRANT_START_INDEX)){
-		duty = 1023;
 	}
 
 	if(current_index == FIRST_QUADRANT_START_INDEX){
