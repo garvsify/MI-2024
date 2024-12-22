@@ -1,7 +1,5 @@
 /*NOTES ON THIS BUILD:
 
-NOTHING TO DO! IT WORKS AMAZINGLY
-
 */
 
 //INCLUDES
@@ -18,10 +16,6 @@ int main(void)
 
 	HAL_ADC_Stop_DMA(&hadc1);
 
-	//PROCESS RAW AND FINAL FREQ. GEN. TIMER START VALUES AND PRESCALER
-	Process_TIM16_Raw_Start_Value_and_Raw_Prescaler();
-	Process_TIM16_Final_Start_Value_and_Prescaler_Adjust();
-
 	//START FREQ. GEN and PWM GEN TIMERS and ENABLE PWM OUTPUT
 	Start_PWM_Gen_Timer();
 	Start_Freq_Gen_Timer();
@@ -31,25 +25,7 @@ int main(void)
 
 	while (1)
 	{
-		if((isr_done == YES) && (adc_values_ready == YES)){
 
-			Global_Interrupt_Disable(); //DO NOT DELETE
-
-			HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 1);
-
-			Process_TIM16_Raw_Start_Value_and_Raw_Prescaler();
-			Process_TIM16_Final_Start_Value_and_Prescaler_Adjust();
-
-			TIM16_final_start_value_locked = TIM16_final_start_value;
-			TIM16_prescaler_divisors_final_index_locked = TIM16_prescaler_divisors_final_index;
-
-			HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 0);
-
-			isr_done = NO;
-			adc_values_ready = NO;
-
-			Global_Interrupt_Enable(); //DO NOT DELETE
-		}
 	}
 	return 1;
 }

@@ -91,8 +91,6 @@ volatile extern uint16_t TIM16_final_start_value_locked;
 volatile extern uint8_t TIM16_prescaler_divisors_final_index_locked;
 volatile extern uint8_t TIM16_prescaler_divisors_final_index;
 volatile extern uint16_t prev_duty;
-volatile extern enum Validate isr_done;
-volatile extern enum Validate adc_values_ready;
 
 //CUSTOM TYPES
 enum Polarity{

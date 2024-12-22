@@ -28,8 +28,6 @@ volatile enum Validate TIM16_callback_active = NO;
 volatile uint16_t TIM16_final_start_value_locked = 0;
 volatile uint8_t TIM16_prescaler_adjust_locked = 0;
 volatile uint16_t prev_duty = 0;
-volatile enum Validate isr_done = YES;
-volatile enum Validate adc_values_ready = NO;
 
 //FUNCTION DEFINITIONS
 uint8_t Global_Interrupt_Enable(void){

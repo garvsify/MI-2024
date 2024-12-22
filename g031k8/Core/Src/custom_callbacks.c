@@ -8,9 +8,9 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	Global_Interrupt_Disable();
 	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 1);
 
-	//////////////////////////
-	//SET THE CURRENT(prev) VALUES//
-	//////////////////////////
+	/////////////////////////////////////////////////////////////
+	//FLASH LED in case of wave reaching apex or perceived apex//
+	/////////////////////////////////////////////////////////////
 	/*if((current_waveshape == SINE_MODE || current_waveshape == TRIANGLE_MODE) && current_index >= SINE_OR_TRIANGLE_WAVE_TEMPO_PERCEIVED_APEX_INDEX && current_index < SINE_OR_TRIANGLE_WAVE_TEMPO_PULSE_OFF_INDEX){
 		HAL_GPIO_WritePin(TEMPO_GPIO_Port, TEMPO_Pin, 1);
 	}
@@ -20,10 +20,15 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	else{
 		HAL_GPIO_WritePin(TEMPO_GPIO_Port, TEMPO_Pin, 0);
 	}*/
+
+	////////////////////////////////
+	//SET THE CURRENT(prev) VALUES//
+	////////////////////////////////
 	TIM16->EGR |= TIM_EGR_UG; //DO NOT DELETE THIS LINE, IT LITERALLY MAKES OR BREAKS THE BASTARD - It triggers an 'update' event
 	__HAL_TIM_SET_COUNTER(&htim16, TIM16_final_start_value_locked); //this line must go here, or at least very near the beginning!
 	__HAL_TIM_SET_PRESCALER(&htim16, (TIM16_prescaler_divisors[TIM16_prescaler_divisors_final_index_locked]) - 1); //have to take one off the divisor
 	__HAL_TIM_SET_COMPARE(&htim14, TIM_CHANNEL_1, prev_duty); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
+
 	/////////////////////////////
 	//CALCULATE THE NEXT VALUES//
 	/////////////////////////////
@@ -84,14 +89,12 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 
 	prev_duty = duty;
 
-	Global_Interrupt_Enable();
 	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 0);
 	TIM16_callback_active = NO;
 
 	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 1);
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions); //this function takes ages to execute!
-
-	isr_done = YES;
+	Global_Interrupt_Enable();
 }
 
 uint8_t Multiply_Duty_By_Current_Depth_and_Divide_By_256(void)
@@ -159,5 +162,15 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 		initial_ADC_conversion_complete = YES;
 	}
 	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 0);
-	adc_values_ready = YES;
+
+
+	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 1);
+
+	Process_TIM16_Raw_Start_Value_and_Raw_Prescaler();
+	Process_TIM16_Final_Start_Value_and_Prescaler_Adjust();
+
+	TIM16_final_start_value_locked = TIM16_final_start_value;
+	TIM16_prescaler_divisors_final_index_locked = TIM16_prescaler_divisors_final_index;
+
+	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 0);
 }
