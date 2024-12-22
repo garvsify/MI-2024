@@ -14,7 +14,7 @@
 #define TRIANGLE_MODE 0
 #define SINE_MODE 1
 #define SQUARE_MODE 2
-#define NUMBER_OF_FREQUENCY_STEPS 625; //883 in calcs, seems to be wrong, but 650 gives 15Hz max freq.
+#define NUMBER_OF_FREQUENCY_STEPS 625; //625 is the max. possible if prescaler array is limited to index 5
 #define FIRST_HALFCYCLE 0
 #define SECOND_HALFCYCLE 1
 #define FIRST_QUADRANT 0
