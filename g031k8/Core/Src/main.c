@@ -34,7 +34,7 @@ int main(void)
 	HAL_ADC_ConfigChannel(&hadc1, &ADC_CH_Cfg);
 	HAL_ADC_Start(&hadc1);
 	HAL_ADC_PollForConversion(&hadc1, 0.1);
-	current_speed_linear = (uint16_t)HAL_ADC_GetValue(&hadc1) >> 2; //convert to 10-bit
+	current_speed = (uint16_t)HAL_ADC_GetValue(&hadc1) >> 2; //convert to 10-bit
 
 
 
