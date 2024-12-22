@@ -11,7 +11,10 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	//////////////////////////
 	//SET THE CURRENT(prev) VALUES//
 	//////////////////////////
-	if(current_index >= 384-75 && current_index < 384+64-75){
+	if((current_waveshape == SINE_MODE || current_waveshape == TRIANGLE_MODE) && current_index >= SINE_OR_TRIANGLE_WAVE_TEMPO_PERCEIVED_APEX_INDEX && current_index < SINE_OR_TRIANGLE_WAVE_TEMPO_PULSE_OFF_INDEX){
+		HAL_GPIO_WritePin(TEMPO_GPIO_Port, TEMPO_Pin, 1);
+	}
+	else if(current_waveshape == SQUARE_MODE && current_index >= SQUARE_WAVE_TEMPO_APEX_INDEX && current_index < SQUARE_WAVE_TEMPO_PULSE_OFF_INDEX){
 		HAL_GPIO_WritePin(TEMPO_GPIO_Port, TEMPO_Pin, 1);
 	}
 	else{
