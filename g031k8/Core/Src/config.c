@@ -318,11 +318,17 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(ISR_MEAS_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : SYM processing flag pin */
-  GPIO_InitStruct.Pin = SYM_PROC_Pin;
+  /*Configure GPIO pin : Tempo LED flash pin */
+  GPIO_InitStruct.Pin = TEMPO_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(SYM_PROC_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(TEMPO_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : Tap Tempo I/P pin - requires pullup to detect falling edge */
+  GPIO_InitStruct.Pin = TAP_TEMPO_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(TAP_TEMPO_GPIO_Port, &GPIO_InitStruct);
 }
 
 void Error_Handler(void)

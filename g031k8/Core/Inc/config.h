@@ -34,8 +34,11 @@
 #define ISR_MEAS_Pin GPIO_PIN_12
 #define ISR_MEAS_GPIO_Port GPIOA
 
-#define SYM_PROC_Pin GPIO_PIN_11
-#define SYM_PROC_GPIO_Port GPIOA
+#define TEMPO_Pin GPIO_PIN_11
+#define TEMPO_GPIO_Port GPIOA
+
+#define TAP_TEMPO_Pin GPIO_PIN_15
+#define TAP_TEMPO_GPIO_Port GPIOA
 
 extern ADC_HandleTypeDef hadc1;
 extern DMA_HandleTypeDef hdma_adc1;
