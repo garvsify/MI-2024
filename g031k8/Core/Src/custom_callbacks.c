@@ -11,7 +11,7 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	//////////////////////////
 	//SET THE CURRENT(prev) VALUES//
 	//////////////////////////
-	if((current_waveshape == SINE_MODE || current_waveshape == TRIANGLE_MODE) && current_index >= SINE_OR_TRIANGLE_WAVE_TEMPO_PERCEIVED_APEX_INDEX && current_index < SINE_OR_TRIANGLE_WAVE_TEMPO_PULSE_OFF_INDEX){
+	/*if((current_waveshape == SINE_MODE || current_waveshape == TRIANGLE_MODE) && current_index >= SINE_OR_TRIANGLE_WAVE_TEMPO_PERCEIVED_APEX_INDEX && current_index < SINE_OR_TRIANGLE_WAVE_TEMPO_PULSE_OFF_INDEX){
 		HAL_GPIO_WritePin(TEMPO_GPIO_Port, TEMPO_Pin, 1);
 	}
 	else if(current_waveshape == SQUARE_MODE && current_index >= SQUARE_WAVE_TEMPO_APEX_INDEX && current_index < SQUARE_WAVE_TEMPO_PULSE_OFF_INDEX){
@@ -19,7 +19,7 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	}
 	else{
 		HAL_GPIO_WritePin(TEMPO_GPIO_Port, TEMPO_Pin, 0);
-	}
+	}*/
 	TIM16->EGR |= TIM_EGR_UG; //DO NOT DELETE THIS LINE, IT LITERALLY MAKES OR BREAKS THE BASTARD - It triggers an 'update' event
 	__HAL_TIM_SET_COUNTER(&htim16, TIM16_final_start_value_locked); //this line must go here, or at least very near the beginning!
 	__HAL_TIM_SET_PRESCALER(&htim16, (TIM16_prescaler_divisors[TIM16_prescaler_divisors_final_index_locked]) - 1); //have to take one off the divisor
