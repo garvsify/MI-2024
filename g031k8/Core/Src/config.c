@@ -486,11 +486,11 @@ void System_Init(void){
 	MX_DMA_Init();
 	MX_USART2_UART_Init();
 	MX_ADC1_Init();
-	MX_TIM14_Init();
-	MX_TIM16_Init();
-	MX_TIM2_Init();
-	MX_TIM3_Init();
-	MX_TIM17_Init();
+	MX_TIM14_Init(); //PWM Gen.
+	MX_TIM16_Init(); //Frequency Gen.
+	MX_TIM2_Init(); //I/P Capture Measurement
+	MX_TIM3_Init(); //I/P Capture Measurement Re-Elapse
+	MX_TIM17_Init(); //Maximum I/P Capture Measurement Timeout
 
 	//Set custom callback function for TIM16 (freq. gen.) to the callback function in TIMx_callback.c for TIM16.
 	//I believe the correct CallbackID is HAL_TIM_OC_DELAY_ELAPSED_CB_ID, but if this doesn't work maybe

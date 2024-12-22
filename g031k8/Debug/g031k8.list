@@ -35,17 +35,17 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  15 .debug_rnglists 00000d9e  00000000  00000000  00021f40  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  00017873  00000000  00000000  00022cde  2**0
+ 16 .debug_macro  0001785b  00000000  00000000  00022cde  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   00014bba  00000000  00000000  0003a551  2**0
+ 17 .debug_line   00014bb8  00000000  00000000  0003a539  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    0009aadc  00000000  00000000  0004f10b  2**0
+ 18 .debug_str    0009aa89  00000000  00000000  0004f0f1  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000043  00000000  00000000  000e9be7  2**0
+ 19 .comment      00000043  00000000  00000000  000e9b7a  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  00003f34  00000000  00000000  000e9c2c  2**2
+ 20 .debug_frame  00003f34  00000000  00000000  000e9bc0  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_line_str 00000057  00000000  00000000  000edb60  2**0
+ 21 .debug_line_str 00000057  00000000  00000000  000edaf4  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -2104,15 +2104,15 @@ void System_Init(void){
  8000dc4:	f7ff fec2 	bl	8000b4c <MX_USART2_UART_Init>
 	MX_ADC1_Init();
  8000dc8:	f7ff fb9c 	bl	8000504 <MX_ADC1_Init>
-	MX_TIM14_Init();
+	MX_TIM14_Init(); //PWM Gen.
  8000dcc:	f7ff fc44 	bl	8000658 <MX_TIM14_Init>
-	MX_TIM16_Init();
+	MX_TIM16_Init(); //Frequency Gen.
  8000dd0:	f7ff fc94 	bl	80006fc <MX_TIM16_Init>
-	MX_TIM2_Init();
+	MX_TIM2_Init(); //I/P Capture Measurement
  8000dd4:	f7ff fd26 	bl	8000824 <MX_TIM2_Init>
-	MX_TIM3_Init();
+	MX_TIM3_Init(); //I/P Capture Measurement Re-Elapse
  8000dd8:	f7ff fda0 	bl	800091c <MX_TIM3_Init>
-	MX_TIM17_Init();
+	MX_TIM17_Init(); //Maximum I/P Capture Measurement Timeout
  8000ddc:	f7ff fe26 	bl	8000a2c <MX_TIM17_Init>
 
 	//Set custom callback function for TIM16 (freq. gen.) to the callback function in TIMx_callback.c for TIM16.

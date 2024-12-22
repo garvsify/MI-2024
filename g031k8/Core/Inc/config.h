@@ -58,7 +58,7 @@ void MX_ADC1_Init(void);
 void MX_TIM14_Init(void); //PWM Gen.
 void MX_TIM16_Init(void); //Frequency Gen.
 void MX_TIM2_Init(void); //I/P Capture Measurement
-void MX_TIM3_Init(void); //I/P Capture Measurement Elapse
+void MX_TIM3_Init(void); //I/P Capture Measurement Re-Elapse
 void MX_TIM17_Init(void); //Maximum I/P Capture Measurement Timeout
 
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
