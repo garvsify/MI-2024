@@ -6,7 +6,9 @@
 ../Core/Src/system.c:81:9:Start_PWM_TIM	2
 ../Core/Src/system.c:95:9:Start_OC_TIM	2
 ../Core/Src/system.c:108:9:Stop_OC_TIM	2
-../Core/Src/system.c:120:9:Process_TIM16_Raw_Start_Value_and_Raw_Prescaler	2
-../Core/Src/system.c:148:9:Adjust_TIM16_Prescaler	3
-../Core/Src/system.c:159:9:Process_TIM16_Final_Start_Value_and_Prescaler_Adjust	75
-../Core/Src/system.c:541:10:unsigned_bitwise_modulo	1
+../Core/Src/system.c:120:9:Start_IC_TIM	2
+../Core/Src/system.c:132:9:Start_Input_Capture_Timer	2
+../Core/Src/system.c:144:9:Process_TIM16_Raw_Start_Value_and_Raw_Prescaler	2
+../Core/Src/system.c:172:9:Adjust_TIM16_Prescaler	3
+../Core/Src/system.c:183:9:Process_TIM16_Final_Start_Value_and_Prescaler_Adjust	75
+../Core/Src/system.c:565:10:unsigned_bitwise_modulo	1

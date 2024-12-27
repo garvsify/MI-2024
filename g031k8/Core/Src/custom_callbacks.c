@@ -176,3 +176,23 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 
 	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 0);
 }
+
+void TIM2_ch1_IP_Capture_callback(TIM_HandleTypeDef *htim){
+
+	if(input_capture_event == FIRST){ //edge detected is the first
+
+		__HAL_TIM_SET_COUNTER(&htim2->Channel, TIM16_final_start_value_locked);
+	}
+	else{ //is second
+
+	}
+
+}
+
+void TIM2_ch2_callback(TIM_HandleTypeDef *htim){
+
+}
+
+void TIM2_ch3_callback(TIM_HandleTypeDef *htimc){
+
+}

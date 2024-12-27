@@ -28,6 +28,7 @@ volatile enum Validate TIM16_callback_active = NO;
 volatile uint16_t TIM16_final_start_value_locked = 0;
 volatile uint8_t TIM16_prescaler_adjust_locked = 0;
 volatile uint16_t prev_duty = 0;
+volatile enum Input_Capture_Event input_capture_event = FIRST;
 
 //FUNCTION DEFINITIONS
 uint8_t Global_Interrupt_Enable(void){
@@ -108,6 +109,30 @@ uint8_t Start_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t OC_TIM_channel){
 uint8_t Stop_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t OC_TIM_channel){
 
 	uint8_t ok = HAL_TIM_OC_Stop_IT(TIM, OC_TIM_channel);
+
+	if(ok != HAL_OK){
+
+		Error_Handler();
+	}
+
+	return ok;
+}
+
+uint8_t Start_IC_TIM(TIM_HandleTypeDef *TIM, uint32_t IC_TIM_channel){
+
+	uint8_t ok = HAL_TIM_IC_Start_IT(&htim2, IC_TIM_channel);
+
+	if(ok != HAL_OK){
+
+		Error_Handler();
+	}
+
+	return ok;
+}
+
+uint8_t Start_Input_Capture_Timer(void){
+
+	uint8_t ok = Start_IC_TIM(&htim2, TIM_CHANNEL_1);
 
 	if(ok != HAL_OK){
 

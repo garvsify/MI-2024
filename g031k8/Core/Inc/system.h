@@ -87,6 +87,7 @@ volatile extern uint16_t TIM16_final_start_value_locked;
 volatile extern uint8_t TIM16_prescaler_divisors_final_index_locked;
 volatile extern uint8_t TIM16_prescaler_divisors_final_index;
 volatile extern uint16_t prev_duty;
+volatile extern enum Input_Capture_Event input_capture_event;
 
 //CUSTOM TYPES
 enum Polarity{
@@ -120,15 +121,22 @@ enum Symmetry_Type{
 	LENGTHEN
 };
 
+enum Input_Capture_Event{
+	FIRST,
+	SECOND
+};
+
 //FUNCTION DECLARATIONS
 uint8_t Global_Interrupt_Enable(void);
 uint8_t Global_Interrupt_Disable(void);
 uint8_t Start_ADC_Trig_Timer(void);
 uint8_t Start_PWM_Gen_Timer(void);
 uint8_t Start_Freq_Gen_Timer(void);
+uint8_t Start_Input_Capture_Timer(void);
 uint8_t Start_PWM_TIM(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel);
 uint8_t Start_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel);
 uint8_t Stop_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel);
+uint8_t Start_IC_TIM(TIM_HandleTypeDef *TIM, uint32_t IC_TIM_channel);
 uint8_t Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(void);
 uint8_t Process_TIM16_Final_Start_Value_and_Prescaler_Adjust(void);
 uint8_t Adjust_and_Set_TIM16_Prescaler(uint8_t TIM16_prescaler_adjust_arg);

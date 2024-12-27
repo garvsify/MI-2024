@@ -189,14 +189,13 @@ void TIM16_IRQHandler(void)
   */
 void TIM2_IRQHandler(void)
 {
-
   HAL_TIM_IRQHandler(&htim2);
 
 }
 
-void EXTI2_3_IRQHandler(void)
+/*void EXTI2_3_IRQHandler(void) //not needed as I/P capture does this all for us!
 {
   HAL_GPIO_EXTI_IRQHandler(T_NRST_Pin);
   HAL_GPIO_EXTI_IRQHandler(TAP_TEMPO_Pin);
-}
+}*/
 

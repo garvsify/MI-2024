@@ -403,8 +403,8 @@ void MX_GPIO_Init(void)
   HAL_GPIO_Init(TAP_TEMPO_GPIO_Port, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
-  HAL_NVIC_SetPriority(EXTI2_3_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(EXTI2_3_IRQn);
+  //HAL_NVIC_SetPriority(EXTI2_3_IRQn, 0, 0); //not needed as I/P capture does this all for us!
+  //HAL_NVIC_EnableIRQ(EXTI2_3_IRQn); //not needed as I/P capture does this all for us!
 }
 
 void Error_Handler(void)
@@ -433,7 +433,7 @@ void System_Init(void){
 	MX_ADC1_Init();
 	MX_TIM14_Init(); //PWM Gen.
 	MX_TIM16_Init(); //Frequency Gen.
-	MX_TIM2_Init(); //I/P Capture Measurement is ch1, I/P Capture Measurement Re-Elapse 1 is TIM2_ch1, and I/P Capture Measurement Re-Elapse 2 is TIM2_ch2
+	MX_TIM2_Init(); //I/P Capture Measurement is TIM2_ch1, I/P Capture Measurement Re-Elapse 1 is TIM2_ch2, and I/P Capture Measurement Re-Elapse 2 is TIM2_ch3
 
 	//Set custom callback function for TIM16 (freq. gen.) to the callback function in TIMx_callback.c for TIM16.
 	//I believe the correct CallbackID is HAL_TIM_OC_DELAY_ELAPSED_CB_ID, but if this doesn't work maybe
@@ -445,7 +445,13 @@ void System_Init(void){
 	HAL_ADC_RegisterCallback(&hadc1, HAL_ADC_CONVERSION_COMPLETE_CB_ID, &ADC_DMA_conversion_complete_callback);
 
 	//Set custom callback function for I/P capture input falling edge event
+	HAL_TIM_RegisterCallback(&htim16, HAL_TIM_IC_CAPTURE_CB_ID, &TIM2_ch1_IP_Capture_callback);
 
+	//Set custom callback function for TIM2_ch2 (Measurement Re-Elapse 1)
+	HAL_TIM_RegisterCallback(&htim16, HAL_TIM_OC_DELAY_ELAPSED_CB_ID, &TIM2_ch2_callback);
+
+	//Set custom callback function for TIM2_ch3 (Measurement Re-Elapse 2)
+	HAL_TIM_RegisterCallback(&htim16, HAL_TIM_OC_DELAY_ELAPSED_CB_ID, &TIM2_ch3_callback);
 }
 
 #ifdef  USE_FULL_ASSERT
