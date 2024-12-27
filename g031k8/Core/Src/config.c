@@ -295,9 +295,9 @@ void MX_TIM2_Init(void)
   {
     Error_Handler();
   }
-  /* USER CODE BEGIN TIM2_Init 2 */
 
-  /* USER CODE END TIM2_Init 2 */
+  HAL_NVIC_SetPriority(TIM2_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(TIM2_IRQn);
 
 }
 
@@ -398,9 +398,13 @@ void MX_GPIO_Init(void)
 
   /*Configure GPIO pin : Tap Tempo I/P pin - requires pullup to detect falling edge */
   GPIO_InitStruct.Pin = TAP_TEMPO_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(TAP_TEMPO_GPIO_Port, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI2_3_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI2_3_IRQn);
 }
 
 void Error_Handler(void)
@@ -439,6 +443,9 @@ void System_Init(void){
 
 	//Set custom callback function for ADC (DMA) conversion complete.
 	HAL_ADC_RegisterCallback(&hadc1, HAL_ADC_CONVERSION_COMPLETE_CB_ID, &ADC_DMA_conversion_complete_callback);
+
+	//Set custom callback function for I/P capture input falling edge event
+
 }
 
 #ifdef  USE_FULL_ASSERT

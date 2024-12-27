@@ -94,6 +94,7 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 
 	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 1);
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions); //this function takes ages to execute!
+	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 0);
 	Global_Interrupt_Enable();
 }
 
@@ -110,6 +111,7 @@ uint8_t Multiply_Duty_By_Current_Depth_and_Divide_By_256(void)
 
 void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 {
+	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 1);
 	HAL_ADC_Stop_DMA(hadc); //disable ADC DMA
 
 	//GET WAVESHAPE

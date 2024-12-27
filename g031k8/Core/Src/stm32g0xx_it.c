@@ -187,17 +187,16 @@ void TIM16_IRQHandler(void)
 /**
   * @brief This function handles TIM17 global interrupt.
   */
-void TIM17_IRQHandler(void)
+void TIM2_IRQHandler(void)
 {
-  /* USER CODE BEGIN TIM17_IRQn 0 */
 
-  /* USER CODE END TIM17_IRQn 0 */
-  HAL_TIM_IRQHandler(&htim17);
-  /* USER CODE BEGIN TIM17_IRQn 1 */
+  HAL_TIM_IRQHandler(&htim2);
 
-  /* USER CODE END TIM17_IRQn 1 */
 }
 
-/* USER CODE BEGIN 1 */
+void EXTI2_3_IRQHandler(void)
+{
+  HAL_GPIO_EXTI_IRQHandler(T_NRST_Pin);
+  HAL_GPIO_EXTI_IRQHandler(TAP_TEMPO_Pin);
+}
 
-/* USER CODE END 1 */
