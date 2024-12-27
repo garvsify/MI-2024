@@ -29,6 +29,9 @@ volatile uint16_t TIM16_final_start_value_locked = 0;
 volatile uint8_t TIM16_prescaler_adjust_locked = 0;
 volatile uint16_t prev_duty = 0;
 volatile enum Input_Capture_Event input_capture_event = FIRST;
+volatile uint32_t TIM2_ch1_input_capture_value;
+volatile enum Validate input_capture_measurement_is_ongoing = NO;
+volatile enum Validate speed_pot_is_disabled = NO;
 
 //FUNCTION DEFINITIONS
 uint8_t Global_Interrupt_Enable(void){

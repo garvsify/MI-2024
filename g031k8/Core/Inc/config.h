@@ -40,6 +40,7 @@
 #define TAP_TEMPO_Pin GPIO_PIN_15
 #define TAP_TEMPO_GPIO_Port GPIOA
 
+//create instance of peripheral structs (handles)
 extern ADC_HandleTypeDef hadc1;
 extern DMA_HandleTypeDef hdma_adc1;
 extern TIM_HandleTypeDef htim14;
@@ -57,7 +58,9 @@ void MX_USART2_UART_Init(void);
 void MX_ADC1_Init(void);
 void MX_TIM14_Init(void); //PWM Gen.
 void MX_TIM16_Init(void); //Frequency Gen.
-void MX_TIM2_Init(void); //I/P Capture Measurement is ch1, I/P Capture Measurement Re-Elapse 1 is TIM2_ch1, and I/P Capture Measurement Re-Elapse 2 is TIM2_ch2
+void MX_TIM2_Init(void); //I/P Capture Measurement is TIM2_ch1, I/P Capture Measurement Re-Elapse 1 is TIM3_ch1, and I/P Capture Measurement Re-Elapse 2 is TIM17_ch1
+void MX_TIM3_Init(void);
+void MX_TIM17_Init(void);
 
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 

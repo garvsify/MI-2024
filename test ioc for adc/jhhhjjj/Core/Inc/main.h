@@ -59,7 +59,6 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define T_NRST_Pin GPIO_PIN_2
 #define T_NRST_GPIO_Port GPIOF
-#define T_NRST_EXTI_IRQn EXTI2_3_IRQn
 #define T_VCP_TX_Pin GPIO_PIN_2
 #define T_VCP_TX_GPIO_Port GPIOA
 #define T_VCP_RX_Pin GPIO_PIN_3

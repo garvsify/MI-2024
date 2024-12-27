@@ -168,7 +168,11 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 
 	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 1);
 
-	Process_TIM16_Raw_Start_Value_and_Raw_Prescaler();
+	if(speed_pot_is_disabled == NO){
+
+		Process_TIM16_Raw_Start_Value_and_Raw_Prescaler();
+	}
+
 	Process_TIM16_Final_Start_Value_and_Prescaler_Adjust();
 
 	TIM16_final_start_value_locked = TIM16_final_start_value;
@@ -177,22 +181,53 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 0);
 }
 
-void TIM2_ch1_IP_Capture_callback(TIM_HandleTypeDef *htim){
+void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
+
+	TIM2_ch1_input_capture_value = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
 
 	if(input_capture_event == FIRST){ //edge detected is the first
 
-		__HAL_TIM_SET_COUNTER(&htim2->Channel, TIM16_final_start_value_locked);
+		speed_pot_is_disabled = YES;
+		input_capture_measurement_is_ongoing = YES;
+		__HAL_TIM_SET_COUNTER(&htim2, 0); //begin measurement
+
+		input_capture_event = SECOND;
 	}
 	else{ //is second
 
+		input_capture_event = FIRST; //reset event name
+		input_capture_measurement_is_ongoing = NO;
+
+		if(TIM2_ch1_input_capture_value < HIGHEST_PRESCALER_TOP_SPEED_PERIOD){ //if the captured value is less than 129, then the desired speed is not reproducable, so just set the absolute top speed (i.e. highest prescaler and shortest period)
+
+			TIM16_final_start_value = 127; //equivalent to 256 - 129
+			TIM16_base_prescaler_divisors_index = PRESCALER_DIVISORS_MAX_INDEX;
+		}
+		else{
+
+			//write code lad
+		}
 	}
 
 }
 
-void TIM2_ch2_callback(TIM_HandleTypeDef *htim){
+void TIM2_ch1_overflow_callback(TIM_HandleTypeDef *htim){
+
+	if(input_capture_measurement_is_ongoing == YES && input_capture_event == SECOND){
+
+		/*overflow has occurred at a time when an input capture measurement is occurring, which means input capture event would have been the second if it it did occur.
+		This means that the user has depressed the switch once, and hasn't pressed again within the timeout period.
+		Thus, reset evrything requiring the user to press the switch again to start another capture*/
+
+		input_capture_measurement_is_ongoing = NO;
+		input_capture_event = FIRST;
+	}
+}
+
+void TIM3_ch1_IP_capture_measurement_reelapse_1_callback(TIM_HandleTypeDef *htim){
 
 }
 
-void TIM2_ch3_callback(TIM_HandleTypeDef *htimc){
+void TIM17_ch1_IP_capture_measurement_reelapse_2_callback(TIM_HandleTypeDef *htimc){
 
 }

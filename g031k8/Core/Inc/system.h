@@ -30,6 +30,8 @@
 #define TEMPO_PULSE_LENGTH 32
 #define SINE_OR_TRIANGLE_WAVE_TEMPO_PULSE_OFF_INDEX SINE_OR_TRIANGLE_WAVE_TEMPO_PERCEIVED_APEX_INDEX + TEMPO_PULSE_LENGTH
 #define SQUARE_WAVE_TEMPO_PULSE_OFF_INDEX SQUARE_WAVE_TEMPO_APEX_INDEX + TEMPO_PULSE_LENGTH
+#define HIGHEST_PRESCALER_TOP_SPEED_PERIOD 129
+#define PRESCALER_DIVISORS_MAX_INDEX 5
 
 
 		//TURN ON/OFF SYMMETRY and SET RESOLUTION
@@ -88,6 +90,8 @@ volatile extern uint8_t TIM16_prescaler_divisors_final_index_locked;
 volatile extern uint8_t TIM16_prescaler_divisors_final_index;
 volatile extern uint16_t prev_duty;
 volatile extern enum Input_Capture_Event input_capture_event;
+volatile extern uint32_t TIM2_ch1_input_capture_value;
+volatile extern enum Validate input_capture_measurement_is_ongoing;
 
 //CUSTOM TYPES
 enum Polarity{

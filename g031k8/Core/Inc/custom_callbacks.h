@@ -4,9 +4,10 @@
 #include "system.h"
 
 void TIM16_callback(TIM_HandleTypeDef *htim);
-void TIM2_ch1_IP_Capture_callback(TIM_HandleTypeDef *htim);
-void TIM2_ch2_callback(TIM_HandleTypeDef *htim);
-void TIM2_ch3_callback(TIM_HandleTypeDef *htim);
+void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim);
+void TIM2_ch1_overflow_callback(TIM_HandleTypeDef *htim);
+void TIM3_ch1_IP_capture_measurement_reelapse_1_callback(TIM_HandleTypeDef *htim);
+void TIM17_ch1_IP_capture_measurement_reelapse_2_callback(TIM_HandleTypeDef *htim);
 void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc);
 uint8_t Multiply_Duty_By_Current_Depth_and_Divide_By_256(void);
 

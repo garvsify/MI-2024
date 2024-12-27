@@ -2,9 +2,11 @@
 ../Core/Src/config.c:61:6:MX_ADC1_Init	32	static,ignoring_inline_asm
 ../Core/Src/config.c:132:6:MX_TIM14_Init	40	static,ignoring_inline_asm
 ../Core/Src/config.c:173:6:MX_TIM16_Init	104	static,ignoring_inline_asm
-../Core/Src/config.c:234:6:MX_TIM2_Init	88	static,ignoring_inline_asm
-../Core/Src/config.c:304:6:MX_USART2_UART_Init	8	static,ignoring_inline_asm
-../Core/Src/config.c:324:6:MX_DMA_Init	16	static
-../Core/Src/config.c:339:6:MX_GPIO_Init	56	static
-../Core/Src/config.c:410:6:Error_Handler	0	static,ignoring_inline_asm
-../Core/Src/config.c:420:6:System_Init	16	static,ignoring_inline_asm
+../Core/Src/config.c:234:6:MX_TIM2_Init	56	static,ignoring_inline_asm
+../Core/Src/config.c:292:6:MX_TIM3_Init	72	static,ignoring_inline_asm
+../Core/Src/config.c:350:6:MX_TIM17_Init	96	static,ignoring_inline_asm
+../Core/Src/config.c:407:6:MX_USART2_UART_Init	8	static,ignoring_inline_asm
+../Core/Src/config.c:427:6:MX_DMA_Init	16	static
+../Core/Src/config.c:442:6:MX_GPIO_Init	56	static
+../Core/Src/config.c:513:6:Error_Handler	0	static,ignoring_inline_asm
+../Core/Src/config.c:523:6:System_Init	16	static,ignoring_inline_asm
