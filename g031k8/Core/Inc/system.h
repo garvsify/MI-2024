@@ -32,6 +32,13 @@
 #define SQUARE_WAVE_TEMPO_PULSE_OFF_INDEX SQUARE_WAVE_TEMPO_APEX_INDEX + TEMPO_PULSE_LENGTH
 #define HIGHEST_PRESCALER_TOP_SPEED_PERIOD 129
 #define PRESCALER_DIVISORS_MAX_INDEX 5
+#define SIXTY_FOUR_PRESCALER_LARGEST_INTERRUPT_PERIOD 256
+#define ONE_HUNDRED_TWENTY_EIGHT_PRESCALER_LARGEST_INTERRUPT_PERIOD 512
+#define TWO_HUNDRED_FIFTY_SIX_PRESCALER_LARGEST_INTERRUPT_PERIOD 1024
+#define FIVE_HUNDRED_TWELVE_PRESCALER_LARGEST_INTERRUPT_PERIOD 2048
+#define ONE_THOUSAND_TWENTY_FOUR_PRESCALER_LARGEST_INTERRUPT_PERIOD 4096
+#define SLOWEST_SPEED_PRESCALER_DIVISORS_ARRAY_INDEX 1
+#define FASTEST_SPEED_PRESCALER_DIVISORS_ARRAY_INDEX 5
 
 
 		//TURN ON/OFF SYMMETRY and SET RESOLUTION
@@ -94,6 +101,7 @@ volatile extern uint32_t TIM2_ch1_input_capture_value;
 volatile extern enum Validate input_capture_measurement_is_ongoing;
 volatile extern enum Validate input_capture_measurement_reelapse_1_is_ongoing;
 volatile extern enum Validate input_capture_measurement_reelapse_2_is_ongoing;
+volatile extern uint16_t interrupt_period;
 
 //CUSTOM TYPES
 enum Polarity{

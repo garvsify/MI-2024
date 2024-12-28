@@ -34,6 +34,7 @@ volatile enum Validate input_capture_measurement_is_ongoing = NO;
 volatile enum Validate speed_pot_is_disabled = NO;
 volatile enum Validate input_capture_measurement_reelapse_1_is_ongoing = NO;
 volatile enum Validate input_capture_measurement_reelapse_2_is_ongoing = NO;
+volatile uint16_t interrupt_period = 0;
 
 //FUNCTION DEFINITIONS
 uint8_t Global_Interrupt_Enable(void){
@@ -160,7 +161,7 @@ uint8_t Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(void){
         if(speed_control <= (127-12)){ //inequality is correct!
 
             TIM16_raw_start_value = (uint8_t) speed_control + 12;
-            TIM16_base_prescaler_divisors_index = 1;
+            TIM16_base_prescaler_divisors_index = SLOWEST_SPEED_PRESCALER_DIVISORS_ARRAY_INDEX;
         }
         else{ 	//(speed_control > (127-12))
 
@@ -170,7 +171,7 @@ uint8_t Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(void){
             TIM16_raw_start_value = (uint8_t)(speed_control_subtracted - (uint16_t)(how_many_128 << 7)); //how_many_128*128, set TMR0
             //biggest how_many_128 for NUMBER_OF_FREQUENCY_STEPS == 600 is 3
             //biggest base_prescaler_divisors_index == 5 for NUMBER_OF_FREQUENCY_STEPS == 600
-            TIM16_base_prescaler_divisors_index = (uint8_t)(how_many_128 + 2);
+            TIM16_base_prescaler_divisors_index = (uint8_t)(how_many_128 + SLOWEST_SPEED_PRESCALER_DIVISORS_ARRAY_INDEX + 1);
         }
     return 1;
 }

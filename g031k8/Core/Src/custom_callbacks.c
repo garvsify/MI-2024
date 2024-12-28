@@ -185,7 +185,11 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 
 	TIM2_ch1_input_capture_value = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
 
-	uint16_t interrupt_period = TIM2_ch1_input_capture_value >> 9; //divided by 512
+	interrupt_period = TIM2_ch1_input_capture_value >> 9; //divided by 512
+
+	//since the input capture measurement is z, and this is 512x the interrupt period, we just use the interrupt
+	//period = z/512 as the 'elapse period value' if we also set the elapse timer prescaler to 512 less than the
+	//input capture measurement timer
 
 	if(input_capture_event == FIRST){ //edge detected is the first
 
@@ -211,8 +215,7 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 
 		if(interrupt_period < HIGHEST_PRESCALER_TOP_SPEED_PERIOD){ //if the captured value/512 is less than 129, then the desired speed is not reproducable, so just set the absolute top speed (i.e. highest prescaler and shortest period)
 
-			//move to overflow callback//TIM16_final_start_value = 127; //equivalent to 256 - 129
-			//move to overflow callback//TIM16_base_prescaler_divisors_index = PRESCALER_DIVISORS_MAX_INDEX;
+			interrupt_period = HIGHEST_PRESCALER_TOP_SPEED_PERIOD;
 
 			//start TIM3 from 0 with CCR loaded with TIM2_ch1_input_capture_value
 			//CCR shouldn't be preloaded so *should* update instantaneously
@@ -234,6 +237,49 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 			//set I/P capture measurement re-elapse 1 is ongoing flag
 			input_capture_measurement_reelapse_1_is_ongoing = YES;
 		}
+
+		//DETERMINE WHAT TO SET THE RAW_START_VALUE AND BASE_PRESCALER TO BASED ON THE I/P CAPTURE VALUE
+		if(interrupt_period <= SIXTY_FOUR_PRESCALER_LARGEST_INTERRUPT_PERIOD){
+
+			TIM16_raw_start_value = 256 - interrupt_period;
+			TIM16_base_prescaler_divisors_index = FASTEST_SPEED_PRESCALER_DIVISORS_ARRAY_INDEX;
+		}
+		else if(interrupt_period <= ONE_HUNDRED_TWENTY_EIGHT_PRESCALER_LARGEST_INTERRUPT_PERIOD){
+
+			interrupt_period = interrupt_period >> 1;
+			TIM16_raw_start_value = 256 - interrupt_period;
+			TIM16_base_prescaler_divisors_index = FASTEST_SPEED_PRESCALER_DIVISORS_ARRAY_INDEX - 1;
+		}
+		else if(interrupt_period <= TWO_HUNDRED_FIFTY_SIX_PRESCALER_LARGEST_INTERRUPT_PERIOD){
+
+			interrupt_period = interrupt_period >> 2;
+			TIM16_raw_start_value = 256 - interrupt_period;
+			TIM16_base_prescaler_divisors_index = FASTEST_SPEED_PRESCALER_DIVISORS_ARRAY_INDEX - 2;
+		}
+		else if(interrupt_period <= FIVE_HUNDRED_TWELVE_PRESCALER_LARGEST_INTERRUPT_PERIOD){
+
+			interrupt_period = interrupt_period >> 3;
+			TIM16_raw_start_value = 256 - interrupt_period;
+			TIM16_base_prescaler_divisors_index = FASTEST_SPEED_PRESCALER_DIVISORS_ARRAY_INDEX - 3;
+		}
+		else if(interrupt_period <= ONE_THOUSAND_TWENTY_FOUR_PRESCALER_LARGEST_INTERRUPT_PERIOD){
+
+			interrupt_period = interrupt_period >> 4;
+			TIM16_raw_start_value = 256 - interrupt_period;
+			TIM16_base_prescaler_divisors_index = FASTEST_SPEED_PRESCALER_DIVISORS_ARRAY_INDEX - 4;
+		}
+
+		//WHEN THE MEASUREMENT REELAPSE TIMER INTERRUPTS, WE WANT TO 'RESTART' THE WAVE TO A SPECIFIC INDEX,
+		//AS SUCH WE HAVE TO WORK OUT THE INDEX WE WANT TO RESTART THE WAVE AT, BASED ON THE TYPE OF WAVE SELECTED,
+		//(WE'LL HAVE TO SYNCHRONISE THE TIM16 INTERRUPTS UPON THIS REELAPSE INTERRUPT, AND ALSO
+		//BECAUSE OF HOW THE TIM16 CALLBACK WORKS, WE'LL HAVE TO WORK OUT HERE WHAT THE DUTY, FINAL_START_VALUE, AND PRESCALER_ADJUST ARE
+
+		//REWRITE THE BELOW, JUST COPIED FROM TIM16 CALLBACK
+		if((current_waveshape == SINE_MODE || current_waveshape == TRIANGLE_MODE) && current_index >= SINE_OR_TRIANGLE_WAVE_TEMPO_PERCEIVED_APEX_INDEX && current_index < SINE_OR_TRIANGLE_WAVE_TEMPO_PULSE_OFF_INDEX){
+			HAL_GPIO_WritePin(TEMPO_GPIO_Port, TEMPO_Pin, 1);
+		}
+		else if(current_waveshape == SQUARE_MODE && current_index >= SQUARE_WAVE_TEMPO_APEX_INDEX && current_index < SQUARE_WAVE_TEMPO_PULSE_OFF_INDEX){
+			HAL_GPIO_WritePin(TEMPO_GPIO_Port, TEMPO_Pin, 1);
 	}
 }
 
@@ -259,5 +305,7 @@ void TIM3_ch1_IP_capture_measurement_reelapse_1_callback(TIM_HandleTypeDef *htim
 }
 
 void TIM17_ch1_IP_capture_measurement_reelapse_2_callback(TIM_HandleTypeDef *htimc){
+
+	//I don't think this is actually needed but leaving it defined just in case
 
 }

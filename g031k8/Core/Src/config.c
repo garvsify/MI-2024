@@ -555,11 +555,11 @@ void System_Init(void){
 	//Set custom callback function for I/P capture timer overflow
 	HAL_TIM_RegisterCallback(&htim2, HAL_TIM_PERIOD_ELAPSED_CB_ID, &TIM2_ch1_overflow_callback);
 
-	//Set custom callback function for TIM2_ch2 (Measurement Re-Elapse 1)
+	//Set custom callback function for TIM3_ch1 (Measurement Re-Elapse 1)
 	HAL_TIM_RegisterCallback(&htim3, HAL_TIM_OC_DELAY_ELAPSED_CB_ID, &TIM3_ch1_IP_capture_measurement_reelapse_1_callback);
 
-	//Set custom callback function for TIM2_ch3 (Measurement Re-Elapse 2)
-	HAL_TIM_RegisterCallback(&htim17, HAL_TIM_OC_DELAY_ELAPSED_CB_ID, &TIM17_ch1_IP_capture_measurement_reelapse_2_callback);
+	//Set custom callback function for TIM17_ch1 (Measurement Re-Elapse 2)
+	//HAL_TIM_RegisterCallback(&htim17, HAL_TIM_OC_DELAY_ELAPSED_CB_ID, &TIM17_ch1_IP_capture_measurement_reelapse_2_callback);
 }
 
 #ifdef  USE_FULL_ASSERT
