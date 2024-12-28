@@ -198,17 +198,41 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 		input_capture_event = FIRST; //reset event name
 		input_capture_measurement_is_ongoing = NO;
 
+		if(input_capture_measurement_reelapse_1_is_ongoing == YES){
+			//second edge was received when the measurement reelapse 1 was ongoing
+			//This should restart the measurement reelapse (discarding the previous measurement)
+			Stop_OC_TIM(&htim3, TIM_CHANNEL_1);
+			__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, (TIM2_ch1_input_capture_value >> 9)); //measured value divided by 512
+			__HAL_TIM_SET_COUNTER(&htim3, 0);
+			Start_OC_TIM(&htim3, TIM_CHANNEL_1);
+		}
+
 		if(TIM2_ch1_input_capture_value < HIGHEST_PRESCALER_TOP_SPEED_PERIOD){ //if the captured value is less than 129, then the desired speed is not reproducable, so just set the absolute top speed (i.e. highest prescaler and shortest period)
 
-			TIM16_final_start_value = 127; //equivalent to 256 - 129
-			TIM16_base_prescaler_divisors_index = PRESCALER_DIVISORS_MAX_INDEX;
+			//move to overflow callback//TIM16_final_start_value = 127; //equivalent to 256 - 129
+			//move to overflow callback//TIM16_base_prescaler_divisors_index = PRESCALER_DIVISORS_MAX_INDEX;
+
+			//start TIM3 from 0 with CCR loaded with TIM2_ch1_input_capture_value
+			//CCR shouldn't be preloaded so *should* update instantaneously
+			__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, HIGHEST_PRESCALER_TOP_SPEED_PERIOD);
+			__HAL_TIM_SET_COUNTER(&htim3, 0);
+			Start_OC_TIM(&htim3, TIM_CHANNEL_1);
+
+			//set I/P capture measurement re-elapse 1 is ongoing flag
+			input_capture_measurement_reelapse_1_is_ongoing = YES;
 		}
 		else{
 
-			//write code lad
+			//start TIM3 from 0 with CCR loaded with TIM2_ch1_input_capture_value
+			//CCR shouldn't be preloaded so *should* update instantaneously
+			__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, (TIM2_ch1_input_capture_value >> 9)); //measured value divided by 512
+			__HAL_TIM_SET_COUNTER(&htim3, 0);
+			Start_OC_TIM(&htim3, TIM_CHANNEL_1);
+
+			//set I/P capture measurement re-elapse 1 is ongoing flag
+			input_capture_measurement_reelapse_1_is_ongoing = YES;
 		}
 	}
-
 }
 
 void TIM2_ch1_overflow_callback(TIM_HandleTypeDef *htim){
@@ -217,14 +241,18 @@ void TIM2_ch1_overflow_callback(TIM_HandleTypeDef *htim){
 
 		/*overflow has occurred at a time when an input capture measurement is occurring, which means input capture event would have been the second if it it did occur.
 		This means that the user has depressed the switch once, and hasn't pressed again within the timeout period.
-		Thus, reset evrything requiring the user to press the switch again to start another capture*/
+		Thus, reset everything requiring the user to press the switch again to start another capture*/
 
 		input_capture_measurement_is_ongoing = NO;
 		input_capture_event = FIRST;
+
+		//write code to set the lowest speed!
 	}
 }
 
 void TIM3_ch1_IP_capture_measurement_reelapse_1_callback(TIM_HandleTypeDef *htim){
+
+	input_capture_measurement_reelapse_1_is_ongoing = NO;
 
 }
 

@@ -92,6 +92,8 @@ volatile extern uint16_t prev_duty;
 volatile extern enum Input_Capture_Event input_capture_event;
 volatile extern uint32_t TIM2_ch1_input_capture_value;
 volatile extern enum Validate input_capture_measurement_is_ongoing;
+volatile extern enum Validate input_capture_measurement_reelapse_1_is_ongoing;
+volatile extern enum Validate input_capture_measurement_reelapse_2_is_ongoing;
 
 //CUSTOM TYPES
 enum Polarity{

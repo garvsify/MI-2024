@@ -32,6 +32,8 @@ volatile enum Input_Capture_Event input_capture_event = FIRST;
 volatile uint32_t TIM2_ch1_input_capture_value;
 volatile enum Validate input_capture_measurement_is_ongoing = NO;
 volatile enum Validate speed_pot_is_disabled = NO;
+volatile enum Validate input_capture_measurement_reelapse_1_is_ongoing = NO;
+volatile enum Validate input_capture_measurement_reelapse_2_is_ongoing = NO;
 
 //FUNCTION DEFINITIONS
 uint8_t Global_Interrupt_Enable(void){
