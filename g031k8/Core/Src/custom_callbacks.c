@@ -185,6 +185,8 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 
 	TIM2_ch1_input_capture_value = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
 
+	uint16_t interrupt_period = TIM2_ch1_input_capture_value >> 9; //divided by 512
+
 	if(input_capture_event == FIRST){ //edge detected is the first
 
 		speed_pot_is_disabled = YES;
@@ -202,12 +204,12 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 			//second edge was received when the measurement reelapse 1 was ongoing
 			//This should restart the measurement reelapse (discarding the previous measurement)
 			Stop_OC_TIM(&htim3, TIM_CHANNEL_1);
-			__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, (TIM2_ch1_input_capture_value >> 9)); //measured value divided by 512
+			__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, interrupt_period);
 			__HAL_TIM_SET_COUNTER(&htim3, 0);
 			Start_OC_TIM(&htim3, TIM_CHANNEL_1);
 		}
 
-		if(TIM2_ch1_input_capture_value < HIGHEST_PRESCALER_TOP_SPEED_PERIOD){ //if the captured value is less than 129, then the desired speed is not reproducable, so just set the absolute top speed (i.e. highest prescaler and shortest period)
+		if(interrupt_period < HIGHEST_PRESCALER_TOP_SPEED_PERIOD){ //if the captured value/512 is less than 129, then the desired speed is not reproducable, so just set the absolute top speed (i.e. highest prescaler and shortest period)
 
 			//move to overflow callback//TIM16_final_start_value = 127; //equivalent to 256 - 129
 			//move to overflow callback//TIM16_base_prescaler_divisors_index = PRESCALER_DIVISORS_MAX_INDEX;
@@ -225,7 +227,7 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 
 			//start TIM3 from 0 with CCR loaded with TIM2_ch1_input_capture_value
 			//CCR shouldn't be preloaded so *should* update instantaneously
-			__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, (TIM2_ch1_input_capture_value >> 9)); //measured value divided by 512
+			__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, interrupt_period); //measured value divided by 512
 			__HAL_TIM_SET_COUNTER(&htim3, 0);
 			Start_OC_TIM(&htim3, TIM_CHANNEL_1);
 
