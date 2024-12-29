@@ -205,6 +205,7 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 		input_capture_measurement_is_ongoing = NO;
 
 		if(input_capture_measurement_reelapse_1_is_ongoing == YES){
+
 			//second edge was received when the measurement reelapse 1 was ongoing
 			//This should restart the measurement reelapse (discarding the previous measurement)
 			Stop_OC_TIM(&htim3, TIM_CHANNEL_1);
@@ -274,12 +275,50 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 		//(WE'LL HAVE TO SYNCHRONISE THE TIM16 INTERRUPTS UPON THIS REELAPSE INTERRUPT, AND ALSO
 		//BECAUSE OF HOW THE TIM16 CALLBACK WORKS, WE'LL HAVE TO WORK OUT HERE WHAT THE DUTY, FINAL_START_VALUE, AND PRESCALER_ADJUST ARE
 
-		//REWRITE THE BELOW, JUST COPIED FROM TIM16 CALLBACK
-		if((current_waveshape == SINE_MODE || current_waveshape == TRIANGLE_MODE) && current_index >= SINE_OR_TRIANGLE_WAVE_TEMPO_PERCEIVED_APEX_INDEX && current_index < SINE_OR_TRIANGLE_WAVE_TEMPO_PULSE_OFF_INDEX){
-			HAL_GPIO_WritePin(TEMPO_GPIO_Port, TEMPO_Pin, 1);
+		if(current_waveshape == SINE_MODE || current_waveshape == TRIANGLE_MODE){
+
+			current_index = SINE_OR_TRIANGLE_WAVE_TEMPO_PERCEIVED_APEX_INDEX;
+			current_quadrant = CURRENT_QUADRANT_SINE_OR_TRI_SYNCED;
+			current_halfcycle = CURRENT_HALFCYCLE_SINE_OR_TRI_SYNCED;
 		}
-		else if(current_waveshape == SQUARE_MODE && current_index >= SQUARE_WAVE_TEMPO_APEX_INDEX && current_index < SQUARE_WAVE_TEMPO_PULSE_OFF_INDEX){
-			HAL_GPIO_WritePin(TEMPO_GPIO_Port, TEMPO_Pin, 1);
+		else{
+			current_index = SQUARE_WAVE_TEMPO_APEX_INDEX;
+			current_quadrant = CURRENT_QUADRANT_SQUARE_SYNCED;
+			current_halfcycle = CURRENT_HALFCYCLE_SQUARE_SYNCED;
+		}
+
+		//ONCE INDEX IS SET, FIND THE DUTY VALUE
+		if(current_waveshape == TRIANGLE_MODE){
+			duty = tri_wavetable[current_index];
+		}
+		else if(current_waveshape == SINE_MODE){
+			duty = sine_wavetable[current_index];
+		}
+		else if((current_waveshape == SQUARE_MODE) && (current_index < THIRD_QUADRANT_START_INDEX)){
+			duty = 1023;
+		}
+		else if((current_waveshape == SQUARE_MODE) && (current_index >= THIRD_QUADRANT_START_INDEX)){
+			duty = 0;
+		}
+
+		//APPLY DEPTH
+		#if DEPTH_ON_OR_OFF == 1
+
+			//Apply Depth
+			if(current_depth == 255){
+				duty = 1023 - duty;
+			}
+			else if(current_depth != 0){
+				//duty = 1023 - duty*(current_depth >> 8);
+				Multiply_Duty_By_Current_Depth_and_Divide_By_256();
+			}
+			else{
+				duty = 1023; //if depth is 0, just output 1023
+			}
+
+		#endif
+
+		prev_duty = duty;
 	}
 }
 
@@ -304,8 +343,8 @@ void TIM3_ch1_IP_capture_measurement_reelapse_1_callback(TIM_HandleTypeDef *htim
 
 }
 
-void TIM17_ch1_IP_capture_measurement_reelapse_2_callback(TIM_HandleTypeDef *htimc){
+/*void TIM17_ch1_IP_capture_measurement_reelapse_2_callback(TIM_HandleTypeDef *htim){
 
 	//I don't think this is actually needed but leaving it defined just in case
 
-}
+}*/
