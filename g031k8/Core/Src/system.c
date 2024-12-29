@@ -35,6 +35,16 @@ volatile enum Validate speed_pot_is_disabled = NO;
 volatile enum Validate input_capture_measurement_reelapse_1_is_ongoing = NO;
 volatile enum Validate input_capture_measurement_reelapse_2_is_ongoing = NO;
 volatile uint16_t interrupt_period = 0;
+volatile enum Adjust_Prescaler_Action TIM16_prescaler_adjust_to_be_loaded = 0;
+volatile uint16_t TIM16_raw_start_value_to_be_loaded = 0;
+volatile uint16_t TIM16_final_start_value_to_be_loaded = 0;
+volatile uint8_t TIM16_base_prescaler_divisors_index_to_be_loaded = 0;
+volatile uint16_t duty_to_be_loaded = 0;
+volatile uint8_t TIM16_prescaler_divisors_final_index_to_be_loaded = 0;
+volatile uint8_t current_halfcycle_to_be_loaded = 0;
+volatile uint8_t current_quadrant_to_be_loaded = 0;
+volatile uint16_t current_index_to_be_loaded = 0;
+volatile uint16_t current_depth_to_be_loaded = 0;
 
 //FUNCTION DEFINITIONS
 uint8_t Global_Interrupt_Enable(void){

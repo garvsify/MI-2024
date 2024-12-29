@@ -282,6 +282,7 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 			current_halfcycle_to_be_loaded = CURRENT_HALFCYCLE_SINE_OR_TRI_SYNCED;
 		}
 		else{
+
 			current_index_to_be_loaded = SQUARE_WAVE_TEMPO_APEX_INDEX;
 			current_quadrant_to_be_loaded = CURRENT_QUADRANT_SQUARE_SYNCED;
 			current_halfcycle_to_be_loaded = CURRENT_HALFCYCLE_SQUARE_SYNCED;
@@ -690,9 +691,11 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 
 		//ADJUST PRESCALER
 		if(TIM16_prescaler_adjust_to_be_loaded == MULTIPLY_BY_TWO){
+
 			TIM16_prescaler_divisors_final_index_to_be_loaded = TIM16_base_prescaler_divisors_index_to_be_loaded - 1;
 		}
 		else if(TIM16_prescaler_adjust_to_be_loaded == DO_NOTHING){
+
 				TIM16_prescaler_divisors_final_index_to_be_loaded = TIM16_base_prescaler_divisors_index_to_be_loaded;
 		}
 
@@ -724,16 +727,18 @@ void TIM2_ch1_overflow_callback(TIM_HandleTypeDef *htim){
 
 void TIM3_ch1_IP_capture_measurement_reelapse_1_callback(TIM_HandleTypeDef *htim){
 
-	input_capture_measurement_reelapse_1_is_ongoing = NO;
-
 	//force update of timers to sync the wave to the TIM3 reelapse interrupt
 
 	TIM16->EGR |= TIM_EGR_UG; //DO NOT DELETE THIS LINE, IT LITERALLY MAKES OR BREAKS THE BASTARD - It triggers an 'update' event
-	__HAL_TIM_SET_COUNTER(&htim16, TIM16_final_start_value_locked); //this line must go here, or at least very near the beginning!
-	__HAL_TIM_SET_PRESCALER(&htim16, (TIM16_prescaler_divisors[TIM16_prescaler_divisors_final_index_locked]) - 1); //have to take one off the divisor
-	__HAL_TIM_SET_COMPARE(&htim14, TIM_CHANNEL_1, prev_duty); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
+	__HAL_TIM_SET_COUNTER(&htim16, TIM16_final_start_value_to_be_loaded); //this line must go here, or at least very near the beginning!
+	__HAL_TIM_SET_PRESCALER(&htim16, (TIM16_prescaler_divisors[TIM16_prescaler_divisors_final_index_to_be_loaded]) - 1); //have to take one off the divisor
+	__HAL_TIM_SET_COMPARE(&htim14, TIM_CHANNEL_1, duty_to_be_loaded); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
 
+	input_capture_measurement_reelapse_1_is_ongoing = NO;
 
+	current_index = current_index_to_be_loaded;
+	current_halfcycle = current_halfcycle_to_be_loaded;
+	current_quadrant = current_quadrant_to_be_loaded;
 }
 
 /*void TIM17_ch1_IP_capture_measurement_reelapse_2_callback(TIM_HandleTypeDef *htim){

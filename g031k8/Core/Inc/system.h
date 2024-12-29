@@ -140,6 +140,16 @@ volatile extern enum Validate speed_pot_is_disabled;
 volatile extern enum Validate input_capture_measurement_reelapse_1_is_ongoing;
 volatile extern enum Validate input_capture_measurement_reelapse_2_is_ongoing;
 volatile extern uint16_t interrupt_period;
+volatile extern enum Adjust_Prescaler_Action TIM16_prescaler_adjust_to_be_loaded;
+volatile extern uint16_t TIM16_raw_start_value_to_be_loaded;
+volatile extern uint16_t TIM16_final_start_value_to_be_loaded;
+volatile extern uint8_t TIM16_base_prescaler_divisors_index_to_be_loaded;
+volatile extern uint16_t duty_to_be_loaded;
+volatile extern uint8_t TIM16_prescaler_divisors_final_index_to_be_loaded;
+volatile extern uint8_t current_halfcycle_to_be_loaded;
+volatile extern uint8_t current_quadrant_to_be_loaded;
+volatile extern uint16_t current_index_to_be_loaded;
+volatile extern uint16_t current_depth_to_be_loaded;
 
 //CUSTOM TYPES
 enum Polarity{
