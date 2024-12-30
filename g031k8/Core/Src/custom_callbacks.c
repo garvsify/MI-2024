@@ -5,7 +5,7 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	//TIM16 interrupt flag is already cleared by stm32g0xx_it.c
 
 	TIM16_callback_active = YES;
-	Global_Interrupt_Disable();
+	//Global_Interrupt_Disable();
 	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 1);
 
 	/////////////////////////////////////////////////////////////
@@ -95,7 +95,7 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 1);
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions); //this function takes ages to execute!
 	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 0);
-	Global_Interrupt_Enable();
+	//Global_Interrupt_Enable();
 }
 
 uint8_t Multiply_Duty_By_Current_Depth_and_Divide_By_256(void)
@@ -171,12 +171,10 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 	if(speed_pot_is_disabled == NO){
 
 		Process_TIM16_Raw_Start_Value_and_Raw_Prescaler();
+		Process_TIM16_Final_Start_Value_and_Prescaler_Adjust();
+		TIM16_final_start_value_locked = TIM16_final_start_value;
+		TIM16_prescaler_divisors_final_index_locked = TIM16_prescaler_divisors_final_index;
 	}
-
-	Process_TIM16_Final_Start_Value_and_Prescaler_Adjust();
-
-	TIM16_final_start_value_locked = TIM16_final_start_value;
-	TIM16_prescaler_divisors_final_index_locked = TIM16_prescaler_divisors_final_index;
 
 	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 0);
 }
@@ -307,15 +305,18 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 
 			//Apply Depth
 			if(current_depth_to_be_loaded == 255){
-				duty_to_be_loaded = 1023 - duty;
+
+				duty_to_be_loaded = 1023 - duty_to_be_loaded;
 			}
 			else if(current_depth != 0){
+
 				//duty = 1023 - duty*(current_depth >> 8);
 				uint32_t multiply_product = 0;
 				multiply_product = duty * current_depth; //compiler should compile this as a hardware multiplication, but need to check
 				duty_to_be_loaded = 1023 - (uint16_t)(multiply_product >> 8);
 			}
 			else{
+
 				duty_to_be_loaded = 1023; //if depth is 0, just output 1023
 			}
 
@@ -739,6 +740,10 @@ void TIM3_ch1_IP_capture_measurement_reelapse_1_callback(TIM_HandleTypeDef *htim
 	current_index = current_index_to_be_loaded;
 	current_halfcycle = current_halfcycle_to_be_loaded;
 	current_quadrant = current_quadrant_to_be_loaded;
+
+	//set the locked values to the 'to be loaded' values such that the TIM16 continually loads these if the speed pot is disabled
+	TIM16_final_start_value_locked = TIM16_final_start_value_to_be_loaded;
+	TIM16_prescaler_divisors_final_index_locked = TIM16_prescaler_divisors_final_index_to_be_loaded;
 }
 
 /*void TIM17_ch1_IP_capture_measurement_reelapse_2_callback(TIM_HandleTypeDef *htim){

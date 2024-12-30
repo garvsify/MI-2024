@@ -538,7 +538,7 @@ void System_Init(void){
 	MX_TIM16_Init(); //Frequency Gen.
 	MX_TIM2_Init(); //I/P Capture Measurement is TIM2_ch1, I/P Capture Measurement Re-Elapse 1 is TIM3_ch1, and I/P Capture Measurement Re-Elapse 2 is TIM17_ch1
 	MX_TIM3_Init();
-	MX_TIM17_Init();
+	//MX_TIM17_Init();
 
 	//Set custom callback function for TIM16 (freq. gen.) to the callback function in TIMx_callback.c for TIM16.
 	//I believe the correct CallbackID is HAL_TIM_OC_DELAY_ELAPSED_CB_ID, but if this doesn't work maybe
