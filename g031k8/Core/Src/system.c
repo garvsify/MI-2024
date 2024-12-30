@@ -97,16 +97,16 @@ uint8_t Start_Freq_Gen_Timer(void)
 
 uint8_t Start_PWM_TIM(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel){
 
-	uint8_t ok = 0;
-	ok = HAL_TIM_Base_Start(TIM);
-	ok = HAL_TIM_PWM_Start(TIM, PWM_TIM_channel);
+	uint8_t ok_AND = 0;
+	ok_AND = HAL_TIM_Base_Start(TIM);
+	ok_AND &= HAL_TIM_PWM_Start(TIM, PWM_TIM_channel);
 
-	if(ok != HAL_OK){
+	if(ok_AND != HAL_OK){
 
 		Error_Handler();
 	}
 
-	return ok;
+	return ok_AND;
 }
 
 uint8_t Start_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t OC_TIM_channel){
@@ -136,14 +136,15 @@ uint8_t Stop_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t OC_TIM_channel){
 
 uint8_t Start_IC_TIM(TIM_HandleTypeDef *TIM, uint32_t IC_TIM_channel){
 
-	uint8_t ok = HAL_TIM_IC_Start_IT(&htim2, IC_TIM_channel);
+	uint8_t ok_AND = HAL_TIM_Base_Start_IT(&htim2);
+	ok_AND &= HAL_TIM_IC_Start_IT(&htim2, IC_TIM_channel);
 
-	if(ok != HAL_OK){
+	if(ok_AND != HAL_OK){
 
 		Error_Handler();
 	}
 
-	return ok;
+	return ok_AND;
 }
 
 uint8_t Start_Input_Capture_Timer(void){

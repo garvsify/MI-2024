@@ -10,7 +10,7 @@ TIM_HandleTypeDef htim14;
 TIM_HandleTypeDef htim16;
 TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim3;
-TIM_HandleTypeDef htim17;
+//TIM_HandleTypeDef htim17;
 
 UART_HandleTypeDef huart2;
 
@@ -278,6 +278,9 @@ void MX_TIM2_Init(void)
   {
     Error_Handler();
   }
+
+  HAL_NVIC_SetPriority(TIM2_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(TIM2_IRQn);
   /* USER CODE BEGIN TIM2_Init 2 */
 
   /* USER CODE END TIM2_Init 2 */
@@ -336,6 +339,9 @@ void MX_TIM3_Init(void)
   {
     Error_Handler();
   }
+
+  HAL_NVIC_SetPriority(TIM3_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(TIM3_IRQn);
   /* USER CODE BEGIN TIM3_Init 2 */
 
   /* USER CODE END TIM3_Init 2 */
@@ -501,8 +507,9 @@ void MX_GPIO_Init(void)
 
   /*Configure GPIO pin : Tap Tempo I/P pin - requires pullup to detect falling edge */
   GPIO_InitStruct.Pin = TAP_TEMPO_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Mode = GPIO_MODE_EVT_FALLING;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Alternate = GPIO_AF2_TIM2;
   HAL_GPIO_Init(TAP_TEMPO_GPIO_Port, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
