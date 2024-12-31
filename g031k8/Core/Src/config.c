@@ -469,30 +469,6 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(LD3_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : ADC_CH0_Pin */
-  GPIO_InitStruct.Pin = ADC_CH0_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(ADC_CH0_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : ADC_CH1_Pin */
-  GPIO_InitStruct.Pin = ADC_CH1_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(ADC_CH1_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : ADC_CH4_Pin */
-  GPIO_InitStruct.Pin = ADC_CH4_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(ADC_CH4_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : ADC_CH5_Pin */
-  GPIO_InitStruct.Pin = ADC_CH5_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(ADC_CH5_GPIO_Port, &GPIO_InitStruct);
-
   /*Configure GPIO pin : ISR measurement pin */
   GPIO_InitStruct.Pin = ISR_MEAS_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
@@ -504,17 +480,6 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(TEMPO_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : Tap Tempo I/P pin - requires pullup to detect falling edge */
-  GPIO_InitStruct.Pin = TAP_TEMPO_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_EVT_FALLING;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  GPIO_InitStruct.Alternate = GPIO_AF2_TIM2;
-  HAL_GPIO_Init(TAP_TEMPO_GPIO_Port, &GPIO_InitStruct);
-
-  /* EXTI interrupt init*/
-  //HAL_NVIC_SetPriority(EXTI2_3_IRQn, 0, 0); //not needed as I/P capture does this all for us!
-  //HAL_NVIC_EnableIRQ(EXTI2_3_IRQn); //not needed as I/P capture does this all for us!
 }
 
 void Error_Handler(void)
