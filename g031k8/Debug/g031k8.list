@@ -33,21 +33,21 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  14 .debug_aranges 00000f58  00000000  00000000  000294c8  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_rnglists 00001695  00000000  00000000  0002a420  2**0
+ 15 .debug_rnglists 00001698  00000000  00000000  0002a420  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  000178cd  00000000  00000000  0002bab5  2**0
+ 16 .debug_macro  000178cd  00000000  00000000  0002bab8  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   0001f55a  00000000  00000000  00043382  2**0
+ 17 .debug_line   0001f566  00000000  00000000  00043385  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    0009b0c6  00000000  00000000  000628dc  2**0
+ 18 .debug_str    0009b0c6  00000000  00000000  000628eb  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000043  00000000  00000000  000fd9a2  2**0
+ 19 .comment      00000043  00000000  00000000  000fd9b1  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  0000296c  00000000  00000000  000fd9e8  2**2
+ 20 .debug_frame  0000296c  00000000  00000000  000fd9f4  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_loclists 0000d1a8  00000000  00000000  00100354  2**0
+ 21 .debug_loclists 0000d1a8  00000000  00000000  00100360  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 22 .debug_line_str 00000057  00000000  00000000  0010d4fc  2**0
+ 22 .debug_line_str 00000057  00000000  00000000  0010d508  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -3275,7 +3275,7 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
   else if(htim_base->Instance==TIM3)
  8001462:	4a3c      	ldr	r2, [pc, #240]	@ (8001554 <HAL_TIM_Base_MspInit+0x10c>)
  8001464:	4293      	cmp	r3, r2
- 8001466:	d04e      	beq.n	8001506 <HAL_TIM_Base_MspInit+0xbe>
+ 8001466:	d04f      	beq.n	8001508 <HAL_TIM_Base_MspInit+0xc0>
   HAL_NVIC_EnableIRQ(TIM3_IRQn);
   /* USER CODE BEGIN TIM3_MspInit 1 */
 
@@ -3293,7 +3293,7 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
   else if(htim_base->Instance==TIM16)
  800146e:	4a3b      	ldr	r2, [pc, #236]	@ (800155c <HAL_TIM_Base_MspInit+0x114>)
  8001470:	4293      	cmp	r3, r2
- 8001472:	d05b      	beq.n	800152c <HAL_TIM_Base_MspInit+0xe4>
+ 8001472:	d05c      	beq.n	800152e <HAL_TIM_Base_MspInit+0xe6>
     HAL_NVIC_EnableIRQ(TIM16_IRQn);
   /* USER CODE BEGIN TIM16_MspInit 1 */
 
@@ -3351,110 +3351,114 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
 }
  80014b8:	e7df      	b.n	800147a <HAL_TIM_Base_MspInit+0x32>
   __HAL_RCC_TIM2_CLK_ENABLE();
- 80014ba:	2301      	movs	r3, #1
- 80014bc:	4a29      	ldr	r2, [pc, #164]	@ (8001564 <HAL_TIM_Base_MspInit+0x11c>)
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
- 80014be:	20a0      	movs	r0, #160	@ 0xa0
+ 80014ba:	2201      	movs	r2, #1
+ 80014bc:	4b29      	ldr	r3, [pc, #164]	@ (8001564 <HAL_TIM_Base_MspInit+0x11c>)
+  GPIO_InitStruct.Pin = GPIO_PIN_15;
+ 80014be:	2080      	movs	r0, #128	@ 0x80
   __HAL_RCC_TIM2_CLK_ENABLE();
- 80014c0:	6bd1      	ldr	r1, [r2, #60]	@ 0x3c
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
- 80014c2:	05c0      	lsls	r0, r0, #23
+ 80014c0:	6bd9      	ldr	r1, [r3, #60]	@ 0x3c
+  GPIO_InitStruct.Pin = GPIO_PIN_15;
+ 80014c2:	0200      	lsls	r0, r0, #8
   __HAL_RCC_TIM2_CLK_ENABLE();
- 80014c4:	4319      	orrs	r1, r3
- 80014c6:	63d1      	str	r1, [r2, #60]	@ 0x3c
- 80014c8:	6bd1      	ldr	r1, [r2, #60]	@ 0x3c
- 80014ca:	4019      	ands	r1, r3
+ 80014c4:	4311      	orrs	r1, r2
+ 80014c6:	63d9      	str	r1, [r3, #60]	@ 0x3c
+ 80014c8:	6bd9      	ldr	r1, [r3, #60]	@ 0x3c
+ 80014ca:	4011      	ands	r1, r2
  80014cc:	9100      	str	r1, [sp, #0]
  80014ce:	9900      	ldr	r1, [sp, #0]
   __HAL_RCC_GPIOA_CLK_ENABLE();
- 80014d0:	6b51      	ldr	r1, [r2, #52]	@ 0x34
- 80014d2:	4319      	orrs	r1, r3
- 80014d4:	6351      	str	r1, [r2, #52]	@ 0x34
- 80014d6:	6b52      	ldr	r2, [r2, #52]	@ 0x34
+ 80014d0:	6b59      	ldr	r1, [r3, #52]	@ 0x34
+ 80014d2:	4311      	orrs	r1, r2
+ 80014d4:	6359      	str	r1, [r3, #52]	@ 0x34
+  GPIO_InitStruct.Pin = GPIO_PIN_15;
+ 80014d6:	2102      	movs	r1, #2
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+ 80014d8:	6b5b      	ldr	r3, [r3, #52]	@ 0x34
+  GPIO_InitStruct.Pin = GPIO_PIN_15;
+ 80014da:	9006      	str	r0, [sp, #24]
+ 80014dc:	9107      	str	r1, [sp, #28]
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+ 80014de:	4013      	ands	r3, r2
+ 80014e0:	9301      	str	r3, [sp, #4]
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
- 80014d8:	a906      	add	r1, sp, #24
+ 80014e2:	20a0      	movs	r0, #160	@ 0xa0
   __HAL_RCC_GPIOA_CLK_ENABLE();
- 80014da:	4013      	ands	r3, r2
- 80014dc:	9301      	str	r3, [sp, #4]
-  GPIO_InitStruct.Pin = GPIO_PIN_15;
- 80014de:	2280      	movs	r2, #128	@ 0x80
-  __HAL_RCC_GPIOA_CLK_ENABLE();
- 80014e0:	9b01      	ldr	r3, [sp, #4]
-  GPIO_InitStruct.Pin = GPIO_PIN_15;
- 80014e2:	2302      	movs	r3, #2
- 80014e4:	0212      	lsls	r2, r2, #8
- 80014e6:	9206      	str	r2, [sp, #24]
- 80014e8:	9307      	str	r3, [sp, #28]
+ 80014e4:	9b01      	ldr	r3, [sp, #4]
   GPIO_InitStruct.Alternate = GPIO_AF2_TIM2;
- 80014ea:	2302      	movs	r3, #2
- 80014ec:	930a      	str	r3, [sp, #40]	@ 0x28
+ 80014e6:	2302      	movs	r3, #2
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
- 80014ee:	f001 fa01 	bl	80028f4 <HAL_GPIO_Init>
+ 80014e8:	a906      	add	r1, sp, #24
+ 80014ea:	05c0      	lsls	r0, r0, #23
+  GPIO_InitStruct.Alternate = GPIO_AF2_TIM2;
+ 80014ec:	930a      	str	r3, [sp, #40]	@ 0x28
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+ 80014ee:	9208      	str	r2, [sp, #32]
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+ 80014f0:	f001 fa00 	bl	80028f4 <HAL_GPIO_Init>
   HAL_NVIC_SetPriority(TIM2_IRQn, 0, 0);
- 80014f2:	2200      	movs	r2, #0
- 80014f4:	2100      	movs	r1, #0
- 80014f6:	200f      	movs	r0, #15
- 80014f8:	f001 f836 	bl	8002568 <HAL_NVIC_SetPriority>
+ 80014f4:	2200      	movs	r2, #0
+ 80014f6:	2100      	movs	r1, #0
+ 80014f8:	200f      	movs	r0, #15
+ 80014fa:	f001 f835 	bl	8002568 <HAL_NVIC_SetPriority>
   HAL_NVIC_EnableIRQ(TIM2_IRQn);
- 80014fc:	200f      	movs	r0, #15
- 80014fe:	f001 f85d 	bl	80025bc <HAL_NVIC_EnableIRQ>
+ 80014fe:	200f      	movs	r0, #15
+ 8001500:	f001 f85c 	bl	80025bc <HAL_NVIC_EnableIRQ>
   if(htim_base->Instance==TIM14)
- 8001502:	6823      	ldr	r3, [r4, #0]
- 8001504:	e7b0      	b.n	8001468 <HAL_TIM_Base_MspInit+0x20>
+ 8001504:	6823      	ldr	r3, [r4, #0]
+ 8001506:	e7af      	b.n	8001468 <HAL_TIM_Base_MspInit+0x20>
   __HAL_RCC_TIM3_CLK_ENABLE();
- 8001506:	2302      	movs	r3, #2
- 8001508:	4a16      	ldr	r2, [pc, #88]	@ (8001564 <HAL_TIM_Base_MspInit+0x11c>)
+ 8001508:	2302      	movs	r3, #2
+ 800150a:	4a16      	ldr	r2, [pc, #88]	@ (8001564 <HAL_TIM_Base_MspInit+0x11c>)
   HAL_NVIC_SetPriority(TIM3_IRQn, 0, 0);
- 800150a:	2010      	movs	r0, #16
+ 800150c:	2010      	movs	r0, #16
   __HAL_RCC_TIM3_CLK_ENABLE();
- 800150c:	6bd1      	ldr	r1, [r2, #60]	@ 0x3c
- 800150e:	4319      	orrs	r1, r3
- 8001510:	63d1      	str	r1, [r2, #60]	@ 0x3c
- 8001512:	6bd2      	ldr	r2, [r2, #60]	@ 0x3c
+ 800150e:	6bd1      	ldr	r1, [r2, #60]	@ 0x3c
+ 8001510:	4319      	orrs	r1, r3
+ 8001512:	63d1      	str	r1, [r2, #60]	@ 0x3c
+ 8001514:	6bd2      	ldr	r2, [r2, #60]	@ 0x3c
   HAL_NVIC_SetPriority(TIM3_IRQn, 0, 0);
- 8001514:	2100      	movs	r1, #0
+ 8001516:	2100      	movs	r1, #0
   __HAL_RCC_TIM3_CLK_ENABLE();
- 8001516:	4013      	ands	r3, r2
- 8001518:	9302      	str	r3, [sp, #8]
+ 8001518:	4013      	ands	r3, r2
+ 800151a:	9302      	str	r3, [sp, #8]
   HAL_NVIC_SetPriority(TIM3_IRQn, 0, 0);
- 800151a:	2200      	movs	r2, #0
+ 800151c:	2200      	movs	r2, #0
   __HAL_RCC_TIM3_CLK_ENABLE();
- 800151c:	9b02      	ldr	r3, [sp, #8]
+ 800151e:	9b02      	ldr	r3, [sp, #8]
   HAL_NVIC_SetPriority(TIM3_IRQn, 0, 0);
- 800151e:	f001 f823 	bl	8002568 <HAL_NVIC_SetPriority>
+ 8001520:	f001 f822 	bl	8002568 <HAL_NVIC_SetPriority>
   HAL_NVIC_EnableIRQ(TIM3_IRQn);
- 8001522:	2010      	movs	r0, #16
- 8001524:	f001 f84a 	bl	80025bc <HAL_NVIC_EnableIRQ>
+ 8001524:	2010      	movs	r0, #16
+ 8001526:	f001 f849 	bl	80025bc <HAL_NVIC_EnableIRQ>
   if(htim_base->Instance==TIM14)
- 8001528:	6823      	ldr	r3, [r4, #0]
- 800152a:	e79d      	b.n	8001468 <HAL_TIM_Base_MspInit+0x20>
+ 800152a:	6823      	ldr	r3, [r4, #0]
+ 800152c:	e79c      	b.n	8001468 <HAL_TIM_Base_MspInit+0x20>
     __HAL_RCC_TIM16_CLK_ENABLE();
- 800152c:	2180      	movs	r1, #128	@ 0x80
- 800152e:	4b0d      	ldr	r3, [pc, #52]	@ (8001564 <HAL_TIM_Base_MspInit+0x11c>)
- 8001530:	0289      	lsls	r1, r1, #10
- 8001532:	6c1a      	ldr	r2, [r3, #64]	@ 0x40
+ 800152e:	2180      	movs	r1, #128	@ 0x80
+ 8001530:	4b0c      	ldr	r3, [pc, #48]	@ (8001564 <HAL_TIM_Base_MspInit+0x11c>)
+ 8001532:	0289      	lsls	r1, r1, #10
+ 8001534:	6c1a      	ldr	r2, [r3, #64]	@ 0x40
     HAL_NVIC_SetPriority(TIM16_IRQn, 0, 0);
- 8001534:	2015      	movs	r0, #21
+ 8001536:	2015      	movs	r0, #21
     __HAL_RCC_TIM16_CLK_ENABLE();
- 8001536:	430a      	orrs	r2, r1
- 8001538:	641a      	str	r2, [r3, #64]	@ 0x40
- 800153a:	6c1b      	ldr	r3, [r3, #64]	@ 0x40
+ 8001538:	430a      	orrs	r2, r1
+ 800153a:	641a      	str	r2, [r3, #64]	@ 0x40
+ 800153c:	6c1b      	ldr	r3, [r3, #64]	@ 0x40
     HAL_NVIC_SetPriority(TIM16_IRQn, 0, 0);
- 800153c:	2200      	movs	r2, #0
+ 800153e:	2200      	movs	r2, #0
     __HAL_RCC_TIM16_CLK_ENABLE();
- 800153e:	400b      	ands	r3, r1
- 8001540:	9304      	str	r3, [sp, #16]
+ 8001540:	400b      	ands	r3, r1
+ 8001542:	9304      	str	r3, [sp, #16]
     HAL_NVIC_SetPriority(TIM16_IRQn, 0, 0);
- 8001542:	2100      	movs	r1, #0
+ 8001544:	2100      	movs	r1, #0
     __HAL_RCC_TIM16_CLK_ENABLE();
- 8001544:	9b04      	ldr	r3, [sp, #16]
+ 8001546:	9b04      	ldr	r3, [sp, #16]
     HAL_NVIC_SetPriority(TIM16_IRQn, 0, 0);
- 8001546:	f001 f80f 	bl	8002568 <HAL_NVIC_SetPriority>
+ 8001548:	f001 f80e 	bl	8002568 <HAL_NVIC_SetPriority>
     HAL_NVIC_EnableIRQ(TIM16_IRQn);
- 800154a:	2015      	movs	r0, #21
- 800154c:	f001 f836 	bl	80025bc <HAL_NVIC_EnableIRQ>
- 8001550:	e793      	b.n	800147a <HAL_TIM_Base_MspInit+0x32>
- 8001552:	46c0      	nop			@ (mov r8, r8)
+ 800154c:	2015      	movs	r0, #21
+ 800154e:	f001 f835 	bl	80025bc <HAL_NVIC_EnableIRQ>
+ 8001552:	e792      	b.n	800147a <HAL_TIM_Base_MspInit+0x32>
  8001554:	40000400 	.word	0x40000400
  8001558:	40002000 	.word	0x40002000
  800155c:	40014400 	.word	0x40014400
