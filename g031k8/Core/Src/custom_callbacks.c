@@ -90,14 +90,14 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	prev_duty = duty;
 
 	//SHIFT THE DELAY LINES BY ONE INDEX TO THE RIGHT
-	for(uint16_t i = 0; i < (FINAL_INDEX + 1); i++){
-		uint16_t i_flip = FINAL_INDEX - i;
-		if(i_flip != FINAL_INDEX){
+	/*for(uint16_t i = 0; i < ((FINAL_INDEX + 1) >> 2); i++){
+		uint16_t i_flip = ((FINAL_INDEX - 1) >> 2) - i;
+		if(i_flip != ((FINAL_INDEX - 1) >> 2)){
 			duty_delay_line[i_flip + 1] = duty_delay_line[i_flip];
 			prescaler_divisors_final_index_delay_line[i_flip + 1] = prescaler_divisors_final_index_delay_line[i_flip];
 			final_start_value_delay_line[i_flip + 1] = final_start_value_delay_line[i_flip];
 		}
-	}
+	}*/
 
 	//STORE THE VALUES IN THE DELAY LINES' 0th INDEXES
 	duty_delay_line[0] = prev_duty;
@@ -105,9 +105,9 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	final_start_value_delay_line[0] = TIM16_final_start_value_locked;
 
 	//DETERMINE THE DELAYED WAVE'S VALUES
-	duty_delayed = *(duty_delay_line + delay_line_read_pointer_offset);
-	final_start_value_delayed = *(final_start_value_delay_line + delay_line_read_pointer_offset);
-	prescaler_divisors_final_index_delayed = *(prescaler_divisors_final_index_delay_line + delay_line_read_pointer_offset);
+	//duty_delayed = *(duty_delay_line + delay_line_read_pointer_offset);
+	//final_start_value_delayed = *(final_start_value_delay_line + delay_line_read_pointer_offset);
+	//prescaler_divisors_final_index_delayed = *(prescaler_divisors_final_index_delay_line + delay_line_read_pointer_offset);
 
 	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 0);
 	TIM16_callback_active = NO;
