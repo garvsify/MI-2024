@@ -66,19 +66,7 @@ uint8_t Global_Interrupt_Disable(void){
 	return 1;
 }
 
-uint8_t Start_ADC_Trig_Timer(void)
-{
-	uint8_t ok = Start_OC_TIM(&htim17, TIM_CHANNEL_1); //start adc trig.
-
-	if(ok != HAL_OK){
-
-			Error_Handler();
-	}
-
-	return ok;
-}
-
-uint8_t Start_PWM_Gen_Timer(void)
+uint8_t Start_PWM_Gen_Timer_Main_Oscillator(void)
 {
 	uint8_t ok = Start_PWM_TIM(&htim14, TIM_CHANNEL_1); //start PWM
 
@@ -90,9 +78,33 @@ uint8_t Start_PWM_Gen_Timer(void)
 	return ok;
 }
 
-uint8_t Start_Freq_Gen_Timer(void)
+uint8_t Start_Freq_Gen_Timer_Main_Oscillator(void)
 {
 	uint8_t ok = Start_OC_TIM(&htim16, TIM_CHANNEL_1); //start freq. gen.
+
+	if(ok != HAL_OK){
+
+		Error_Handler();
+	}
+
+	return ok;
+}
+
+uint8_t Start_PWM_Gen_Timer_Secondary_Oscillator(void)
+{
+	uint8_t ok = Start_PWM_TIM(&htim1, TIM_CHANNEL_4); //start PWM
+
+	if(ok != HAL_OK){
+
+		Error_Handler();
+	}
+
+	return ok;
+}
+
+uint8_t Start_Freq_Gen_Timer_Secondary_Oscillator(void)
+{
+	uint8_t ok = Start_OC_TIM(&htim17, TIM_CHANNEL_1); //start freq. gen.
 
 	if(ok != HAL_OK){
 

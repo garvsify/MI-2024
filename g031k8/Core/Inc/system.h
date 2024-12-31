@@ -198,9 +198,10 @@ enum Input_Capture_Event{
 //FUNCTION DECLARATIONS
 uint8_t Global_Interrupt_Enable(void);
 uint8_t Global_Interrupt_Disable(void);
-uint8_t Start_ADC_Trig_Timer(void);
-uint8_t Start_PWM_Gen_Timer(void);
-uint8_t Start_Freq_Gen_Timer(void);
+uint8_t Start_PWM_Gen_Timer_Main_Oscillator(void);
+uint8_t Start_Freq_Gen_Timer_Main_Oscillator(void);
+uint8_t Start_PWM_Gen_Timer_Secondary_Oscillator(void);
+uint8_t Start_Freq_Gen_Timer_Secondary_Oscillator(void);
 uint8_t Start_Input_Capture_Timer(void);
 uint8_t Start_PWM_TIM(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel);
 uint8_t Start_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel);

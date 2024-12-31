@@ -6,7 +6,7 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 
 	TIM16_callback_active = YES;
 	//Global_Interrupt_Disable();
-	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 1);
+	//HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 1);
 
 	/////////////////////////////////////////////////////////////
 	//FLASH LED in case of wave reaching apex or perceived apex//
@@ -21,17 +21,21 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 		HAL_GPIO_WritePin(TEMPO_GPIO_Port, TEMPO_Pin, 0);
 	}*/
 
+
 	////////////////////////////////
 	//SET THE CURRENT(prev) VALUES//
 	////////////////////////////////
+
+	//MAIN OSCILLATOR
 	TIM16->EGR |= TIM_EGR_UG; //DO NOT DELETE THIS LINE, IT LITERALLY MAKES OR BREAKS THE BASTARD - It triggers an 'update' event
 	__HAL_TIM_SET_COUNTER(&htim16, TIM16_final_start_value_locked); //this line must go here, or at least very near the beginning!
 	__HAL_TIM_SET_PRESCALER(&htim16, (TIM16_prescaler_divisors[TIM16_prescaler_divisors_final_index_locked]) - 1); //have to take one off the divisor
 	__HAL_TIM_SET_COMPARE(&htim14, TIM_CHANNEL_1, prev_duty); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
 
-	/////////////////////////////
-	//CALCULATE THE NEXT VALUES//
-	/////////////////////////////
+
+	//////////////////////////////////////////////////////
+	//CALCULATE THE NEXT DUTY VALUES FOR MAIN OSCILLATOR//
+	//////////////////////////////////////////////////////
 	current_index++;
 
 	if(current_index == FINAL_INDEX + 1){
@@ -87,6 +91,7 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 
 	#endif
 
+	//SET THE NEXT VALUE OF DUTY FOR MAIN OSCILLATOR
 	prev_duty = duty;
 
 	//SHIFT THE DELAY LINES BY ONE INDEX TO THE RIGHT
@@ -104,18 +109,36 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	prescaler_divisors_final_index_delay_line[0] = TIM16_prescaler_divisors_final_index_locked;
 	final_start_value_delay_line[0] = TIM16_final_start_value_locked;
 
-	//DETERMINE THE DELAYED WAVE'S VALUES
+	//HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 0);
+	TIM16_callback_active = NO;
+
+	//HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 1);
+	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions); //this function takes ages to execute!
+	//HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 0);
+	//Global_Interrupt_Enable();
+}
+
+void TIM17_callback(TIM_HandleTypeDef *htim)
+{
+	////////////////////////////////
+	//SET THE CURRENT(prev) VALUES//
+	////////////////////////////////
+
+	//SECONDARY OSCILLATOR
+	TIM1->EGR |= TIM_EGR_UG; //DO NOT DELETE THIS LINE, IT LITERALLY MAKES OR BREAKS THE BASTARD - It triggers an 'update' event
+	__HAL_TIM_SET_COUNTER(&htim17, final_start_value_delayed); //this line must go here, or at least very near the beginning!
+	__HAL_TIM_SET_PRESCALER(&htim17, (TIM16_prescaler_divisors[prescaler_divisors_final_index_delayed]) - 1); //have to take one off the divisor
+	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, duty_delayed); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
+
+
+	//////////////////////////////////////////////////////
+	//CALCULATE THE NEXT VALUES FOR SECONDARY OSCILLATOR//
+	//////////////////////////////////////////////////////
+
+	//DETERMINE THE DELAYED WAVE'S VALUES (SECONDARY OSCILLATOR)
 	duty_delayed = *(duty_delay_line + delay_line_read_pointer_offset);
 	final_start_value_delayed = *(final_start_value_delay_line + delay_line_read_pointer_offset);
 	prescaler_divisors_final_index_delayed = *(prescaler_divisors_final_index_delay_line + delay_line_read_pointer_offset);
-
-	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 0);
-	TIM16_callback_active = NO;
-
-	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 1);
-	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions); //this function takes ages to execute!
-	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 0);
-	//Global_Interrupt_Enable();
 }
 
 uint8_t Multiply_Duty_By_Current_Depth_and_Divide_By_256(void)
@@ -131,7 +154,7 @@ uint8_t Multiply_Duty_By_Current_Depth_and_Divide_By_256(void)
 
 void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 {
-	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 1);
+	//HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 1);
 	HAL_ADC_Stop_DMA(hadc); //disable ADC DMA
 
 	//GET WAVESHAPE
@@ -183,10 +206,10 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 	if(initial_ADC_conversion_complete == NO){
 		initial_ADC_conversion_complete = YES;
 	}
-	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 0);
+	//HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 0);
 
 
-	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 1);
+	//HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 1);
 
 	if(speed_pot_is_disabled == NO){
 
@@ -196,7 +219,7 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 		TIM16_prescaler_divisors_final_index_locked = TIM16_prescaler_divisors_final_index;
 	}
 
-	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 0);
+	//HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 0);
 }
 
 void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){

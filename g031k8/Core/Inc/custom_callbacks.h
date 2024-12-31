@@ -4,6 +4,7 @@
 #include "system.h"
 
 void TIM16_callback(TIM_HandleTypeDef *htim);
+void TIM17_callback(TIM_HandleTypeDef *htim);
 void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim);
 void TIM2_ch1_overflow_callback(TIM_HandleTypeDef *htim);
 void TIM3_ch1_IP_capture_measurement_reelapse_1_callback(TIM_HandleTypeDef *htim);
