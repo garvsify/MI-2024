@@ -150,6 +150,13 @@ volatile extern uint8_t current_halfcycle_to_be_loaded;
 volatile extern uint8_t current_quadrant_to_be_loaded;
 volatile extern uint16_t current_index_to_be_loaded;
 volatile extern uint16_t current_depth_to_be_loaded;
+volatile extern uint16_t duty_delay_line[512];
+volatile extern uint8_t prescaler_divisors_final_index_delay_line[512];
+volatile extern uint16_t final_start_value_delay_line[512];
+volatile extern uint16_t delay_line_read_pointer_offset;
+volatile extern uint16_t final_start_value_delayed;
+volatile extern uint8_t prescaler_divisors_final_index_delayed;
+volatile extern uint16_t duty_delayed;
 
 //CUSTOM TYPES
 enum Polarity{

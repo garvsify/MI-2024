@@ -9,6 +9,8 @@ int main(void)
 {
 	System_Init();
 
+	delay_line_read_pointer_offset = 0; //no phase difference between the two waves
+
 	__HAL_TIM_ENABLE_IT(&htim2, TIM_IT_UPDATE); //make sure the overflow (update) interrupt is enabled for TIM2
 
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions);
