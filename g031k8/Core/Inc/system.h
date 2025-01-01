@@ -150,12 +150,10 @@ volatile extern uint8_t current_halfcycle_to_be_loaded;
 volatile extern uint8_t current_quadrant_to_be_loaded;
 volatile extern uint16_t current_index_to_be_loaded;
 volatile extern uint16_t current_depth_to_be_loaded;
-volatile extern uint16_t duty_delay_line[512];
-volatile extern uint8_t prescaler_divisors_final_index_delay_line[512];
-volatile extern uint16_t final_start_value_delay_line[512];
-volatile extern uint16_t delay_line_read_pointer_offset;
-volatile extern uint16_t final_start_value_delayed;
-volatile extern uint8_t prescaler_divisors_final_index_delayed;
+volatile extern uint16_t duty_delay_line_storage_array[513]; //one index larger than the number of indexes (wave samples) to allow us to 'wrap' the array into a kind of circular buffer
+volatile extern uint16_t duty_delay_line_start_offset; //initial value is 1st index
+volatile extern uint16_t duty_delay_line_finish_offset; //initial value is 512th index (513th value)
+volatile extern uint16_t duty_delay_line_read_pointer_offset;
 volatile extern uint16_t duty_delayed;
 
 //CUSTOM TYPES
@@ -198,7 +196,6 @@ enum Input_Capture_Event{
 //FUNCTION DECLARATIONS
 uint8_t Global_Interrupt_Enable(void);
 uint8_t Global_Interrupt_Disable(void);
-uint8_t Start_ADC_Trig_Timer(void);
 uint8_t Start_PWM_Gen_Timer_Main_Oscillator(void);
 uint8_t Start_PWM_Gen_Timer_Secondary_Oscillator(void);
 uint8_t Start_Freq_Gen_Timer(void);

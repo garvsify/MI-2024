@@ -45,12 +45,10 @@ volatile uint8_t current_halfcycle_to_be_loaded = 0;
 volatile uint8_t current_quadrant_to_be_loaded = 0;
 volatile uint16_t current_index_to_be_loaded = 0;
 volatile uint16_t current_depth_to_be_loaded = 0;
-volatile uint16_t duty_delay_line[512] = {0};
-volatile uint8_t prescaler_divisors_final_index_delay_line[512] = {0};
-volatile uint16_t final_start_value_delay_line[512] = {0};
-volatile uint16_t delay_line_read_pointer_offset = 0;
-volatile uint16_t final_start_value_delayed = 0;
-volatile uint8_t prescaler_divisors_final_index_delayed = 0;
+volatile uint16_t duty_delay_line_storage_array[513] = {0}; //one index larger than the number of indexes (wave samples) to allow us to 'wrap' the array into a kind of circular buffer
+volatile uint16_t duty_delay_line_start_offset = 1; //initial value is 1st index
+volatile uint16_t duty_delay_line_finish_offset = FINAL_INDEX + 1; //initial value is 512th index (513th value)
+volatile uint16_t duty_delay_line_read_pointer_offset = 0;
 volatile uint16_t duty_delayed = 0;
 
 //FUNCTION DEFINITIONS
@@ -64,18 +62,6 @@ uint8_t Global_Interrupt_Disable(void){
 
 	__disable_irq();
 	return 1;
-}
-
-uint8_t Start_ADC_Trig_Timer(void)
-{
-	uint8_t ok = Start_OC_TIM(&htim17, TIM_CHANNEL_1); //start adc trig.
-
-	if(ok != HAL_OK){
-
-			Error_Handler();
-	}
-
-	return ok;
 }
 
 uint8_t Start_PWM_Gen_Timer_Main_Oscillator(void)
@@ -92,7 +78,7 @@ uint8_t Start_PWM_Gen_Timer_Main_Oscillator(void)
 
 uint8_t Start_PWM_Gen_Timer_Secondary_Oscillator(void)
 {
-	uint8_t ok = Start_PWM_TIM(&htim14, TIM_CHANNEL_1); //start PWM
+	uint8_t ok = Start_PWM_TIM(&htim1, TIM_CHANNEL_4); //start PWM
 
 	if(ok != HAL_OK){
 

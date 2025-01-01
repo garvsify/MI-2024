@@ -9,7 +9,7 @@ int main(void)
 {
 	System_Init();
 
-	delay_line_read_pointer_offset = 0; //no phase difference between the two waves
+	duty_delay_line_read_pointer_offset = 0; //no phase difference between the two waves
 
 	__HAL_TIM_ENABLE_IT(&htim2, TIM_IT_UPDATE); //make sure the overflow (update) interrupt is enabled for TIM2
 
@@ -22,8 +22,9 @@ int main(void)
 
 	//START FREQ. GEN and PWM GEN TIMERS and ENABLE PWM OUTPUT
 	Start_PWM_Gen_Timer_Main_Oscillator();
+	Start_PWM_Gen_Timer_Secondary_Oscillator();
 	Start_Freq_Gen_Timer();
-	Start_Input_Capture_Timer();
+	//Start_Input_Capture_Timer();
 
 	//ENABLE INTERRUPTS
 	Global_Interrupt_Enable();
