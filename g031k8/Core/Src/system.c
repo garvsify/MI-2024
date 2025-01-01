@@ -78,7 +78,19 @@ uint8_t Start_ADC_Trig_Timer(void)
 	return ok;
 }
 
-uint8_t Start_PWM_Gen_Timer(void)
+uint8_t Start_PWM_Gen_Timer_Main_Oscillator(void)
+{
+	uint8_t ok = Start_PWM_TIM(&htim14, TIM_CHANNEL_1); //start PWM
+
+	if(ok != HAL_OK){
+
+		Error_Handler();
+	}
+
+	return ok;
+}
+
+uint8_t Start_PWM_Gen_Timer_Secondary_Oscillator(void)
 {
 	uint8_t ok = Start_PWM_TIM(&htim14, TIM_CHANNEL_1); //start PWM
 

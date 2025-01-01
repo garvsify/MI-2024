@@ -57,7 +57,6 @@
 /* External variables --------------------------------------------------------*/
 extern DMA_HandleTypeDef hdma_adc1;
 extern TIM_HandleTypeDef htim16;
-extern TIM_HandleTypeDef htim17;
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -193,9 +192,9 @@ void TIM2_IRQHandler(void)
 
 }
 
-/*void EXTI2_3_IRQHandler(void) //not needed as I/P capture does this all for us!
+void TIM3_IRQHandler(void)
 {
-  HAL_GPIO_EXTI_IRQHandler(T_NRST_Pin);
-  HAL_GPIO_EXTI_IRQHandler(TAP_TEMPO_Pin);
-}*/
+  HAL_TIM_IRQHandler(&htim3);
+
+}
 

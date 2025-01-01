@@ -21,7 +21,7 @@ int main(void)
 	HAL_ADC_Stop_DMA(&hadc1);
 
 	//START FREQ. GEN and PWM GEN TIMERS and ENABLE PWM OUTPUT
-	Start_PWM_Gen_Timer();
+	Start_PWM_Gen_Timer_Main_Oscillator();
 	Start_Freq_Gen_Timer();
 	Start_Input_Capture_Timer();
 
