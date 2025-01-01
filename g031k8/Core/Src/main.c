@@ -26,13 +26,14 @@ int main(void)
 	Start_PWM_Gen_Timer_Main_Oscillator();
 	Start_PWM_Gen_Timer_Secondary_Oscillator();
 	Start_Freq_Gen_Timer();
-	//Start_Input_Capture_Timer();
+	Start_Input_Capture_Timer();
 
 	//ENABLE INTERRUPTS
 	Global_Interrupt_Enable();
 
 	while (1)
 	{
+
 
 	}
 	return 1;
