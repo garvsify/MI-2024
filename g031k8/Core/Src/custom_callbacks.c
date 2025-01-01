@@ -171,7 +171,8 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 
 	//GET DEPTH
 	#if DEPTH_ON_OR_OFF == ON
-		current_depth = ADCResultsDMA[2] >> 4; //convert to 8-bit
+		//current_depth = ADCResultsDMA[2] >> 4; //convert to 8-bit
+		duty_delay_line_read_pointer_offset = ADCResultsDMA[2] >> 3;
 
 	#endif
 

@@ -9,7 +9,9 @@ int main(void)
 {
 	System_Init();
 
-	duty_delay_line_read_pointer_offset = 255; //phase difference between the two waves
+	//duty_delay_line_read_pointer_offset = 255; //phase difference between the two waves
+
+	current_depth = 255; //whilst depth pot is being used as delay adjust
 
 	__HAL_TIM_ENABLE_IT(&htim2, TIM_IT_UPDATE); //make sure the overflow (update) interrupt is enabled for TIM2
 
