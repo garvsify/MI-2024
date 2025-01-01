@@ -3309,17 +3309,17 @@ int main(void)
 	System_Init();
  80014ae:	f7ff fa8d 	bl	80009cc <System_Init>
 
-	duty_delay_line_read_pointer_offset = 0; //no phase difference between the two waves
- 80014b2:	2200      	movs	r2, #0
+	duty_delay_line_read_pointer_offset = 255; //phase difference between the two waves
+ 80014b2:	22ff      	movs	r2, #255	@ 0xff
 
 	__HAL_TIM_ENABLE_IT(&htim2, TIM_IT_UPDATE); //make sure the overflow (update) interrupt is enabled for TIM2
  80014b4:	2101      	movs	r1, #1
-	duty_delay_line_read_pointer_offset = 0; //no phase difference between the two waves
+	duty_delay_line_read_pointer_offset = 255; //phase difference between the two waves
  80014b6:	4b0f      	ldr	r3, [pc, #60]	@ (80014f4 <main+0x48>)
 
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions);
  80014b8:	4c0f      	ldr	r4, [pc, #60]	@ (80014f8 <main+0x4c>)
-	duty_delay_line_read_pointer_offset = 0; //no phase difference between the two waves
+	duty_delay_line_read_pointer_offset = 255; //phase difference between the two waves
  80014ba:	801a      	strh	r2, [r3, #0]
 	__HAL_TIM_ENABLE_IT(&htim2, TIM_IT_UPDATE); //make sure the overflow (update) interrupt is enabled for TIM2
  80014bc:	4b0f      	ldr	r3, [pc, #60]	@ (80014fc <main+0x50>)

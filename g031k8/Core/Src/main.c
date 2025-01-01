@@ -9,7 +9,7 @@ int main(void)
 {
 	System_Init();
 
-	duty_delay_line_read_pointer_offset = 0; //no phase difference between the two waves
+	duty_delay_line_read_pointer_offset = 255; //phase difference between the two waves
 
 	__HAL_TIM_ENABLE_IT(&htim2, TIM_IT_UPDATE); //make sure the overflow (update) interrupt is enabled for TIM2
 
