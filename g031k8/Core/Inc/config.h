@@ -40,6 +40,9 @@
 #define TAP_TEMPO_Pin GPIO_PIN_15
 #define TAP_TEMPO_GPIO_Port GPIOA
 
+#define TAP_TEMPO_TOGGLE_Pin GPIO_PIN_10
+#define TAP_TEMPO_TOGGLE_GPIO_Port GPIOA
+
 //create instance of peripheral structs (handles)
 extern ADC_HandleTypeDef hadc1;
 extern DMA_HandleTypeDef hdma_adc1;

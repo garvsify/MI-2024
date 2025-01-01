@@ -26,10 +26,21 @@ int main(void)
 	Start_PWM_Gen_Timer_Main_Oscillator();
 	Start_PWM_Gen_Timer_Secondary_Oscillator();
 	Start_Freq_Gen_Timer();
+	HAL_GPIO_WritePin(TAP_TEMPO_TOGGLE_GPIO_Port, TAP_TEMPO_TOGGLE_Pin, 1);
 	Start_Input_Capture_Timer();
 
 	//ENABLE INTERRUPTS
 	Global_Interrupt_Enable();
+
+	HAL_Delay(4000);
+	HAL_GPIO_WritePin(TAP_TEMPO_TOGGLE_GPIO_Port, TAP_TEMPO_TOGGLE_Pin, 0);
+	HAL_Delay(50);
+	HAL_GPIO_WritePin(TAP_TEMPO_TOGGLE_GPIO_Port, TAP_TEMPO_TOGGLE_Pin, 1);
+	HAL_Delay(550);
+	HAL_GPIO_WritePin(TAP_TEMPO_TOGGLE_GPIO_Port, TAP_TEMPO_TOGGLE_Pin, 0);
+	HAL_Delay(50);
+	HAL_GPIO_WritePin(TAP_TEMPO_TOGGLE_GPIO_Port, TAP_TEMPO_TOGGLE_Pin, 1);
+
 
 	while (1)
 	{

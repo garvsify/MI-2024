@@ -476,10 +476,16 @@ void MX_GPIO_Init(void)
   HAL_GPIO_Init(ISR_MEAS_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : Tempo LED flash pin */
-  GPIO_InitStruct.Pin = TEMPO_Pin;
+  /*GPIO_InitStruct.Pin = TEMPO_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(TEMPO_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(TEMPO_GPIO_Port, &GPIO_InitStruct);*/
+
+  /*Configure GPIO pin : Tap Tempo Toggle Test pin */
+  GPIO_InitStruct.Pin = TAP_TEMPO_TOGGLE_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(TAP_TEMPO_TOGGLE_GPIO_Port, &GPIO_InitStruct);
 }
 
 void Error_Handler(void)
