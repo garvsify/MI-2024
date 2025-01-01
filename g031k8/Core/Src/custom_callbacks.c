@@ -765,9 +765,3 @@ void TIM3_ch1_IP_capture_measurement_reelapse_1_callback(TIM_HandleTypeDef *htim
 	TIM16_final_start_value_locked = TIM16_final_start_value_to_be_loaded;
 	TIM16_prescaler_divisors_final_index_locked = TIM16_prescaler_divisors_final_index_to_be_loaded;
 }
-
-/*void TIM17_ch1_IP_capture_measurement_reelapse_2_callback(TIM_HandleTypeDef *htim){
-
-	//I don't think this is actually needed but leaving it defined just in case
-
-}*/

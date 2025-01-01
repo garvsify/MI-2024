@@ -10,7 +10,7 @@ TIM_HandleTypeDef htim14;
 TIM_HandleTypeDef htim16;
 TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim3;
-//TIM_HandleTypeDef htim17;
+TIM_HandleTypeDef htim1;
 
 UART_HandleTypeDef huart2;
 
@@ -344,68 +344,6 @@ void MX_TIM3_Init(void)
 
 }
 
-/**
-  * @brief TIM17 Initialization Function
-  * @param None
-  * @retval None
-  */
-void MX_TIM17_Init(void)
-{
-
-  /* USER CODE BEGIN TIM17_Init 0 */
-
-  /* USER CODE END TIM17_Init 0 */
-
-  TIM_OC_InitTypeDef sConfigOC = {0};
-  TIM_BreakDeadTimeConfigTypeDef sBreakDeadTimeConfig = {0};
-
-  /* USER CODE BEGIN TIM17_Init 1 */
-
-  /* USER CODE END TIM17_Init 1 */
-  htim17.Instance = TIM17;
-  htim17.Init.Prescaler = (512*64)- 1;
-  htim17.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim17.Init.Period = 4096 - 1;
-  htim17.Init.ClockDivision = TIM_CLOCKDIVISION_DIV4;
-  htim17.Init.RepetitionCounter = 0;
-  htim17.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
-  if (HAL_TIM_Base_Init(&htim17) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  if (HAL_TIM_OC_Init(&htim17) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  sConfigOC.OCMode = TIM_OCMODE_TIMING;
-  sConfigOC.Pulse = 0;
-  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
-  sConfigOC.OCNPolarity = TIM_OCNPOLARITY_HIGH;
-  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
-  sConfigOC.OCIdleState = TIM_OCIDLESTATE_RESET;
-  sConfigOC.OCNIdleState = TIM_OCNIDLESTATE_RESET;
-  if (HAL_TIM_OC_ConfigChannel(&htim17, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  sBreakDeadTimeConfig.OffStateRunMode = TIM_OSSR_DISABLE;
-  sBreakDeadTimeConfig.OffStateIDLEMode = TIM_OSSI_DISABLE;
-  sBreakDeadTimeConfig.LockLevel = TIM_LOCKLEVEL_OFF;
-  sBreakDeadTimeConfig.DeadTime = 0;
-  sBreakDeadTimeConfig.BreakState = TIM_BREAK_DISABLE;
-  sBreakDeadTimeConfig.BreakPolarity = TIM_BREAKPOLARITY_HIGH;
-  sBreakDeadTimeConfig.BreakFilter = 0;
-  sBreakDeadTimeConfig.AutomaticOutput = TIM_AUTOMATICOUTPUT_DISABLE;
-  if (HAL_TIMEx_ConfigBreakDeadTime(&htim17, &sBreakDeadTimeConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN TIM17_Init 2 */
-
-  /* USER CODE END TIM17_Init 2 */
-
-}
-
 void MX_USART2_UART_Init(void)
 {
   huart2.Instance = USART2;
@@ -502,11 +440,11 @@ void System_Init(void){
 	MX_DMA_Init();
 	MX_USART2_UART_Init();
 	MX_ADC1_Init();
-	MX_TIM14_Init(); //PWM Gen.
+	MX_TIM14_Init(); //PWM Gen. Main Oscillator
 	MX_TIM16_Init(); //Frequency Gen.
 	MX_TIM2_Init(); //I/P Capture Measurement is TIM2_ch1, I/P Capture Measurement Re-Elapse 1 is TIM3_ch1, and I/P Capture Measurement Re-Elapse 2 is TIM17_ch1
 	MX_TIM3_Init();
-	//MX_TIM17_Init();
+	MX_TIM1_Init(); //PWM Gen. Secondary Oscillator
 
 	//Set custom callback function for TIM16 (freq. gen.) to the callback function in TIMx_callback.c for TIM16.
 	//I believe the correct CallbackID is HAL_TIM_OC_DELAY_ELAPSED_CB_ID, but if this doesn't work maybe
@@ -525,9 +463,6 @@ void System_Init(void){
 
 	//Set custom callback function for TIM3_ch1 (Measurement Re-Elapse 1)
 	HAL_TIM_RegisterCallback(&htim3, HAL_TIM_OC_DELAY_ELAPSED_CB_ID, &TIM3_ch1_IP_capture_measurement_reelapse_1_callback);
-
-	//Set custom callback function for TIM17_ch1 (Measurement Re-Elapse 2)
-	//HAL_TIM_RegisterCallback(&htim17, HAL_TIM_OC_DELAY_ELAPSED_CB_ID, &TIM17_ch1_IP_capture_measurement_reelapse_2_callback);
 }
 
 #ifdef  USE_FULL_ASSERT
