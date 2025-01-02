@@ -155,6 +155,8 @@ volatile extern uint16_t duty_delay_line_finish_offset; //initial value is 512th
 volatile extern uint16_t duty_delay_line_read_pointer_offset;
 volatile extern uint16_t duty_delayed;
 volatile extern enum Validate TAP_TEMPO_EXTI4_15_IRQ_is_disabled;
+volatile extern enum Validate tap_tempo_mode_is_active;
+volatile extern uint8_t speed_pot_adc_measurement_num;
 
 //CUSTOM TYPES
 enum Polarity{

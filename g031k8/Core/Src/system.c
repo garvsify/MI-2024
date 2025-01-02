@@ -50,6 +50,8 @@ volatile uint16_t duty_delay_line_finish_offset = FINAL_INDEX + 1; //initial val
 volatile uint16_t duty_delay_line_read_pointer_offset = 0;
 volatile uint16_t duty_delayed = 0;
 volatile enum Validate TAP_TEMPO_EXTI4_15_IRQ_is_disabled = NO;
+volatile enum Validate tap_tempo_mode_is_active = NO;
+volatile uint8_t speed_pot_adc_measurement_num = 0;
 
 //FUNCTION DEFINITIONS
 uint8_t Global_Interrupt_Enable(void){
