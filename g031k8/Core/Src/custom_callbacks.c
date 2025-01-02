@@ -241,7 +241,7 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 
 		if(input_capture_measurement_reelapse_is_ongoing == YES){
 
-			//second edge was received when the measurement reelapse 1 was ongoing
+			//second edge was received when the measurement reelapse was ongoing
 			//This should restart the measurement reelapse (discarding the previous measurement)
 			Stop_OC_TIM(&htim3, TIM_CHANNEL_1);
 			__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, interrupt_period);
@@ -270,7 +270,7 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 			__HAL_TIM_SET_COUNTER(&htim3, 0);
 			Start_OC_TIM(&htim3, TIM_CHANNEL_1);
 
-			//set I/P capture measurement re-elapse 1 is ongoing flag
+			//set I/P capture measurement re-elapse is ongoing flag
 			input_capture_measurement_reelapse_is_ongoing = YES;
 		}
 
@@ -787,14 +787,17 @@ void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
 
 void TIM17_callback_debounce(TIM_HandleTypeDef *htim){
 
-	Stop_OC_TIM(&htim17, TIM_CHANNEL_1);
-	HAL_NVIC_EnableIRQ(EXTI4_15_IRQn); //enable EXTI10 interrupts - NOT WORKING
+	EXTI->IMR1 &= ~(EXTI_LINE_10);
+
+	//HAL_NVIC_EnableIRQ(EXTI4_15_IRQn); //enable EXTI10 interrupts - NOT WORKING
 	/*Configure GPIO pin : BOUNCY TAP TEMPO I/P PIN */
 	/*GPIO_InitTypeDef GPIO_InitStruct = {0};
 	GPIO_InitStruct.Pin = BOUNCY_Pin;
 	GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
 	GPIO_InitStruct.Pull = GPIO_PULLUP;
 	HAL_GPIO_Init(BOUNCY_GPIO_Port, &GPIO_InitStruct);*/
+
+	Stop_OC_TIM(&htim17, TIM_CHANNEL_1);
 
 	TAP_TEMPO_EXTI4_15_IRQ_is_disabled = NO;
 
@@ -803,8 +806,11 @@ void TIM17_callback_debounce(TIM_HandleTypeDef *htim){
 
 void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
 
-	HAL_NVIC_DisableIRQ(EXTI4_15_IRQn); //disable further EXTI10 interrupts - NOT WORKING
+	EXTI->IMR1 |= (EXTI_LINE_10);
+
+	//HAL_NVIC_DisableIRQ(EXTI4_15_IRQn); //disable further EXTI10 interrupts - NOT WORKING
 	//HAL_GPIO_DeInit(BOUNCY_GPIO_Port, BOUNCY_Pin); //apparently disables EXTI interrupt
+
 	tap_tempo_mode_is_active = YES;
 	TAP_TEMPO_EXTI4_15_IRQ_is_disabled = YES;
 	HAL_GPIO_WritePin(DEBOUNCED_GPIO_Port, DEBOUNCED_Pin, 0); //latch low until timer elapses

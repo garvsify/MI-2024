@@ -66,6 +66,24 @@ uint8_t Global_Interrupt_Disable(void){
 	return 1;
 }
 
+uint8_t Startup(void){
+
+	//duty_delay_line_read_pointer_offset = 255; //phase difference between the two waves
+
+	current_depth = 255; //whilst depth pot is being used as delay adjust
+
+	__HAL_TIM_ENABLE_IT(&htim2, TIM_IT_UPDATE); //make sure the overflow (update) interrupt is enabled for TIM2
+
+	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions);
+
+	//WAIT
+	while(initial_ADC_conversion_complete == NO){}; //wait while first ADC conversion is ongoing
+
+	HAL_ADC_Stop_DMA(&hadc1);
+
+	return 1;
+}
+
 uint8_t Start_PWM_Gen_Timer_Main_Oscillator(void)
 {
 	uint8_t ok = Start_PWM_TIM(&htim14, TIM_CHANNEL_1); //start PWM
