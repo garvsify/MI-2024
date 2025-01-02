@@ -816,9 +816,9 @@ void TIM1_ch1_speed_pot_check_callback(TIM_HandleTypeDef *htim){
 
 	if(tap_tempo_mode_is_active == YES){
 
-		static uint16_t first_speed_measurement = 0;
+		static uint16_t first_speed_measurement;
 
-		static uint16_t second_speed_measurement = 0;
+		static uint16_t second_speed_measurement;
 
 		if(speed_pot_adc_measurement_num == 0){
 
@@ -831,6 +831,8 @@ void TIM1_ch1_speed_pot_check_callback(TIM_HandleTypeDef *htim){
 			speed_pot_adc_measurement_num = 2;
 		}
 		else if(speed_pot_adc_measurement_num == 2){
+
+			speed_pot_adc_measurement_num = 0;
 
 			if(first_speed_measurement > second_speed_measurement){
 
