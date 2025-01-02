@@ -174,7 +174,7 @@ uint8_t Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(void){
     speed_control = current_speed * NUMBER_OF_FREQUENCY_STEPS;
     speed_control = speed_control >> 10;
 
-    //speed_control = (speed_adc_10_bit/1024)*883
+    //speed_control = (speed_adc_10_bit/1024)*'range macro'
 
         if(speed_control <= (127-12)){ //inequality is correct!
 
@@ -590,5 +590,48 @@ uint8_t Process_TIM16_Final_Start_Value_and_Prescaler_Adjust(void){
 uint32_t unsigned_bitwise_modulo(uint32_t dividend, uint8_t base_2_exponent){
 
     return dividend & ((1 << base_2_exponent) - 1);
+}
+
+uint8_t Speed_pot_check(void){
+
+	if(tap_tempo_mode_is_active == YES){
+
+		static uint16_t first_speed_measurement;
+
+		static uint16_t second_speed_measurement;
+
+		if(speed_pot_adc_measurement_num == 0){
+
+			first_speed_measurement = current_speed;
+			speed_pot_adc_measurement_num = 1;
+		}
+		else if(speed_pot_adc_measurement_num == 1){
+
+			second_speed_measurement = current_speed;
+			speed_pot_adc_measurement_num = 2;
+		}
+		else if(speed_pot_adc_measurement_num == 2){
+
+			speed_pot_adc_measurement_num = 0;
+
+			if(first_speed_measurement > second_speed_measurement){
+
+				if(first_speed_measurement - second_speed_measurement > SPEED_TOLERANCE){
+
+					tap_tempo_mode_is_active = NO;
+					speed_pot_is_disabled = NO; //to be refactored at some point
+				}
+			}
+			else if(second_speed_measurement > first_speed_measurement){
+
+				if(second_speed_measurement - first_speed_measurement > SPEED_TOLERANCE){
+
+					tap_tempo_mode_is_active = NO;
+					speed_pot_is_disabled = NO; //to be refactored at some point
+				}
+			}
+		}
+	}
+	return 1;
 }
 

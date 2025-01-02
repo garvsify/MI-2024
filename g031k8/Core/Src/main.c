@@ -26,7 +26,6 @@ int main(void)
 	Start_PWM_Gen_Timer_Main_Oscillator();
 	Start_PWM_Gen_Timer_Secondary_Oscillator();
 	Start_Freq_Gen_Timer();
-	HAL_GPIO_WritePin(DEBOUNCED_GPIO_Port, DEBOUNCED_Pin, 1);
 	Start_Input_Capture_Timer();
 
 	//ENABLE INTERRUPTS
@@ -34,8 +33,8 @@ int main(void)
 
 	while (1)
 	{
-
-
+		Speed_pot_check();
+		HAL_Delay(100);
 	}
 	return 1;
 }

@@ -9,7 +9,6 @@ void TIM2_ch1_overflow_callback(TIM_HandleTypeDef *htim);
 void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim);
 void TIM17_callback_debounce(TIM_HandleTypeDef *htim);
 void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin);
-void TIM1_ch1_speed_pot_check_callback(TIM_HandleTypeDef *htim);
 void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc);
 uint8_t Multiply_Duty_By_Current_Depth_and_Divide_By_256(void);
 
