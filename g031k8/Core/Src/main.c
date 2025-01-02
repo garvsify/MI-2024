@@ -27,7 +27,7 @@ int main(void)
 	Start_PWM_Gen_Timer_Secondary_Oscillator();
 	Start_Freq_Gen_Timer();
 	HAL_GPIO_WritePin(DEBOUNCED_GPIO_Port, DEBOUNCED_Pin, 1);
-	//Start_Input_Capture_Timer();
+	Start_Input_Capture_Timer();
 
 	//ENABLE INTERRUPTS
 	Global_Interrupt_Enable();
