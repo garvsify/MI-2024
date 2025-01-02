@@ -772,6 +772,8 @@ void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
 	__HAL_TIM_SET_PRESCALER(&htim16, (TIM16_prescaler_divisors[TIM16_prescaler_divisors_final_index_to_be_loaded]) - 1); //have to take one off the divisor
 	__HAL_TIM_SET_COMPARE(&htim14, TIM_CHANNEL_1, duty_to_be_loaded); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
 
+	Stop_OC_TIM(&htim3, TIM_CHANNEL_1);
+
 	input_capture_measurement_reelapse_is_ongoing = NO;
 
 	current_index = current_index_to_be_loaded;
@@ -781,4 +783,9 @@ void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
 	//set the locked values to the 'to be loaded' values such that the TIM16 continually loads these if the speed pot is disabled
 	TIM16_final_start_value_locked = TIM16_final_start_value_to_be_loaded;
 	TIM16_prescaler_divisors_final_index_locked = TIM16_prescaler_divisors_final_index_to_be_loaded;
+}
+
+void TIM17_callback_debounce(TIM_HandleTypeDef *htim){
+
+
 }

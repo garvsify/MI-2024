@@ -594,11 +594,14 @@ void System_Init(void){
 	//Set custom callback function for I/P capture input falling edge event
 	HAL_TIM_RegisterCallback(&htim2, HAL_TIM_IC_CAPTURE_CB_ID, &TIM2_ch1_IP_capture_callback);
 
-	//Set custom callback function for I/P capture timer overflow
+	//Set custom callback function for I/P capture timer overflow (Update event/overflow)
 	HAL_TIM_RegisterCallback(&htim2, HAL_TIM_PERIOD_ELAPSED_CB_ID, &TIM2_ch1_overflow_callback);
 
-	//Set custom callback function for TIM3_ch1 (Measurement Re-Elapse)
+	//Set custom callback function for TIM3_ch1 (Measurement Re-Elapse) (CCR match)
 	HAL_TIM_RegisterCallback(&htim3, HAL_TIM_OC_DELAY_ELAPSED_CB_ID, &TIM3_ch1_IP_capture_measurement_reelapse_callback);
+
+	//Set custom callback function for TIM17 debounce (CCR match)
+	HAL_TIM_RegisterCallback(&htim17, HAL_TIM_OC_DELAY_ELAPSED_CB_ID, &TIM17_callback_debounce);
 }
 
 #ifdef  USE_FULL_ASSERT
