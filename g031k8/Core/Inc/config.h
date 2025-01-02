@@ -34,14 +34,14 @@
 #define ISR_MEAS_Pin GPIO_PIN_12
 #define ISR_MEAS_GPIO_Port GPIOA
 
-#define TEMPO_Pin GPIO_PIN_11
-#define TEMPO_GPIO_Port GPIOA
+#define INPUT_CAP_Pin GPIO_PIN_15
+#define INPUT_CAP_GPIO_Port GPIOA
 
-#define TAP_TEMPO_Pin GPIO_PIN_15
-#define TAP_TEMPO_GPIO_Port GPIOA
+#define DEBOUNCED_Pin GPIO_PIN_1
+#define DEBOUNCED_GPIO_Port GPIOB
 
-#define TAP_TEMPO_TOGGLE_Pin GPIO_PIN_10
-#define TAP_TEMPO_TOGGLE_GPIO_Port GPIOA
+#define BOUNCY_Pin GPIO_PIN_10
+#define BOUNCY_GPIO_Port GPIOA
 
 //create instance of peripheral structs (handles)
 extern ADC_HandleTypeDef hadc1;

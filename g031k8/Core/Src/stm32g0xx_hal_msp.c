@@ -187,12 +187,12 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
   /**TIM2 GPIO Configuration
   PA15     ------> TIM2_CH1
   */
-  GPIO_InitStruct.Pin = GPIO_PIN_15;
+  GPIO_InitStruct.Pin = INPUT_CAP_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Pull = GPIO_PULLUP; //even though we do not 'technically' need a pullup as a push-pull O/P will be driving the I/P cap pin, I think it is better to ensure the I/P cap input properly idles
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   GPIO_InitStruct.Alternate = GPIO_AF2_TIM2;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  HAL_GPIO_Init(INPUT_CAP_GPIO_Port, &GPIO_InitStruct);
 
   /* TIM2 interrupt Init */
   HAL_NVIC_SetPriority(TIM2_IRQn, 0, 0);

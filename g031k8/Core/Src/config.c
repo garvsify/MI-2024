@@ -475,17 +475,17 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(ISR_MEAS_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : Tempo LED flash pin */
-  /*GPIO_InitStruct.Pin = TEMPO_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(TEMPO_GPIO_Port, &GPIO_InitStruct);*/
+  /*Configure GPIO pin : BOUNCY TAP TEMPO I/P PIN */
+  GPIO_InitStruct.Pin = BOUNCY_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(BOUNCY_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : Tap Tempo Toggle Test pin */
-  GPIO_InitStruct.Pin = TAP_TEMPO_TOGGLE_Pin;
+  /*Configure GPIO pin : DEBOUNCED TAP TEMPO I/P PIN */
+  GPIO_InitStruct.Pin = DEBOUNCED_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(TAP_TEMPO_TOGGLE_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(BOUNCY_GPIO_Port, &GPIO_InitStruct);
 }
 
 void Error_Handler(void)
@@ -514,8 +514,8 @@ void System_Init(void){
 	MX_ADC1_Init();
 	MX_TIM14_Init(); //PWM Gen. Main Oscillator
 	MX_TIM16_Init(); //Frequency Gen.
-	MX_TIM2_Init(); //I/P Capture Measurement is TIM2_ch1, I/P Capture Measurement Re-Elapse 1 is TIM3_ch1, and I/P Capture Measurement Re-Elapse 2 is TIM17_ch1
-	MX_TIM3_Init();
+	MX_TIM2_Init(); //I/P Capture Measurement is TIM2_ch1
+	MX_TIM3_Init(); //I/P Capture Measurement Re-Elapse is TIM3_ch1
 	MX_TIM1_Init(); //PWM Gen. Secondary Oscillator
 
 	//Set custom callback function for TIM16 (freq. gen.) to the callback function in TIMx_callback.c for TIM16.
@@ -533,8 +533,8 @@ void System_Init(void){
 	//Set custom callback function for I/P capture timer overflow
 	HAL_TIM_RegisterCallback(&htim2, HAL_TIM_PERIOD_ELAPSED_CB_ID, &TIM2_ch1_overflow_callback);
 
-	//Set custom callback function for TIM3_ch1 (Measurement Re-Elapse 1)
-	HAL_TIM_RegisterCallback(&htim3, HAL_TIM_OC_DELAY_ELAPSED_CB_ID, &TIM3_ch1_IP_capture_measurement_reelapse_1_callback);
+	//Set custom callback function for TIM3_ch1 (Measurement Re-Elapse)
+	HAL_TIM_RegisterCallback(&htim3, HAL_TIM_OC_DELAY_ELAPSED_CB_ID, &TIM3_ch1_IP_capture_measurement_reelapse_callback);
 }
 
 #ifdef  USE_FULL_ASSERT

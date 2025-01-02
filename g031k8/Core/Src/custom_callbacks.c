@@ -239,7 +239,7 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 		input_capture_event = FIRST; //reset event name
 		input_capture_measurement_is_ongoing = NO;
 
-		if(input_capture_measurement_reelapse_1_is_ongoing == YES){
+		if(input_capture_measurement_reelapse_is_ongoing == YES){
 
 			//second edge was received when the measurement reelapse 1 was ongoing
 			//This should restart the measurement reelapse (discarding the previous measurement)
@@ -260,7 +260,7 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 			Start_OC_TIM(&htim3, TIM_CHANNEL_1);
 
 			//set I/P capture measurement re-elapse 1 is ongoing flag
-			input_capture_measurement_reelapse_1_is_ongoing = YES;
+			input_capture_measurement_reelapse_is_ongoing = YES;
 		}
 		else{
 
@@ -271,7 +271,7 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 			Start_OC_TIM(&htim3, TIM_CHANNEL_1);
 
 			//set I/P capture measurement re-elapse 1 is ongoing flag
-			input_capture_measurement_reelapse_1_is_ongoing = YES;
+			input_capture_measurement_reelapse_is_ongoing = YES;
 		}
 
 		//DETERMINE WHAT TO SET THE RAW_START_VALUE AND BASE_PRESCALER TO BASED ON THE I/P CAPTURE VALUE
@@ -763,7 +763,7 @@ void TIM2_ch1_overflow_callback(TIM_HandleTypeDef *htim){
 	}
 }
 
-void TIM3_ch1_IP_capture_measurement_reelapse_1_callback(TIM_HandleTypeDef *htim){
+void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
 
 	//force update of timers to sync the wave to the TIM3 reelapse interrupt
 
@@ -772,7 +772,7 @@ void TIM3_ch1_IP_capture_measurement_reelapse_1_callback(TIM_HandleTypeDef *htim
 	__HAL_TIM_SET_PRESCALER(&htim16, (TIM16_prescaler_divisors[TIM16_prescaler_divisors_final_index_to_be_loaded]) - 1); //have to take one off the divisor
 	__HAL_TIM_SET_COMPARE(&htim14, TIM_CHANNEL_1, duty_to_be_loaded); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
 
-	input_capture_measurement_reelapse_1_is_ongoing = NO;
+	input_capture_measurement_reelapse_is_ongoing = NO;
 
 	current_index = current_index_to_be_loaded;
 	current_halfcycle = current_halfcycle_to_be_loaded;
