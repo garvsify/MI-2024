@@ -19,6 +19,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "config.h"
+#include "system.h"
 #include "stm32g0xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -190,6 +191,8 @@ void TIM17_IRQHandler(void)
 
 void EXTI4_15_IRQHandler(void)
 {
-  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_10);
+	if(TAP_TEMPO_EXTI4_15_IRQ_is_disabled == NO){
+		HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_10);
+	}
 }
 

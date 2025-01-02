@@ -49,6 +49,7 @@ volatile uint16_t duty_delay_line_start_offset = 1; //initial value is 1st index
 volatile uint16_t duty_delay_line_finish_offset = FINAL_INDEX + 1; //initial value is 512th index (513th value)
 volatile uint16_t duty_delay_line_read_pointer_offset = 0;
 volatile uint16_t duty_delayed = 0;
+volatile enum Validate TAP_TEMPO_EXTI4_15_IRQ_is_disabled = NO;
 
 //FUNCTION DEFINITIONS
 uint8_t Global_Interrupt_Enable(void){
