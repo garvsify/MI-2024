@@ -787,5 +787,22 @@ void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
 
 void TIM17_callback_debounce(TIM_HandleTypeDef *htim){
 
+	Stop_OC_TIM(&htim17, TIM_CHANNEL_1);
+	//HAL_NVIC_EnableIRQ(EXTI4_15_IRQn); //enable EXTI10 interrupts - NOT WORKING
+	/*Configure GPIO pin : BOUNCY TAP TEMPO I/P PIN */
+	GPIO_InitTypeDef GPIO_InitStruct = {0};
+	GPIO_InitStruct.Pin = BOUNCY_Pin;
+	GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+	GPIO_InitStruct.Pull = GPIO_PULLUP;
+	HAL_GPIO_Init(BOUNCY_GPIO_Port, &GPIO_InitStruct);
+	HAL_GPIO_WritePin(DEBOUNCED_GPIO_Port, DEBOUNCED_Pin, 1); //latch high
+}
 
+void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
+
+	//HAL_NVIC_DisableIRQ(EXTI4_15_IRQn); //disable further EXTI10 interrupts - NOT WORKING
+	HAL_GPIO_DeInit(BOUNCY_GPIO_Port, BOUNCY_Pin); //apparently disables EXTI interrupt
+	HAL_GPIO_WritePin(DEBOUNCED_GPIO_Port, DEBOUNCED_Pin, 0); //latch low until timer elapses
+	__HAL_TIM_SET_COUNTER(&htim17, 0);
+	Start_OC_TIM(&htim17, TIM_CHANNEL_1);
 }

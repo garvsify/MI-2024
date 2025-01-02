@@ -4,4 +4,5 @@
 ../Core/Src/custom_callbacks.c:219:6:TIM2_ch1_IP_capture_callback	32	static
 ../Core/Src/custom_callbacks.c:751:6:TIM2_ch1_overflow_callback	0	static
 ../Core/Src/custom_callbacks.c:766:6:TIM3_ch1_IP_capture_measurement_reelapse_callback	16	static
-../Core/Src/custom_callbacks.c:788:6:TIM17_callback_debounce	0	static
+../Core/Src/custom_callbacks.c:788:6:TIM17_callback_debounce	32	static
+../Core/Src/custom_callbacks.c:801:6:HAL_GPIO_EXTI_Falling_Callback	8	static
