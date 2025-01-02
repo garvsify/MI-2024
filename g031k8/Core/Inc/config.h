@@ -52,6 +52,7 @@ extern TIM_HandleTypeDef htim16;
 extern TIM_HandleTypeDef htim2;
 extern TIM_HandleTypeDef htim3;
 extern TIM_HandleTypeDef htim1;
+extern TIM_HandleTypeDef htim17;
 
 extern UART_HandleTypeDef huart2;
 
@@ -66,6 +67,7 @@ void MX_TIM16_Init(void); //Frequency Gen.
 void MX_TIM2_Init(void); //I/P Capture Measurement is TIM2_ch1,
 void MX_TIM3_Init(void); //I/P Capture Measurement Re-Elapse is TIM3_ch1,
 void MX_TIM1_Init(void); //PWM Gen. Secondary Oscillator
+void MX_TIM17_Init(void); //Tap Tempo Debouncing Timer
 
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 

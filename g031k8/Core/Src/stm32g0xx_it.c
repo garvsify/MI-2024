@@ -55,8 +55,6 @@
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
-extern DMA_HandleTypeDef hdma_adc1;
-extern TIM_HandleTypeDef htim16;
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -169,32 +167,29 @@ void DMA1_Ch4_5_DMAMUX1_OVR_IRQHandler(void)
   /* USER CODE END DMA1_Ch4_5_DMAMUX1_OVR_IRQn 1 */
 }
 
-/**
-  * @brief This function handles TIM16 global interrupt.
-  */
 void TIM16_IRQHandler(void)
 {
-  /* USER CODE BEGIN TIM16_IRQn 0 */
-
-  /* USER CODE END TIM16_IRQn 0 */
   HAL_TIM_IRQHandler(&htim16);
-  /* USER CODE BEGIN TIM16_IRQn 1 */
-
-  /* USER CODE END TIM16_IRQn 1 */
 }
 
-/**
-  * @brief This function handles TIM17 global interrupt.
-  */
 void TIM2_IRQHandler(void)
 {
   HAL_TIM_IRQHandler(&htim2);
-
 }
 
 void TIM3_IRQHandler(void)
 {
   HAL_TIM_IRQHandler(&htim3);
 
+}
+
+void TIM17_IRQHandler(void)
+{
+  HAL_TIM_IRQHandler(&htim17);
+}
+
+void EXTI4_15_IRQHandler(void)
+{
+  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_10);
 }
 
