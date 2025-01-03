@@ -23,7 +23,7 @@ int main(void)
 	while (1)
 	{
 		Speed_pot_check();
-		HAL_Delay(100);
+		HAL_Delay(50);
 	}
 	return 1;
 }

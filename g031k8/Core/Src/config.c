@@ -543,9 +543,10 @@ void MX_GPIO_Init(void)
   HAL_GPIO_Init(BOUNCY_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : DEBOUNCED TAP TEMPO O/P PIN */
+  /*Configure GPIO pin : PB1 */
    GPIO_InitStruct.Pin = DEBOUNCED_Pin;
    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-   GPIO_InitStruct.Pull = GPIO_PULLUP;
+   GPIO_InitStruct.Pull = GPIO_NOPULL;
    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
    HAL_GPIO_Init(DEBOUNCED_GPIO_Port, &GPIO_InitStruct);
 

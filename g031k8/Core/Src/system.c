@@ -81,6 +81,8 @@ uint8_t Startup(void){
 
 	HAL_ADC_Stop_DMA(&hadc1);
 
+	HAL_GPIO_WritePin(DEBOUNCED_GPIO_Port, DEBOUNCED_Pin, 1); //latch high the debounced o/p
+
 	return 1;
 }
 
