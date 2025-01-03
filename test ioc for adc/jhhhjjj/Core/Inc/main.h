@@ -65,8 +65,13 @@ void Error_Handler(void);
 #define T_VCP_TX_GPIO_Port GPIOA
 #define T_VCP_RX_Pin GPIO_PIN_3
 #define T_VCP_RX_GPIO_Port GPIOA
+#define DEBOUNCED_SW_OUT_Pin GPIO_PIN_9
+#define DEBOUNCED_SW_OUT_GPIO_Port GPIOA
 #define LD3_Pin GPIO_PIN_6
 #define LD3_GPIO_Port GPIOC
+#define SW_IN_Pin GPIO_PIN_10
+#define SW_IN_GPIO_Port GPIOA
+#define SW_IN_EXTI_IRQn EXTI4_15_IRQn
 #define T_JTMS_Pin GPIO_PIN_13
 #define T_JTMS_GPIO_Port GPIOA
 #define T_JTCK_Pin GPIO_PIN_14
