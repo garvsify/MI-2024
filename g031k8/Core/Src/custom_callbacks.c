@@ -37,6 +37,11 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	/////////////////////////////
 	//CALCULATE THE NEXT VALUES//
 	/////////////////////////////
+	/*if(current_index == FINAL_INDEX && is_very_first_oscillation == YES){
+
+		is_very_first_oscillation = NO;
+	}*/
+
 	current_index++;
 
 	if(current_index == FINAL_INDEX + 1){
@@ -124,6 +129,11 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	else{
 		duty_delayed = *(duty_delay_line_storage_array + duty_delay_line_start_offset + duty_delay_line_read_pointer_offset);
 	}
+
+	/*if(is_very_first_oscillation == YES){
+
+		duty_delayed = 1023;
+	}*/
 
 	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 0);
 	TIM16_callback_active = NO;

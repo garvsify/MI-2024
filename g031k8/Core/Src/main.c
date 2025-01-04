@@ -22,8 +22,10 @@ int main(void)
 
 	while (1)
 	{
-		Speed_pot_check();
-		HAL_Delay(50);
+		//Speed_pot_check();
+		//HAL_Delay(300);
+		//const char one_byte_data = 'p';
+		//HAL_UART_Transmit_DMA(&huart2, (const uint8_t*)&one_byte_data, sizeof(one_byte_data));
 	}
 	return 1;
 }

@@ -52,6 +52,7 @@ volatile uint16_t duty_delayed = 0;
 volatile enum Validate TAP_TEMPO_EXTI4_15_IRQ_is_disabled = NO;
 volatile enum Validate tap_tempo_mode_is_active = NO;
 volatile uint8_t speed_pot_adc_measurement_num = 0;
+volatile enum Validate is_very_first_oscillation = YES;
 
 //FUNCTION DEFINITIONS
 uint8_t Global_Interrupt_Enable(void){
@@ -71,6 +72,12 @@ uint8_t Startup(void){
 	//duty_delay_line_read_pointer_offset = 255; //phase difference between the two waves
 
 	current_depth = 255; //whilst depth pot is being used as delay adjust
+
+	// re-initialise all values is delay line storage array to 512 (mid scale) as they are initialised to 0 on startup
+	for(uint16_t i = 0; i < FINAL_INDEX + 1; i++){
+
+		duty_delay_line_storage_array[i] = 512;
+	}
 
 	__HAL_TIM_ENABLE_IT(&htim2, TIM_IT_UPDATE); //make sure the overflow (update) interrupt is enabled for TIM2
 

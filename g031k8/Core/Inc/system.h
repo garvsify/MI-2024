@@ -158,6 +158,7 @@ volatile extern uint16_t duty_delayed;
 volatile extern enum Validate TAP_TEMPO_EXTI4_15_IRQ_is_disabled;
 volatile extern enum Validate tap_tempo_mode_is_active;
 volatile extern uint8_t speed_pot_adc_measurement_num;
+volatile extern enum Validate is_very_first_oscillation;
 
 //CUSTOM TYPES
 enum Polarity{
