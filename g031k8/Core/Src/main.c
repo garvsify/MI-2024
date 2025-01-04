@@ -20,7 +20,7 @@ int main(void)
 	//ENABLE INTERRUPTS
 	Global_Interrupt_Enable();
 
-	const char one_byte_data = 'p';
+	const char one_byte_data = 'w';
 
 	while (1)
 	{

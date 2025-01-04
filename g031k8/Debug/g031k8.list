@@ -1703,30 +1703,30 @@ void System_Init(void){
   __HAL_RCC_DMA1_CLK_ENABLE();
  8000abc:	2301      	movs	r3, #1
  8000abe:	4a34      	ldr	r2, [pc, #208]	@ (8000b90 <System_Init+0xe4>)
-  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 1, 1);
  8000ac0:	2009      	movs	r0, #9
   __HAL_RCC_DMA1_CLK_ENABLE();
  8000ac2:	6b91      	ldr	r1, [r2, #56]	@ 0x38
  8000ac4:	4319      	orrs	r1, r3
  8000ac6:	6391      	str	r1, [r2, #56]	@ 0x38
  8000ac8:	6b92      	ldr	r2, [r2, #56]	@ 0x38
-  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
- 8000aca:	2100      	movs	r1, #0
+  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 1, 1);
+ 8000aca:	2101      	movs	r1, #1
   __HAL_RCC_DMA1_CLK_ENABLE();
  8000acc:	4013      	ands	r3, r2
  8000ace:	9301      	str	r3, [sp, #4]
-  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
- 8000ad0:	2200      	movs	r2, #0
+  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 1, 1);
+ 8000ad0:	2201      	movs	r2, #1
   __HAL_RCC_DMA1_CLK_ENABLE();
  8000ad2:	9b01      	ldr	r3, [sp, #4]
-  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 1, 1);
  8000ad4:	f002 f80e 	bl	8002af4 <HAL_NVIC_SetPriority>
   HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
  8000ad8:	2009      	movs	r0, #9
  8000ada:	f002 f835 	bl	8002b48 <HAL_NVIC_EnableIRQ>
-  HAL_NVIC_SetPriority(DMA1_Channel2_3_IRQn, 0, 0);
- 8000ade:	2200      	movs	r2, #0
- 8000ae0:	2100      	movs	r1, #0
+  HAL_NVIC_SetPriority(DMA1_Channel2_3_IRQn, 1, 1);
+ 8000ade:	2201      	movs	r2, #1
+ 8000ae0:	2101      	movs	r1, #1
  8000ae2:	200a      	movs	r0, #10
  8000ae4:	f002 f806 	bl	8002af4 <HAL_NVIC_SetPriority>
   HAL_NVIC_EnableIRQ(DMA1_Channel2_3_IRQn);
@@ -3648,10 +3648,10 @@ int main(void)
 	Global_Interrupt_Enable();
  8001664:	f000 fa36 	bl	8001ad4 <Global_Interrupt_Enable>
 
-	const char one_byte_data = 'p';
+	const char one_byte_data = 'w';
  8001668:	466b      	mov	r3, sp
  800166a:	1ddd      	adds	r5, r3, #7
- 800166c:	2370      	movs	r3, #112	@ 0x70
+ 800166c:	2377      	movs	r3, #119	@ 0x77
 	{
 		Speed_pot_check();
 
@@ -3661,7 +3661,7 @@ int main(void)
  800166e:	2600      	movs	r6, #0
  8001670:	4c07      	ldr	r4, [pc, #28]	@ (8001690 <main+0x48>)
  8001672:	4f08      	ldr	r7, [pc, #32]	@ (8001694 <main+0x4c>)
-	const char one_byte_data = 'p';
+	const char one_byte_data = 'w';
  8001674:	702b      	strb	r3, [r5, #0]
 		Speed_pot_check();
  8001676:	f000 fce3 	bl	8002040 <Speed_pot_check>
@@ -4350,14 +4350,14 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
  80019f4:	f001 f8de 	bl	8002bb4 <HAL_DMA_Init>
  80019f8:	2800      	cmp	r0, #0
  80019fa:	d10d      	bne.n	8001a18 <HAL_UART_MspInit+0xcc>
-    HAL_NVIC_SetPriority(USART2_IRQn, 0, 0); //DO NOT DELETE, DMA WON'T WORK
- 80019fc:	2200      	movs	r2, #0
- 80019fe:	2100      	movs	r1, #0
+    HAL_NVIC_SetPriority(USART2_IRQn, 1, 1); //DO NOT DELETE, DMA WON'T WORK
+ 80019fc:	2201      	movs	r2, #1
+ 80019fe:	2101      	movs	r1, #1
  8001a00:	201c      	movs	r0, #28
     __HAL_LINKDMA(huart,hdmatx,hdma_usart2_tx);
  8001a02:	67e5      	str	r5, [r4, #124]	@ 0x7c
  8001a04:	62ac      	str	r4, [r5, #40]	@ 0x28
-    HAL_NVIC_SetPriority(USART2_IRQn, 0, 0); //DO NOT DELETE, DMA WON'T WORK
+    HAL_NVIC_SetPriority(USART2_IRQn, 1, 1); //DO NOT DELETE, DMA WON'T WORK
  8001a06:	f001 f875 	bl	8002af4 <HAL_NVIC_SetPriority>
     HAL_NVIC_EnableIRQ(USART2_IRQn); //DO NOT DELETE, DMA WON'T WORK
  8001a0a:	201c      	movs	r0, #28
