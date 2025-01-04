@@ -194,3 +194,8 @@ void EXTI4_15_IRQHandler(void)
 	}
 }
 
+void USART2_IRQHandler(void)
+{
+	HAL_UART_IRQHandler(&huart2);
+}
+
