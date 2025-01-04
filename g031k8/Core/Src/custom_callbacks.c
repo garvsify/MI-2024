@@ -37,10 +37,6 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	/////////////////////////////
 	//CALCULATE THE NEXT VALUES//
 	/////////////////////////////
-	/*if(current_index == FINAL_INDEX && is_very_first_oscillation == YES){
-
-		is_very_first_oscillation = NO;
-	}*/
 
 	current_index++;
 
@@ -129,11 +125,6 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	else{
 		duty_delayed = *(duty_delay_line_storage_array + duty_delay_line_start_offset + duty_delay_line_read_pointer_offset);
 	}
-
-	/*if(is_very_first_oscillation == YES){
-
-		duty_delayed = 1023;
-	}*/
 
 	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 0);
 	TIM16_callback_active = NO;
@@ -827,4 +818,13 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
 	__HAL_TIM_SET_COUNTER(&htim17, 0);
 
 	Start_OC_TIM(&htim17, TIM_CHANNEL_1);
+}
+
+void UART2_TX_transfer_complete_callback(UART_HandleTypeDef *huart){
+
+	UART_DMA_TX_is_complete = YES;
+}
+
+void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
+
 }

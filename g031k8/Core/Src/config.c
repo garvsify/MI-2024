@@ -161,7 +161,7 @@ void MX_TIM14_Init(void)
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 1023;
+  sConfigOC.Pulse = INITIAL_PWM_VALUE;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
   if (HAL_TIM_PWM_ConfigChannel(&htim14, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
@@ -382,7 +382,7 @@ void MX_TIM1_Init(void)
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 1023;
+  sConfigOC.Pulse = INITIAL_PWM_VALUE;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
   sConfigOC.OCIdleState = TIM_OCIDLESTATE_RESET;
@@ -624,6 +624,14 @@ void System_Init(void){
 
 	//Set custom callback function for TIM17 debounce (CCR match)
 	HAL_TIM_RegisterCallback(&htim17, HAL_TIM_OC_DELAY_ELAPSED_CB_ID, &TIM17_callback_debounce);
+
+	//CANNOT SET CUSTOM CALLBACK FOR EXTI, however redefinition of 'weak' predefined EXTI callback is in custom_callbacks.c
+
+	//Set custom callback function for DMA TX Transfer Complete
+	HAL_UART_RegisterCallback(&huart2, HAL_UART_TX_COMPLETE_CB_ID, &UART2_TX_transfer_complete_callback);
+
+	//Set custom callback function for DMA RX Transfer Complete
+	HAL_UART_RegisterCallback(&huart2, HAL_UART_RX_COMPLETE_CB_ID, &UART2_RX_transfer_complete_callback);
 }
 
 #ifdef  USE_FULL_ASSERT

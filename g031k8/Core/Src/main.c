@@ -20,12 +20,19 @@ int main(void)
 	//ENABLE INTERRUPTS
 	Global_Interrupt_Enable();
 
+	const char one_byte_data = 'p';
+
 	while (1)
 	{
-		//Speed_pot_check();
+		Speed_pot_check();
+
+		if(UART_DMA_TX_is_complete == YES){
+
+			UART_DMA_TX_is_complete = NO;
+			HAL_UART_Transmit_DMA(&huart2, (const uint8_t*)&one_byte_data, sizeof(one_byte_data));
+		}
+
 		//HAL_Delay(300);
-		//const char one_byte_data = 'p';
-		//HAL_UART_Transmit_DMA(&huart2, (const uint8_t*)&one_byte_data, sizeof(one_byte_data));
 	}
 	return 1;
 }

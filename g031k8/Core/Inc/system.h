@@ -40,6 +40,7 @@
 #define SLOWEST_SPEED_PRESCALER_DIVISORS_ARRAY_INDEX 1
 #define FASTEST_SPEED_PRESCALER_DIVISORS_ARRAY_INDEX 5
 #define SPEED_TOLERANCE 2
+#define INITIAL_PWM_VALUE 512
 
 
 #if SINE_OR_TRIANGLE_WAVE_TEMPO_PERCEIVED_APEX_INDEX < SECOND_QUADRANT_START_INDEX
@@ -159,6 +160,7 @@ volatile extern enum Validate TAP_TEMPO_EXTI4_15_IRQ_is_disabled;
 volatile extern enum Validate tap_tempo_mode_is_active;
 volatile extern uint8_t speed_pot_adc_measurement_num;
 volatile extern enum Validate is_very_first_oscillation;
+volatile extern enum Validate UART_DMA_TX_is_complete;
 
 //CUSTOM TYPES
 enum Polarity{
