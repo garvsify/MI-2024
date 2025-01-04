@@ -26,13 +26,9 @@ int main(void)
 	{
 		Speed_pot_check();
 
-		/*if(UART_DMA_TX_is_complete == YES){
+		HAL_UART_Transmit(&huart2, (const uint8_t*)&one_byte_data, sizeof(one_byte_data), 500);
 
-			UART_DMA_TX_is_complete = NO;
-			HAL_UART_Transmit_DMA(&huart2, (const uint8_t*)&one_byte_data, sizeof(one_byte_data));
-		}*/
-
-		HAL_Delay(300);
+		HAL_Delay(500);
 	}
 	return 1;
 }
