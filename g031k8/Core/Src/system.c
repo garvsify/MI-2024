@@ -89,28 +89,19 @@ uint8_t Startup(void){
 
 	HAL_ADC_Stop_DMA(&hadc1);
 
-	HAL_GPIO_WritePin(DEBOUNCED_GPIO_Port, DEBOUNCED_Pin, 1); //latch high the debounced o/p
+	HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1); //latch high the debounced o/p
 
 	return 1;
 }
 
-uint8_t Start_PWM_Gen_Timer_Main_Oscillator(void)
+uint8_t Start_PWM_Gen_Timer_Main_and_Secondary_Oscillators(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel_1, uint32_t PWM_TIM_channel_2)
 {
-	uint8_t ok = Start_PWM_TIM(&htim14, TIM_CHANNEL_1); //start PWM
+	uint8_t ok_AND = 1;
+	ok_AND &= HAL_TIM_Base_Start(TIM);
+	ok_AND &= Start_PWM_TIM(TIM, PWM_TIM_channel_1); //start PWM
+	ok_AND &= Start_PWM_TIM(TIM, PWM_TIM_channel_2); //start PWM
 
-	if(ok != HAL_OK){
-
-		Error_Handler();
-	}
-
-	return ok;
-}
-
-uint8_t Start_PWM_Gen_Timer_Secondary_Oscillator(void)
-{
-	uint8_t ok = Start_PWM_TIM(&htim1, TIM_CHANNEL_4); //start PWM
-
-	if(ok != HAL_OK){
+	if(ok_AND != HAL_OK){
 
 		Error_Handler();
 	}
@@ -128,20 +119,6 @@ uint8_t Start_Freq_Gen_Timer(void)
 	}
 
 	return ok;
-}
-
-uint8_t Start_PWM_TIM(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel){
-
-	uint8_t ok_AND = 0;
-	ok_AND = HAL_TIM_Base_Start(TIM);
-	ok_AND &= HAL_TIM_PWM_Start(TIM, PWM_TIM_channel);
-
-	if(ok_AND != HAL_OK){
-
-		Error_Handler();
-	}
-
-	return ok_AND;
 }
 
 uint8_t Start_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t OC_TIM_channel){

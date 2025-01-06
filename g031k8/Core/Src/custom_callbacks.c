@@ -27,7 +27,7 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	TIM16->EGR |= TIM_EGR_UG; //DO NOT DELETE THIS LINE, IT LITERALLY MAKES OR BREAKS THE BASTARD - It triggers an 'update' event
 	__HAL_TIM_SET_COUNTER(&htim16, TIM16_final_start_value_locked); //this line must go here, or at least very near the beginning!
 	__HAL_TIM_SET_PRESCALER(&htim16, (TIM16_prescaler_divisors[TIM16_prescaler_divisors_final_index_locked]) - 1); //have to take one off the divisor
-	__HAL_TIM_SET_COMPARE(&htim14, TIM_CHANNEL_1, prev_duty); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
+	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, prev_duty); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
 
 	/////////////////////////////////////////////////////////////
 	//SET THE CURRENT(prev) VALUES FOR THE SECONDARY OSCILLATOR//
@@ -771,7 +771,7 @@ void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
 	TIM16->EGR |= TIM_EGR_UG; //DO NOT DELETE THIS LINE, IT LITERALLY MAKES OR BREAKS THE BASTARD - It triggers an 'update' event
 	__HAL_TIM_SET_COUNTER(&htim16, TIM16_final_start_value_to_be_loaded); //this line must go here, or at least very near the beginning!
 	__HAL_TIM_SET_PRESCALER(&htim16, (TIM16_prescaler_divisors[TIM16_prescaler_divisors_final_index_to_be_loaded]) - 1); //have to take one off the divisor
-	__HAL_TIM_SET_COMPARE(&htim14, TIM_CHANNEL_1, duty_to_be_loaded); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
+	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, duty_to_be_loaded); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
 
 	Stop_OC_TIM(&htim3, TIM_CHANNEL_1);
 
@@ -792,7 +792,7 @@ void TIM17_callback_debounce(TIM_HandleTypeDef *htim){
 
 	TAP_TEMPO_EXTI4_15_IRQ_is_disabled = NO;
 
-	HAL_GPIO_WritePin(DEBOUNCED_GPIO_Port, DEBOUNCED_Pin, 1); //reset
+	HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1); //reset
 
 	HAL_NVIC_EnableIRQ(EXTI4_15_IRQn); //enable EXTI10 interrupts
 
@@ -813,7 +813,7 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
 
 	TAP_TEMPO_EXTI4_15_IRQ_is_disabled = YES;
 
-	HAL_GPIO_WritePin(DEBOUNCED_GPIO_Port, DEBOUNCED_Pin, 0); //latch low until timer elapses
+	HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0); //latch low until timer elapses
 
 	__HAL_TIM_SET_COUNTER(&htim17, 0);
 

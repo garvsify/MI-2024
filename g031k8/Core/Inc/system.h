@@ -203,11 +203,9 @@ enum Input_Capture_Event{
 uint8_t Global_Interrupt_Enable(void);
 uint8_t Global_Interrupt_Disable(void);
 uint8_t Startup(void);
-uint8_t Start_PWM_Gen_Timer_Main_Oscillator(void);
-uint8_t Start_PWM_Gen_Timer_Secondary_Oscillator(void);
+uint8_t Start_PWM_Gen_Timer_Main_and_Secondary_Oscillators(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel_1, uint32_t PWM_TIM_channel_2);
 uint8_t Start_Freq_Gen_Timer(void);
 uint8_t Start_Input_Capture_Timer(void);
-uint8_t Start_PWM_TIM(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel);
 uint8_t Start_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel);
 uint8_t Stop_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel);
 uint8_t Start_IC_TIM(TIM_HandleTypeDef *TIM, uint32_t IC_TIM_channel);
