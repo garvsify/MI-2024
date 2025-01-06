@@ -27,6 +27,7 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	TIM16->EGR |= TIM_EGR_UG; //DO NOT DELETE THIS LINE, IT LITERALLY MAKES OR BREAKS THE BASTARD - It triggers an 'update' event
 	__HAL_TIM_SET_COUNTER(&htim16, TIM16_final_start_value_locked); //this line must go here, or at least very near the beginning!
 	__HAL_TIM_SET_PRESCALER(&htim16, (TIM16_prescaler_divisors[TIM16_prescaler_divisors_final_index_locked]) - 1); //have to take one off the divisor
+	TIM1->EGR |= TIM_EGR_UG; //not sure if we really need this line but gonna keep it here because it worked wonders for TIM16
 	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, prev_duty); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
 
 	/////////////////////////////////////////////////////////////
@@ -771,7 +772,10 @@ void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
 	TIM16->EGR |= TIM_EGR_UG; //DO NOT DELETE THIS LINE, IT LITERALLY MAKES OR BREAKS THE BASTARD - It triggers an 'update' event
 	__HAL_TIM_SET_COUNTER(&htim16, TIM16_final_start_value_to_be_loaded); //this line must go here, or at least very near the beginning!
 	__HAL_TIM_SET_PRESCALER(&htim16, (TIM16_prescaler_divisors[TIM16_prescaler_divisors_final_index_to_be_loaded]) - 1); //have to take one off the divisor
+	TIM1->EGR |= TIM_EGR_UG; //not sure if we really need this line but gonna keep it here because it worked wonders for TIM16
 	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, duty_to_be_loaded); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
+
+	//ADD CODE TO WORK OUT THE SECONDARY OSCILLATOR DELAYED VALUE SO BOTH CAN UPDATE SIMULTANEOUSLY, IT WILL BE MUCH BETTER THAT WAY
 
 	Stop_OC_TIM(&htim3, TIM_CHANNEL_1);
 
