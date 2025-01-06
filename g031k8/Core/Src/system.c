@@ -98,15 +98,15 @@ uint8_t Start_PWM_Gen_Timer_Main_and_Secondary_Oscillators(TIM_HandleTypeDef *TI
 {
 	uint8_t ok_AND = 1;
 	ok_AND &= HAL_TIM_Base_Start(TIM);
-	ok_AND &= Start_PWM_TIM(TIM, PWM_TIM_channel_1); //start PWM
-	ok_AND &= Start_PWM_TIM(TIM, PWM_TIM_channel_2); //start PWM
+	ok_AND &= HAL_TIM_PWM_Start(TIM, PWM_TIM_channel_1); //start PWM
+	ok_AND &= HAL_TIM_PWM_Start(TIM, PWM_TIM_channel_2); //start PWM
 
 	if(ok_AND != HAL_OK){
 
 		Error_Handler();
 	}
 
-	return ok;
+	return ok_AND;
 }
 
 uint8_t Start_Freq_Gen_Timer(void)

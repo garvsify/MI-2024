@@ -1,0 +1,14 @@
+../Core/Src/system.c:59:9:Global_Interrupt_Enable	1
+../Core/Src/system.c:65:9:Global_Interrupt_Disable	1
+../Core/Src/system.c:71:9:Startup	3
+../Core/Src/system.c:97:9:Start_PWM_Gen_Timer_Main_and_Secondary_Oscillators	2
+../Core/Src/system.c:112:9:Start_Freq_Gen_Timer	2
+../Core/Src/system.c:124:9:Start_OC_TIM	2
+../Core/Src/system.c:137:9:Stop_OC_TIM	2
+../Core/Src/system.c:149:9:Start_IC_TIM	2
+../Core/Src/system.c:162:9:Start_Input_Capture_Timer	2
+../Core/Src/system.c:174:9:Process_TIM16_Raw_Start_Value_and_Raw_Prescaler	2
+../Core/Src/system.c:202:9:Adjust_TIM16_Prescaler	3
+../Core/Src/system.c:213:9:Process_TIM16_Final_Start_Value_and_Prescaler_Adjust	75
+../Core/Src/system.c:595:10:unsigned_bitwise_modulo	1
+../Core/Src/system.c:600:9:Speed_pot_check	9
