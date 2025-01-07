@@ -5,6 +5,8 @@
 //INCLUDES
 #include "system.h"
 
+volatile char rx_buffer[1] = {0};
+
 int main(void)
 {
 	System_Init();
@@ -21,15 +23,17 @@ int main(void)
 
 	const char one_byte_data = 'j';
 
+	HAL_UART_Receive_DMA(&huart2, (uint8_t*)rx_buffer, sizeof(rx_buffer));
+
 	while (1)
 	{
 		Speed_pot_check();
 
-		if(UART_DMA_TX_is_complete == YES){
+		/*if(UART_DMA_TX_is_complete == YES){
 
 			UART_DMA_TX_is_complete = NO;
 			HAL_UART_Transmit_DMA(&huart2, (const uint8_t*)&one_byte_data, sizeof(one_byte_data));
-		}
+		}*/
 		HAL_Delay(50);
 	}
 	return 1;

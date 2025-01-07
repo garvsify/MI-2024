@@ -161,6 +161,7 @@ volatile extern enum Validate tap_tempo_mode_is_active;
 volatile extern uint8_t speed_pot_adc_measurement_num;
 volatile extern enum Validate is_very_first_oscillation;
 volatile extern enum Validate UART_DMA_TX_is_complete;
+volatile extern char rx_buffer[1];
 
 //CUSTOM TYPES
 enum Polarity{

@@ -831,4 +831,11 @@ void UART2_TX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
 void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
+	if(rx_buffer[0] == 'y'){
+
+		speed_pot_is_disabled = YES;
+		TIM16_prescaler_divisors_final_index_locked = 5;
+		TIM16_final_start_value_locked = 127;
+		rx_buffer[0] = 0;
+	}
 }
