@@ -838,4 +838,5 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 		TIM16_final_start_value_locked = 127;
 		rx_buffer[0] = 0;
 	}
+	HAL_UART_Receive_DMA(&huart2, (uint8_t*)rx_buffer, sizeof(rx_buffer));
 }
