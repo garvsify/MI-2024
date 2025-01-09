@@ -56,6 +56,7 @@ struct MIDI_Message_Characteristics{
 	enum Validate has_system_exclusive_end_byte;
 };
 
+#endif
 
 
 
