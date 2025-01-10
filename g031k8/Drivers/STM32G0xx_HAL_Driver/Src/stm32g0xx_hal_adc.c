@@ -2830,6 +2830,8 @@ HAL_StatusTypeDef ADC_Disable(ADC_HandleTypeDef *hadc)
     /* Get tick count */
     tickstart = HAL_GetTick();
 
+    HAL_Delay(100);
+
     while ((hadc->Instance->CR & ADC_CR_ADEN) != 0UL)
     {
       if ((HAL_GetTick() - tickstart) > ADC_DISABLE_TIMEOUT)
