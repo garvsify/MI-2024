@@ -558,39 +558,6 @@ void Error_Handler(void)
   }
 }
 
-uint8_t Get_ADC_Calibration_Value(ADC_HandleTypeDef *hadc){
-
-	hadc->Instance->CR |= 0x0000; //Disable ADC, ADCVREGEN, AUTOFF
-	hadc->Instance->CR |= 0b1 << 31; //Set ADC_CAL to start calibration
-	while(hadc->Instance->CR >> 31 == 1){ //wait while calibration completes
-
-	}
-	return (uint8_t)(hadc->Instance->DR &= 0x0000007F) + 1; //extract only the 7 bits that form the calibration value - datasheet says increment it by 1
-
-}
-
-uint8_t Average_8_ADC_Calibration_Values(void){ //the datasheet recommends averaging the calibration value
-
-	uint8_t calibration_value;
-	uint16_t average;
-
-	for(i = 0; i < 8; i++){
-
-		calibration_value = Get_ADC_Calibration_Value(&hadc1);
-		average += calibration_value;
-	}
-
-	if(unsigned_bitwise_modulo((uint32_t)average, 3) != 0){
-
-		average = (average >> 3) + 1; //divide by 8 and round up
-	}
-	else{
-		average = average >> 3; //divide by 8
-	}
-
-	return (uint8_t)average;
-}
-
 void System_Init(void){
 	/* MCU Configuration--------------------------------------------------------*/
 
@@ -611,6 +578,9 @@ void System_Init(void){
 	MX_TIM1_Init(); //PWM Gen. Main/Secondary Oscillator
 	MX_TIM17_Init(); //Tap Tempo Debouncing Timer
 	//MX_IWDG_Init(); fucks up stuff - to be config'd
+
+	//Calibrate ADC - DO NOT MOVE TO BEFORE OTHER CONFIG ABOVE
+	HAL_ADCEx_Calibration_Start(&hadc1);
 
 	//Set custom callback function for TIM16 (freq. gen.) to the callback function in TIMx_callback.c for TIM16.
 	//I believe the correct CallbackID is HAL_TIM_OC_DELAY_ELAPSED_CB_ID, but if this doesn't work maybe

@@ -77,9 +77,6 @@ void MX_IWDG_Init(void);
 
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 
-uint8_t Get_ADC_Calibration_Value(ADC_HandleTypeDef *hadc);
-uint8_t Average_8_ADC_Calibration_Values(void);
-
 void Error_Handler(void);
 
 
