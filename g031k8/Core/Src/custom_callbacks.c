@@ -826,6 +826,14 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
 	}
 }
 
+void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
+
+	if(TIM17_debounce_is_elapsing == NO){ //check if this rising edge has occurred during debounce
+
+		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1); //reset
+	}
+}
+
 void UART2_TX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
 	UART_DMA_TX_is_complete = YES;

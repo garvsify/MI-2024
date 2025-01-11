@@ -216,5 +216,6 @@ uint8_t Process_TIM16_Final_Start_Value_and_Prescaler_Adjust(void);
 uint8_t Adjust_and_Set_TIM16_Prescaler(uint8_t TIM16_prescaler_adjust_arg);
 uint32_t unsigned_bitwise_modulo(uint32_t dividend, uint8_t base_2_exponent);
 uint8_t Speed_pot_check(void);
+uint8_t Check_Tap_Tempo_Switch_State(enum Tap_Tempo_Switch_State *tap_tempo_switch_state_ptr);
 
 #endif

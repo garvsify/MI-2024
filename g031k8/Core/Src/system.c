@@ -640,3 +640,34 @@ uint8_t Speed_pot_check(void){
 	return 1;
 }
 
+uint8_t Check_Tap_Tempo_Switch_State(enum Tap_Tempo_Switch_State *tap_tempo_switch_state_ptr){
+
+	uint32_t switch_state = (PortA_IDR_storage >> 10) & 0b1; //extract PA10 bit info
+
+	if(switch_state == 0){
+
+		if(tap_tempo_switch_state_counter != 0){
+
+			tap_tempo_switch_state_counter--;
+		}
+	}
+	else{
+
+		if(tap_tempo_switch_state_counter != TAP_TEMPO_SWITCH_CONFIDENCE_COUNT){
+
+			tap_tempo_switch_state_counter++;
+		}
+	}
+
+	if(tap_tempo_switch_state_counter == 0){
+
+		*tap_tempo_switch_state_ptr = DEPRESSED;
+	}
+	else if(tap_tempo_switch_state_counter == TAP_TEMPO_SWITCH_CONFIDENCE_COUNT){
+
+		*tap_tempo_switch_state_ptr = NOT_DEPRESSED;
+	}
+
+	return 1;
+}
+
