@@ -812,17 +812,18 @@ void TIM17_callback_debounce(TIM_HandleTypeDef *htim){
 
 void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
 
-	HAL_NVIC_DisableIRQ(EXTI4_15_IRQn); //disable further EXTI10 interrupts
-	HAL_GPIO_DeInit(SW_IN_GPIO_Port, SW_IN_Pin); //apparently disables EXTI interrupt - alternative to the above
+	if(HAL_GPIO_ReadPin(SW_IN_GPIO_Port, SW_IN_Pin) == 0){
 
-	__HAL_TIM_SET_COUNTER(&htim17, 0);
-	Start_OC_TIM(&htim17, TIM_CHANNEL_1);
-
-	if(HAL_GPIO_ReadPin(SW_IN_GPIO_Port, SW_IN_Pin) == 0){ //check if proper press
+		HAL_NVIC_DisableIRQ(EXTI4_15_IRQn); //disable further EXTI10 interrupts
+		HAL_GPIO_DeInit(SW_IN_GPIO_Port, SW_IN_Pin); //apparently disables EXTI interrupt - alternative to the above
 
 		tap_tempo_mode_is_active = YES;
 		TAP_TEMPO_EXTI4_15_IRQ_is_disabled = YES;
+		TIM17_debounce_is_elapsing = YES;
 		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0); //latch low until timer elapses
+
+		__HAL_TIM_SET_COUNTER(&htim17, 0);
+		Start_OC_TIM(&htim17, TIM_CHANNEL_1);
 	}
 }
 

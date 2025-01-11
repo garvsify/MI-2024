@@ -39,6 +39,7 @@ int main(void)
 			UART_DMA_TX_is_complete = NO;
 			HAL_UART_Transmit_DMA(&huart2, (const uint8_t*)&one_byte_data, sizeof(one_byte_data));
 		}*/
+
 		HAL_Delay(50);
 	}
 	return 1;
