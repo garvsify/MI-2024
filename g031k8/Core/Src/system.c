@@ -74,7 +74,7 @@ uint8_t Startup(void){
 
 	current_depth = 255; //whilst depth pot is being used as delay adjust
 
-	// re-initialise all values is delay line storage array to 512 (mid scale) as they are initialised to 0 on startup
+	// re-initialise all values in delay line storage array to 512 (mid scale) as they are initialised to 0 on startup
 	for(uint16_t i = 0; i < FINAL_INDEX + 1; i++){
 
 		duty_delay_line_storage_array[i] = INITIAL_PWM_VALUE;

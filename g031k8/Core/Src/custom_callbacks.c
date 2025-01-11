@@ -801,17 +801,17 @@ void TIM17_callback_debounce(TIM_HandleTypeDef *htim){
 	HAL_NVIC_EnableIRQ(EXTI4_15_IRQn); //enable EXTI10 interrupts
 
 	/*Configure GPIO pin : BOUNCY TAP TEMPO I/P PIN */ // - alternative to the above
-	/*GPIO_InitTypeDef GPIO_InitStruct = {0};
-	GPIO_InitStruct.Pin = BOUNCY_Pin;
+	GPIO_InitTypeDef GPIO_InitStruct = {0};
+	GPIO_InitStruct.Pin = SW_IN_Pin;
 	GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
 	GPIO_InitStruct.Pull = GPIO_PULLUP;
-	HAL_GPIO_Init(BOUNCY_GPIO_Port, &GPIO_InitStruct);*/
+	HAL_GPIO_Init(SW_IN_GPIO_Port, &GPIO_InitStruct);
 }
 
 void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
 
 	HAL_NVIC_DisableIRQ(EXTI4_15_IRQn); //disable further EXTI10 interrupts
-	//HAL_GPIO_DeInit(BOUNCY_GPIO_Port, BOUNCY_Pin); //apparently disables EXTI interrupt - alternative to the above
+	HAL_GPIO_DeInit(SW_IN_GPIO_Port, SW_IN_Pin); //apparently disables EXTI interrupt - alternative to the above
 
 	tap_tempo_mode_is_active = YES;
 

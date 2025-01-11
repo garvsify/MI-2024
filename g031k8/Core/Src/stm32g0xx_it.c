@@ -156,7 +156,10 @@ void EXTI4_15_IRQHandler(void)
   /* USER CODE BEGIN EXTI4_15_IRQn 0 */
 
   /* USER CODE END EXTI4_15_IRQn 0 */
-  HAL_GPIO_EXTI_IRQHandler(SW_IN_Pin);
+	if(TAP_TEMPO_EXTI4_15_IRQ_is_disabled == NO){
+
+		HAL_GPIO_EXTI_IRQHandler(SW_IN_Pin);
+	}
   /* USER CODE BEGIN EXTI4_15_IRQn 1 */
 
   /* USER CODE END EXTI4_15_IRQn 1 */
