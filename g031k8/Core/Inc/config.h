@@ -62,6 +62,8 @@ extern DMA_HandleTypeDef hdma_usart2_tx;
 
 extern IWDG_HandleTypeDef hiwdg;
 
+extern LPTIM_HandleTypeDef hlptim1;
+
 void System_Init(void);
 void SystemClock_Config(void);
 void MX_GPIO_Init(void);

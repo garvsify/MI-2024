@@ -250,30 +250,32 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 			__HAL_TIM_SET_COUNTER(&htim3, 0);
 			Start_OC_TIM(&htim3, TIM_CHANNEL_1);
 		}
-
-		if(interrupt_period < HIGHEST_PRESCALER_TOP_SPEED_PERIOD){ //if the captured value/512 is less than 129, then the desired speed is not reproducable, so just set the absolute top speed (i.e. highest prescaler and shortest period)
-
-			interrupt_period = HIGHEST_PRESCALER_TOP_SPEED_PERIOD;
-
-			//start TIM3 from 0 with CCR loaded with TIM2_ch1_input_capture_value
-			//CCR shouldn't be preloaded so *should* update instantaneously
-			__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, HIGHEST_PRESCALER_TOP_SPEED_PERIOD);
-			__HAL_TIM_SET_COUNTER(&htim3, 0);
-			Start_OC_TIM(&htim3, TIM_CHANNEL_1);
-
-			//set I/P capture measurement re-elapse 1 is ongoing flag
-			input_capture_measurement_reelapse_is_ongoing = YES;
-		}
 		else{
 
-			//start TIM3 from 0 with CCR loaded with TIM2_ch1_input_capture_value
-			//CCR shouldn't be preloaded so *should* update instantaneously
-			__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, interrupt_period); //measured value divided by 512
-			__HAL_TIM_SET_COUNTER(&htim3, 0);
-			Start_OC_TIM(&htim3, TIM_CHANNEL_1);
+			if(interrupt_period < HIGHEST_PRESCALER_TOP_SPEED_PERIOD){ //if the captured value/512 is less than 129, then the desired speed is not reproducable, so just set the absolute top speed (i.e. highest prescaler and shortest period)
 
-			//set I/P capture measurement re-elapse is ongoing flag
-			input_capture_measurement_reelapse_is_ongoing = YES;
+				interrupt_period = HIGHEST_PRESCALER_TOP_SPEED_PERIOD;
+
+				//start TIM3 from 0 with CCR loaded with TIM2_ch1_input_capture_value
+				//CCR shouldn't be preloaded so *should* update instantaneously
+				__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, HIGHEST_PRESCALER_TOP_SPEED_PERIOD);
+				__HAL_TIM_SET_COUNTER(&htim3, 0);
+				Start_OC_TIM(&htim3, TIM_CHANNEL_1);
+
+				//set I/P capture measurement re-elapse 1 is ongoing flag
+				input_capture_measurement_reelapse_is_ongoing = YES;
+			}
+			else{
+
+				//start TIM3 from 0 with CCR loaded with TIM2_ch1_input_capture_value
+				//CCR shouldn't be preloaded so *should* update instantaneously
+				__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, interrupt_period); //measured value divided by 512
+				__HAL_TIM_SET_COUNTER(&htim3, 0);
+				Start_OC_TIM(&htim3, TIM_CHANNEL_1);
+
+				//set I/P capture measurement re-elapse is ongoing flag
+				input_capture_measurement_reelapse_is_ongoing = YES;
+			}
 		}
 
 		//DETERMINE WHAT TO SET THE RAW_START_VALUE AND BASE_PRESCALER TO BASED ON THE I/P CAPTURE VALUE
@@ -839,4 +841,9 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 		rx_buffer[0] = 0;
 	}
 	HAL_UART_Receive_DMA(&huart2, (uint8_t*)rx_buffer, sizeof(rx_buffer));
+}
+
+void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
+
+	HAL_LPTIM_SetOnce_Start_IT(&hlptim1, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK);
 }
