@@ -854,3 +854,10 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 	}
 	HAL_UART_Receive_DMA(&huart2, (uint8_t*)rx_buffer, sizeof(rx_buffer));
 }
+
+void DMA4_M2M_transfer_complete_callback(DMA_HandleTypeDef *hdma){
+
+	Check_Tap_Tempo_Switch_State(&tap_tempo_switch_state);
+
+	HAL_DMA_Start_IT(&hdma_memtomem_dma1_channel4, GPIOA_BASE + 0x10, (uint32_t)&PortA_IDR_storage, 1);
+}

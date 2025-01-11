@@ -26,15 +26,17 @@ int main(void)
 
 	const char one_byte_data = 'j';
 
-	HAL_UART_Receive_DMA(&huart2, (uint8_t*)rx_buffer, sizeof(rx_buffer));
+	//HAL_UART_Receive_DMA(&huart2, (uint8_t*)rx_buffer, sizeof(rx_buffer));
 
-	static uint8_t first_M2M_transfer = 0;
+	if (HAL_DMA_Start_IT(&hdma_memtomem_dma1_channel4, GPIOA_BASE + 0x10, (uint32_t)&PortA_IDR_storage, 1) != HAL_OK){
+
+		/* Transfer Error */
+		Error_Handler();
+	}
 
 	while (1)
 	{
 		//Speed_pot_check();
-
-		//Check_Tap_Tempo_Switch_State(&tap_tempo_switch_state);
 
 		/*if(UART_DMA_TX_is_complete == YES){
 
@@ -43,19 +45,6 @@ int main(void)
 		}*/
 		//HAL_Delay(100);
 
-		if(hdma_memtomem_dma1_channel4.Instance->CNDTR == 0){
-
-			if(first_M2M_transfer != 0){
-
-				Check_Tap_Tempo_Switch_State(&tap_tempo_switch_state);
-			}
-			else{
-
-				first_M2M_transfer = 1;
-			}
-
-			hdma_memtomem_dma1_channel4.Instance->CCR |= (1 << 14); //Start M2M transfer
-		}
 	}
 	return 1;
 }

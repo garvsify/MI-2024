@@ -501,17 +501,16 @@ void MX_DMA_Init(void)
     Error_Handler( );
   }
 
-  //Set source and destination addresses for memory-to-memory transfer
-  hdma_memtomem_dma1_channel4.Instance->CPAR = GPIOA_BASE + 0x10; //whole input data register for port A as source address
-  hdma_memtomem_dma1_channel4.Instance->CMAR = (uint32_t)&PortA_IDR_storage;
-
   /* DMA interrupt init */
   /* DMA1_Channel1_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
   /* DMA1_Channel2_3_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Channel2_3_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(DMA1_Channel2_3_IRQn, 1, 1);
   HAL_NVIC_EnableIRQ(DMA1_Channel2_3_IRQn);
+  /* DMA1_Ch4_5_DMAMUX1_OVR_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Ch4_5_DMAMUX1_OVR_IRQn, 1, 1);
+  HAL_NVIC_EnableIRQ(DMA1_Ch4_5_DMAMUX1_OVR_IRQn);
 
 }
 
@@ -630,6 +629,9 @@ void System_Init(void){
 
 	//Set custom callback function for DMA RX Transfer Complete
 	HAL_UART_RegisterCallback(&huart2, HAL_UART_RX_COMPLETE_CB_ID, &UART2_RX_transfer_complete_callback);
+
+	//Set custom callback function for DMA Memory to memory transfer
+	HAL_DMA_RegisterCallback(&hdma_memtomem_dma1_channel4, HAL_DMA_XFER_CPLT_CB_ID, &DMA4_M2M_transfer_complete_callback);
 }
 
 #ifdef  USE_FULL_ASSERT
