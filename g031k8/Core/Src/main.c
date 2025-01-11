@@ -1,5 +1,8 @@
 /*NOTES ON THIS BUILD:
 
+Don't know where the bug is yet, but basically have found that when you do two slow taps on the tap tempo switch,
+and then in the timer relapse period do two fast taps, the micro shits itself and locks up
+
 */
 
 //INCLUDES
