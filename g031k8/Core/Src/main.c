@@ -28,16 +28,34 @@ int main(void)
 
 	HAL_UART_Receive_DMA(&huart2, (uint8_t*)rx_buffer, sizeof(rx_buffer));
 
+	static uint8_t first_M2M_transfer = 0;
+
 	while (1)
 	{
-		Speed_pot_check();
+		//Speed_pot_check();
+
+		//Check_Tap_Tempo_Switch_State(&tap_tempo_switch_state);
 
 		/*if(UART_DMA_TX_is_complete == YES){
 
 			UART_DMA_TX_is_complete = NO;
 			HAL_UART_Transmit_DMA(&huart2, (const uint8_t*)&one_byte_data, sizeof(one_byte_data));
 		}*/
-		HAL_Delay(50);
+		//HAL_Delay(100);
+
+		if(hdma_memtomem_dma1_channel4.Instance->CNDTR == 0){
+
+			if(first_M2M_transfer != 0){
+
+				Check_Tap_Tempo_Switch_State(&tap_tempo_switch_state);
+			}
+			else{
+
+				first_M2M_transfer = 1;
+			}
+
+			hdma_memtomem_dma1_channel4.Instance->CCR |= (1 << 14); //Start M2M transfer
+		}
 	}
 	return 1;
 }

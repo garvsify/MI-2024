@@ -230,9 +230,9 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 
 	if(input_capture_event == FIRST){ //edge detected is the first
 
+		__HAL_TIM_SET_COUNTER(&htim2, 0); //begin measurement
 		speed_pot_is_disabled = YES;
 		input_capture_measurement_is_ongoing = YES;
-		__HAL_TIM_SET_COUNTER(&htim2, 0); //begin measurement
 
 		input_capture_event = SECOND;
 	}
@@ -250,30 +250,32 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 			__HAL_TIM_SET_COUNTER(&htim3, 0);
 			Start_OC_TIM(&htim3, TIM_CHANNEL_1);
 		}
-
-		if(interrupt_period < HIGHEST_PRESCALER_TOP_SPEED_PERIOD){ //if the captured value/512 is less than 129, then the desired speed is not reproducable, so just set the absolute top speed (i.e. highest prescaler and shortest period)
-
-			interrupt_period = HIGHEST_PRESCALER_TOP_SPEED_PERIOD;
-
-			//start TIM3 from 0 with CCR loaded with TIM2_ch1_input_capture_value
-			//CCR shouldn't be preloaded so *should* update instantaneously
-			__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, HIGHEST_PRESCALER_TOP_SPEED_PERIOD);
-			__HAL_TIM_SET_COUNTER(&htim3, 0);
-			Start_OC_TIM(&htim3, TIM_CHANNEL_1);
-
-			//set I/P capture measurement re-elapse 1 is ongoing flag
-			input_capture_measurement_reelapse_is_ongoing = YES;
-		}
 		else{
 
-			//start TIM3 from 0 with CCR loaded with TIM2_ch1_input_capture_value
-			//CCR shouldn't be preloaded so *should* update instantaneously
-			__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, interrupt_period); //measured value divided by 512
-			__HAL_TIM_SET_COUNTER(&htim3, 0);
-			Start_OC_TIM(&htim3, TIM_CHANNEL_1);
+			if(interrupt_period < HIGHEST_PRESCALER_TOP_SPEED_PERIOD){ //if the captured value/512 is less than 129, then the desired speed is not reproducable, so just set the absolute top speed (i.e. highest prescaler and shortest period)
 
-			//set I/P capture measurement re-elapse is ongoing flag
-			input_capture_measurement_reelapse_is_ongoing = YES;
+				interrupt_period = HIGHEST_PRESCALER_TOP_SPEED_PERIOD;
+
+				//start TIM3 from 0 with CCR loaded with TIM2_ch1_input_capture_value
+				//CCR shouldn't be preloaded so *should* update instantaneously
+				__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, HIGHEST_PRESCALER_TOP_SPEED_PERIOD);
+				__HAL_TIM_SET_COUNTER(&htim3, 0);
+				Start_OC_TIM(&htim3, TIM_CHANNEL_1);
+
+				//set I/P capture measurement re-elapse 1 is ongoing flag
+				input_capture_measurement_reelapse_is_ongoing = YES;
+			}
+			else{
+
+				//start TIM3 from 0 with CCR loaded with TIM2_ch1_input_capture_value
+				//CCR shouldn't be preloaded so *should* update instantaneously
+				__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, interrupt_period); //measured value divided by 512
+				__HAL_TIM_SET_COUNTER(&htim3, 0);
+				Start_OC_TIM(&htim3, TIM_CHANNEL_1);
+
+				//set I/P capture measurement re-elapse is ongoing flag
+				input_capture_measurement_reelapse_is_ongoing = YES;
+			}
 		}
 
 		//DETERMINE WHAT TO SET THE RAW_START_VALUE AND BASE_PRESCALER TO BASED ON THE I/P CAPTURE VALUE
@@ -792,12 +794,10 @@ void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
 
 void TIM17_callback_debounce(TIM_HandleTypeDef *htim){
 
+	TIM17_debounce_is_elapsing = NO;
+
 	Stop_OC_TIM(&htim17, TIM_CHANNEL_1);
-
 	TAP_TEMPO_EXTI4_15_IRQ_is_disabled = NO;
-
-	HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1); //reset
-
 	HAL_NVIC_EnableIRQ(EXTI4_15_IRQn); //enable EXTI10 interrupts
 
 	/*Configure GPIO pin : BOUNCY TAP TEMPO I/P PIN */ // - alternative to the above
@@ -806,21 +806,35 @@ void TIM17_callback_debounce(TIM_HandleTypeDef *htim){
 	GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
 	GPIO_InitStruct.Pull = GPIO_PULLUP;
 	HAL_GPIO_Init(SW_IN_GPIO_Port, &GPIO_InitStruct);
+
+	if(HAL_GPIO_ReadPin(SW_IN_GPIO_Port, SW_IN_Pin) == 1){
+
+		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1);
+	}
 }
 
 void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
 
-	HAL_NVIC_DisableIRQ(EXTI4_15_IRQn); //disable further EXTI10 interrupts
-	HAL_GPIO_DeInit(SW_IN_GPIO_Port, SW_IN_Pin); //apparently disables EXTI interrupt - alternative to the above
+	if(HAL_GPIO_ReadPin(SW_IN_GPIO_Port, SW_IN_Pin) == 0){
 
-	__HAL_TIM_SET_COUNTER(&htim17, 0);
-	Start_OC_TIM(&htim17, TIM_CHANNEL_1);
-
-	if(HAL_GPIO_ReadPin(SW_IN_GPIO_Port, SW_IN_Pin) == 0){ //check if proper press
+		HAL_NVIC_DisableIRQ(EXTI4_15_IRQn); //disable further EXTI10 interrupts
+		HAL_GPIO_DeInit(SW_IN_GPIO_Port, SW_IN_Pin); //apparently disables EXTI interrupt - alternative to the above
 
 		tap_tempo_mode_is_active = YES;
 		TAP_TEMPO_EXTI4_15_IRQ_is_disabled = YES;
+		TIM17_debounce_is_elapsing = YES;
 		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0); //latch low until timer elapses
+
+		__HAL_TIM_SET_COUNTER(&htim17, 0);
+		Start_OC_TIM(&htim17, TIM_CHANNEL_1);
+	}
+}
+
+void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
+
+	if(TIM17_debounce_is_elapsing == NO){ //check if this rising edge has occurred during debounce
+
+		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1); //reset
 	}
 }
 

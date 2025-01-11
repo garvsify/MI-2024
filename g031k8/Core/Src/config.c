@@ -19,6 +19,7 @@ UART_HandleTypeDef huart2;
 DMA_HandleTypeDef hdma_usart2_rx;
 DMA_HandleTypeDef hdma_usart2_tx;
 
+DMA_HandleTypeDef hdma_memtomem_dma1_channel4;
 
 //FUNCTIONS
 void SystemClock_Config(void)
@@ -405,7 +406,7 @@ void MX_TIM17_Init(void)
   htim17.Instance = TIM17;
   htim17.Init.Prescaler = (512*64)- 1;
   htim17.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim17.Init.Period = 400 - 1;
+  htim17.Init.Period = TIM17_CCR_IE_SWITCH_DEBOUNCE_LENGTH - 1;
   htim17.Init.ClockDivision = TIM_CLOCKDIVISION_DIV4;
   htim17.Init.RepetitionCounter = 0;
   htim17.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
@@ -418,7 +419,7 @@ void MX_TIM17_Init(void)
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_TIMING;
-  sConfigOC.Pulse = 400 - 1;
+  sConfigOC.Pulse = TIM17_CCR_IE_SWITCH_DEBOUNCE_LENGTH - 1;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCNPolarity = TIM_OCNPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
@@ -485,12 +486,31 @@ void MX_DMA_Init(void)
   /* DMA controller clock enable */
   __HAL_RCC_DMA1_CLK_ENABLE();
 
+  /* Configure DMA request hdma_memtomem_dma1_channel4 on DMA1_Channel4 */
+  hdma_memtomem_dma1_channel4.Instance = DMA1_Channel4;
+  hdma_memtomem_dma1_channel4.Init.Request = DMA_REQUEST_MEM2MEM;
+  hdma_memtomem_dma1_channel4.Init.Direction = DMA_MEMORY_TO_MEMORY;
+  hdma_memtomem_dma1_channel4.Init.PeriphInc = DMA_PINC_DISABLE;
+  hdma_memtomem_dma1_channel4.Init.MemInc = DMA_MINC_DISABLE;
+  hdma_memtomem_dma1_channel4.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
+  hdma_memtomem_dma1_channel4.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
+  hdma_memtomem_dma1_channel4.Init.Mode = DMA_NORMAL;
+  hdma_memtomem_dma1_channel4.Init.Priority = DMA_PRIORITY_LOW;
+  if (HAL_DMA_Init(&hdma_memtomem_dma1_channel4) != HAL_OK)
+  {
+    Error_Handler( );
+  }
+
+  //Set source and destination addresses for memory-to-memory transfer
+  hdma_memtomem_dma1_channel4.Instance->CPAR = GPIOA_BASE + 0x10; //whole input data register for port A as source address
+  hdma_memtomem_dma1_channel4.Instance->CMAR = (uint32_t)&PortA_IDR_storage;
+
   /* DMA interrupt init */
-  /* DMA1_Channel1_IRQn interrupt configuration */ // - ADC
-  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 1, 1);
+  /* DMA1_Channel1_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
-  /* DMA1_Channel2_3_IRQn interrupt configuration */ // - UART RX is ch2, TX is ch3
-  HAL_NVIC_SetPriority(DMA1_Channel2_3_IRQn, 1, 1);
+  /* DMA1_Channel2_3_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel2_3_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(DMA1_Channel2_3_IRQn);
 
 }
@@ -536,7 +556,7 @@ void MX_GPIO_Init(void)
 
   /*Configure GPIO pin : SW_IN_Pin */
   GPIO_InitStruct.Pin = SW_IN_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(SW_IN_GPIO_Port, &GPIO_InitStruct);
 

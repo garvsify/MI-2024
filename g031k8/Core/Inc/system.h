@@ -41,6 +41,8 @@
 #define FASTEST_SPEED_PRESCALER_DIVISORS_ARRAY_INDEX 5
 #define SPEED_TOLERANCE 2
 #define INITIAL_PWM_VALUE 512
+#define TAP_TEMPO_SWITCH_CONFIDENCE_COUNT 100
+#define TIM17_CCR_IE_SWITCH_DEBOUNCE_LENGTH 30
 
 
 #if SINE_OR_TRIANGLE_WAVE_TEMPO_PERCEIVED_APEX_INDEX < SECOND_QUADRANT_START_INDEX
@@ -162,6 +164,10 @@ volatile extern uint8_t speed_pot_adc_measurement_num;
 volatile extern enum Validate is_very_first_oscillation;
 volatile extern enum Validate UART_DMA_TX_is_complete;
 volatile extern char rx_buffer[1];
+extern uint8_t tap_tempo_switch_state_counter;
+extern enum Tap_Tempo_Switch_State tap_tempo_switch_state;
+volatile extern enum Validate TIM17_debounce_is_elapsing;
+volatile extern uint32_t PortA_IDR_storage;
 
 //CUSTOM TYPES
 enum Polarity{
@@ -200,6 +206,11 @@ enum Input_Capture_Event{
 	SECOND
 };
 
+enum Tap_Tempo_Switch_State{
+	NOT_DEPRESSED,
+	DEPRESSED,
+};
+
 //FUNCTION DECLARATIONS
 uint8_t Global_Interrupt_Enable(void);
 uint8_t Global_Interrupt_Disable(void);
@@ -215,5 +226,6 @@ uint8_t Process_TIM16_Final_Start_Value_and_Prescaler_Adjust(void);
 uint8_t Adjust_and_Set_TIM16_Prescaler(uint8_t TIM16_prescaler_adjust_arg);
 uint32_t unsigned_bitwise_modulo(uint32_t dividend, uint8_t base_2_exponent);
 uint8_t Speed_pot_check(void);
+uint8_t Check_Tap_Tempo_Switch_State(enum Tap_Tempo_Switch_State *tap_tempo_switch_state_ptr);
 
 #endif
