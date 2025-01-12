@@ -46,6 +46,9 @@
 #define SW_IN_Pin GPIO_PIN_10
 #define SW_IN_GPIO_Port GPIOA
 
+#define MONITOR_Pin GPIO_PIN_6
+#define MONITOR_GPIO_Port GPIOB
+
 //create instance of peripheral structs (handles)
 extern ADC_HandleTypeDef hadc1;
 extern DMA_HandleTypeDef hdma_adc1;

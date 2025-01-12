@@ -42,6 +42,8 @@
 #define SPEED_TOLERANCE 2
 #define INITIAL_PWM_VALUE 512
 #define LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK 4001 - 1 //8ms overflow with prescaler of 128
+#define TAP_TEMPO_SWITCH_CONFIDENCE_COUNT 5
+#define TIM17_DEBOUNCE_LENGTH 40
 
 
 #if SINE_OR_TRIANGLE_WAVE_TEMPO_PERCEIVED_APEX_INDEX < SECOND_QUADRANT_START_INDEX
@@ -163,6 +165,9 @@ volatile extern uint8_t speed_pot_adc_measurement_num;
 volatile extern enum Validate is_very_first_oscillation;
 volatile extern enum Validate UART_DMA_TX_is_complete;
 volatile extern char rx_buffer[1];
+extern uint8_t tap_tempo_switch_state_counter;
+extern enum Tap_Tempo_Switch_State tap_tempo_switch_state;
+volatile extern enum Validate TIM17_debounce_is_elapsing;
 
 //CUSTOM TYPES
 enum Polarity{
@@ -199,6 +204,11 @@ enum Symmetry_Type{
 enum Input_Capture_Event{
 	FIRST,
 	SECOND
+};
+
+enum Tap_Tempo_Switch_State{
+	NOT_DEPRESSED,
+	DEPRESSED
 };
 
 //FUNCTION DECLARATIONS

@@ -30,6 +30,8 @@ int main(void)
 
 	HAL_LPTIM_SetOnce_Start_IT(&hlptim1, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK);
 
+	HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
+
 	while (1)
 	{
 		Speed_pot_check();

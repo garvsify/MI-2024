@@ -267,3 +267,8 @@ void USART2_IRQHandler(void)
 /* USER CODE BEGIN 1 */
 
 /* USER CODE END 1 */
+
+void LPTIM1_IRQHandler(void)
+{
+  HAL_LPTIM_IRQHandler(&hlptim1);
+}

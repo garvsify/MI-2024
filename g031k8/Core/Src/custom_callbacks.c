@@ -5,8 +5,6 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	//TIM16 interrupt flag is already cleared by stm32g0xx_it.c
 
 	TIM16_callback_active = YES;
-	//Global_Interrupt_Disable();
-	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 1);
 
 	/////////////////////////////////////////////////////////////
 	//FLASH LED in case of wave reaching apex or perceived apex//
@@ -127,13 +125,9 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 		duty_delayed = *(duty_delay_line_storage_array + duty_delay_line_start_offset + duty_delay_line_read_pointer_offset);
 	}
 
-	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 0);
 	TIM16_callback_active = NO;
 
-	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 1);
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions); //this function takes ages to execute!
-	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 0);
-	//Global_Interrupt_Enable();
 }
 
 uint8_t Multiply_Duty_By_Current_Depth_and_Divide_By_256(void)
@@ -149,7 +143,6 @@ uint8_t Multiply_Duty_By_Current_Depth_and_Divide_By_256(void)
 
 void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 {
-	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 1);
 	HAL_ADC_Stop_DMA(hadc); //disable ADC DMA
 
 	//GET WAVESHAPE
@@ -202,10 +195,6 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 	if(initial_ADC_conversion_complete == NO){
 		initial_ADC_conversion_complete = YES;
 	}
-	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 0);
-
-
-	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 1);
 
 	if(speed_pot_is_disabled == NO){
 
@@ -214,8 +203,6 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 		TIM16_final_start_value_locked = TIM16_final_start_value;
 		TIM16_prescaler_divisors_final_index_locked = TIM16_prescaler_divisors_final_index;
 	}
-
-	HAL_GPIO_WritePin(ISR_MEAS_GPIO_Port, ISR_MEAS_Pin, 0);
 }
 
 void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
@@ -797,9 +784,6 @@ void TIM17_callback_debounce(TIM_HandleTypeDef *htim){
 	Stop_OC_TIM(&htim17, TIM_CHANNEL_1);
 
 	TAP_TEMPO_EXTI4_15_IRQ_is_disabled = NO;
-
-	HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1); //reset
-
 	HAL_NVIC_EnableIRQ(EXTI4_15_IRQn); //enable EXTI10 interrupts
 
 	/*Configure GPIO pin : BOUNCY TAP TEMPO I/P PIN */ // - alternative to the above
@@ -812,7 +796,7 @@ void TIM17_callback_debounce(TIM_HandleTypeDef *htim){
 
 void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
 
-	if(HAL_GPIO_ReadPin(SW_IN_GPIO_Port, SW_IN_Pin) == 0){
+	if(tap_tempo_switch_state == NOT_DEPRESSED){
 
 		HAL_NVIC_DisableIRQ(EXTI4_15_IRQn); //disable further EXTI10 interrupts
 		HAL_GPIO_DeInit(SW_IN_GPIO_Port, SW_IN_Pin); //apparently disables EXTI interrupt - alternative to the above
@@ -853,6 +837,16 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 }
 
 void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
+
+	Check_Tap_Tempo_Switch_State(&tap_tempo_switch_state);
+
+	/*if(tap_tempo_switch_state == DEPRESSED){
+
+		HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
+	}
+	else{
+		HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
+	}*/
 
 	HAL_LPTIM_SetOnce_Start_IT(&hlptim1, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK);
 }

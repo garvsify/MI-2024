@@ -54,6 +54,9 @@ volatile enum Validate tap_tempo_mode_is_active = NO;
 volatile uint8_t speed_pot_adc_measurement_num = 0;
 volatile enum Validate is_very_first_oscillation = YES;
 volatile enum Validate UART_DMA_TX_is_complete = YES;
+uint8_t tap_tempo_switch_state_counter = TAP_TEMPO_SWITCH_CONFIDENCE_COUNT;
+enum Tap_Tempo_Switch_State tap_tempo_switch_state = NOT_DEPRESSED;
+volatile enum Validate TIM17_debounce_is_elapsing = NO;
 
 //FUNCTION DEFINITIONS
 uint8_t Global_Interrupt_Enable(void){
@@ -642,7 +645,7 @@ uint8_t Speed_pot_check(void){
 
 uint8_t Check_Tap_Tempo_Switch_State(enum Tap_Tempo_Switch_State *tap_tempo_switch_state_ptr){
 
-	uint32_t switch_state = (PortA_IDR_storage >> 10) & 0b1; //extract PA10 bit info
+	uint8_t switch_state = (uint8_t)HAL_GPIO_ReadPin(SW_IN_GPIO_Port, SW_IN_Pin);
 
 	if(switch_state == 0){
 
