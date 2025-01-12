@@ -800,7 +800,7 @@ void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
 	HAL_GPIO_Init(SW_IN_GPIO_Port, &GPIO_InitStruct);
 }*/
 
-void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
+/*void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
 
 	if(tap_tempo_switch_state == NOT_DEPRESSED){ //previous state is not depressed - will eliminate switch release bouncing causing falling edges
 
@@ -816,7 +816,7 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
 		__HAL_TIM_SET_COUNTER(&htim17, 0);
 		Start_OC_TIM(&htim17, TIM_CHANNEL_1);
 	}
-}
+}*/
 
 /*void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
 
@@ -847,13 +847,19 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 	Check_Tap_Tempo_Switch_State(&tap_tempo_switch_state);
 
-	/*if(tap_tempo_switch_state == DEPRESSED){
+	if(tap_tempo_switch_state == DEPRESSED){
 
-		HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
+		//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
+		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
+		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+		tap_tempo_mode_is_active = YES;
+
 	}
 	else{
-		HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
-	}*/
+		//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
+		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1); //reset
+		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+	}
 
 	HAL_LPTIM_SetOnce_Start_IT(&hlptim1, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK);
 }

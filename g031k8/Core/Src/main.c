@@ -1,8 +1,5 @@
 /*NOTES ON THIS BUILD:
 
-Don't know where the bug is yet, but basically have found that when you do two slow taps on the tap tempo switch,
-and then in the timer relapse period do two fast taps, the micro shits itself and locks up
-
 */
 
 //INCLUDES
@@ -26,11 +23,7 @@ int main(void)
 
 	const char one_byte_data = 'j';
 
-	HAL_UART_Receive_DMA(&huart2, (uint8_t*)rx_buffer, sizeof(rx_buffer));
-
-	HAL_LPTIM_SetOnce_Start_IT(&hlptim1, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK);
-
-	HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
+	Start_Tap_Tempo_Monitoring_Timer_and_UART();
 
 	while (1)
 	{
