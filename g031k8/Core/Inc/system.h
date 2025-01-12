@@ -41,7 +41,8 @@
 #define FASTEST_SPEED_PRESCALER_DIVISORS_ARRAY_INDEX 5
 #define SPEED_TOLERANCE 2
 #define INITIAL_PWM_VALUE 512
-#define LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK 4001 - 1 //8ms overflow with prescaler of 128
+//#define LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK 4001 - 1 //8ms overflow with prescaler of 128
+#define LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK 2001 - 1 //8ms overflow with prescaler of 128
 #define TAP_TEMPO_SWITCH_CONFIDENCE_COUNT 5
 //#define TIM17_DEBOUNCE_LENGTH 55
 #define SPEED_POT_CHECK_LENGTH 25

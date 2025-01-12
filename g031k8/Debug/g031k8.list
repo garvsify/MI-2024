@@ -3550,7 +3550,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 	HAL_LPTIM_SetOnce_Start_IT(&hlptim1, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK);
  80015f4:	22fa      	movs	r2, #250	@ 0xfa
- 80015f6:	0112      	lsls	r2, r2, #4
+ 80015f6:	00d2      	lsls	r2, r2, #3
  80015f8:	0011      	movs	r1, r2
  80015fa:	480b      	ldr	r0, [pc, #44]	@ (8001628 <LPTIM1_callback+0x5c>)
  80015fc:	f002 f8be 	bl	800377c <HAL_LPTIM_SetOnce_Start_IT>
@@ -5881,7 +5881,7 @@ uint8_t Start_Tap_Tempo_Monitoring_Timers_and_UART_Receive(void){
 	//START TAP TEMPO SWITCH CHECKING
 	HAL_LPTIM_SetOnce_Start_IT(&hlptim1, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK);
  8002160:	22fa      	movs	r2, #250	@ 0xfa
- 8002162:	0112      	lsls	r2, r2, #4
+ 8002162:	00d2      	lsls	r2, r2, #3
  8002164:	0011      	movs	r1, r2
  8002166:	480a      	ldr	r0, [pc, #40]	@ (8002190 <Start_Tap_Tempo_Monitoring_Timers_and_UART_Receive+0x3c>)
  8002168:	f001 fb08 	bl	800377c <HAL_LPTIM_SetOnce_Start_IT>
