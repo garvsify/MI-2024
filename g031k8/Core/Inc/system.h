@@ -14,7 +14,7 @@
 #define TRIANGLE_MODE 0
 #define SINE_MODE 1
 #define SQUARE_MODE 2
-#define NUMBER_OF_FREQUENCY_STEPS 625; //625 is the max. possible if prescaler array is limited to index 5
+#define NUMBER_OF_FREQUENCY_STEPS 625 //625 is the max. possible if prescaler array is limited to index 5
 #define FIRST_HALFCYCLE 0
 #define SECOND_HALFCYCLE 1
 #define FIRST_QUADRANT 0
@@ -37,8 +37,7 @@
 #define TWO_HUNDRED_FIFTY_SIX_PRESCALER_LARGEST_INTERRUPT_PERIOD 1024
 #define FIVE_HUNDRED_TWELVE_PRESCALER_LARGEST_INTERRUPT_PERIOD 2048
 #define ONE_THOUSAND_TWENTY_FOUR_PRESCALER_LARGEST_INTERRUPT_PERIOD 4096
-#define SLOWEST_SPEED_PRESCALER_DIVISORS_ARRAY_INDEX 1
-#define FASTEST_SPEED_PRESCALER_DIVISORS_ARRAY_INDEX 5
+#define SLOWEST_SPEED_PRESCALER 1024
 #define SPEED_TOLERANCE 2
 #define INITIAL_PWM_VALUE 512
 //#define LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK 4001 - 1 //8ms overflow with prescaler of 128
@@ -98,34 +97,26 @@
 			#define SYMMETRY_ADC_NUM_BITS 8
 		#endif
 
-		#if SYMMETRY_ADC_RESOLUTION == 10
-			#define SYMMETRY_ADC_HALF_SCALE_NO_BITS 9
-			#define SYMMETRY_ADC_FULL_SCALE 1023
-			#define SYMMETRY_ADC_HALF_SCALE 511
-			#define SYMMETRY_ADC_NUM_BITS 10
-		#endif
-
-		#if SYMMETRY_ADC_RESOLUTION == 12
-			#define SYMMETRY_ADC_FULL_SCALE 4095
-			#define SYMMETRY_ADC_HALF_SCALE_NO_BITS 11
-			#define SYMMETRY_ADC_HALF_SCALE 2048
-			#define SYMMETRY_ADC_NUM_BITS 12
-		#endif
-
 		//TURN ON/OFF DEPTH
 		#define DEPTH_ON_OR_OFF ON
+
+		#define SPEED_ADC_RESOLUTION 10
+		#define DEPTH_ADC_RESOLUTION 8
+		#define WAVESHAPE_ADC_RESOLUTION 12
+		#define DELAY_ADC_RESOLUTION 9
+
 
 //CONSTANTS
 extern const uint16_t sine_wavetable[512];
 extern const uint16_t tri_wavetable[512];
-extern const uint16_t TIM16_prescaler_divisors[6];
+extern const uint16_t TIM16_prescalers[6];
 
 //VARIABLES
 volatile extern uint16_t duty;
 volatile extern uint8_t current_waveshape;
 volatile extern uint16_t current_speed;
 volatile extern uint16_t current_depth;
-volatile extern uint32_t current_symmetry;
+volatile extern uint16_t current_symmetry;
 volatile extern uint16_t current_index;
 volatile extern uint8_t current_halfcycle;
 volatile extern uint8_t current_quadrant;
@@ -135,11 +126,9 @@ volatile extern enum Validate initial_ADC_conversion_complete;
 volatile extern enum Validate TIM16_callback_active;
 volatile extern uint16_t TIM16_raw_start_value;
 volatile extern uint16_t TIM16_final_start_value;
-volatile extern uint8_t TIM16_base_prescaler_divisors_index;
+volatile extern uint16_t TIM16_raw_prescaler;
 volatile extern enum Adjust_Prescaler_Action TIM16_prescaler_adjust;
-volatile extern uint16_t TIM16_final_start_value_locked;
-volatile extern uint8_t TIM16_prescaler_divisors_final_index_locked;
-volatile extern uint8_t TIM16_prescaler_divisors_final_index;
+volatile extern uint16_t TIM16_final_prescaler;
 volatile extern uint16_t prev_duty;
 volatile extern enum Input_Capture_Event input_capture_event;
 volatile extern uint32_t TIM2_ch1_input_capture_value;
@@ -150,9 +139,9 @@ volatile extern uint16_t interrupt_period;
 volatile extern enum Adjust_Prescaler_Action TIM16_prescaler_adjust_to_be_loaded;
 volatile extern uint16_t TIM16_raw_start_value_to_be_loaded;
 volatile extern uint16_t TIM16_final_start_value_to_be_loaded;
-volatile extern uint8_t TIM16_base_prescaler_divisors_index_to_be_loaded;
+volatile extern uint16_t TIM16_raw_prescaler_to_be_loaded; //technically should be uint32_t but we'll never calculate a prescaler anywhere close to 65536
+volatile extern uint16_t TIM16_final_prescaler_to_be_loaded;
 volatile extern uint16_t duty_to_be_loaded;
-volatile extern uint8_t TIM16_prescaler_divisors_final_index_to_be_loaded;
 volatile extern uint8_t current_halfcycle_to_be_loaded;
 volatile extern uint8_t current_quadrant_to_be_loaded;
 volatile extern uint16_t current_index_to_be_loaded;
@@ -170,7 +159,6 @@ volatile extern enum Validate UART_DMA_TX_is_complete;
 volatile extern char rx_buffer[1];
 extern uint8_t tap_tempo_switch_state_counter;
 extern enum Tap_Tempo_Switch_State tap_tempo_switch_state;
-volatile extern enum Validate TIM17_debounce_is_elapsing;
 
 //CUSTOM TYPES
 enum Polarity{
@@ -224,9 +212,10 @@ uint8_t Start_Input_Capture_Timer(void);
 uint8_t Start_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel);
 uint8_t Stop_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel);
 uint8_t Start_IC_TIM(TIM_HandleTypeDef *TIM, uint32_t IC_TIM_channel);
-uint8_t Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(void);
-uint8_t Process_TIM16_Final_Start_Value_and_Prescaler_Adjust(void);
-uint8_t Adjust_and_Set_TIM16_Prescaler(uint8_t TIM16_prescaler_adjust_arg);
+uint8_t Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(volatile uint16_t speed_adc_value, uint8_t adc_resolution_bits, uint16_t speed_range, volatile uint16_t *TIM16_raw_start_value_ptr, volatile uint16_t *TIM16_raw_prescaler_ptr);
+uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(volatile uint16_t TIM16_raw_start_value_value, volatile uint16_t *TIM16_final_start_value_ptr, volatile uint16_t TIM16_raw_prescaler_value, volatile uint16_t *TIM16_final_prescaler_ptr,
+																volatile uint16_t current_symmetry_value, volatile uint16_t current_waveshape_value, volatile uint8_t current_halfcycle_value, volatile uint8_t current_quadrant_value, volatile uint16_t current_index_value);
+uint8_t Adjust_TIM16_Prescaler(volatile enum Adjust_Prescaler_Action TIM16_prescaler_adjustment, volatile uint16_t *TIM16_final_prescaler_ptr, volatile uint16_t TIM16_raw_prescaler_value);
 uint32_t unsigned_bitwise_modulo(uint32_t dividend, uint8_t base_2_exponent);
 uint8_t Speed_pot_check(void);
 uint8_t Check_Tap_Tempo_Switch_State(enum Tap_Tempo_Switch_State *tap_tempo_switch_state_ptr);

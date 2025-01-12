@@ -23,8 +23,8 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	//SET THE CURRENT(prev) VALUES FOR THE MAIN OSCILLATOR//
 	////////////////////////////////////////////////////////
 	TIM16->EGR |= TIM_EGR_UG; //DO NOT DELETE THIS LINE, IT LITERALLY MAKES OR BREAKS THE BASTARD - It triggers an 'update' event
-	__HAL_TIM_SET_COUNTER(&htim16, TIM16_final_start_value_locked); //this line must go here, or at least very near the beginning!
-	__HAL_TIM_SET_PRESCALER(&htim16, (TIM16_prescaler_divisors[TIM16_prescaler_divisors_final_index_locked]) - 1); //have to take one off the divisor
+	__HAL_TIM_SET_COUNTER(&htim16, TIM16_final_start_value); //this line must go here, or at least very near the beginning!
+	__HAL_TIM_SET_PRESCALER(&htim16, (TIM16_final_prescaler - 1)); //have to take one off the divisor
 	TIM1->EGR |= TIM_EGR_UG; //not sure if we really need this line but gonna keep it here because it worked wonders for TIM16
 	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, prev_duty); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
 
@@ -198,10 +198,8 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 
 	if(speed_pot_is_disabled == NO){
 
-		Process_TIM16_Raw_Start_Value_and_Raw_Prescaler();
-		Process_TIM16_Final_Start_Value_and_Prescaler_Adjust();
-		TIM16_final_start_value_locked = TIM16_final_start_value;
-		TIM16_prescaler_divisors_final_index_locked = TIM16_prescaler_divisors_final_index;
+		Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(current_speed, SPEED_ADC_RESOLUTION, NUMBER_OF_FREQUENCY_STEPS, &TIM16_raw_start_value, &TIM16_raw_prescaler);
+		Process_TIM16_Final_Start_Value_and_Final_Prescaler(TIM16_raw_start_value, &TIM16_final_start_value, TIM16_raw_prescaler, &TIM16_final_prescaler, current_symmetry, current_waveshape, current_halfcycle, current_quadrant, current_index);
 	}
 }
 
@@ -212,7 +210,7 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 	interrupt_period = TIM2_ch1_input_capture_value >> 9; //divided by 512
 
 	//since the input capture measurement is z, and this is 512x the interrupt period, we just use the interrupt
-	//period = z/512 as the 'elapse period value' if we also set the elapse timer prescaler to 512 less than the
+	//period = z/512 as the 'elapse period value' if we also set the elapse timer prescaler to 512x less than the
 	//input capture measurement timer
 
 	if(input_capture_event == FIRST){ //edge detected is the first
@@ -266,35 +264,15 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 		}
 
 		//DETERMINE WHAT TO SET THE RAW_START_VALUE AND BASE_PRESCALER TO BASED ON THE I/P CAPTURE VALUE
-		if(interrupt_period <= SIXTY_FOUR_PRESCALER_LARGEST_INTERRUPT_PERIOD){
 
-			TIM16_raw_start_value_to_be_loaded = 256 - interrupt_period;
-			TIM16_base_prescaler_divisors_index_to_be_loaded = FASTEST_SPEED_PRESCALER_DIVISORS_ARRAY_INDEX;
-		}
-		else if(interrupt_period <= ONE_HUNDRED_TWENTY_EIGHT_PRESCALER_LARGEST_INTERRUPT_PERIOD){
+		uint32_t N = interrupt_period << 6; //calculate the N-value which is prescaler_meas * interrupt_period_meas. The measurement prescaler is used which is 64. (TIM2 has a prescaler of 64*512, but since we divide this value by 512, the prescaler is then just 64).
 
-			interrupt_period = interrupt_period >> 1;
-			TIM16_raw_start_value_to_be_loaded = 256 - interrupt_period;
-			TIM16_base_prescaler_divisors_index_to_be_loaded = FASTEST_SPEED_PRESCALER_DIVISORS_ARRAY_INDEX - 1;
-		}
-		else if(interrupt_period <= TWO_HUNDRED_FIFTY_SIX_PRESCALER_LARGEST_INTERRUPT_PERIOD){
+		uint16_t biggest_prescaler = (uint16_t)(N >> 7); //smallest error will occur with smallest period and therefore largest prescaler. I AM USING SMALLEST PERIOD AS 128 BECAUSE EVEN THOUGH I CALCULATED EVERYTHING WITH SMALLEST PERIOD AS 129, IT WILL NOT BREAK THE MATHS IN THE SYMMETRY-ADJUST ROUTINE. USE THE EXCEL SPREADSHEET IF NOT SURE.
 
-			interrupt_period = interrupt_period >> 2;
-			TIM16_raw_start_value_to_be_loaded = 256 - interrupt_period;
-			TIM16_base_prescaler_divisors_index_to_be_loaded = FASTEST_SPEED_PRESCALER_DIVISORS_ARRAY_INDEX - 2;
-		}
-		else if(interrupt_period <= FIVE_HUNDRED_TWELVE_PRESCALER_LARGEST_INTERRUPT_PERIOD){
+		interrupt_period = HIGHEST_PRESCALER_TOP_SPEED_PERIOD - 1; //actually implemented interrupt period based on the biggest prescaler. NOTE: SEE NOTE ABOVE.
+		TIM16_raw_start_value_to_be_loaded = 256 - interrupt_period;
 
-			interrupt_period = interrupt_period >> 3;
-			TIM16_raw_start_value_to_be_loaded = 256 - interrupt_period;
-			TIM16_base_prescaler_divisors_index_to_be_loaded = FASTEST_SPEED_PRESCALER_DIVISORS_ARRAY_INDEX - 3;
-		}
-		else if(interrupt_period <= ONE_THOUSAND_TWENTY_FOUR_PRESCALER_LARGEST_INTERRUPT_PERIOD){
-
-			interrupt_period = interrupt_period >> 4;
-			TIM16_raw_start_value_to_be_loaded = 256 - interrupt_period;
-			TIM16_base_prescaler_divisors_index_to_be_loaded = FASTEST_SPEED_PRESCALER_DIVISORS_ARRAY_INDEX - 4;
-		}
+		TIM16_raw_prescaler_to_be_loaded = biggest_prescaler;
 
 		//WHEN THE MEASUREMENT REELAPSE TIMER INTERRUPTS, WE WANT TO 'RESTART' THE WAVE TO A SPECIFIC INDEX,
 		//AS SUCH WE HAVE TO WORK OUT THE INDEX WE WANT TO RESTART THE WAVE AT, BASED ON THE TYPE OF WAVE SELECTED,
@@ -721,19 +699,18 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 		//ADJUST PRESCALER
 		if(TIM16_prescaler_adjust_to_be_loaded == MULTIPLY_BY_TWO){
 
-			TIM16_prescaler_divisors_final_index_to_be_loaded = TIM16_base_prescaler_divisors_index_to_be_loaded - 1;
+			TIM16_final_prescaler_to_be_loaded = TIM16_raw_prescaler_to_be_loaded << 1; //multiply by 2
 		}
 		else if(TIM16_prescaler_adjust_to_be_loaded == DO_NOTHING){
 
-				TIM16_prescaler_divisors_final_index_to_be_loaded = TIM16_base_prescaler_divisors_index_to_be_loaded;
+				TIM16_final_prescaler_to_be_loaded = TIM16_raw_prescaler_to_be_loaded;
 		}
 
 		#endif
 
 		#if SYMMETRY_ON_OR_OFF == OFF
 			TIM16_final_start_value_to_be_loaded = TIM16_raw_start_value_to_be_loaded;
-			TIM16_prescaler_adjust_to_be_loaded = DO_NOTHING;
-			TIM16_prescaler_divisors_final_index_to_be_loaded = TIM16_base_prescaler_divisors_index_to_be_loaded;
+			TIM16_finsl_prescaler_to_be_loaded = TIM16_prescaler_raw_to_be_loaded;
 		#endif
 
 	}
@@ -749,8 +726,6 @@ void TIM2_ch1_overflow_callback(TIM_HandleTypeDef *htim){
 
 		input_capture_measurement_is_ongoing = NO;
 		input_capture_event = FIRST;
-
-		//do nothing
 	}
 }
 
@@ -760,7 +735,7 @@ void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
 
 	TIM16->EGR |= TIM_EGR_UG; //DO NOT DELETE THIS LINE, IT LITERALLY MAKES OR BREAKS THE BASTARD - It triggers an 'update' event
 	__HAL_TIM_SET_COUNTER(&htim16, TIM16_final_start_value_to_be_loaded); //this line must go here, or at least very near the beginning!
-	__HAL_TIM_SET_PRESCALER(&htim16, (TIM16_prescaler_divisors[TIM16_prescaler_divisors_final_index_to_be_loaded]) - 1); //have to take one off the divisor
+	__HAL_TIM_SET_PRESCALER(&htim16, TIM16_final_prescaler_to_be_loaded - 1); //have to take one off the divisor
 	TIM1->EGR |= TIM_EGR_UG; //not sure if we really need this line but gonna keep it here because it worked wonders for TIM16
 	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, duty_to_be_loaded); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
 
@@ -774,9 +749,9 @@ void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
 	current_halfcycle = current_halfcycle_to_be_loaded;
 	current_quadrant = current_quadrant_to_be_loaded;
 
-	//set the locked values to the 'to be loaded' values such that the TIM16 continually loads these if the speed pot is disabled
-	TIM16_final_start_value_locked = TIM16_final_start_value_to_be_loaded;
-	TIM16_prescaler_divisors_final_index_locked = TIM16_prescaler_divisors_final_index_to_be_loaded;
+	//set the values to the 'to be loaded' values such that the TIM16 continually loads these if the speed pot is disabled
+	TIM16_final_start_value = TIM16_final_start_value_to_be_loaded;
+	TIM16_final_prescaler = TIM16_final_prescaler_to_be_loaded;
 }
 
 /*void TIM17_callback_debounce(TIM_HandleTypeDef *htim){
@@ -836,8 +811,8 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 	if(rx_buffer[0] == 'y'){
 
 		speed_pot_is_disabled = YES;
-		TIM16_prescaler_divisors_final_index_locked = 5;
-		TIM16_final_start_value_locked = 127;
+		TIM16_final_prescaler = 64;
+		TIM16_final_start_value = 127;
 		rx_buffer[0] = 0;
 	}
 	HAL_UART_Receive_DMA(&huart2, (uint8_t*)rx_buffer, sizeof(rx_buffer));
