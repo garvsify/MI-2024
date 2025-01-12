@@ -863,3 +863,13 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 	HAL_LPTIM_SetOnce_Start_IT(&hlptim1, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK);
 }
+
+void TIM17_callback_speed_pot_check(TIM_HandleTypeDef *htim){
+
+	Stop_OC_TIM(&htim17, TIM_CHANNEL_1);
+
+	Speed_pot_check();
+
+	__HAL_TIM_SET_COUNTER(&htim17, 0);
+	Start_OC_TIM(&htim17, TIM_CHANNEL_1);
+}

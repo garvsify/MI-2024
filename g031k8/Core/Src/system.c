@@ -685,11 +685,17 @@ uint8_t Check_Tap_Tempo_Switch_State(enum Tap_Tempo_Switch_State *tap_tempo_swit
 	return 1;
 }
 
-uint8_t Start_Tap_Tempo_Monitoring_Timer_and_UART(void){
+uint8_t Start_Tap_Tempo_Monitoring_Timers_and_UART_Receive(void){
 
+	//START UART RECEIVE
 	HAL_UART_Receive_DMA(&huart2, (uint8_t*)rx_buffer, sizeof(rx_buffer));
 
+	//START TAP TEMPO SWITCH CHECKING
 	HAL_LPTIM_SetOnce_Start_IT(&hlptim1, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK);
+
+	//START SPEED POT CHECKING (once tap tempo gets enabled)
+	__HAL_TIM_SET_COUNTER(&htim17, 0);
+	Start_OC_TIM(&htim17, TIM_CHANNEL_1);
 
 	return 1;
 }

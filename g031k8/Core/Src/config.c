@@ -404,9 +404,10 @@ void MX_TIM17_Init(void)
 
   /* USER CODE END TIM17_Init 1 */
   htim17.Instance = TIM17;
-  htim17.Init.Prescaler = (512*64)- 1;
+  htim17.Init.Prescaler = (512*64)- 1; //Still good for speed pot check
   htim17.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim17.Init.Period = TIM17_DEBOUNCE_LENGTH - 1;
+  //htim17.Init.Period = TIM17_DEBOUNCE_LENGTH - 1;
+  htim17.Init.Period = SPEED_POT_CHECK_LENGTH - 1;
   htim17.Init.ClockDivision = TIM_CLOCKDIVISION_DIV4;
   htim17.Init.RepetitionCounter = 0;
   htim17.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
@@ -419,7 +420,7 @@ void MX_TIM17_Init(void)
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_TIMING;
-  sConfigOC.Pulse = TIM17_DEBOUNCE_LENGTH - 1;
+  sConfigOC.Pulse = SPEED_POT_CHECK_LENGTH - 1;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCNPolarity = TIM_OCNPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
@@ -584,8 +585,8 @@ void MX_GPIO_Init(void)
   HAL_GPIO_Init(MONITOR_GPIO_Port, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
-  HAL_NVIC_SetPriority(EXTI4_15_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);
+  //HAL_NVIC_SetPriority(EXTI4_15_IRQn, 0, 0);
+  //HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
@@ -646,6 +647,9 @@ void System_Init(void){
 
 	//Set custom callback function for TIM17 debounce (CCR match)
 	//HAL_TIM_RegisterCallback(&htim17, HAL_TIM_OC_DELAY_ELAPSED_CB_ID, &TIM17_callback_debounce);
+
+	//Set custom callback function for TIM17 Speed Pot Check (CCR match)
+	HAL_TIM_RegisterCallback(&htim17, HAL_TIM_OC_DELAY_ELAPSED_CB_ID, &TIM17_callback_speed_pot_check);
 
 	//CANNOT SET CUSTOM CALLBACK FOR EXTI, however redefinition of 'weak' predefined EXTI callback is in custom_callbacks.c
 

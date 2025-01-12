@@ -6,11 +6,14 @@
 #include "system.h"
 
 volatile char rx_buffer[1] = {0};
+const char one_byte_data = 'j';
 
 int main(void)
 {
+	//SYSTEM INIT
 	System_Init();
 
+	//STARTUP BITS AND BOBS
 	Startup();
 
 	//START FREQ. GEN and PWM GEN TIMERS and ENABLE PWM OUTPUT
@@ -21,21 +24,16 @@ int main(void)
 	//ENABLE INTERRUPTS
 	Global_Interrupt_Enable();
 
-	const char one_byte_data = 'j';
-
-	Start_Tap_Tempo_Monitoring_Timer_and_UART();
+	//START TAP TEMPO SWITCH MONITORING AND UART RECEIVE
+	Start_Tap_Tempo_Monitoring_Timers_and_UART_Receive();
 
 	while (1)
 	{
-		Speed_pot_check();
-
 		/*if(UART_DMA_TX_is_complete == YES){
 
 			UART_DMA_TX_is_complete = NO;
 			HAL_UART_Transmit_DMA(&huart2, (const uint8_t*)&one_byte_data, sizeof(one_byte_data));
 		}*/
-
-		HAL_Delay(50);
 	}
 	return 1;
 }
