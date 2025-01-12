@@ -269,7 +269,7 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 
 		uint16_t biggest_prescaler = (uint16_t)(N >> 7); //smallest error will occur with smallest period and therefore largest prescaler. I AM USING SMALLEST PERIOD AS 128 BECAUSE EVEN THOUGH I CALCULATED EVERYTHING WITH SMALLEST PERIOD AS 129, IT WILL NOT BREAK THE MATHS IN THE SYMMETRY-ADJUST ROUTINE. USE THE EXCEL SPREADSHEET IF NOT SURE.
 
-		interrupt_period = HIGHEST_PRESCALER_TOP_SPEED_PERIOD - 1; //actually implemented interrupt period based on the biggest prescaler. NOTE: SEE NOTE ABOVE.
+		interrupt_period = 1 << 7; //actually implemented interrupt period based on the biggest prescaler. NOTE: SEE NOTE ABOVE.
 		TIM16_raw_start_value_to_be_loaded = 256 - interrupt_period;
 
 		TIM16_raw_prescaler_to_be_loaded = biggest_prescaler;

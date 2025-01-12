@@ -2586,13 +2586,13 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 				input_capture_measurement_reelapse_is_ongoing = YES;
  8000fd0:	2301      	movs	r3, #1
  8000fd2:	7033      	strb	r3, [r6, #0]
-		interrupt_period = HIGHEST_PRESCALER_TOP_SPEED_PERIOD - 1; //actually implemented interrupt period based on the biggest prescaler. NOTE: SEE NOTE ABOVE.
+		interrupt_period = 1 << 7; //actually implemented interrupt period based on the biggest prescaler. NOTE: SEE NOTE ABOVE.
  8000fd4:	2380      	movs	r3, #128	@ 0x80
 		TIM16_raw_start_value_to_be_loaded = 256 - interrupt_period;
  8000fd6:	2080      	movs	r0, #128	@ 0x80
 		uint32_t N = interrupt_period << 6; //calculate the N-value which is prescaler_meas * interrupt_period_meas. The measurement prescaler is used which is 64. (TIM2 has a prescaler of 64*512, but since we divide this value by 512, the prescaler is then just 64).
  8000fd8:	8822      	ldrh	r2, [r4, #0]
-		interrupt_period = HIGHEST_PRESCALER_TOP_SPEED_PERIOD - 1; //actually implemented interrupt period based on the biggest prescaler. NOTE: SEE NOTE ABOVE.
+		interrupt_period = 1 << 7; //actually implemented interrupt period based on the biggest prescaler. NOTE: SEE NOTE ABOVE.
  8000fda:	8023      	strh	r3, [r4, #0]
 		TIM16_raw_start_value_to_be_loaded = 256 - interrupt_period;
  8000fdc:	8823      	ldrh	r3, [r4, #0]
@@ -3488,7 +3488,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 	HAL_LPTIM_SetOnce_Start_IT(&hlptim1, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK);
  80015a4:	22fa      	movs	r2, #250	@ 0xfa
- 80015a6:	00d2      	lsls	r2, r2, #3
+ 80015a6:	0092      	lsls	r2, r2, #2
  80015a8:	0011      	movs	r1, r2
  80015aa:	480b      	ldr	r0, [pc, #44]	@ (80015d8 <LPTIM1_callback+0x5c>)
  80015ac:	f002 f8e6 	bl	800377c <HAL_LPTIM_SetOnce_Start_IT>
@@ -5884,7 +5884,7 @@ uint8_t Start_Tap_Tempo_Monitoring_Timers_and_UART_Receive(void){
 	//START TAP TEMPO SWITCH CHECKING
 	HAL_LPTIM_SetOnce_Start_IT(&hlptim1, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK);
  8002160:	22fa      	movs	r2, #250	@ 0xfa
- 8002162:	00d2      	lsls	r2, r2, #3
+ 8002162:	0092      	lsls	r2, r2, #2
  8002164:	0011      	movs	r1, r2
  8002166:	480a      	ldr	r0, [pc, #40]	@ (8002190 <Start_Tap_Tempo_Monitoring_Timers_and_UART_Receive+0x3c>)
  8002168:	f001 fb08 	bl	800377c <HAL_LPTIM_SetOnce_Start_IT>
