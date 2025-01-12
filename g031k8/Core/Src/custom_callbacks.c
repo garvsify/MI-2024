@@ -273,8 +273,9 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 				enum Validate divisible_by_four_remainder_flag = NO;
 				enum Validate divisible_by_eight_remainder_flag = NO;
 				enum Validate divisible_by_sixteen_remainder_flag = NO;
+				enum Validate divisible_by_thirtytwo_remainder_flag = NO;
 
-				for(uint8_t i = 0; i < (128 + 1); i++){ //check from period = 264 to 129
+				for(uint8_t i = 0; i < (160 + 1); i++){ //check from period = 264 to 96
 
 					interrupt_period = 256 - i;
 					uint16_t remainder = N % interrupt_period;
@@ -306,6 +307,11 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 							divisible_by_sixteen_remainder_flag = YES;
 							break;
 						}
+						else if(unsigned_bitwise_modulo(remainder, 5) == 0){ //remainder divisible by 32
+
+							divisible_by_sixteen_remainder_flag = YES;
+							break;
+						}
 					}
 				}
 
@@ -328,6 +334,10 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 				else if(divisible_by_sixteen_remainder_flag == YES){
 
 					TIM16_raw_prescaler_to_be_loaded = (N / interrupt_period) << 4; //x16
+				}
+				else if(divisible_by_thirtytwo_remainder_flag == YES){
+
+					TIM16_raw_prescaler_to_be_loaded = (N / interrupt_period) << 5; //x32
 				}
 
 				TIM16_raw_start_value_to_be_loaded = 256 - interrupt_period;
