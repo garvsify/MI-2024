@@ -206,11 +206,13 @@ uint8_t Adjust_TIM16_Prescaler(volatile enum Adjust_Prescaler_Action TIM16_presc
 uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(volatile uint16_t TIM16_raw_start_value_value, volatile uint16_t *TIM16_final_start_value_ptr, volatile uint16_t TIM16_raw_prescaler_value, volatile uint16_t *TIM16_final_prescaler_ptr,
 																volatile uint16_t current_symmetry_value, volatile uint16_t current_waveshape_value, volatile uint8_t current_halfcycle_value, volatile uint8_t current_quadrant_value, volatile uint16_t current_index_value){
 
+	volatile enum Adjust_Prescaler_Action TIM16_prescaler_adjustment;
+
     #if SYMMETRY_ON_OR_OFF == ON
 
 		volatile enum TIM16_final_start_value_Oscillation_Mode TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
 		volatile enum Symmetry_Type symmetry_type_for_halfcycle = SHORTEN;
-		volatile enum Adjust_Prescaler_Action TIM16_prescaler_adjustment;
+
 
 		uint8_t pot_rotation_corrected = 0;
 		enum Symmetry_Status symmetry_status = CW;

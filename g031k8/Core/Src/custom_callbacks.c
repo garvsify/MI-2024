@@ -780,7 +780,7 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 
 		#if SYMMETRY_ON_OR_OFF == OFF
 			TIM16_final_start_value_to_be_loaded = TIM16_raw_start_value_to_be_loaded;
-			TIM16_finsl_prescaler_to_be_loaded = TIM16_prescaler_raw_to_be_loaded;
+			TIM16_final_prescaler_to_be_loaded = TIM16_raw_prescaler_to_be_loaded;
 		#endif
 
 	}
