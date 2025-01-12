@@ -779,45 +779,52 @@ void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
 	TIM16_prescaler_divisors_final_index_locked = TIM16_prescaler_divisors_final_index_to_be_loaded;
 }
 
-void TIM17_callback_debounce(TIM_HandleTypeDef *htim){
+/*void TIM17_callback_debounce(TIM_HandleTypeDef *htim){
 
 	Stop_OC_TIM(&htim17, TIM_CHANNEL_1);
 
+	if(tap_tempo_switch_state == NOT_DEPRESSED){ //switch released before timer elapsed
+
+		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1); //reset
+	}
+
+	TIM17_debounce_is_elapsing = NO;
 	TAP_TEMPO_EXTI4_15_IRQ_is_disabled = NO;
 	HAL_NVIC_EnableIRQ(EXTI4_15_IRQn); //enable EXTI10 interrupts
 
-	/*Configure GPIO pin : BOUNCY TAP TEMPO I/P PIN */ // - alternative to the above
+	DeInit- alternative to the above
 	GPIO_InitTypeDef GPIO_InitStruct = {0};
 	GPIO_InitStruct.Pin = SW_IN_Pin;
 	GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
 	GPIO_InitStruct.Pull = GPIO_PULLUP;
 	HAL_GPIO_Init(SW_IN_GPIO_Port, &GPIO_InitStruct);
-}
+}*/
 
 void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
 
-	if(tap_tempo_switch_state == NOT_DEPRESSED){
+	if(tap_tempo_switch_state == NOT_DEPRESSED){ //previous state is not depressed - will eliminate switch release bouncing causing falling edges
 
 		HAL_NVIC_DisableIRQ(EXTI4_15_IRQn); //disable further EXTI10 interrupts
 		HAL_GPIO_DeInit(SW_IN_GPIO_Port, SW_IN_Pin); //apparently disables EXTI interrupt - alternative to the above
 
+		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0); //latch low until timer elapses
+
 		tap_tempo_mode_is_active = YES;
 		TAP_TEMPO_EXTI4_15_IRQ_is_disabled = YES;
 		TIM17_debounce_is_elapsing = YES;
-		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0); //latch low until timer elapses
 
 		__HAL_TIM_SET_COUNTER(&htim17, 0);
 		Start_OC_TIM(&htim17, TIM_CHANNEL_1);
 	}
 }
 
-void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
+/*void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
 
 	if(TIM17_debounce_is_elapsing == NO){ //check if this rising edge has occurred during debounce
 
 		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1); //reset
 	}
-}
+}*/
 
 void UART2_TX_transfer_complete_callback(UART_HandleTypeDef *huart){
 

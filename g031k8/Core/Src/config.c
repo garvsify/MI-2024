@@ -645,7 +645,7 @@ void System_Init(void){
 	HAL_TIM_RegisterCallback(&htim3, HAL_TIM_OC_DELAY_ELAPSED_CB_ID, &TIM3_ch1_IP_capture_measurement_reelapse_callback);
 
 	//Set custom callback function for TIM17 debounce (CCR match)
-	HAL_TIM_RegisterCallback(&htim17, HAL_TIM_OC_DELAY_ELAPSED_CB_ID, &TIM17_callback_debounce);
+	//HAL_TIM_RegisterCallback(&htim17, HAL_TIM_OC_DELAY_ELAPSED_CB_ID, &TIM17_callback_debounce);
 
 	//CANNOT SET CUSTOM CALLBACK FOR EXTI, however redefinition of 'weak' predefined EXTI callback is in custom_callbacks.c
 

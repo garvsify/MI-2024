@@ -645,6 +645,8 @@ uint8_t Speed_pot_check(void){
 
 uint8_t Check_Tap_Tempo_Switch_State(enum Tap_Tempo_Switch_State *tap_tempo_switch_state_ptr){
 
+	static uint8_t extend_rising_edge = 0;
+
 	uint8_t switch_state = (uint8_t)HAL_GPIO_ReadPin(SW_IN_GPIO_Port, SW_IN_Pin);
 
 	if(switch_state == 0){
@@ -658,7 +660,14 @@ uint8_t Check_Tap_Tempo_Switch_State(enum Tap_Tempo_Switch_State *tap_tempo_swit
 
 		if(tap_tempo_switch_state_counter != TAP_TEMPO_SWITCH_CONFIDENCE_COUNT){
 
-			tap_tempo_switch_state_counter++;
+			if(extend_rising_edge == 5){
+
+				tap_tempo_switch_state_counter++;
+				extend_rising_edge = 0;
+			}
+			else{
+				extend_rising_edge++;
+			}
 		}
 	}
 
@@ -669,6 +678,18 @@ uint8_t Check_Tap_Tempo_Switch_State(enum Tap_Tempo_Switch_State *tap_tempo_swit
 	else if(tap_tempo_switch_state_counter == TAP_TEMPO_SWITCH_CONFIDENCE_COUNT){
 
 		*tap_tempo_switch_state_ptr = NOT_DEPRESSED;
+
+		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1); //reset
+
+		TAP_TEMPO_EXTI4_15_IRQ_is_disabled = NO;
+			HAL_NVIC_EnableIRQ(EXTI4_15_IRQn); //enable EXTI10 interrupts
+
+			//DeInit- alternative to the above
+			GPIO_InitTypeDef GPIO_InitStruct = {0};
+			GPIO_InitStruct.Pin = SW_IN_Pin;
+			GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+			GPIO_InitStruct.Pull = GPIO_PULLUP;
+			HAL_GPIO_Init(SW_IN_GPIO_Port, &GPIO_InitStruct);
 	}
 
 	return 1;
