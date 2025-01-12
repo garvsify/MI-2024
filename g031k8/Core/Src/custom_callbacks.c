@@ -240,6 +240,7 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 			if(interrupt_period < HIGHEST_PRESCALER_TOP_SPEED_PERIOD){ //if the captured value/512 is less than 129, then the desired speed is not reproducable, so just set the absolute top speed (i.e. highest prescaler and shortest period)
 
 				interrupt_period = HIGHEST_PRESCALER_TOP_SPEED_PERIOD;
+				TIM16_raw_prescaler_to_be_loaded = 64;
 
 				//start TIM3 from 0 with CCR loaded with TIM2_ch1_input_capture_value
 				//CCR shouldn't be preloaded so *should* update instantaneously
@@ -260,19 +261,78 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 
 				//set I/P capture measurement re-elapse is ongoing flag
 				input_capture_measurement_reelapse_is_ongoing = YES;
+
+				//DETERMINE WHAT TO SET THE RAW_START_VALUE AND BASE_PRESCALER TO BASED ON THE I/P CAPTURE VALUE
+
+				uint32_t N = interrupt_period << 6; //calculate the N-value which is prescaler_meas * interrupt_period_meas. The measurement prescaler is used which is 64. (TIM2 has a prescaler of 64*512, but since we divide this value by 512, the prescaler is then just 64).
+
+				//uint16_t smallest_prescaler = (uint16_t)(N >> 8); //divide N by 256
+
+				enum Validate zero_remainder_flag = NO;
+				enum Validate divisible_by_two_remainder_flag = NO;
+				enum Validate divisible_by_four_remainder_flag = NO;
+				enum Validate divisible_by_eight_remainder_flag = NO;
+				enum Validate divisible_by_sixteen_remainder_flag = NO;
+
+				for(uint8_t i = 0; i < (128 + 1); i++){ //check from period = 264 to 129
+
+					interrupt_period = 256 - i;
+					uint16_t remainder = N % interrupt_period;
+
+					if(remainder == 0){ //check if no remainder -> integer
+
+						zero_remainder_flag = YES;
+						break;
+					}
+					else{
+
+						if(unsigned_bitwise_modulo(remainder, 1) == 0){ //remainder divisible by 2
+
+							divisible_by_two_remainder_flag = YES;
+							break;
+						}
+						else if(unsigned_bitwise_modulo(remainder, 2) == 0){ //remainder divisible by 4
+
+							divisible_by_four_remainder_flag = YES;
+							break;
+						}
+						else if(unsigned_bitwise_modulo(remainder, 3) == 0){ //remainder divisible by 8
+
+							divisible_by_eight_remainder_flag = YES;
+							break;
+						}
+						else if(unsigned_bitwise_modulo(remainder, 4) == 0){ //remainder divisible by 16
+
+							divisible_by_sixteen_remainder_flag = YES;
+							break;
+						}
+					}
+				}
+
+				if(zero_remainder_flag == YES){
+
+					TIM16_raw_prescaler_to_be_loaded = N / interrupt_period;
+				}
+				else if(divisible_by_two_remainder_flag == YES){
+
+					TIM16_raw_prescaler_to_be_loaded = (N / interrupt_period) << 1; //x2
+				}
+				else if(divisible_by_four_remainder_flag == YES){
+
+					TIM16_raw_prescaler_to_be_loaded = (N / interrupt_period) << 2; //x4
+				}
+				else if(divisible_by_eight_remainder_flag == YES){
+
+					TIM16_raw_prescaler_to_be_loaded = (N / interrupt_period) << 3; //x8
+				}
+				else if(divisible_by_sixteen_remainder_flag == YES){
+
+					TIM16_raw_prescaler_to_be_loaded = (N / interrupt_period) << 4; //x16
+				}
+
+				TIM16_raw_start_value_to_be_loaded = 256 - interrupt_period;
 			}
 		}
-
-		//DETERMINE WHAT TO SET THE RAW_START_VALUE AND BASE_PRESCALER TO BASED ON THE I/P CAPTURE VALUE
-
-		uint32_t N = interrupt_period << 6; //calculate the N-value which is prescaler_meas * interrupt_period_meas. The measurement prescaler is used which is 64. (TIM2 has a prescaler of 64*512, but since we divide this value by 512, the prescaler is then just 64).
-
-		uint16_t biggest_prescaler = (uint16_t)(N >> 7); //smallest error will occur with smallest period and therefore largest prescaler. I AM USING SMALLEST PERIOD AS 128 BECAUSE EVEN THOUGH I CALCULATED EVERYTHING WITH SMALLEST PERIOD AS 129, IT WILL NOT BREAK THE MATHS IN THE SYMMETRY-ADJUST ROUTINE. USE THE EXCEL SPREADSHEET IF NOT SURE.
-
-		interrupt_period = 1 << 7; //actually implemented interrupt period based on the biggest prescaler. NOTE: SEE NOTE ABOVE.
-		TIM16_raw_start_value_to_be_loaded = 256 - interrupt_period;
-
-		TIM16_raw_prescaler_to_be_loaded = biggest_prescaler;
 
 		//WHEN THE MEASUREMENT REELAPSE TIMER INTERRUPTS, WE WANT TO 'RESTART' THE WAVE TO A SPECIFIC INDEX,
 		//AS SUCH WE HAVE TO WORK OUT THE INDEX WE WANT TO RESTART THE WAVE AT, BASED ON THE TYPE OF WAVE SELECTED,
