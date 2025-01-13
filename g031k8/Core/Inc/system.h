@@ -118,7 +118,6 @@ volatile extern uint8_t current_quadrant;
 volatile extern uint16_t ADCResultsDMA[4];
 const extern uint8_t num_ADC_conversions;
 volatile extern enum Validate initial_ADC_conversion_complete;
-volatile extern enum Validate TIM16_callback_active;
 volatile extern uint16_t TIM16_raw_start_value;
 volatile extern uint16_t TIM16_final_start_value;
 volatile extern uint16_t TIM16_raw_prescaler;
@@ -154,6 +153,11 @@ volatile extern enum Validate UART_DMA_TX_is_complete;
 volatile extern char rx_buffer[1];
 extern uint8_t tap_tempo_switch_state_counter;
 extern enum Tap_Tempo_Switch_State tap_tempo_switch_state;
+volatile extern enum Validate TIM16_ISR_has_completed;
+volatile extern enum Validate calculation_of_next_duty_values_has_completed;
+volatile extern enum Validate ADC_conversion_has_completed;
+volatile extern enum Validate calculation_of_raw_and_final_values_has_completed;
+volatile extern enum Validate input_capture_needs_to_be_processed;
 
 //CUSTOM TYPES
 enum Polarity{
@@ -215,5 +219,9 @@ uint32_t unsigned_bitwise_modulo(uint32_t dividend, uint8_t base_2_exponent);
 uint8_t Speed_pot_check(void);
 uint8_t Check_Tap_Tempo_Switch_State(enum Tap_Tempo_Switch_State *tap_tempo_switch_state_ptr);
 uint8_t Start_Tap_Tempo_Monitoring_Timers_and_UART_Receive(void);
+uint8_t Calculate_Next_Duty_Values(void);
+uint8_t Process_Input_Capture_Value(void);
+
+uint8_t Multiply_Duty_By_Current_Depth_and_Divide_By_256(void);
 
 #endif

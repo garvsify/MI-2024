@@ -23,7 +23,6 @@ volatile uint16_t duty = 0;
 volatile uint16_t TIM16_final_prescaler = 0;
 volatile uint16_t ADCResultsDMA[4] = {0};
 volatile enum Validate initial_ADC_conversion_complete = NO;
-volatile enum Validate TIM16_callback_active = NO;
 volatile uint16_t prev_duty = 0;
 volatile enum Input_Capture_Event input_capture_event = FIRST;
 volatile uint32_t TIM2_ch1_input_capture_value;
@@ -53,6 +52,11 @@ volatile enum Validate is_very_first_oscillation = YES;
 volatile enum Validate UART_DMA_TX_is_complete = YES;
 uint8_t tap_tempo_switch_state_counter = TAP_TEMPO_SWITCH_CONFIDENCE_COUNT;
 enum Tap_Tempo_Switch_State tap_tempo_switch_state = NOT_DEPRESSED;
+volatile enum Validate TIM16_ISR_has_completed = NO;
+volatile enum Validate calculation_of_next_duty_values_has_completed = NO;
+volatile enum Validate ADC_conversion_has_completed = NO;
+volatile enum Validate calculation_of_raw_and_final_values_has_completed = NO;
+volatile enum Validate input_capture_needs_to_be_processed = NO;
 
 //FUNCTION DEFINITIONS
 uint8_t Global_Interrupt_Enable(void){
@@ -688,6 +692,657 @@ uint8_t Start_Tap_Tempo_Monitoring_Timers_and_UART_Receive(void){
 	//START SPEED POT CHECKING (once tap tempo gets enabled)
 	__HAL_TIM_SET_COUNTER(&htim17, 0);
 	Start_OC_TIM(&htim17, TIM_CHANNEL_1);
+
+	return 1;
+}
+
+
+uint8_t Calculate_Next_Duty_Values(void){
+
+	/////////////////////////////
+	//CALCULATE THE NEXT VALUES//
+	/////////////////////////////
+
+	current_index++;
+
+	if(current_index == FINAL_INDEX + 1){
+		current_quadrant = FIRST_QUADRANT;
+		current_halfcycle = FIRST_HALFCYCLE;
+		current_index = 0;
+	}
+
+	if(current_waveshape == TRIANGLE_MODE){
+		duty = tri_wavetable[current_index];
+	}
+	else if(current_waveshape == SINE_MODE){
+		duty = sine_wavetable[current_index];
+	}
+	else if((current_waveshape == SQUARE_MODE) && (current_index < THIRD_QUADRANT_START_INDEX)){
+		duty = 1023;
+	}
+	else if((current_waveshape == SQUARE_MODE) && (current_index >= THIRD_QUADRANT_START_INDEX)){
+		duty = 0;
+	}
+
+	if(current_index == FIRST_QUADRANT_START_INDEX){
+		current_quadrant = FIRST_QUADRANT;
+		current_halfcycle = FIRST_HALFCYCLE;
+	}
+	else if(current_index == SECOND_QUADRANT_START_INDEX){
+		current_quadrant = SECOND_QUADRANT;
+		current_halfcycle = FIRST_HALFCYCLE;
+	}
+	else if(current_index == THIRD_QUADRANT_START_INDEX){
+		current_quadrant = FIRST_QUADRANT;
+		current_halfcycle = SECOND_HALFCYCLE;
+	}
+	else if(current_index == FOURTH_QUADRANT_START_INDEX){
+		current_quadrant = SECOND_QUADRANT;
+		current_halfcycle = SECOND_HALFCYCLE;
+	}
+
+	//APPLY DEPTH
+	#if DEPTH_ON_OR_OFF == ON
+
+		//Apply Depth
+		if(current_depth == 255){
+			duty = 1023 - duty;
+		}
+		else if(current_depth != 0){
+			//duty = 1023 - duty*(current_depth >> 8);
+			Multiply_Duty_By_Current_Depth_and_Divide_By_256();
+		}
+		else{
+			duty = 1023; //if depth is 0, just output 1023
+		}
+
+	#endif
+
+	//SET THE NEXT VALUE FOR THE MAIN OSCILLATOR
+	prev_duty = duty;
+
+	//STORE THE VALUES IN THE APPROPRIATE '0TH - 1' INDEX RELATIVE TO THE START POINTER
+	if(duty_delay_line_start_offset != 0){
+		duty_delay_line_storage_array[duty_delay_line_start_offset - 1] = duty;
+	}
+	else{
+		duty_delay_line_storage_array[FINAL_INDEX + 1] = duty;
+	}
+
+	//DECREMENT THE START AND FINISH POINTERS
+	if(duty_delay_line_start_offset == 0){
+		duty_delay_line_start_offset = FINAL_INDEX + 1;
+		duty_delay_line_finish_offset = duty_delay_line_finish_offset - 1;
+	}
+	else if(duty_delay_line_finish_offset == 0){
+		duty_delay_line_finish_offset = FINAL_INDEX + 1;
+		duty_delay_line_start_offset = duty_delay_line_start_offset - 1;
+	}
+	else{
+		duty_delay_line_start_offset = duty_delay_line_start_offset - 1;
+		duty_delay_line_finish_offset = duty_delay_line_finish_offset - 1;
+	}
+
+	//DETERMINE THE DELAYED WAVE'S VALUES
+	if(duty_delay_line_start_offset + duty_delay_line_read_pointer_offset > FINAL_INDEX + 1){ //if the desired starting index falls off the end of the array
+		duty_delayed = *(duty_delay_line_storage_array + (duty_delay_line_start_offset + duty_delay_line_read_pointer_offset - (FINAL_INDEX + 1)));
+	}
+	else{
+		duty_delayed = *(duty_delay_line_storage_array + duty_delay_line_start_offset + duty_delay_line_read_pointer_offset);
+	}
+
+	calculation_of_next_duty_values_has_completed = YES;
+
+	return 1;
+}
+
+uint8_t Process_Input_Capture_Value(void){
+
+	if(interrupt_period < HIGHEST_PRESCALER_TOP_SPEED_PERIOD){ //if the captured value/512 is less than 129, then the desired speed is not reproducable, so just set the absolute top speed (i.e. highest prescaler and shortest period)
+
+		interrupt_period = HIGHEST_PRESCALER_TOP_SPEED_PERIOD;
+		TIM16_raw_start_value_to_be_loaded = 256 - interrupt_period;
+		TIM16_raw_prescaler_to_be_loaded = 64;
+
+		//start TIM3 from 0 with CCR loaded with TIM2_ch1_input_capture_value
+		//CCR shouldn't be preloaded so *should* update instantaneously
+		__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, HIGHEST_PRESCALER_TOP_SPEED_PERIOD);
+		__HAL_TIM_SET_COUNTER(&htim3, 0);
+		Start_OC_TIM(&htim3, TIM_CHANNEL_1);
+
+		//set I/P capture measurement re-elapse 1 is ongoing flag
+		input_capture_measurement_reelapse_is_ongoing = YES;
+	}
+	else{
+
+		//start TIM3 from 0 with CCR loaded with TIM2_ch1_input_capture_value
+		//CCR shouldn't be preloaded so *should* update instantaneously
+		__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, interrupt_period); //measured value divided by 512
+		__HAL_TIM_SET_COUNTER(&htim3, 0);
+		Start_OC_TIM(&htim3, TIM_CHANNEL_1);
+
+		//set I/P capture measurement re-elapse is ongoing flag
+		input_capture_measurement_reelapse_is_ongoing = YES;
+
+		//DETERMINE WHAT TO SET THE RAW_START_VALUE AND BASE_PRESCALER TO BASED ON THE I/P CAPTURE VALUE
+
+		uint32_t N = interrupt_period << 6; //calculate the N-value which is prescaler_meas * interrupt_period_meas. The measurement prescaler is used which is 64. (TIM2 has a prescaler of 64*512, but since we divide this value by 512, the prescaler is then just 64).
+
+		//uint16_t smallest_prescaler = (uint16_t)(N >> 8); //divide N by 256
+
+		enum Validate zero_remainder_flag = NO;
+		enum Validate divisible_by_two_remainder_flag = NO;
+		enum Validate divisible_by_four_remainder_flag = NO;
+		enum Validate divisible_by_eight_remainder_flag = NO;
+		enum Validate divisible_by_sixteen_remainder_flag = NO;
+		enum Validate divisible_by_thirtytwo_remainder_flag = NO;
+
+		for(uint8_t i = 0; i < (160 + 1); i++){ //check from period = 264 to 96
+
+			interrupt_period = 256 - i;
+			uint16_t remainder = N % interrupt_period;
+
+			if(remainder == 0){ //check if no remainder -> integer
+
+				zero_remainder_flag = YES;
+				break;
+			}
+			else{
+
+				if(unsigned_bitwise_modulo(remainder, 1) == 0){ //remainder divisible by 2
+
+					divisible_by_two_remainder_flag = YES;
+					break;
+				}
+				else if(unsigned_bitwise_modulo(remainder, 2) == 0){ //remainder divisible by 4
+
+					divisible_by_four_remainder_flag = YES;
+					break;
+				}
+				else if(unsigned_bitwise_modulo(remainder, 3) == 0){ //remainder divisible by 8
+
+					divisible_by_eight_remainder_flag = YES;
+					break;
+				}
+				else if(unsigned_bitwise_modulo(remainder, 4) == 0){ //remainder divisible by 16
+
+					divisible_by_sixteen_remainder_flag = YES;
+					break;
+				}
+				else if(unsigned_bitwise_modulo(remainder, 5) == 0){ //remainder divisible by 32
+
+					divisible_by_sixteen_remainder_flag = YES;
+					break;
+				}
+			}
+		}
+
+		if(zero_remainder_flag == YES){
+
+			TIM16_raw_prescaler_to_be_loaded = N / interrupt_period;
+		}
+		else if(divisible_by_two_remainder_flag == YES){
+
+			TIM16_raw_prescaler_to_be_loaded = (N / interrupt_period) << 1; //x2
+		}
+		else if(divisible_by_four_remainder_flag == YES){
+
+			TIM16_raw_prescaler_to_be_loaded = (N / interrupt_period) << 2; //x4
+		}
+		else if(divisible_by_eight_remainder_flag == YES){
+
+			TIM16_raw_prescaler_to_be_loaded = (N / interrupt_period) << 3; //x8
+		}
+		else if(divisible_by_sixteen_remainder_flag == YES){
+
+			TIM16_raw_prescaler_to_be_loaded = (N / interrupt_period) << 4; //x16
+		}
+		else if(divisible_by_thirtytwo_remainder_flag == YES){
+
+			TIM16_raw_prescaler_to_be_loaded = (N / interrupt_period) << 5; //x32
+		}
+
+		TIM16_raw_start_value_to_be_loaded = 256 - interrupt_period;
+	}
+
+			//WHEN THE MEASUREMENT REELAPSE TIMER INTERRUPTS, WE WANT TO 'RESTART' THE WAVE TO A SPECIFIC INDEX,
+			//AS SUCH WE HAVE TO WORK OUT THE INDEX WE WANT TO RESTART THE WAVE AT, BASED ON THE TYPE OF WAVE SELECTED,
+			//(WE'LL HAVE TO SYNCHRONISE THE TIM16 INTERRUPTS UPON THIS REELAPSE INTERRUPT, AND ALSO
+			//BECAUSE OF HOW THE TIM16 CALLBACK WORKS, WE'LL HAVE TO WORK OUT HERE WHAT THE DUTY, FINAL_START_VALUE, AND PRESCALER_ADJUST ARE
+
+			if(current_waveshape == SINE_MODE || current_waveshape == TRIANGLE_MODE){
+
+				current_index_to_be_loaded = SINE_OR_TRIANGLE_WAVE_TEMPO_PERCEIVED_APEX_INDEX;
+				current_quadrant_to_be_loaded = CURRENT_QUADRANT_SINE_OR_TRI_SYNCED;
+				current_halfcycle_to_be_loaded = CURRENT_HALFCYCLE_SINE_OR_TRI_SYNCED;
+			}
+			else{
+
+				current_index_to_be_loaded = SQUARE_WAVE_TEMPO_APEX_INDEX;
+				current_quadrant_to_be_loaded = CURRENT_QUADRANT_SQUARE_SYNCED;
+				current_halfcycle_to_be_loaded = CURRENT_HALFCYCLE_SQUARE_SYNCED;
+			}
+
+			//ONCE INDEX IS SET, FIND THE DUTY VALUE
+			if(current_waveshape == TRIANGLE_MODE){
+				duty_to_be_loaded = tri_wavetable[current_index];
+			}
+			else if(current_waveshape == SINE_MODE){
+				duty_to_be_loaded = sine_wavetable[current_index];
+			}
+			else if((current_waveshape == SQUARE_MODE) && (current_index < THIRD_QUADRANT_START_INDEX)){
+				duty_to_be_loaded = 1023;
+			}
+			else if((current_waveshape == SQUARE_MODE) && (current_index >= THIRD_QUADRANT_START_INDEX)){
+				duty_to_be_loaded = 0;
+			}
+
+			//APPLY DEPTH
+			#if DEPTH_ON_OR_OFF == 1
+
+				//Apply Depth
+				if(current_depth_to_be_loaded == 255){
+
+					duty_to_be_loaded = 1023 - duty_to_be_loaded;
+				}
+				else if(current_depth != 0){
+
+					//duty = 1023 - duty*(current_depth >> 8);
+					uint32_t multiply_product = 0;
+					multiply_product = duty * current_depth; //compiler should compile this as a hardware multiplication, but need to check
+					duty_to_be_loaded = 1023 - (uint16_t)(multiply_product >> 8);
+				}
+				else{
+
+					duty_to_be_loaded = 1023; //if depth is 0, just output 1023
+				}
+
+			#endif
+
+			//APPLY SYMMETRY
+			#if SYMMETRY_ON_OR_OFF == ON
+
+				enum TIM16_final_start_value_Oscillation_Mode TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
+				enum Symmetry_Type symmetry_type_for_halfcycle = SHORTEN;
+
+				uint8_t pot_rotation_corrected = 0;
+				uint8_t symmetry_status = CW;
+
+				if(current_symmetry < SYMMETRY_ADC_HALF_SCALE){ //adc = 0-127
+					symmetry_status = CW;
+				}
+				else{ //adc is 128-255
+					symmetry_status = CCW;
+				}
+
+				if((current_waveshape == SINE_MODE) || (current_waveshape == TRIANGLE_MODE)){
+
+					if((current_halfcycle == FIRST_HALFCYCLE && current_quadrant == FIRST_QUADRANT) || (current_halfcycle == SECOND_HALFCYCLE && current_quadrant == SECOND_QUADRANT)){
+
+						if(symmetry_status == CW){
+
+							symmetry_type_for_halfcycle = LENGTHEN;
+						}
+						else{
+
+							symmetry_type_for_halfcycle = SHORTEN;
+						}
+					}
+					else if((current_halfcycle == FIRST_HALFCYCLE && current_quadrant == SECOND_QUADRANT) || (current_halfcycle == SECOND_HALFCYCLE && current_quadrant == FIRST_QUADRANT)){
+
+						if(symmetry_status == CW){
+
+							symmetry_type_for_halfcycle = SHORTEN;
+						}
+						else{
+
+							symmetry_type_for_halfcycle = LENGTHEN;
+						}
+					}
+				}
+				else if(current_waveshape == SQUARE_MODE){
+
+					if(current_halfcycle == FIRST_HALFCYCLE){
+
+						if(symmetry_status == CW){
+
+							symmetry_type_for_halfcycle = LENGTHEN;
+						}
+						else{
+
+							symmetry_type_for_halfcycle = SHORTEN;
+						}
+					}
+					else{
+
+						if(symmetry_status == CW){
+
+							symmetry_type_for_halfcycle = SHORTEN;
+						}
+						else{
+
+							symmetry_type_for_halfcycle = LENGTHEN;
+						}
+					}
+				}
+
+				if(symmetry_status == CW){
+
+					pot_rotation_corrected = SYMMETRY_ADC_HALF_SCALE - 1 - current_symmetry;
+				}
+				else{ //CCW
+
+					pot_rotation_corrected = SYMMETRY_ADC_HALF_SCALE - 1 - (SYMMETRY_ADC_FULL_SCALE - current_symmetry);
+				}
+
+				//HAVE TO BE uin16_t FOR 1ST AND 3RD VARIABLES HERE BECAUSE A uint8_t IS LIMITED TO 255!
+				uint16_t two_fifty_six_minus_TIM16_raw_start_value = 256 - TIM16_raw_start_value_to_be_loaded;
+
+				uint16_t two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC = two_fifty_six_minus_TIM16_raw_start_value * pot_rotation_corrected;
+
+				uint16_t two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC_and_shifted_by_ADC_bits = (uint16_t)(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC >> SYMMETRY_ADC_NUM_BITS);
+
+
+				//HAVE TO BE uin16_t HERE BECAUSE A uint8_t IS LIMITED TO 255!
+				uint16_t manipulated_period_shorten = two_fifty_six_minus_TIM16_raw_start_value - two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC_and_shifted_by_ADC_bits; //manipulated shorten will always be less than 256
+
+				uint16_t manipulated_period_lengthen = two_fifty_six_minus_TIM16_raw_start_value + two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC_and_shifted_by_ADC_bits; //manipulated lengthen can be greater than 256 up to 381
+
+
+				if((manipulated_period_lengthen < 256) || ((manipulated_period_lengthen == 256) && (unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) == 0))){
+
+					if(unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) == 128){
+
+						//remainder is 128, which means two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC_and_shifted_by_ADC_bits ends in 0.5
+
+						//manipulated_period_shorten should oscillate over the halfperiod between manipulated_period_shorten and manipulated_period_shorten - 1; //DONE
+						//manipulated_period_lengthen should oscillate over the halfperiod between manipulated_period_lengthen and manipulated_period_lengthen + 1; //DONE
+
+						if(symmetry_type_for_halfcycle == SHORTEN){
+
+							TIM16_final_start_value_oscillation_mode = OSCILLATE_DOWNWARDS;
+						}
+						else if(symmetry_type_for_halfcycle == LENGTHEN){
+
+							TIM16_final_start_value_oscillation_mode = OSCILLATE_UPWARDS;
+						}
+						TIM16_prescaler_adjust_to_be_loaded = DO_NOTHING;
+					}
+					else if(unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) == 0){
+
+						//remainder is zero, which means both shortened and lengthened manipulated periods have no no remainder
+
+						manipulated_period_shorten = manipulated_period_shorten; //do nothing //DONE
+						manipulated_period_lengthen = manipulated_period_lengthen; //do nothing //DONE
+
+						if(symmetry_type_for_halfcycle == SHORTEN){
+							TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
+						}
+						else if(symmetry_type_for_halfcycle == LENGTHEN){
+							TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
+						}
+						TIM16_prescaler_adjust_to_be_loaded = DO_NOTHING;
+					}
+					else if(unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) < 128){
+
+						//remainder is less than 128, which means two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC_and_shifted_by_ADC_bits ends in less than 0.5
+
+						manipulated_period_shorten = manipulated_period_shorten; //do nothing //DONE
+						manipulated_period_lengthen = manipulated_period_lengthen; //do nothing //DONE
+
+						if(symmetry_type_for_halfcycle == SHORTEN){
+							TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
+						}
+						else if(symmetry_type_for_halfcycle == LENGTHEN){
+							TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
+						}
+						TIM16_prescaler_adjust_to_be_loaded = DO_NOTHING;
+					}
+					else if(unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) > 128){
+
+						//remainder is greater than 128, which means two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC_and_shifted_by_ADC_bits ends in more than 0.5
+
+						manipulated_period_shorten = manipulated_period_shorten - 1; //DONE
+						manipulated_period_lengthen = manipulated_period_lengthen + 1; //DONE
+
+						if(symmetry_type_for_halfcycle == SHORTEN){
+							TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
+						}
+						else if(symmetry_type_for_halfcycle == LENGTHEN){
+							TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
+						}
+						TIM16_prescaler_adjust_to_be_loaded = DO_NOTHING;
+					}
+				}
+
+				else if((manipulated_period_lengthen > 256) || ((manipulated_period_lengthen == 256) && (unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) > 0))){
+
+					if(unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) == 128){
+
+						manipulated_period_shorten = manipulated_period_shorten - 1; //DONE
+						//NO NEED TO CHECK IF MANIPULATED_PERIOD_SHORTEN ENDS IN 0.5 AS IN THIS SPECIFIC CONDITION, WE HAVE ELIMINATED THAT POSSIBILITY
+						manipulated_period_lengthen = manipulated_period_lengthen + 1; //DONE
+
+						if(unsigned_bitwise_modulo(manipulated_period_lengthen, 1) == 0){
+
+							manipulated_period_lengthen = manipulated_period_lengthen >> 1; //DONE
+							//DO NOT OSCILLATE BETWEEN VALUES //DONE
+							//prescaler during lengthened halfperiod should be set to half //DONE
+
+							if(symmetry_type_for_halfcycle == SHORTEN){
+								TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
+								TIM16_prescaler_adjust_to_be_loaded = DO_NOTHING;
+							}
+							else if(symmetry_type_for_halfcycle == LENGTHEN){
+								TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
+								TIM16_prescaler_adjust_to_be_loaded = MULTIPLY_BY_TWO;
+							}
+						}
+						else{
+
+							manipulated_period_lengthen = manipulated_period_lengthen >> 1; //DONE
+							//prescaler during lengthened halfperiod should be set to half //DONE
+							//manipulated period_lengthened should oscillate over the halfperiod between manipulated_period_lengthen and manipulated_period_lengthen + 1. //DONE
+
+							if(symmetry_type_for_halfcycle == SHORTEN){
+								TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
+								TIM16_prescaler_adjust_to_be_loaded = DO_NOTHING;
+							}
+							else if(symmetry_type_for_halfcycle == LENGTHEN){
+								TIM16_final_start_value_oscillation_mode = OSCILLATE_UPWARDS;
+								TIM16_prescaler_adjust_to_be_loaded = MULTIPLY_BY_TWO;
+							}
+						}
+					}
+					else if(unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) == 0){
+
+						manipulated_period_shorten = manipulated_period_shorten; //do nothing// //DONE
+
+						if(unsigned_bitwise_modulo(manipulated_period_lengthen, 1) == 0){
+
+							manipulated_period_lengthen = manipulated_period_lengthen >> 1; //DONE
+							//DO NOT OSCILLATE BETWEEN VALUES //DONE
+							//prescaler during lengthened halfperiod should be set to half //DONE
+
+							if(symmetry_type_for_halfcycle == SHORTEN){
+								TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
+								TIM16_prescaler_adjust = DO_NOTHING;
+							}
+							else if(symmetry_type_for_halfcycle == LENGTHEN){
+								TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
+								TIM16_prescaler_adjust = MULTIPLY_BY_TWO;
+							}
+						}
+						else{
+
+							manipulated_period_lengthen = manipulated_period_lengthen >> 1; //DONE
+							//prescaler during lengthened halfperiod should be set to half //DONE
+							//manipulated period_lengthened should oscillate over the halfperiod between manipulated_period_lengthen and manipulated_period_lengthen + 1. //DONE
+
+							if(symmetry_type_for_halfcycle == SHORTEN){
+								TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
+								TIM16_prescaler_adjust = DO_NOTHING;
+							}
+							else if(symmetry_type_for_halfcycle == LENGTHEN){
+								TIM16_final_start_value_oscillation_mode = OSCILLATE_UPWARDS;
+								TIM16_prescaler_adjust = MULTIPLY_BY_TWO;
+							}
+						}
+					}
+					else if(unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) < 128){
+
+						manipulated_period_shorten = manipulated_period_shorten; //do nothing// //DONE
+						//NO NEED TO CHECK IF MANIPULATED_PERIOD_SHORTEN ENDS IN 0.5 AS IN THIS SPECIFIC CONDITION, WE HAVE ELIMINATED THAT POSSIBILITY
+						manipulated_period_lengthen = manipulated_period_lengthen; //do nothing //DONE
+
+						if(unsigned_bitwise_modulo(manipulated_period_lengthen, 1) == 0){
+
+							manipulated_period_lengthen = manipulated_period_lengthen >> 1; //DONE
+							//DO NOT OSCILLATE BETWEEN VALUES //DONE
+							//prescaler during lengthened halfperiod should be set to half //DONE
+
+							if(symmetry_type_for_halfcycle == SHORTEN){
+								TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
+								TIM16_prescaler_adjust_to_be_loaded = DO_NOTHING;
+							}
+							else if(symmetry_type_for_halfcycle == LENGTHEN){
+								TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
+								TIM16_prescaler_adjust_to_be_loaded = MULTIPLY_BY_TWO;
+							}
+						}
+						else{
+
+							manipulated_period_lengthen = manipulated_period_lengthen >> 1; //DONE
+							//prescaler during lengthened halfperiod should be set to half //DONE
+							//manipulated period_lengthened should oscillate over the halfperiod between manipulated_period_lengthen and manipulated_period_lengthen + 1. //DONE
+
+							if(symmetry_type_for_halfcycle == SHORTEN){
+								TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
+								TIM16_prescaler_adjust_to_be_loaded = DO_NOTHING;
+							}
+							else if(symmetry_type_for_halfcycle == LENGTHEN){
+								TIM16_final_start_value_oscillation_mode = OSCILLATE_UPWARDS;
+								TIM16_prescaler_adjust_to_be_loaded = MULTIPLY_BY_TWO;
+							}
+						}
+					}
+					else if(unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) > 128){
+
+						manipulated_period_shorten = manipulated_period_shorten - 1; //DONE
+						//NO NEED TO CHECK IF MANIPULATED_PERIOD_SHORTEN ENDS IN 0.5 AS IN THIS SPECIFIC CONDITION, WE HAVE ELIMINATED THAT POSSIBILITY
+						manipulated_period_lengthen = manipulated_period_lengthen + 1; //DONE
+
+						if(unsigned_bitwise_modulo(manipulated_period_lengthen, 1) == 0){
+
+							manipulated_period_lengthen = manipulated_period_lengthen >> 1; //DONE
+							//DO NOT OSCILLATE BETWEEN VALUES //DONE
+							//prescaler during lengthened halfperiod should be set to half //DONE
+
+							if(symmetry_type_for_halfcycle == SHORTEN){
+								TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
+								TIM16_prescaler_adjust_to_be_loaded = DO_NOTHING;
+							}
+							else if(symmetry_type_for_halfcycle == LENGTHEN){
+								TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
+								TIM16_prescaler_adjust_to_be_loaded = MULTIPLY_BY_TWO;
+							}
+						}
+						else{
+
+							manipulated_period_lengthen = manipulated_period_lengthen >> 1; //DONE
+							//prescaler during lengthened halfperiod should be set to half //DONE
+							//manipulated period_lengthened should oscillate over the halfperiod between manipulated_period_lengthen and manipulated_period_lengthen + 1. //DONE
+
+							if(symmetry_type_for_halfcycle == SHORTEN){
+								TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
+								TIM16_prescaler_adjust_to_be_loaded = DO_NOTHING;
+							}
+							else if(symmetry_type_for_halfcycle == LENGTHEN){
+								TIM16_final_start_value_oscillation_mode = OSCILLATE_UPWARDS;
+								TIM16_prescaler_adjust_to_be_loaded = MULTIPLY_BY_TWO;
+							}
+						}
+					}
+				}
+
+			//DETERMINE THE TIM16_FINAL_START_VALUE FROM MANIPULATED_PERIOD_LENGTHEN/SHORTEN CALCULATED
+			//NOTE INVERSE RELATIONSHIP BETWEEN TIM16_FINAL_START_VALUE AND MANIPULATED_PERIOD_LENGTHEN/SHORTEN BECAUSE 256-TIM16_FINAL_START_VALUE = MANIPULATED_PERIOD_LENGTHEN/SHORTEN
+			//ODD VALUES OF CURRENT_INDEX WILL FEATURE THE ADJUSTED(OSCILLATED) VALUE
+			if(symmetry_type_for_halfcycle == SHORTEN){
+
+				if(TIM16_final_start_value_oscillation_mode == DO_NOT_OSCILLATE){
+
+					TIM16_final_start_value_to_be_loaded = 256 - manipulated_period_shorten;
+				}
+				else if(TIM16_final_start_value_oscillation_mode == OSCILLATE_UPWARDS){
+
+					if(unsigned_bitwise_modulo(current_index, 1) == 0){ //if current index is even
+
+						TIM16_final_start_value_to_be_loaded = 256 - manipulated_period_shorten;
+					}
+					else{ //if current index is odd
+
+						TIM16_final_start_value_to_be_loaded = 256 - manipulated_period_shorten - 1;
+					}
+				}
+				else if(TIM16_final_start_value_oscillation_mode == OSCILLATE_DOWNWARDS){
+
+					if(unsigned_bitwise_modulo(current_index, 1) == 0){ //if current index is even
+
+						TIM16_final_start_value_to_be_loaded = 256 - manipulated_period_shorten;
+					}
+					else{ //if current index is odd
+
+						TIM16_final_start_value_to_be_loaded = 256 - manipulated_period_shorten + 1;
+					}
+				}
+			}
+			else if(symmetry_type_for_halfcycle == LENGTHEN){
+
+				if(TIM16_final_start_value_oscillation_mode == DO_NOT_OSCILLATE){
+
+					TIM16_final_start_value_to_be_loaded = 256 - manipulated_period_lengthen;
+				}
+				else if(TIM16_final_start_value_oscillation_mode == OSCILLATE_UPWARDS){
+
+					if(unsigned_bitwise_modulo(current_index, 1) == 0){ //if current index is even
+
+						TIM16_final_start_value_to_be_loaded = 256 - manipulated_period_lengthen;
+					}
+					else{ //if current index is odd
+
+						TIM16_final_start_value_to_be_loaded = 256 - manipulated_period_lengthen - 1;
+					}
+				}
+				else if(TIM16_final_start_value_oscillation_mode == OSCILLATE_DOWNWARDS){
+
+					if(unsigned_bitwise_modulo(current_index, 1) == 0){ //if current index is even
+
+						TIM16_final_start_value_to_be_loaded = 256 - manipulated_period_lengthen;
+					}
+					else{ //if current index is odd
+
+						TIM16_final_start_value_to_be_loaded = 256 - manipulated_period_lengthen + 1;
+					}
+				}
+			}
+
+			//ADJUST PRESCALER
+			if(TIM16_prescaler_adjust_to_be_loaded == MULTIPLY_BY_TWO){
+
+				TIM16_final_prescaler_to_be_loaded = TIM16_raw_prescaler_to_be_loaded << 1; //multiply by 2
+			}
+			else if(TIM16_prescaler_adjust_to_be_loaded == DO_NOTHING){
+
+					TIM16_final_prescaler_to_be_loaded = TIM16_raw_prescaler_to_be_loaded;
+			}
+
+			#endif
+
+			#if SYMMETRY_ON_OR_OFF == OFF
+				TIM16_final_start_value_to_be_loaded = TIM16_raw_start_value_to_be_loaded;
+				TIM16_final_prescaler_to_be_loaded = TIM16_raw_prescaler_to_be_loaded;
+			#endif
 
 	return 1;
 }
