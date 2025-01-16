@@ -182,7 +182,7 @@ Discarded input sections
  .debug_macro   0x00000000       0xd0 ./Core/Src/MIDI_defines.o
  .debug_macro   0x00000000      0x124 ./Core/Src/MIDI_defines.o
  .debug_line    0x00000000      0x804 ./Core/Src/MIDI_defines.o
- .debug_str     0x00000000    0x97bdf ./Core/Src/MIDI_defines.o
+ .debug_str     0x00000000    0x97bde ./Core/Src/MIDI_defines.o
  .comment       0x00000000       0x44 ./Core/Src/MIDI_defines.o
  .ARM.attributes
                 0x00000000       0x28 ./Core/Src/MIDI_defines.o
@@ -5493,50 +5493,50 @@ LOAD C:/ST/STM32CubeIDE_1.16.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.ext
  .debug_line    0x0001c6b0     0x70f7 ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_uart.o
  .debug_line    0x000237a7     0x15d7 ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_uart_ex.o
 
-.debug_str      0x00000000    0x9ea10
- .debug_str     0x00000000    0x9943b ./Core/Src/config.o
-                              0x9a00c (size before relaxing)
- .debug_str     0x0009943b      0x57f ./Core/Src/custom_callbacks.o
-                              0x99483 (size before relaxing)
- .debug_str     0x000999ba       0xf4 ./Core/Src/main.o
-                              0x98587 (size before relaxing)
- .debug_str     0x00099aae      0x216 ./Core/Src/stm32g0xx_hal_msp.o
+.debug_str      0x00000000    0x9ea0f
+ .debug_str     0x00000000    0x9943a ./Core/Src/config.o
+                              0x9a00b (size before relaxing)
+ .debug_str     0x0009943a      0x57f ./Core/Src/custom_callbacks.o
+                              0x99482 (size before relaxing)
+ .debug_str     0x000999b9       0xf4 ./Core/Src/main.o
+                              0x98586 (size before relaxing)
+ .debug_str     0x00099aad      0x216 ./Core/Src/stm32g0xx_hal_msp.o
                               0x98c75 (size before relaxing)
- .debug_str     0x00099cc4      0x17f ./Core/Src/stm32g0xx_it.o
-                              0x98be2 (size before relaxing)
- .debug_str     0x00099e43      0x6d1 ./Core/Src/system.o
-                              0x99a85 (size before relaxing)
- .debug_str     0x0009a514       0x8e ./Core/Src/system_stm32g0xx.o
+ .debug_str     0x00099cc3      0x17f ./Core/Src/stm32g0xx_it.o
+                              0x98be1 (size before relaxing)
+ .debug_str     0x00099e42      0x6d1 ./Core/Src/system.o
+                              0x99a84 (size before relaxing)
+ .debug_str     0x0009a513       0x8e ./Core/Src/system_stm32g0xx.o
                               0x973ab (size before relaxing)
- .debug_str     0x0009a5a2       0x44 ./Core/Startup/startup_stm32g031k8tx.o
+ .debug_str     0x0009a5a1       0x44 ./Core/Startup/startup_stm32g031k8tx.o
                                  0x73 (size before relaxing)
- .debug_str     0x0009a5e6      0x571 ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal.o
+ .debug_str     0x0009a5e5      0x571 ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal.o
                               0x97b81 (size before relaxing)
- .debug_str     0x0009ab57      0x8d3 ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_adc.o
+ .debug_str     0x0009ab56      0x8d3 ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_adc.o
                               0x983be (size before relaxing)
- .debug_str     0x0009b42a      0x1e2 ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_adc_ex.o
+ .debug_str     0x0009b429      0x1e2 ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_adc_ex.o
                               0x97c01 (size before relaxing)
- .debug_str     0x0009b60c      0x28b ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_cortex.o
+ .debug_str     0x0009b60b      0x28b ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_cortex.o
                               0x97827 (size before relaxing)
- .debug_str     0x0009b897      0x261 ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_dma.o
+ .debug_str     0x0009b896      0x261 ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_dma.o
                               0x97845 (size before relaxing)
- .debug_str     0x0009baf8      0x12c ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_gpio.o
+ .debug_str     0x0009baf7      0x12c ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_gpio.o
                               0x974d2 (size before relaxing)
- .debug_str     0x0009bc24      0x5a2 ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_lptim.o
+ .debug_str     0x0009bc23      0x5a2 ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_lptim.o
                               0x97e36 (size before relaxing)
- .debug_str     0x0009c1c6      0x37b ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_pwr_ex.o
+ .debug_str     0x0009c1c5      0x37b ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_pwr_ex.o
                               0x97824 (size before relaxing)
- .debug_str     0x0009c541      0x4ae ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_rcc.o
+ .debug_str     0x0009c540      0x4ae ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_rcc.o
                               0x97b01 (size before relaxing)
- .debug_str     0x0009c9ef      0x185 ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_rcc_ex.o
+ .debug_str     0x0009c9ee      0x185 ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_rcc_ex.o
                               0x9773a (size before relaxing)
- .debug_str     0x0009cb74      0xd1f ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_tim.o
+ .debug_str     0x0009cb73      0xd1f ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_tim.o
                               0x98f76 (size before relaxing)
- .debug_str     0x0009d893      0x4a0 ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_tim_ex.o
+ .debug_str     0x0009d892      0x4a0 ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_tim_ex.o
                               0x984d8 (size before relaxing)
- .debug_str     0x0009dd33      0xa15 ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_uart.o
+ .debug_str     0x0009dd32      0xa15 ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_uart.o
                               0x986f9 (size before relaxing)
- .debug_str     0x0009e748      0x2c8 ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_uart_ex.o
+ .debug_str     0x0009e747      0x2c8 ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_uart_ex.o
                               0x97d4f (size before relaxing)
 
 .comment        0x00000000       0x43
