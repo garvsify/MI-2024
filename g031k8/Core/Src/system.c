@@ -644,7 +644,7 @@ uint8_t Check_Tap_Tempo_Switch_State(enum Tap_Tempo_Switch_State *tap_tempo_swit
 
 	uint8_t switch_state = (uint8_t)HAL_GPIO_ReadPin(SW_IN_GPIO_Port, SW_IN_Pin);
 
-	if(switch_state == 0){
+	/*if(switch_state == 0){
 
 		if(tap_tempo_switch_state_counter != 0){
 
@@ -672,6 +672,13 @@ uint8_t Check_Tap_Tempo_Switch_State(enum Tap_Tempo_Switch_State *tap_tempo_swit
 	}
 	else if(tap_tempo_switch_state_counter == TAP_TEMPO_SWITCH_CONFIDENCE_COUNT){
 
+		*tap_tempo_switch_state_ptr = NOT_DEPRESSED;
+	}*/
+
+	if(switch_state == 0){
+		*tap_tempo_switch_state_ptr = DEPRESSED;
+	}
+	else{
 		*tap_tempo_switch_state_ptr = NOT_DEPRESSED;
 	}
 

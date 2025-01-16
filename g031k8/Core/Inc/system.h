@@ -37,7 +37,7 @@
 #define INITIAL_PWM_VALUE 512
 //#define LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK 4001 - 1 //4ms overflow with prescaler of 128
 //#define LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK 1001 - 1 //2ms overflow with prescaler of 128
-#define LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK 501 - 1 //1ms overflow with prescaler of 128
+#define LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK 251 - 1 //0.5ms overflow with prescaler of 128
 #define TAP_TEMPO_SWITCH_CONFIDENCE_COUNT 1
 #define COUNT_TO_DELAY_RISING_TAP_TEMPO_EDGE 1
 
