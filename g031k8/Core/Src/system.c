@@ -706,6 +706,10 @@ uint8_t Input_Capture_Processing(volatile uint16_t interrupt_period_value){
 
 	input_capture_processing_can_be_started = NO; //reset flag
 
+	uint8_t current_waveshape_to_be_loaded = current_waveshape;
+	uint8_t current_symmetry_to_be_loaded = current_symmetry;
+	current_depth_to_be_loaded = current_depth;
+
 	//DETERMINE WHAT TO SET THE RAW_START_VALUE AND BASE_PRESCALER TO BASED ON THE I/P CAPTURE VALUE
 	//CHECK FOR PRIMALITY
 	if(isPrime(interrupt_period_value) == YES){
@@ -752,16 +756,16 @@ uint8_t Input_Capture_Processing(volatile uint16_t interrupt_period_value){
 	}
 
 	//ONCE INDEX IS SET, FIND THE DUTY VALUE
-	if(current_waveshape == TRIANGLE_MODE){
-		duty_to_be_loaded = tri_wavetable[current_index];
+	if(current_waveshape_to_be_loaded == TRIANGLE_MODE){
+		duty_to_be_loaded = tri_wavetable[current_index_to_be_loaded];
 	}
-	else if(current_waveshape == SINE_MODE){
-		duty_to_be_loaded = sine_wavetable[current_index];
+	else if(current_waveshape_to_be_loaded == SINE_MODE){
+		duty_to_be_loaded = sine_wavetable[current_index_to_be_loaded];
 	}
-	else if((current_waveshape == SQUARE_MODE) && (current_index < THIRD_QUADRANT_START_INDEX)){
+	else if((current_waveshape_to_be_loaded == SQUARE_MODE) && (current_index_to_be_loaded < THIRD_QUADRANT_START_INDEX)){
 		duty_to_be_loaded = 1023;
 	}
-	else if((current_waveshape == SQUARE_MODE) && (current_index >= THIRD_QUADRANT_START_INDEX)){
+	else if((current_waveshape_to_be_loaded == SQUARE_MODE) && (current_index_to_be_loaded >= THIRD_QUADRANT_START_INDEX)){
 		duty_to_be_loaded = 0;
 	}
 
@@ -773,10 +777,10 @@ uint8_t Input_Capture_Processing(volatile uint16_t interrupt_period_value){
 
 			duty_to_be_loaded = 1023 - duty_to_be_loaded;
 		}
-		else if(current_depth != 0){
+		else if(current_depth_to_be_loaded != 0){
 			//duty = 1023 - duty*(current_depth >> 8);
 			uint32_t multiply_product = 0;
-			multiply_product = duty * current_depth; //compiler should compile this as a hardware multiplication, but need to check
+			multiply_product = duty * current_depth_to_be_loaded; //compiler should compile this as a hardware multiplication, but need to check
 			duty_to_be_loaded = 1023 - (uint16_t)(multiply_product >> 8);
 		}
 		else{
@@ -791,14 +795,14 @@ uint8_t Input_Capture_Processing(volatile uint16_t interrupt_period_value){
 		enum Symmetry_Type symmetry_type_for_halfcycle = SHORTEN;
 		uint8_t pot_rotation_corrected = 0;
 		uint8_t symmetry_status = CW;
-		if(current_symmetry < SYMMETRY_ADC_HALF_SCALE){ //adc = 0-127
+		if(current_symmetry_to_be_loaded < SYMMETRY_ADC_HALF_SCALE){ //adc = 0-127
 			symmetry_status = CW;
 		}
 		else{ //adc is 128-255
 			symmetry_status = CCW;
 		}
-		if((current_waveshape == SINE_MODE) || (current_waveshape == TRIANGLE_MODE)){
-			if((current_halfcycle == FIRST_HALFCYCLE && current_quadrant == FIRST_QUADRANT) || (current_halfcycle == SECOND_HALFCYCLE && current_quadrant == SECOND_QUADRANT)){
+		if((current_waveshape_to_be_loaded == SINE_MODE) || (current_waveshape_to_be_loaded == TRIANGLE_MODE)){
+			if((current_halfcycle_to_be_loaded == FIRST_HALFCYCLE && current_quadrant_to_be_loaded == FIRST_QUADRANT) || (current_halfcycle_to_be_loaded == SECOND_HALFCYCLE && current_quadrant_to_be_loaded == SECOND_QUADRANT)){
 				if(symmetry_status == CW){
 					symmetry_type_for_halfcycle = LENGTHEN;
 				}
@@ -815,8 +819,8 @@ uint8_t Input_Capture_Processing(volatile uint16_t interrupt_period_value){
 				}
 			}
 		}
-		else if(current_waveshape == SQUARE_MODE){
-			if(current_halfcycle == FIRST_HALFCYCLE){
+		else if(current_waveshape_to_be_loaded == SQUARE_MODE){
+			if(current_halfcycle_to_be_loaded == FIRST_HALFCYCLE){
 				if(symmetry_status == CW){
 					symmetry_type_for_halfcycle = LENGTHEN;
 				}
@@ -834,10 +838,10 @@ uint8_t Input_Capture_Processing(volatile uint16_t interrupt_period_value){
 			}
 		}
 		if(symmetry_status == CW){
-			pot_rotation_corrected = SYMMETRY_ADC_HALF_SCALE - 1 - current_symmetry;
+			pot_rotation_corrected = SYMMETRY_ADC_HALF_SCALE - 1 - current_symmetry_to_be_loaded;
 		}
 		else{ //CCW
-			pot_rotation_corrected = SYMMETRY_ADC_HALF_SCALE - 1 - (SYMMETRY_ADC_FULL_SCALE - current_symmetry);
+			pot_rotation_corrected = SYMMETRY_ADC_HALF_SCALE - 1 - (SYMMETRY_ADC_FULL_SCALE - current_symmetry_to_be_loaded);
 		}
 		//HAVE TO BE uin16_t FOR 1ST AND 3RD VARIABLES HERE BECAUSE A uint8_t IS LIMITED TO 255!
 
