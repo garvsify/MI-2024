@@ -154,6 +154,7 @@ volatile extern enum Validate UART_DMA_TX_is_complete;
 volatile extern char rx_buffer[1];
 extern uint8_t tap_tempo_switch_state_counter;
 extern enum Tap_Tempo_Switch_State tap_tempo_switch_state;
+volatile extern enum Validate input_capture_processing_can_be_started;
 
 //CUSTOM TYPES
 enum Polarity{
@@ -212,10 +213,11 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(volatile uint16_t TI
 																volatile uint16_t current_symmetry_value, volatile uint16_t current_waveshape_value, volatile uint8_t current_halfcycle_value, volatile uint8_t current_quadrant_value, volatile uint16_t current_index_value);
 uint8_t Adjust_TIM16_Prescaler(volatile enum Adjust_Prescaler_Action TIM16_prescaler_adjustment, volatile uint16_t *TIM16_final_prescaler_ptr, volatile uint16_t TIM16_raw_prescaler_value);
 uint32_t unsigned_bitwise_modulo(uint32_t dividend, uint8_t base_2_exponent);
-uint8_t Speed_pot_check(void);
+uint8_t Speed_Pot_Check(void);
 uint8_t Check_Tap_Tempo_Switch_State(enum Tap_Tempo_Switch_State *tap_tempo_switch_state_ptr);
 uint8_t Start_Tap_Tempo_Monitoring_Timers_and_UART_Receive(void);
 
-uint8_t isPrime(uint16_t x);
+enum Validate isPrime(uint16_t x);
+uint8_t Input_Capture_Processing(volatile uint16_t interrupt_period_value);
 
 #endif
