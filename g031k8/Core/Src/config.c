@@ -303,6 +303,8 @@ void MX_TIM3_Init(void)
     Error_Handler();
   }
 
+  __HAL_TIM_DISABLE_OCxPRELOAD(&htim3, TIM_CHANNEL_1);
+
   /* USER CODE BEGIN TIM3_Init 2 */
 
   /* USER CODE END TIM3_Init 2 */

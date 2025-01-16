@@ -215,9 +215,9 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 
 	if(input_capture_event == FIRST){ //edge detected is the first
 
+		__HAL_TIM_SET_COUNTER(&htim2, 0); //begin measurement
 		speed_pot_is_disabled = YES;
 		input_capture_measurement_is_ongoing = YES;
-		__HAL_TIM_SET_COUNTER(&htim2, 0); //begin measurement
 
 		input_capture_event = SECOND;
 	}
@@ -230,9 +230,8 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 
 			//second edge was received when the measurement reelapse was ongoing
 			//This should restart the measurement reelapse (discarding the previous measurement)
-			Stop_OC_TIM(&htim3, TIM_CHANNEL_1);
-			__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, interrupt_period);
 			__HAL_TIM_SET_COUNTER(&htim3, 0);
+			__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, interrupt_period);
 			Start_OC_TIM(&htim3, TIM_CHANNEL_1);
 		}
 		else{
@@ -244,8 +243,8 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 
 				//start TIM3 from 0 with CCR loaded with TIM2_ch1_input_capture_value
 				//CCR shouldn't be preloaded so *should* update instantaneously
-				__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, HIGHEST_PRESCALER_TOP_SPEED_PERIOD);
 				__HAL_TIM_SET_COUNTER(&htim3, 0);
+				__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, HIGHEST_PRESCALER_TOP_SPEED_PERIOD);
 				Start_OC_TIM(&htim3, TIM_CHANNEL_1);
 
 				//set I/P capture measurement re-elapse 1 is ongoing flag
@@ -257,8 +256,8 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 
 				//start TIM3 from 0 with CCR loaded with TIM2_ch1_input_capture_value
 				//CCR shouldn't be preloaded so *should* update instantaneously
-				__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, interrupt_period); //measured value divided by 512
 				__HAL_TIM_SET_COUNTER(&htim3, 0);
+				__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, interrupt_period); //measured value divided by 512
 				Start_OC_TIM(&htim3, TIM_CHANNEL_1);
 
 				//set I/P capture measurement re-elapse is ongoing flag
@@ -276,9 +275,9 @@ void TIM2_ch1_overflow_callback(TIM_HandleTypeDef *htim){
 
 	if(input_capture_measurement_is_ongoing == YES && input_capture_event == SECOND){
 
-		/*overflow has occurred at a time when an input capture measurement is occurring, which means input capture event would have been the second if it it did occur.
-		This means that the user has depressed the switch once, and hasn't pressed again within the timeout period.
-		Thus, reset everything requiring the user to press the switch again to start another capture*/
+		//overflow has occurred at a time when an input capture measurement is occurring, which means input capture event would have been the second if it it did occur.
+		//This means that the user has depressed the switch once, and hasn't pressed again within the timeout period.
+		//Thus, reset everything requiring the user to press the switch again to start another capture
 
 		input_capture_measurement_is_ongoing = NO;
 		input_capture_event = FIRST;
