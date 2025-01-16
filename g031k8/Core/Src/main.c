@@ -1,5 +1,23 @@
 /*NOTES ON THIS BUILD:
 
+Issues:
+
+- 2Hz on signal generator makes wave twice as fast???? But only at this specific frequency????
+
+- Can't go above 7Hz on signal generator
+
+- Abruptly changing signal gen freq can brick the oscillator
+
+
+Fixed:
+
+- Speed pot check was missing tap_tempo_is_on lol
+
+
+To do:
+
+- Make 'Tap tempo IN' and 'CLK IN' separate pins
+
 */
 
 //INCLUDES

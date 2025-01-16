@@ -217,6 +217,7 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 
 		__HAL_TIM_SET_COUNTER(&htim2, 0); //begin measurement
 		speed_pot_is_disabled = YES;
+		tap_tempo_mode_is_active = YES;
 		input_capture_measurement_is_ongoing = YES;
 
 		input_capture_event = SECOND;
