@@ -14,7 +14,7 @@
 #define TRIANGLE_MODE 0
 #define SINE_MODE 1
 #define SQUARE_MODE 2
-#define NUMBER_OF_FREQUENCY_STEPS 625 //625 is the max. possible if prescaler array is limited to index 5
+#define NUMBER_OF_FREQUENCY_STEPS 660
 #define FIRST_HALFCYCLE 0
 #define SECOND_HALFCYCLE 1
 #define FIRST_QUADRANT 0
@@ -215,5 +215,7 @@ uint32_t unsigned_bitwise_modulo(uint32_t dividend, uint8_t base_2_exponent);
 uint8_t Speed_pot_check(void);
 uint8_t Check_Tap_Tempo_Switch_State(enum Tap_Tempo_Switch_State *tap_tempo_switch_state_ptr);
 uint8_t Start_Tap_Tempo_Monitoring_Timers_and_UART_Receive(void);
+
+uint8_t isPrime(uint16_t x);
 
 #endif

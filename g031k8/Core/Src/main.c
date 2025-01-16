@@ -1,5 +1,7 @@
 /*NOTES ON THIS BUILD:
 
+***This won't build, just committing to show the code test I've done (using code at the bottom of main.c)***
+
 */
 
 //INCLUDES
@@ -38,6 +40,48 @@ int main(void)
 	return 1;
 }
 
+#include <stdio.h>
+#include <stdint.h>
+
+uint8_t isPrime(uint16_t x);
+
+uint16_t periods[129] = {0};
+uint8_t check[129] = {0};
+
+int main()
+{
+    //initialise period values in array
+	for(uint8_t p = 0; p < 129; p++){
+
+		periods[p] = 256 - p;
+	}
+
+    for(uint16_t u = 0; u < 66048-8256; u++){
+        if(isPrime(66048-u) == 0){
+            for(uint8_t i = 0; i < 129; i++){
+                if((66048 - u) % periods[i] == 0){
+                	check[i] = 1;
+	            }
+	        }
+	    }
+	}
+
+	for(uint8_t p = 0; p < 129; p++){
+
+		printf("%d\n",check[p]);
+	}
+
+    return 0;
+}
+
+
+uint8_t isPrime(uint16_t x){
+    for (int d = 2; d * d <= x; d++) {
+        if (x % d == 0)
+            return 0;
+    }
+    return x >= 2;
+}
 
 
 
