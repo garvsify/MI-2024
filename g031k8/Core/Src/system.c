@@ -53,10 +53,7 @@ uint8_t Startup(void){
 		delay_line.duty_delay_line_storage_array[i] = INITIAL_PWM_VALUE;
 	}
 
-
 	__HAL_TIM_ENABLE_IT(&htim2, TIM_IT_UPDATE); //make sure the overflow (update) interrupt is enabled for TIM2
-
-
 
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions);
 
@@ -65,12 +62,10 @@ uint8_t Startup(void){
 
 	HAL_ADC_Stop_DMA(&hadc1);
 
-
-
 	//SET DEFAULT PIN STATES
 	HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1); //latch high the debounced o/p
 	HAL_GPIO_WritePin(HACK_POT_HIGH_GPIO_Port, HACK_POT_HIGH_Pin, 1);
-	HAL_GPIO_WritePin(HACK_POT_LOW_GPIO_Port, HACK_POT_LOW_Pin, 1);
+	HAL_GPIO_WritePin(HACK_POT_LOW_GPIO_Port, HACK_POT_LOW_Pin, 0);
 
 	return 1;
 }
@@ -762,28 +757,28 @@ uint8_t Calculate_Next_Main_Oscillator_Values(struct Params* params_ptr, enum Ne
 		params_ptr->duty = sine_wavetable[params_ptr->index];
 	}
 	else if((params_ptr->waveshape == SQUARE_MODE) && (params_ptr->index < THIRD_QUADRANT_START_INDEX)){
-		params_ptr->duty = 1023;
+		params_ptr->duty = PWM_DUTY_VALUE_MAX;
 	}
 	else if((params_ptr->waveshape == SQUARE_MODE) && (params_ptr->index >= THIRD_QUADRANT_START_INDEX)){
-		params_ptr->duty = 0;
+		params_ptr->duty = PWM_DUTY_VALUE_MIN;
 	}
 
 	//APPLY DEPTH
 	#if DEPTH_ON_OR_OFF == 1
 
 		//Apply Depth
-		if(params_ptr->depth == 255){
-			params_ptr->duty = 1023 - params_ptr->duty;
+		if(params_ptr->depth == ((1 << DEPTH_ADC_RESOLUTION) - 1)){ //255
+			params_ptr->duty = PWM_DUTY_VALUE_MAX - params_ptr->duty;
 		}
 		else if(params_ptr->depth != 0){
 
 			//duty = 1023 - duty*(current_depth >> 8);
 			uint32_t multiply_product = 0;
 			multiply_product = (params_ptr->duty) * (params_ptr->depth);
-			params_ptr->duty = 1023 - (multiply_product >> 8);
+			params_ptr->duty = PWM_DUTY_VALUE_MAX - (multiply_product >> 8);
 		}
 		else{
-			params_ptr->duty = 1023; //if depth is 0, just output 1023
+			params_ptr->duty = PWM_DUTY_VALUE_MAX; //if depth is 0, just output 1023
 		}
 
 	#endif
@@ -832,7 +827,7 @@ uint8_t Write_Next_Main_Oscillator_Values_to_Delay_Line(struct Params* params_pt
 uint8_t Process_ADC_Conversion_Values(struct Params* params_ptr, struct Delay_Line* delay_line_ptr, volatile uint16_t* ADCResultsDMA_ptr){
 
 	//GET WAVESHAPE
-	uint16_t ADC_result = ADCResultsDMA_ptr[WAVESHAPE_ADC_RESULT_ARRAY_POS]; //set ADC_Result to waveshape index value
+	uint16_t ADC_result = ADCResultsDMA_ptr[WAVESHAPE_ADC_RESULT_INDEX]; //set ADC_Result to waveshape index value
 
 	if(ADC_result <= TRIANGLE_MODE_ADC_THRESHOLD){
 		params_ptr->waveshape = TRIANGLE_MODE; //triangle wave
@@ -845,24 +840,24 @@ uint8_t Process_ADC_Conversion_Values(struct Params* params_ptr, struct Delay_Li
 	}
 
 	//GET SPEED
-	params_ptr->speed = ADCResultsDMA_ptr[SPEED_ADC_RESULT_ARRAY_POS] >> 2; //convert to 10-bit
+	params_ptr->speed = ADCResultsDMA_ptr[SPEED_ADC_RESULT_INDEX] >> 2; //convert to 10-bit
 
 	//GET DEPTH
 	#if DEPTH_ON_OR_OFF == ON
 
-		params_ptr->depth = ADCResultsDMA[DEPTH_ADC_RESULT_ARRAY_POS] >> 4; //convert to 8-bit
+		params_ptr->depth = ADCResultsDMA_ptr[DEPTH_ADC_RESULT_INDEX] >> 4; //convert to 8-bit
 
 	#endif
 
 	//GET SYMMETRY
 	#if SYMMETRY_ON_OR_OFF == ON
 
-		params_ptr->symmetry = ADCResultsDMA[SYMMETRY_ADC_RESULT_ARRAY_POS] >> 4;
+		params_ptr->symmetry = ADCResultsDMA_ptr[SYMMETRY_ADC_RESULT_INDEX] >> 4;
 
 	#endif
 
 	//GET DELAY LINE READ POINTER OFFSET
-	delay_line_ptr->duty_delay_line_read_pointer_offset = ADCResultsDMA[DUTY_DELAY_LINE_READ_POINTER_OFFSET_ADC_RESULT_ARRAY_POS] >> 3;
+	delay_line_ptr->duty_delay_line_read_pointer_offset = ADCResultsDMA_ptr[DUTY_DELAY_LINE_READ_POINTER_OFFSET_ADC_RESULT_INDEX] >> 3;
 
 	return 1;
 }
