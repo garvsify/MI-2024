@@ -718,8 +718,6 @@ uint8_t Calculate_Next_Main_Oscillator_Values(struct Params* params_ptr, enum Ne
 		params_ptr->index++;
 
 		if(params_ptr->index == FINAL_INDEX + 1){
-			params_ptr->quadrant = FIRST_QUADRANT;
-			params_ptr->halfcycle = FIRST_HALFCYCLE;
 			params_ptr->index = 0;
 		}
 
@@ -865,6 +863,25 @@ uint8_t Process_ADC_Conversion_Values(struct Params* params_ptr, struct Delay_Li
 
 	//GET DELAY LINE READ POINTER OFFSET
 	delay_line_ptr->duty_delay_line_read_pointer_offset = ADCResultsDMA[DUTY_DELAY_LINE_READ_POINTER_OFFSET_ADC_RESULT_ARRAY_POS] >> 3;
+
+	return 1;
+}
+
+uint8_t Set_Oscillator_Values(struct Params* params_ptr){
+
+	////////////////////////////////////////////////////////
+	//SET THE CURRENT(prev) VALUES FOR THE MAIN OSCILLATOR//
+	////////////////////////////////////////////////////////
+	TIM16->EGR |= TIM_EGR_UG; //DO NOT DELETE THIS LINE, IT LITERALLY MAKES OR BREAKS THE BASTARD - It triggers an 'update' event
+	__HAL_TIM_SET_COUNTER(&htim16, params_ptr->final_start_value); //this line must go here, or at least very near the beginning!
+	__HAL_TIM_SET_PRESCALER(&htim16, (params_ptr->final_prescaler - 1)); //have to take one off the divisor
+	TIM1->EGR |= TIM_EGR_UG; //not sure if we really need this line but gonna keep it here because it worked wonders for TIM16
+	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, params_ptr->prev_duty); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
+
+	/////////////////////////////////////////////////////////////
+	//SET THE CURRENT(prev) VALUES FOR THE SECONDARY OSCILLATOR//
+	/////////////////////////////////////////////////////////////
+	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, params_ptr->duty_delayed); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
 
 	return 1;
 }

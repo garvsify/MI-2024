@@ -236,4 +236,6 @@ uint8_t Calculate_Next_Main_Oscillator_Values(struct Params* params_ptr, enum Ne
 uint8_t Write_Next_Main_Oscillator_Values_to_Delay_Line(struct Params* params_ptr, struct Delay_Line* delay_line_ptr);
 uint8_t Process_ADC_Conversion_Values(struct Params* params_ptr, struct Delay_Line* delay_line_ptr, volatile uint16_t* ADCResultsDMA_ptr);
 
+uint8_t Set_Oscillator_Values(struct Params* params_ptr);
+
 #endif

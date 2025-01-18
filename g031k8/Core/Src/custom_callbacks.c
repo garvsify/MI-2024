@@ -2,21 +2,7 @@
 
 void TIM16_callback(TIM_HandleTypeDef *htim)
 {
-	////////////////////////////////////////////////////////
-	//SET THE CURRENT(prev) VALUES FOR THE MAIN OSCILLATOR//
-	////////////////////////////////////////////////////////
-	TIM16->EGR |= TIM_EGR_UG; //DO NOT DELETE THIS LINE, IT LITERALLY MAKES OR BREAKS THE BASTARD - It triggers an 'update' event
-	__HAL_TIM_SET_COUNTER(&htim16, params.final_start_value); //this line must go here, or at least very near the beginning!
-	__HAL_TIM_SET_PRESCALER(&htim16, (params.final_prescaler - 1)); //have to take one off the divisor
-	TIM1->EGR |= TIM_EGR_UG; //not sure if we really need this line but gonna keep it here because it worked wonders for TIM16
-	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, params.prev_duty); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
-
-	/////////////////////////////////////////////////////////////
-	//SET THE CURRENT(prev) VALUES FOR THE SECONDARY OSCILLATOR//
-	/////////////////////////////////////////////////////////////
-	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, params.duty_delayed); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
-
-
+	Set_Oscillator_Values(&params);
 	Calculate_Next_Main_Oscillator_Values(&params, (enum Next_Values_Processing_Mode)REGULAR_MODE);
 	Write_Next_Main_Oscillator_Values_to_Delay_Line(&params, &delay_line);
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions); //this function takes ages to execute!
@@ -131,14 +117,7 @@ void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
 
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
 
-	TIM16->EGR |= TIM_EGR_UG; //DO NOT DELETE THIS LINE, IT LITERALLY MAKES OR BREAKS THE BASTARD - It triggers an 'update' event
-	__HAL_TIM_SET_COUNTER(&htim16, params_to_be_loaded.final_start_value); //this line must go here, or at least very near the beginning!
-	__HAL_TIM_SET_PRESCALER(&htim16, params_to_be_loaded.final_prescaler - 1); //have to take one off the divisor
-	TIM1->EGR |= TIM_EGR_UG; //not sure if we really need this line but gonna keep it here because it worked wonders for TIM16
-	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, params_to_be_loaded.duty); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
-
-	//ADD CODE TO REPLACE THE BELOW CODE THAT WORKS OUT THE SECONDARY OSCILLATOR DELAYED VALUE SO BOTH CAN UPDATE SIMULTANEOUSLY, IT WILL BE MUCH BETTER THAT WAY
-	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, params.duty_delayed); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
+	Set_Oscillator_Values(&params);
 
 	Stop_OC_TIM(&htim3, TIM_CHANNEL_1);
 	input_capture_measurement_reelapse_is_ongoing = NO;
