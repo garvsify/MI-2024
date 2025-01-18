@@ -42,8 +42,8 @@ int main(void)
 	//ENABLE INTERRUPTS
 	Global_Interrupt_Enable();
 
-	//START TAP TEMPO SWITCH MONITORING AND UART RECEIVE
-	Start_Tap_Tempo_Monitoring_Timers_and_UART_Receive();
+	//START UART RECEIVE
+	Start_UART_Receive();
 
 	while (1)
 	{
@@ -55,7 +55,7 @@ int main(void)
 
 		if(input_capture_processing_can_be_started == YES){
 
-			Input_Capture_Processing(interrupt_period);
+			Input_Capture_Processing(interrupt_period, &params_to_be_loaded);
 		}
 	}
 	return 1;
