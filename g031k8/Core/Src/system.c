@@ -23,6 +23,7 @@ enum Tap_Tempo_Switch_State tap_tempo_switch_state = NOT_DEPRESSED;
 volatile enum Validate input_capture_processing_can_be_started = NO;
 volatile enum Validate external_clock_mode_is_active = NO;
 volatile enum Validate tap_tempo_mode_is_active = NO;
+volatile enum Validate TIM16_callback_finished = NO;
 
 //STRUCT VARIABLES
 struct Params params = {0};
