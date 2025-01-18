@@ -27,7 +27,7 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 	}
 	else{ //pot control mode
 
-		Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(SYMMETRY_ADC_NUM_BITS, NUMBER_OF_FREQUENCY_STEPS, &params);
+		Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(&params);
 		Process_TIM16_Final_Start_Value_and_Final_Prescaler(&params);
 	}
 }

@@ -221,7 +221,7 @@ uint8_t Start_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel);
 uint8_t Stop_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel);
 uint8_t Start_IC_TIM(TIM_HandleTypeDef *TIM, uint32_t IC_TIM_channel);
 
-uint8_t Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(uint8_t adc_resolution_bits, uint16_t speed_range, struct Params* params_ptr);
+uint8_t Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(struct Params* params_ptr);
 uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* params_ptr);
 uint8_t Adjust_TIM16_Prescaler(struct Params* params_ptr);
 

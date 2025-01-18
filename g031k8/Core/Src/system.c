@@ -147,14 +147,14 @@ uint8_t Start_Input_Capture_Timer(void){
 	return ok;
 }
 
-uint8_t Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(uint8_t adc_resolution_bits, uint16_t speed_range, struct Params* params_ptr){
+uint8_t Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(struct Params* params_ptr){
 
 	uint32_t speed_control = 0;
 	uint8_t how_many_128 = 0;
 
     //speed_control = (speed_adc_10_bit/1024)*'range macro'
-    speed_control = params_ptr->speed * speed_range;
-    speed_control = speed_control >> adc_resolution_bits;
+    speed_control = params_ptr->speed * NUMBER_OF_FREQUENCY_STEPS;
+    speed_control = speed_control >> SYMMETRY_ADC_RESOLUTION;
 
     how_many_128 = (uint8_t)(speed_control >> 7); //divide by 128, i.e. return how many 128s go into the speed_control
     params_ptr->raw_start_value = (uint16_t)(speed_control - (uint16_t)(how_many_128 << 7)); //how_many_128*128
