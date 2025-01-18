@@ -24,6 +24,7 @@ volatile enum Validate input_capture_processing_can_be_started = NO;
 volatile enum Validate external_clock_mode_is_active = NO;
 volatile enum Validate tap_tempo_mode_is_active = NO;
 volatile enum Validate TIM16_callback_finished = NO;
+volatile enum Validate ADC_values_converted = NO;
 
 //STRUCT VARIABLES
 struct Params params = {0};

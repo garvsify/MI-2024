@@ -48,6 +48,22 @@ int main(void)
 			HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions); //this function takes ages to execute!
 			TIM16_callback_finished = NO;
 		}
+		else if(ADC_values_converted == YES){
+
+			if((tap_tempo_mode_is_active == YES) || (external_clock_mode_is_active == YES)){
+
+				//COPY THE 'to be loaded' raw values into params such that the speed pot raw values are ignored in favour of the I/P cap processing raw values
+				params.raw_start_value = params_to_be_loaded.raw_start_value;
+				params.raw_prescaler = params_to_be_loaded.raw_prescaler;
+				Process_TIM16_Final_Start_Value_and_Final_Prescaler(&params);
+			}
+			else{ //pot control mode
+
+				Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(&params);
+				Process_TIM16_Final_Start_Value_and_Final_Prescaler(&params);
+			}
+			ADC_values_converted = NO;
+		}
 		else if(input_capture_processing_can_be_started == YES){
 
 			Input_Capture_Processing(interrupt_period, &params_to_be_loaded);

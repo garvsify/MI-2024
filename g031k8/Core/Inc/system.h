@@ -131,6 +131,7 @@ volatile extern enum Validate input_capture_processing_can_be_started;
 volatile extern enum Validate external_clock_mode_is_active;
 volatile extern enum Validate tap_tempo_mode_is_active;
 volatile extern enum Validate TIM16_callback_finished;
+volatile extern enum Validate ADC_values_converted;
 
 //STRUCT VARIABLES
 extern struct Params params; //'normal' running variables of the oscillator/s
