@@ -28,7 +28,6 @@ volatile uint16_t prev_duty = 0;
 volatile enum Input_Capture_Event input_capture_event = FIRST;
 volatile uint32_t TIM2_ch1_input_capture_value;
 volatile enum Validate input_capture_measurement_is_ongoing = NO;
-volatile enum Validate speed_pot_is_disabled = NO;
 volatile enum Validate input_capture_measurement_reelapse_is_ongoing = NO;
 volatile uint16_t interrupt_period = 0;
 volatile enum Adjust_Prescaler_Action TIM16_prescaler_adjust_to_be_loaded = 0;
@@ -54,6 +53,7 @@ volatile enum Validate UART_DMA_TX_is_complete = YES;
 uint8_t tap_tempo_switch_state_counter = TAP_TEMPO_SWITCH_CONFIDENCE_COUNT;
 enum Tap_Tempo_Switch_State tap_tempo_switch_state = NOT_DEPRESSED;
 volatile enum Validate input_capture_processing_can_be_started = NO;
+volatile enum Validate external_clock_mode_is_active = NO;
 
 //FUNCTION DEFINITIONS
 uint8_t Global_Interrupt_Enable(void){
@@ -597,7 +597,7 @@ uint32_t unsigned_bitwise_modulo(uint32_t dividend, uint8_t base_2_exponent){
 
 uint8_t Speed_Pot_Check(void){
 
-	if(tap_tempo_mode_is_active == YES){
+	if((tap_tempo_mode_is_active == YES) || (external_clock_mode_is_active == YES)){
 
 		static uint16_t first_speed_measurement;
 
@@ -622,7 +622,7 @@ uint8_t Speed_Pot_Check(void){
 				if(first_speed_measurement - second_speed_measurement > SPEED_TOLERANCE){
 
 					tap_tempo_mode_is_active = NO;
-					speed_pot_is_disabled = NO; //to be refactored at some point
+					external_clock_mode_is_active = NO;
 				}
 			}
 			else if(second_speed_measurement > first_speed_measurement){
@@ -630,7 +630,7 @@ uint8_t Speed_Pot_Check(void){
 				if(second_speed_measurement - first_speed_measurement > SPEED_TOLERANCE){
 
 					tap_tempo_mode_is_active = NO;
-					speed_pot_is_disabled = NO; //to be refactored at some point
+					external_clock_mode_is_active = NO;
 				}
 			}
 		}
@@ -644,7 +644,7 @@ uint8_t Check_Tap_Tempo_Switch_State(enum Tap_Tempo_Switch_State *tap_tempo_swit
 
 	uint8_t switch_state = (uint8_t)HAL_GPIO_ReadPin(SW_IN_GPIO_Port, SW_IN_Pin);
 
-	/*if(switch_state == 0){
+	if(switch_state == 0){
 
 		if(tap_tempo_switch_state_counter != 0){
 
@@ -673,13 +673,6 @@ uint8_t Check_Tap_Tempo_Switch_State(enum Tap_Tempo_Switch_State *tap_tempo_swit
 	else if(tap_tempo_switch_state_counter == TAP_TEMPO_SWITCH_CONFIDENCE_COUNT){
 
 		*tap_tempo_switch_state_ptr = NOT_DEPRESSED;
-	}*/
-
-	if(switch_state == 0){
-		*tap_tempo_switch_state_ptr = DEPRESSED;
-	}
-	else{
-		*tap_tempo_switch_state_ptr = NOT_DEPRESSED;
 	}
 
 	return 1;
@@ -691,7 +684,8 @@ uint8_t Start_Tap_Tempo_Monitoring_Timers_and_UART_Receive(void){
 	HAL_UART_Receive_DMA(&huart2, (uint8_t*)rx_buffer, sizeof(rx_buffer));
 
 	//START TAP TEMPO SWITCH CHECKING
-	HAL_LPTIM_SetOnce_Start_IT(&hlptim1, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK);
+	//No need to do this as EXTI now starts LPTIM
+	//HAL_LPTIM_SetOnce_Start_IT(&hlptim1, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK);
 
 	//START SPEED POT CHECKING (once tap tempo gets enabled)
 	__HAL_TIM_SET_COUNTER(&htim17, 0);

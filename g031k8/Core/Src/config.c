@@ -561,11 +561,11 @@ void MX_GPIO_Init(void)
   HAL_GPIO_Init(T_NRST_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : SW_OUT_Pin */
-  /*GPIO_InitStruct.Pin = SW_OUT_Pin;
+  GPIO_InitStruct.Pin = SW_OUT_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(SW_OUT_GPIO_Port, &GPIO_InitStruct);*/
+  HAL_GPIO_Init(SW_OUT_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : LD3_Pin */
   GPIO_InitStruct.Pin = LD3_Pin;
@@ -580,15 +580,23 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(SW_IN_GPIO_Port, &GPIO_InitStruct);
 
+  //Configure general monitoring pin
   GPIO_InitStruct.Pin = MONITOR_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(MONITOR_GPIO_Port, &GPIO_InitStruct);
 
+  //Configure CLK IN Pin - i.e. dedicated clock inputs to use this pin rather than the Tap-tempo switch debouncing SW IN pin
+  GPIO_InitStruct.Pin = CLK_IN_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(MONITOR_GPIO_Port, &GPIO_InitStruct);
+
   /* EXTI interrupt init*/
-  //HAL_NVIC_SetPriority(EXTI4_15_IRQn, 0, 0);
-  //HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);
+  HAL_NVIC_SetPriority(EXTI4_15_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
@@ -621,10 +629,10 @@ void System_Init(void){
 	MX_TIM16_Init(); //Frequency Gen.
 	MX_TIM2_Init(); //I/P Capture Measurement is TIM2_ch1
 	MX_TIM3_Init(); //I/P Capture Measurement Re-Elapse is TIM3_ch1
-	MX_TIM1_Init(); //PWM Gen. Main/Secondary Oscillator
-	MX_TIM17_Init(); //Tap Tempo Debouncing Timer
+	MX_TIM1_Init(); //PWM Gen. Main/Secondary Oscillator on ch2/ch4
+	MX_TIM17_Init(); //Speed Pot checking timer
 	//MX_IWDG_Init(); fucks up stuff - to be config'd
-	MX_LPTIM1_Init();
+	MX_LPTIM1_Init(); //Tap Tempo checking/debouncing timer
 
 	//Calibrate ADC - DO NOT MOVE TO BEFORE OTHER CONFIG ABOVE
 	HAL_ADCEx_Calibration_Start(&hadc1);

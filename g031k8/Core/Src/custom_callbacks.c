@@ -196,10 +196,14 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 		initial_ADC_conversion_complete = YES;
 	}
 
-	if(speed_pot_is_disabled == NO){
+	if((tap_tempo_mode_is_active == NO) || (external_clock_mode_is_active == NO)){
 
 		Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(current_speed, SPEED_ADC_RESOLUTION, NUMBER_OF_FREQUENCY_STEPS, &TIM16_raw_start_value, &TIM16_raw_prescaler);
 		Process_TIM16_Final_Start_Value_and_Final_Prescaler(TIM16_raw_start_value, &TIM16_final_start_value, TIM16_raw_prescaler, &TIM16_final_prescaler, current_symmetry, current_waveshape, current_halfcycle, current_quadrant, current_index);
+	}
+	else{ //tap tempo mode or ext. clock mode active - use raw 'to_be_loaded' values to calculate final values
+
+		Process_TIM16_Final_Start_Value_and_Final_Prescaler(TIM16_raw_start_value_to_be_loaded, &TIM16_final_start_value, TIM16_raw_prescaler_to_be_loaded, &TIM16_final_prescaler, current_symmetry, current_waveshape, current_halfcycle, current_quadrant, current_index);
 	}
 }
 
@@ -216,10 +220,7 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 	if(input_capture_event == FIRST){ //edge detected is the first
 
 		__HAL_TIM_SET_COUNTER(&htim2, 0); //begin measurement
-		speed_pot_is_disabled = YES;
-		tap_tempo_mode_is_active = YES;
 		input_capture_measurement_is_ongoing = YES;
-
 		input_capture_event = SECOND;
 	}
 	else{ //is second
@@ -314,52 +315,32 @@ void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
 	HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
 }
 
-/*void TIM17_callback_debounce(TIM_HandleTypeDef *htim){
+void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
 
-	Stop_OC_TIM(&htim17, TIM_CHANNEL_1);
+	if((GPIO_Pin == CLK_IN_Pin) && (HAL_GPIO_ReadPin(CLK_IN_GPIO_Port, CLK_IN_Pin) == 0)){ //if specifically CLK IN pin with falling interrupt
 
-	if(tap_tempo_switch_state == NOT_DEPRESSED){ //switch released before timer elapsed
-
-		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1); //reset
+		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
+		external_clock_mode_is_active = YES;
+		tap_tempo_mode_is_active = NO;
+		HAL_NVIC_DisableIRQ(LPTIM1_IRQn);
+		HAL_LPTIM_SetOnce_Stop_IT(&hlptim1);
 	}
-
-	TIM17_debounce_is_elapsing = NO;
-	TAP_TEMPO_EXTI4_15_IRQ_is_disabled = NO;
-	HAL_NVIC_EnableIRQ(EXTI4_15_IRQn); //enable EXTI10 interrupts
-
-	DeInit- alternative to the above
-	GPIO_InitTypeDef GPIO_InitStruct = {0};
-	GPIO_InitStruct.Pin = SW_IN_Pin;
-	GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
-	GPIO_InitStruct.Pull = GPIO_PULLUP;
-	HAL_GPIO_Init(SW_IN_GPIO_Port, &GPIO_InitStruct);
-}*/
-
-/*void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
-
-	if(tap_tempo_switch_state == NOT_DEPRESSED){ //previous state is not depressed - will eliminate switch release bouncing causing falling edges
-
-		HAL_NVIC_DisableIRQ(EXTI4_15_IRQn); //disable further EXTI10 interrupts
-		HAL_GPIO_DeInit(SW_IN_GPIO_Port, SW_IN_Pin); //apparently disables EXTI interrupt - alternative to the above
-
-		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0); //latch low until timer elapses
+	else if((GPIO_Pin == SW_IN_Pin) && HAL_GPIO_ReadPin(SW_IN_GPIO_Port, SW_IN_Pin) == 0){
 
 		tap_tempo_mode_is_active = YES;
-		TAP_TEMPO_EXTI4_15_IRQ_is_disabled = YES;
-		TIM17_debounce_is_elapsing = YES;
-
-		__HAL_TIM_SET_COUNTER(&htim17, 0);
-		Start_OC_TIM(&htim17, TIM_CHANNEL_1);
+		external_clock_mode_is_active = NO;
+		HAL_NVIC_EnableIRQ(LPTIM1_IRQn);
+		HAL_LPTIM_SetOnce_Start_IT(&hlptim1, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK);
 	}
-}*/
+}
 
-/*void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
+void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
 
-	if(TIM17_debounce_is_elapsing == NO){ //check if this rising edge has occurred during debounce
+	if((GPIO_Pin == CLK_IN_Pin) && HAL_GPIO_ReadPin(CLK_IN_GPIO_Port, CLK_IN_Pin) == 1){ //if specifically CLK IN pin with rising interrupt
 
-		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1); //reset
+		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1);
 	}
-}*/
+}
 
 void UART2_TX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
@@ -370,7 +351,6 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
 	if(rx_buffer[0] == 'y'){
 
-		speed_pot_is_disabled = YES;
 		TIM16_final_prescaler = 64;
 		TIM16_final_start_value = 127;
 		rx_buffer[0] = 0;

@@ -33,7 +33,7 @@
 #define HIGHEST_PRESCALER_TOP_SPEED_PERIOD 129
 #define PRESCALER_DIVISORS_MAX_INDEX 5
 #define SLOWEST_SPEED_PRESCALER 1024
-#define SPEED_TOLERANCE 2
+#define SPEED_TOLERANCE 3
 #define INITIAL_PWM_VALUE 512
 //#define LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK 4001 - 1 //4ms overflow with prescaler of 128
 #define LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK 1001 - 1 //2ms overflow with prescaler of 128
@@ -128,7 +128,6 @@ volatile extern uint16_t prev_duty;
 volatile extern enum Input_Capture_Event input_capture_event;
 volatile extern uint32_t TIM2_ch1_input_capture_value;
 volatile extern enum Validate input_capture_measurement_is_ongoing;
-volatile extern enum Validate speed_pot_is_disabled;
 volatile extern enum Validate input_capture_measurement_reelapse_is_ongoing;
 volatile extern uint16_t interrupt_period;
 volatile extern enum Adjust_Prescaler_Action TIM16_prescaler_adjust_to_be_loaded;
@@ -155,6 +154,7 @@ volatile extern char rx_buffer[1];
 extern uint8_t tap_tempo_switch_state_counter;
 extern enum Tap_Tempo_Switch_State tap_tempo_switch_state;
 volatile extern enum Validate input_capture_processing_can_be_started;
+volatile extern enum Validate external_clock_mode_is_active;
 
 //CUSTOM TYPES
 enum Polarity{
