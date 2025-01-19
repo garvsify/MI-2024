@@ -21,96 +21,94 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	/////////////////////////////
 	//CALCULATE THE NEXT VALUES//
 	/////////////////////////////
+	params_ptr->index++;
 
-	current_index++;
-
-	if(current_index == FINAL_INDEX + 1){
-		current_quadrant = FIRST_QUADRANT;
-		current_halfcycle = FIRST_HALFCYCLE;
-		current_index = 0;
+	if(params_ptr->index == FINAL_INDEX + 1){
+		params_ptr->index = 0;
 	}
 
-	if(current_waveshape == TRIANGLE_MODE){
-		duty = tri_wavetable[current_index];
+	if(params_ptr->index == FIRST_QUADRANT_START_INDEX){
+		params_ptr->quadrant = FIRST_QUADRANT;
+		params_ptr->halfcycle = FIRST_HALFCYCLE;
 	}
-	else if(current_waveshape == SINE_MODE){
-		duty = sine_wavetable[current_index];
+	else if(params_ptr->index == SECOND_QUADRANT_START_INDEX){
+		params_ptr->quadrant = SECOND_QUADRANT;
+		params_ptr->halfcycle = FIRST_HALFCYCLE;
 	}
-	else if((current_waveshape == SQUARE_MODE) && (current_index < THIRD_QUADRANT_START_INDEX)){
-		duty = 1023;
+	else if(params_ptr->index == THIRD_QUADRANT_START_INDEX){
+		params_ptr->quadrant = FIRST_QUADRANT;
+		params_ptr->halfcycle = SECOND_HALFCYCLE;
 	}
-	else if((current_waveshape == SQUARE_MODE) && (current_index >= THIRD_QUADRANT_START_INDEX)){
-			duty = 0;
+	else if(params_ptr->index == FOURTH_QUADRANT_START_INDEX){
+		params_ptr->quadrant = SECOND_QUADRANT;
+		params_ptr->halfcycle = SECOND_HALFCYCLE;
 	}
 
-	if(current_index == FIRST_QUADRANT_START_INDEX){
-		current_quadrant = FIRST_QUADRANT;
-		current_halfcycle = FIRST_HALFCYCLE;
+	//ONCE INDEX IS SET, FIND THE DUTY VALUE
+	if(params_ptr->waveshape == TRIANGLE_MODE){
+		params_ptr->duty = tri_wavetable[params_ptr->index];
 	}
-	else if(current_index == SECOND_QUADRANT_START_INDEX){
-		current_quadrant = SECOND_QUADRANT;
-		current_halfcycle = FIRST_HALFCYCLE;
+	else if(params_ptr->waveshape == SINE_MODE){
+		params_ptr->duty = sine_wavetable[params_ptr->index];
 	}
-	else if(current_index == THIRD_QUADRANT_START_INDEX){
-		current_quadrant = FIRST_QUADRANT;
-		current_halfcycle = SECOND_HALFCYCLE;
+	else if((params_ptr->waveshape == SQUARE_MODE) && (params_ptr->index < THIRD_QUADRANT_START_INDEX)){
+		params_ptr->duty = PWM_DUTY_VALUE_MAX;
 	}
-	else if(current_index == FOURTH_QUADRANT_START_INDEX){
-		current_quadrant = SECOND_QUADRANT;
-		current_halfcycle = SECOND_HALFCYCLE;
+	else if((params_ptr->waveshape == SQUARE_MODE) && (params_ptr->index >= THIRD_QUADRANT_START_INDEX)){
+		params_ptr->duty = PWM_DUTY_VALUE_MIN;
 	}
 
 	//APPLY DEPTH
 	#if DEPTH_ON_OR_OFF == 1
 
-		//Apply Depth
-		if(current_depth == 255){
-			duty = 1023 - duty;
-		}
-		else if(current_depth != 0){
+	//Apply Depth
+	if(params_ptr->depth == ((1 << DEPTH_ADC_RESOLUTION) - 1)){ //255
+			params_ptr->duty = PWM_DUTY_VALUE_MAX - params_ptr->duty;
+	}
+	else if(params_ptr->depth != 0){
 
-			uint32_t multiply_product;
-			//Perform: (duty*current_depth) / 256
-			multiply_product = duty * current_depth; //compiler should compile this as a hardware multiplication, but need to check
-			duty = 1023 - (uint16_t)(multiply_product >> 8);
-		}
-		else{
-			duty = 1023; //if depth is 0, just output 1023
-		}
+		//duty = 1023 - duty*(current_depth >> 8);
+		uint32_t multiply_product = 0;
+		multiply_product = (params_ptr->duty) * (params_ptr->depth);
+		params_ptr->duty = PWM_DUTY_VALUE_MAX - (multiply_product >> 8);
+	}
+	else{
+		params_ptr->duty = PWM_DUTY_VALUE_MAX; //if depth is 0, just output 1023
+	}
 
 	#endif
 
 	//SET THE NEXT VALUE FOR THE MAIN OSCILLATOR
-	prev_duty = duty;
+	params_ptr->prev_duty = params_ptr->duty;
 
 	//STORE THE VALUES IN THE APPROPRIATE '0TH - 1' INDEX RELATIVE TO THE START POINTER
-	if(duty_delay_line_start_offset != 0){
-		duty_delay_line_storage_array[duty_delay_line_start_offset - 1] = duty;
+	if(delay_line_ptr->duty_delay_line_start_offset != 0){
+		delay_line_ptr->duty_delay_line_storage_array[delay_line_ptr->duty_delay_line_start_offset - 1] = params_ptr->duty;
 	}
 	else{
-		duty_delay_line_storage_array[FINAL_INDEX + 1] = duty;
+		delay_line_ptr->duty_delay_line_storage_array[FINAL_INDEX + 1] = params_ptr->duty;
 	}
 
 	//DECREMENT THE START AND FINISH POINTERS
-	if(duty_delay_line_start_offset == 0){
-		duty_delay_line_start_offset = FINAL_INDEX + 1;
-		duty_delay_line_finish_offset = duty_delay_line_finish_offset - 1;
+	if(delay_line_ptr->duty_delay_line_start_offset == 0){
+		delay_line_ptr->duty_delay_line_start_offset = FINAL_INDEX + 1;
+		delay_line_ptr->duty_delay_line_finish_offset = delay_line_ptr->duty_delay_line_finish_offset - 1;
 	}
-	else if(duty_delay_line_finish_offset == 0){
-		duty_delay_line_finish_offset = FINAL_INDEX + 1;
-		duty_delay_line_start_offset = duty_delay_line_start_offset - 1;
+	else if(delay_line_ptr->duty_delay_line_finish_offset == 0){
+		delay_line_ptr->duty_delay_line_finish_offset = FINAL_INDEX + 1;
+		delay_line_ptr->duty_delay_line_start_offset = delay_line_ptr->duty_delay_line_start_offset - 1;
 	}
 	else{
-		duty_delay_line_start_offset = duty_delay_line_start_offset - 1;
-		duty_delay_line_finish_offset = duty_delay_line_finish_offset - 1;
+		delay_line_ptr->duty_delay_line_start_offset = delay_line_ptr->duty_delay_line_start_offset - 1;
+		delay_line_ptr->duty_delay_line_finish_offset = delay_line_ptr->duty_delay_line_finish_offset - 1;
 	}
 
 	//DETERMINE THE DELAYED WAVE'S VALUES
-	if(duty_delay_line_start_offset + duty_delay_line_read_pointer_offset > FINAL_INDEX + 1){ //if the desired starting index falls off the end of the array
-		duty_delayed = *(duty_delay_line_storage_array + (duty_delay_line_start_offset + duty_delay_line_read_pointer_offset - (FINAL_INDEX + 1)));
+	if(delay_line_ptr->duty_delay_line_start_offset + delay_line_ptr->duty_delay_line_read_pointer_offset > FINAL_INDEX + 1){ //if the desired starting index falls off the end of the array
+		params_ptr->duty_delayed = *(delay_line_ptr->duty_delay_line_storage_array + (delay_line_ptr->duty_delay_line_start_offset + delay_line_ptr->duty_delay_line_read_pointer_offset - (FINAL_INDEX + 1)));
 	}
 	else{
-		duty_delayed = *(duty_delay_line_storage_array + duty_delay_line_start_offset + duty_delay_line_read_pointer_offset);
+		params_ptr->duty_delayed = *(delay_line_ptr->duty_delay_line_storage_array + delay_line_ptr->duty_delay_line_start_offset + delay_line_ptr->duty_delay_line_read_pointer_offset);
 	}
 
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions); //this function takes ages to execute!
