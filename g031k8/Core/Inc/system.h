@@ -47,7 +47,8 @@
 #define SPEED_POT_CHECK_COUNTER_LENGTH 25
 #define PWM_DUTY_VALUE_MAX 1023
 #define PWM_DUTY_VALUE_MIN 0
-
+#define K_FACTOR_TOP 16
+#define K_FACTOR_BOTTOM 4096
 
 #if SINE_OR_TRIANGLE_WAVE_TEMPO_PERCEIVED_APEX_INDEX < SECOND_QUADRANT_START_INDEX
 	#define CURRENT_QUADRANT_SINE_OR_TRI_SYNCED = FIRST_QUADRANT
@@ -131,6 +132,8 @@ volatile extern enum Validate input_capture_processing_can_be_started;
 volatile extern enum Validate external_clock_mode_is_active;
 volatile extern enum Validate tap_tempo_mode_is_active;
 volatile extern enum Validate TIM16_callback_finished;
+volatile extern uint16_t cycles_of_delay;
+volatile extern uint16_t cycles_of_delay2;
 
 //STRUCT VARIABLES
 extern struct Params params; //'normal' running variables of the oscillator/s

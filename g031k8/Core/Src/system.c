@@ -24,6 +24,8 @@ volatile enum Validate input_capture_processing_can_be_started = NO;
 volatile enum Validate external_clock_mode_is_active = NO;
 volatile enum Validate tap_tempo_mode_is_active = NO;
 volatile enum Validate TIM16_callback_finished = NO;
+volatile uint16_t cycles_of_delay = 0;
+volatile uint16_t cycles_of_delay2 = 0;
 
 //STRUCT VARIABLES
 struct Params params = {0};
@@ -556,6 +558,19 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
         Adjust_TIM16_Prescaler(params_ptr);
     #endif
 
+
+    if(params_ptr->final_prescaler < 512){
+
+    	uint16_t period = 256 - params_ptr->raw_start_value;
+    	uint32_t numerator = (pot_rotation_corrected * K_FACTOR_TOP * period);
+    	uint32_t denominator = (params_ptr->raw_prescaler * K_FACTOR_BOTTOM);
+    	cycles_of_delay = numerator/denominator;
+    }
+    else{
+
+    	cycles_of_delay = 0;
+    }
+
     return 1;
 }
 
@@ -841,8 +856,8 @@ uint8_t Process_ADC_Conversion_Values(struct Params* params_ptr, struct Delay_Li
 	}
 
 	//GET SPEED
-	params_ptr->speed = ADCResultsDMA_ptr[SPEED_ADC_RESULT_INDEX] >> 4; //truncate to 8-bit
-	params_ptr->speed = params_ptr->speed << 2; //convert to 10-bit
+	params_ptr->speed = ADCResultsDMA_ptr[SPEED_ADC_RESULT_INDEX] >> 5; //truncate to 7-bit
+	params_ptr->speed = params_ptr->speed << 3; //convert to 10-bit
 
 	//GET DEPTH
 	#if DEPTH_ON_OR_OFF == ON

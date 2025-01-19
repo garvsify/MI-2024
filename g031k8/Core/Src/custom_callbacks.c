@@ -2,6 +2,11 @@
 
 void TIM16_callback(TIM_HandleTypeDef *htim)
 {
+	/*if(cycles_of_delay != 0){
+		for(uint8_t i = 0; i < cycles_of_delay; i++){
+			asm("NOP");
+		}
+	}*/
 	Set_Oscillator_Values(&params);
 	Calculate_Next_Main_Oscillator_Values(&params, (enum Next_Values_Processing_Mode)REGULAR_MODE);
 	Write_Next_Main_Oscillator_Values_to_Delay_Line(&params, &delay_line);
