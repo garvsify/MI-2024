@@ -155,7 +155,7 @@ uint8_t Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(struct Params* params_pt
 
     //speed_control = (speed_adc_10_bit/1024)*'range macro'
     speed_control = params_ptr->speed * NUMBER_OF_FREQUENCY_STEPS;
-    speed_control = speed_control >> SYMMETRY_ADC_RESOLUTION;
+    speed_control = speed_control >> SPEED_ADC_RESOLUTION;
 
     how_many_128 = (uint8_t)(speed_control >> 7); //divide by 128, i.e. return how many 128s go into the speed_control
     params_ptr->raw_start_value = (uint16_t)(speed_control - (uint16_t)(how_many_128 << 7)); //how_many_128*128
@@ -841,7 +841,8 @@ uint8_t Process_ADC_Conversion_Values(struct Params* params_ptr, struct Delay_Li
 	}
 
 	//GET SPEED
-	params_ptr->speed = ADCResultsDMA_ptr[SPEED_ADC_RESULT_INDEX] >> 2; //convert to 10-bit
+	params_ptr->speed = ADCResultsDMA_ptr[SPEED_ADC_RESULT_INDEX] >> 4; //truncate to 8-bit
+	params_ptr->speed = params_ptr->speed << 2; //convert to 10-bit
 
 	//GET DEPTH
 	#if DEPTH_ON_OR_OFF == ON
@@ -858,7 +859,8 @@ uint8_t Process_ADC_Conversion_Values(struct Params* params_ptr, struct Delay_Li
 	#endif
 
 	//GET DELAY LINE READ POINTER OFFSET
-	delay_line_ptr->duty_delay_line_read_pointer_offset = ADCResultsDMA_ptr[DUTY_DELAY_LINE_READ_POINTER_OFFSET_ADC_RESULT_INDEX] >> 3; //convert to 9-bit
+	delay_line_ptr->duty_delay_line_read_pointer_offset = ADCResultsDMA_ptr[DUTY_DELAY_LINE_READ_POINTER_OFFSET_ADC_RESULT_INDEX] >> 4; //truncate to 8-bit
+	delay_line_ptr->duty_delay_line_read_pointer_offset = delay_line_ptr->duty_delay_line_read_pointer_offset << 1; //convert to 9-bit
 
 	return 1;
 }
