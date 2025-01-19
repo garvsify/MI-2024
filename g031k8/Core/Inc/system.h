@@ -83,7 +83,7 @@
 		//TURN ON/OFF SYMMETRY and SET RESOLUTION
 		//set SYMMETRY_ADC_RESOLUTION to either 8, 10, or 12
 		#define SYMMETRY_ADC_RESOLUTION 8
-		#define SYMMETRY_ON_OR_OFF ON
+		#define SYMMETRY_ON_OR_OFF OFF
 
 		#if SYMMETRY_ADC_RESOLUTION == 8
 			#define SYMMETRY_ADC_HALF_SCALE_NO_BITS 7
@@ -118,7 +118,6 @@ volatile extern uint8_t current_quadrant;
 volatile extern uint16_t ADCResultsDMA[4];
 const extern uint8_t num_ADC_conversions;
 volatile extern enum Validate initial_ADC_conversion_complete;
-volatile extern enum Validate TIM16_callback_active;
 volatile extern uint16_t TIM16_raw_start_value;
 volatile extern uint16_t TIM16_final_start_value;
 volatile extern uint16_t TIM16_raw_prescaler;

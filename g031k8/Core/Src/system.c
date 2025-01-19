@@ -23,7 +23,6 @@ volatile uint16_t duty = 0;
 volatile uint16_t TIM16_final_prescaler = 0;
 volatile uint16_t ADCResultsDMA[4] = {0};
 volatile enum Validate initial_ADC_conversion_complete = NO;
-volatile enum Validate TIM16_callback_active = NO;
 volatile uint16_t prev_duty = 0;
 volatile enum Input_Capture_Event input_capture_event = FIRST;
 volatile uint32_t TIM2_ch1_input_capture_value;

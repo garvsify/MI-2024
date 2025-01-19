@@ -4,21 +4,6 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 {
 	//TIM16 interrupt flag is already cleared by stm32g0xx_it.c
 
-	TIM16_callback_active = YES;
-
-	/////////////////////////////////////////////////////////////
-	//FLASH LED in case of wave reaching apex or perceived apex//
-	/////////////////////////////////////////////////////////////
-	/*if((current_waveshape == SINE_MODE || current_waveshape == TRIANGLE_MODE) && current_index >= SINE_OR_TRIANGLE_WAVE_TEMPO_PERCEIVED_APEX_INDEX && current_index < SINE_OR_TRIANGLE_WAVE_TEMPO_PULSE_OFF_INDEX){
-		HAL_GPIO_WritePin(TEMPO_GPIO_Port, TEMPO_Pin, 1);
-	}
-	else if(current_waveshape == SQUARE_MODE && current_index >= SQUARE_WAVE_TEMPO_APEX_INDEX && current_index < SQUARE_WAVE_TEMPO_PULSE_OFF_INDEX){
-		HAL_GPIO_WritePin(TEMPO_GPIO_Port, TEMPO_Pin, 1);
-	}
-	else{
-		HAL_GPIO_WritePin(TEMPO_GPIO_Port, TEMPO_Pin, 0);
-	}*/
-
 	////////////////////////////////////////////////////////
 	//SET THE CURRENT(prev) VALUES FOR THE MAIN OSCILLATOR//
 	////////////////////////////////////////////////////////
@@ -127,8 +112,6 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	else{
 		duty_delayed = *(duty_delay_line_storage_array + duty_delay_line_start_offset + duty_delay_line_read_pointer_offset);
 	}
-
-	TIM16_callback_active = NO;
 
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions); //this function takes ages to execute!
 }
