@@ -21,94 +21,94 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	/////////////////////////////
 	//CALCULATE THE NEXT VALUES//
 	/////////////////////////////
-	params_ptr->index++;
+	params.index++;
 
-	if(params_ptr->index == FINAL_INDEX + 1){
-		params_ptr->index = 0;
+	if(params.index == FINAL_INDEX + 1){
+		params.index = 0;
 	}
 
-	if(params_ptr->index == FIRST_QUADRANT_START_INDEX){
-		params_ptr->quadrant = FIRST_QUADRANT;
-		params_ptr->halfcycle = FIRST_HALFCYCLE;
+	if(params.index == FIRST_QUADRANT_START_INDEX){
+		params.quadrant = FIRST_QUADRANT;
+		params.halfcycle = FIRST_HALFCYCLE;
 	}
-	else if(params_ptr->index == SECOND_QUADRANT_START_INDEX){
-		params_ptr->quadrant = SECOND_QUADRANT;
-		params_ptr->halfcycle = FIRST_HALFCYCLE;
+	else if(params.index == SECOND_QUADRANT_START_INDEX){
+		params.quadrant = SECOND_QUADRANT;
+		params.halfcycle = FIRST_HALFCYCLE;
 	}
-	else if(params_ptr->index == THIRD_QUADRANT_START_INDEX){
-		params_ptr->quadrant = FIRST_QUADRANT;
-		params_ptr->halfcycle = SECOND_HALFCYCLE;
+	else if(params.index == THIRD_QUADRANT_START_INDEX){
+		params.quadrant = FIRST_QUADRANT;
+		params.halfcycle = SECOND_HALFCYCLE;
 	}
-	else if(params_ptr->index == FOURTH_QUADRANT_START_INDEX){
-		params_ptr->quadrant = SECOND_QUADRANT;
-		params_ptr->halfcycle = SECOND_HALFCYCLE;
+	else if(params.index == FOURTH_QUADRANT_START_INDEX){
+		params.quadrant = SECOND_QUADRANT;
+		params.halfcycle = SECOND_HALFCYCLE;
 	}
 
 	//ONCE INDEX IS SET, FIND THE DUTY VALUE
-	if(params_ptr->waveshape == TRIANGLE_MODE){
-		params_ptr->duty = tri_wavetable[params_ptr->index];
+	if(params.waveshape == TRIANGLE_MODE){
+		params.duty = tri_wavetable[params.index];
 	}
-	else if(params_ptr->waveshape == SINE_MODE){
-		params_ptr->duty = sine_wavetable[params_ptr->index];
+	else if(params.waveshape == SINE_MODE){
+		params.duty = sine_wavetable[params.index];
 	}
-	else if((params_ptr->waveshape == SQUARE_MODE) && (params_ptr->index < THIRD_QUADRANT_START_INDEX)){
-		params_ptr->duty = PWM_DUTY_VALUE_MAX;
+	else if((params.waveshape == SQUARE_MODE) && (params.index < THIRD_QUADRANT_START_INDEX)){
+		params.duty = PWM_DUTY_VALUE_MAX;
 	}
-	else if((params_ptr->waveshape == SQUARE_MODE) && (params_ptr->index >= THIRD_QUADRANT_START_INDEX)){
-		params_ptr->duty = PWM_DUTY_VALUE_MIN;
+	else if((params.waveshape == SQUARE_MODE) && (params.index >= THIRD_QUADRANT_START_INDEX)){
+		params.duty = PWM_DUTY_VALUE_MIN;
 	}
 
 	//APPLY DEPTH
 	#if DEPTH_ON_OR_OFF == 1
 
 	//Apply Depth
-	if(params_ptr->depth == ((1 << DEPTH_ADC_RESOLUTION) - 1)){ //255
-			params_ptr->duty = PWM_DUTY_VALUE_MAX - params_ptr->duty;
+	if(params.depth == ((1 << DEPTH_ADC_RESOLUTION) - 1)){ //255
+			params.duty = PWM_DUTY_VALUE_MAX - params.duty;
 	}
-	else if(params_ptr->depth != 0){
+	else if(params.depth != 0){
 
 		//duty = 1023 - duty*(current_depth >> 8);
 		uint32_t multiply_product = 0;
-		multiply_product = (params_ptr->duty) * (params_ptr->depth);
-		params_ptr->duty = PWM_DUTY_VALUE_MAX - (multiply_product >> 8);
+		multiply_product = (params.duty) * (params.depth);
+		params.duty = PWM_DUTY_VALUE_MAX - (multiply_product >> 8);
 	}
 	else{
-		params_ptr->duty = PWM_DUTY_VALUE_MAX; //if depth is 0, just output 1023
+		params.duty = PWM_DUTY_VALUE_MAX; //if depth is 0, just output 1023
 	}
 
 	#endif
 
 	//SET THE NEXT VALUE FOR THE MAIN OSCILLATOR
-	params_ptr->prev_duty = params_ptr->duty;
+	params.prev_duty = params.duty;
 
 	//STORE THE VALUES IN THE APPROPRIATE '0TH - 1' INDEX RELATIVE TO THE START POINTER
-	if(delay_line_ptr->duty_delay_line_start_offset != 0){
-		delay_line_ptr->duty_delay_line_storage_array[delay_line_ptr->duty_delay_line_start_offset - 1] = params_ptr->duty;
+	if(delay_line.duty_delay_line_start_offset != 0){
+		delay_line.duty_delay_line_storage_array[delay_line.duty_delay_line_start_offset - 1] = params.duty;
 	}
 	else{
-		delay_line_ptr->duty_delay_line_storage_array[FINAL_INDEX + 1] = params_ptr->duty;
+		delay_line.duty_delay_line_storage_array[FINAL_INDEX + 1] = params.duty;
 	}
 
 	//DECREMENT THE START AND FINISH POINTERS
-	if(delay_line_ptr->duty_delay_line_start_offset == 0){
-		delay_line_ptr->duty_delay_line_start_offset = FINAL_INDEX + 1;
-		delay_line_ptr->duty_delay_line_finish_offset = delay_line_ptr->duty_delay_line_finish_offset - 1;
+	if(delay_line.duty_delay_line_start_offset == 0){
+		delay_line.duty_delay_line_start_offset = FINAL_INDEX + 1;
+		delay_line.duty_delay_line_finish_offset = delay_line.duty_delay_line_finish_offset - 1;
 	}
-	else if(delay_line_ptr->duty_delay_line_finish_offset == 0){
-		delay_line_ptr->duty_delay_line_finish_offset = FINAL_INDEX + 1;
-		delay_line_ptr->duty_delay_line_start_offset = delay_line_ptr->duty_delay_line_start_offset - 1;
+	else if(delay_line.duty_delay_line_finish_offset == 0){
+		delay_line.duty_delay_line_finish_offset = FINAL_INDEX + 1;
+		delay_line.duty_delay_line_start_offset = delay_line.duty_delay_line_start_offset - 1;
 	}
 	else{
-		delay_line_ptr->duty_delay_line_start_offset = delay_line_ptr->duty_delay_line_start_offset - 1;
-		delay_line_ptr->duty_delay_line_finish_offset = delay_line_ptr->duty_delay_line_finish_offset - 1;
+		delay_line.duty_delay_line_start_offset = delay_line.duty_delay_line_start_offset - 1;
+		delay_line.duty_delay_line_finish_offset = delay_line.duty_delay_line_finish_offset - 1;
 	}
 
 	//DETERMINE THE DELAYED WAVE'S VALUES
-	if(delay_line_ptr->duty_delay_line_start_offset + delay_line_ptr->duty_delay_line_read_pointer_offset > FINAL_INDEX + 1){ //if the desired starting index falls off the end of the array
-		params_ptr->duty_delayed = *(delay_line_ptr->duty_delay_line_storage_array + (delay_line_ptr->duty_delay_line_start_offset + delay_line_ptr->duty_delay_line_read_pointer_offset - (FINAL_INDEX + 1)));
+	if(delay_line.duty_delay_line_start_offset + delay_line.duty_delay_line_read_pointer_offset > FINAL_INDEX + 1){ //if the desired starting index falls off the end of the array
+		params.duty_delayed = *(delay_line.duty_delay_line_storage_array + (delay_line.duty_delay_line_start_offset + delay_line.duty_delay_line_read_pointer_offset - (FINAL_INDEX + 1)));
 	}
 	else{
-		params_ptr->duty_delayed = *(delay_line_ptr->duty_delay_line_storage_array + delay_line_ptr->duty_delay_line_start_offset + delay_line_ptr->duty_delay_line_read_pointer_offset);
+		params.duty_delayed = *(delay_line.duty_delay_line_storage_array + delay_line.duty_delay_line_start_offset + delay_line.duty_delay_line_read_pointer_offset);
 	}
 
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions); //this function takes ages to execute!
@@ -119,37 +119,39 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 	HAL_ADC_Stop_DMA(hadc); //disable ADC DMA
 
 	//GET WAVESHAPE
-	uint16_t ADC_result = ADCResultsDMA_ptr[WAVESHAPE_ADC_RESULT_INDEX]; //set ADC_Result to waveshape index value
+	uint16_t ADC_result = ADCResultsDMA[WAVESHAPE_ADC_RESULT_INDEX]; //set ADC_Result to waveshape index value
 
 	if(ADC_result <= TRIANGLE_MODE_ADC_THRESHOLD){
-		params_ptr->waveshape = TRIANGLE_MODE; //triangle wave
+		params.waveshape = TRIANGLE_MODE; //triangle wave
 	}
 	else if (ADC_result <= SINE_MODE_ADC_THRESHOLD){
-		params_ptr->waveshape = SINE_MODE; //sine wave
+		params.waveshape = SINE_MODE; //sine wave
 	}
 	else if (ADC_result <= SQUARE_MODE_ADC_THRESHOLD){
-		params_ptr->waveshape = SQUARE_MODE; //square wave
+		params.waveshape = SQUARE_MODE; //square wave
 	}
 
 	//GET SPEED
-	params_ptr->speed = ADCResultsDMA_ptr[SPEED_ADC_RESULT_INDEX] >> 2; //convert to 10-bit
+	params.speed = ADCResultsDMA[SPEED_ADC_RESULT_INDEX] >> 4; //convert to 8-bit
+	params.speed = params.speed << 2; //convert to 10-bit
 
 	//GET DEPTH
 	#if DEPTH_ON_OR_OFF == ON
 
-		params_ptr->depth = ADCResultsDMA_ptr[DEPTH_ADC_RESULT_INDEX] >> 4; //convert to 8-bit
+		params.depth = ADCResultsDMA[DEPTH_ADC_RESULT_INDEX] >> 4; //convert to 8-bit
 
 	#endif
 
 	//GET SYMMETRY
 	#if SYMMETRY_ON_OR_OFF == ON
 
-		params_ptr->symmetry = ADCResultsDMA_ptr[SYMMETRY_ADC_RESULT_INDEX] >> 4; //convert to 8-bit
+		params.symmetry = ADCResultsDMA[SYMMETRY_ADC_RESULT_INDEX] >> 4; //convert to 8-bit
 
 	#endif
 
 	//GET DELAY LINE READ POINTER OFFSET
-	delay_line_ptr->duty_delay_line_read_pointer_offset = ADCResultsDMA_ptr[DUTY_DELAY_LINE_READ_POINTER_OFFSET_ADC_RESULT_INDEX] >> 3; //convert to 9-bit
+	delay_line.duty_delay_line_read_pointer_offset = ADCResultsDMA[DUTY_DELAY_LINE_READ_POINTER_OFFSET_ADC_RESULT_INDEX] >> 4;
+	delay_line.duty_delay_line_read_pointer_offset = delay_line.duty_delay_line_read_pointer_offset << 1; //convert to 9-bit
 
 	//after initial conversion is complete, set the conversion complete flag
 	if(initial_ADC_conversion_complete == NO){
@@ -163,7 +165,7 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 	}
 }
 
-void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
+/*void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 
 	TIM2_ch1_input_capture_value = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
 
@@ -439,7 +441,7 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 
 			uint16_t two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC = two_fifty_six_minus_TIM16_raw_start_value * pot_rotation_corrected;
 
-			uint16_t two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC_and_shifted_by_ADC_bits = (uint16_t)(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC >> SYMMETRY_ADC_NUM_BITS);
+			uint16_t two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC_and_shifted_by_ADC_bits = (uint16_t)(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC >> SYMMETRY_ADC_RESOLUTION);
 
 
 			//HAVE TO BE uin16_t HERE BECAUSE A uint8_t IS LIMITED TO 255!
@@ -744,22 +746,22 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 		#endif
 
 	}
-}
+}*/
 
-void TIM2_ch1_overflow_callback(TIM_HandleTypeDef *htim){
+/*void TIM2_ch1_overflow_callback(TIM_HandleTypeDef *htim){
 
 	if(input_capture_measurement_is_ongoing == YES && input_capture_event == SECOND){
 
-		/*overflow has occurred at a time when an input capture measurement is occurring, which means input capture event would have been the second if it it did occur.
-		This means that the user has depressed the switch once, and hasn't pressed again within the timeout period.
-		Thus, reset everything requiring the user to press the switch again to start another capture*/
+		//overflow has occurred at a time when an input capture measurement is occurring, which means input capture event would have been the second if it it did occur.
+		//This means that the user has depressed the switch once, and hasn't pressed again within the timeout period.
+		//Thus, reset everything requiring the user to press the switch again to start another capture
 
 		input_capture_measurement_is_ongoing = NO;
 		input_capture_event = FIRST;
 	}
-}
+}*/
 
-void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
+/*void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
 
 	//force update of timers to sync the wave to the TIM3 reelapse interrupt
 
@@ -782,7 +784,7 @@ void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
 	//set the values to the 'to be loaded' values such that the TIM16 continually loads these if the speed pot is disabled
 	TIM16_final_start_value = TIM16_final_start_value_to_be_loaded;
 	TIM16_final_prescaler = TIM16_final_prescaler_to_be_loaded;
-}
+}*/
 
 /*void TIM17_callback_debounce(TIM_HandleTypeDef *htim){
 
@@ -830,7 +832,7 @@ void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
 		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1); //reset
 	}
 }*/
-
+/*
 void UART2_TX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
 	UART_DMA_TX_is_complete = YES;
@@ -841,8 +843,8 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 	if(rx_buffer[0] == 'y'){
 
 		speed_pot_is_disabled = YES;
-		TIM16_final_prescaler = 64;
-		TIM16_final_start_value = 127;
+		//TIM16_final_prescaler = 64;
+		//TIM16_final_start_value = 127;
 		rx_buffer[0] = 0;
 	}
 	HAL_UART_Receive_DMA(&huart2, (uint8_t*)rx_buffer, sizeof(rx_buffer));
@@ -877,4 +879,4 @@ void TIM17_callback_speed_pot_check(TIM_HandleTypeDef *htim){
 
 	__HAL_TIM_SET_COUNTER(&htim17, 0);
 	Start_OC_TIM(&htim17, TIM_CHANNEL_1);
-}
+}*/

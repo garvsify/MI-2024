@@ -8,7 +8,6 @@ void TIM16_callback(TIM_HandleTypeDef *htim);
 void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim);
 void TIM2_ch1_overflow_callback(TIM_HandleTypeDef *htim);
 void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim);
-//void TIM17_callback_debounce(TIM_HandleTypeDef *htim);
 void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim);
 void TIM17_callback_speed_pot_check(TIM_HandleTypeDef *htim);
 void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin);

@@ -79,7 +79,7 @@ void MX_ADC1_Init(void)
   hadc1.Init.LowPowerAutoWait = DISABLE;
   hadc1.Init.LowPowerAutoPowerOff = DISABLE;
   hadc1.Init.ContinuousConvMode = DISABLE;
-  hadc1.Init.NbrOfConversion = 4;
+  hadc1.Init.NbrOfConversion = 5;
   hadc1.Init.DiscontinuousConvMode = DISABLE;
   hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
   hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
@@ -128,6 +128,16 @@ void MX_ADC1_Init(void)
   */
   sConfig.Channel = ADC_CHANNEL_5;
   sConfig.Rank = ADC_REGULAR_RANK_4;
+  sConfig.SamplingTime = ADC_SAMPLINGTIME_COMMON_1;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure Channel 6
+  */
+  sConfig.Channel = ADC_CHANNEL_6;
+  sConfig.Rank = ADC_REGULAR_RANK_5;
   sConfig.SamplingTime = ADC_SAMPLINGTIME_COMMON_1;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
@@ -640,30 +650,27 @@ void System_Init(void){
 	HAL_ADC_RegisterCallback(&hadc1, HAL_ADC_CONVERSION_COMPLETE_CB_ID, &ADC_DMA_conversion_complete_callback);
 
 	//Set custom callback function for I/P capture input falling edge event
-	HAL_TIM_RegisterCallback(&htim2, HAL_TIM_IC_CAPTURE_CB_ID, &TIM2_ch1_IP_capture_callback);
+	//HAL_TIM_RegisterCallback(&htim2, HAL_TIM_IC_CAPTURE_CB_ID, &TIM2_ch1_IP_capture_callback);
 
 	//Set custom callback function for I/P capture timer overflow (Update event/overflow)
-	HAL_TIM_RegisterCallback(&htim2, HAL_TIM_PERIOD_ELAPSED_CB_ID, &TIM2_ch1_overflow_callback);
+	//HAL_TIM_RegisterCallback(&htim2, HAL_TIM_PERIOD_ELAPSED_CB_ID, &TIM2_ch1_overflow_callback);
 
 	//Set custom callback function for TIM3_ch1 (Measurement Re-Elapse) (CCR match)
-	HAL_TIM_RegisterCallback(&htim3, HAL_TIM_OC_DELAY_ELAPSED_CB_ID, &TIM3_ch1_IP_capture_measurement_reelapse_callback);
-
-	//Set custom callback function for TIM17 debounce (CCR match)
-	//HAL_TIM_RegisterCallback(&htim17, HAL_TIM_OC_DELAY_ELAPSED_CB_ID, &TIM17_callback_debounce);
+	//HAL_TIM_RegisterCallback(&htim3, HAL_TIM_OC_DELAY_ELAPSED_CB_ID, &TIM3_ch1_IP_capture_measurement_reelapse_callback);
 
 	//Set custom callback function for TIM17 Speed Pot Check (CCR match)
-	HAL_TIM_RegisterCallback(&htim17, HAL_TIM_OC_DELAY_ELAPSED_CB_ID, &TIM17_callback_speed_pot_check);
+	//HAL_TIM_RegisterCallback(&htim17, HAL_TIM_OC_DELAY_ELAPSED_CB_ID, &TIM17_callback_speed_pot_check);
 
 	//CANNOT SET CUSTOM CALLBACK FOR EXTI, however redefinition of 'weak' predefined EXTI callback is in custom_callbacks.c
 
 	//Set custom callback function for DMA TX Transfer Complete
-	HAL_UART_RegisterCallback(&huart2, HAL_UART_TX_COMPLETE_CB_ID, &UART2_TX_transfer_complete_callback);
+	//HAL_UART_RegisterCallback(&huart2, HAL_UART_TX_COMPLETE_CB_ID, &UART2_TX_transfer_complete_callback);
 
 	//Set custom callback function for DMA RX Transfer Complete
-	HAL_UART_RegisterCallback(&huart2, HAL_UART_RX_COMPLETE_CB_ID, &UART2_RX_transfer_complete_callback);
+	//HAL_UART_RegisterCallback(&huart2, HAL_UART_RX_COMPLETE_CB_ID, &UART2_RX_transfer_complete_callback);
 
 	//Set custom callback for LPTIM1 (Tap Tempo SW state check)
-	 HAL_LPTIM_RegisterCallback(&hlptim1, HAL_LPTIM_COMPARE_MATCH_CB_ID, &LPTIM1_callback);
+	 //HAL_LPTIM_RegisterCallback(&hlptim1, HAL_LPTIM_COMPARE_MATCH_CB_ID, &LPTIM1_callback);
 }
 
 #ifdef  USE_FULL_ASSERT

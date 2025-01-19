@@ -49,6 +49,15 @@
 #define MONITOR_Pin GPIO_PIN_6
 #define MONITOR_GPIO_Port GPIOB
 
+#define CLK_IN_Pin GPIO_PIN_7
+#define CLK_IN_GPIO_Port GPIOB
+
+#define HACK_POT_HIGH_Pin GPIO_PIN_12
+#define HACK_POT_HIGH_GPIO_Port GPIOA
+
+#define HACK_POT_LOW_Pin GPIO_PIN_7
+#define HACK_POT_LOW_GPIO_Port GPIOA
+
 //create instance of peripheral structs (handles)
 extern ADC_HandleTypeDef hadc1;
 extern DMA_HandleTypeDef hdma_adc1;

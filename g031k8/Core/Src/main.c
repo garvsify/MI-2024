@@ -25,7 +25,7 @@ int main(void)
 	Global_Interrupt_Enable();
 
 	//START TAP TEMPO SWITCH MONITORING AND UART RECEIVE
-	Start_Tap_Tempo_Monitoring_Timers_and_UART_Receive();
+	//Start_Tap_Tempo_Monitoring_Timers_and_UART_Receive();
 
 	while (1)
 	{

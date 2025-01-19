@@ -8,7 +8,7 @@ const uint16_t TIM16_prescalers[6] = {2048, 1024, 512, 256, 128, 64}; //2048 is 
 const uint8_t num_ADC_conversions = sizeof(ADCResultsDMA) / sizeof(ADCResultsDMA[0]);
 
 //VARIABLE DEFINITIONS
-volatile uint16_t ADCResultsDMA[4] = {0};
+volatile uint16_t ADCResultsDMA[5] = {0};
 volatile enum Validate initial_ADC_conversion_complete = NO;
 volatile enum Input_Capture_Event input_capture_event = FIRST;
 volatile uint32_t TIM2_ch1_input_capture_value;
@@ -47,14 +47,10 @@ uint8_t Global_Interrupt_Disable(void){
 
 uint8_t Startup(void){
 
-	//duty_delay_line_read_pointer_offset = 255; //phase difference between the two waves
-
-	current_depth = 255; //whilst depth pot is being used as delay adjust
-
 	// re-initialise all values in delay line storage array to 512 (mid scale) as they are initialised to 0 on startup
 	for(uint16_t i = 0; i < FINAL_INDEX + 1; i++){
 
-		duty_delay_line_storage_array[i] = INITIAL_PWM_VALUE;
+		delay_line.duty_delay_line_storage_array[i] = INITIAL_PWM_VALUE;
 	}
 
 	__HAL_TIM_ENABLE_IT(&htim2, TIM_IT_UPDATE); //make sure the overflow (update) interrupt is enabled for TIM2
@@ -66,9 +62,10 @@ uint8_t Startup(void){
 
 	HAL_ADC_Stop_DMA(&hadc1);
 
+	//SET DEFAULT PIN STATES
 	HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1); //latch high the debounced o/p
-
-	HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
+	HAL_GPIO_WritePin(HACK_POT_HIGH_GPIO_Port, HACK_POT_HIGH_Pin, 1);
+	HAL_GPIO_WritePin(HACK_POT_LOW_GPIO_Port, HACK_POT_LOW_Pin, 0);
 
 	return 1;
 }
@@ -261,7 +258,7 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
 
 		uint16_t two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC = two_fifty_six_minus_TIM16_raw_start_value * pot_rotation_corrected;
 
-		uint16_t two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC_and_shifted_by_ADC_bits = (uint16_t)(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC >> SYMMETRY_ADC_NUM_BITS);
+		uint16_t two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC_and_shifted_by_ADC_bits = (uint16_t)(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC >> SYMMETRY_ADC_RESOLUTION);
 
 
 		//HAVE TO BE uin16_t HERE BECAUSE A uint8_t IS LIMITED TO 255!
@@ -565,7 +562,7 @@ uint32_t unsigned_bitwise_modulo(uint32_t dividend, uint8_t base_2_exponent){
 
     return dividend & ((1 << base_2_exponent) - 1);
 }
-
+/*
 uint8_t Check_Tap_Tempo_Switch_State(enum Tap_Tempo_Switch_State *tap_tempo_switch_state_ptr){
 
 	static uint8_t extend_rising_edge = 0;
@@ -670,4 +667,4 @@ uint8_t Speed_Pot_Check(struct Params* params_ptr){
 	return 1;
 }
 
-
+*/
