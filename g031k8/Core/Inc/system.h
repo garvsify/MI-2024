@@ -83,7 +83,7 @@
 		//TURN ON/OFF SYMMETRY and SET RESOLUTION
 		//set SYMMETRY_ADC_RESOLUTION to either 8, 10, or 12
 		#define SYMMETRY_ADC_RESOLUTION 8
-		#define SYMMETRY_ON_OR_OFF OFF
+		#define SYMMETRY_ON_OR_OFF ON
 
 		#if SYMMETRY_ADC_RESOLUTION == 8
 			#define SYMMETRY_ADC_HALF_SCALE_NO_BITS 7
@@ -199,6 +199,33 @@ enum Input_Capture_Event{
 enum Tap_Tempo_Switch_State{
 	NOT_DEPRESSED,
 	DEPRESSED
+};
+
+struct Params{
+
+	volatile uint16_t duty;
+	volatile uint16_t prev_duty;
+	volatile uint16_t duty_delayed;
+	volatile uint8_t waveshape;
+	volatile uint16_t speed;
+	volatile uint8_t depth;
+	volatile uint16_t symmetry;
+	volatile uint16_t index;
+	volatile uint8_t halfcycle;
+	volatile uint8_t quadrant;
+	volatile uint16_t raw_start_value;
+	volatile uint16_t final_start_value;
+	volatile uint16_t raw_prescaler;
+	volatile uint16_t final_prescaler;
+	volatile enum Adjust_Prescaler_Action prescaler_adjust;
+};
+
+struct Delay_Line{
+
+	volatile uint16_t duty_delay_line_storage_array[513]; //one index larger than the number of indexes (wave samples) to allow us to 'wrap' the array into a kind of circular buffer
+	volatile uint16_t duty_delay_line_start_offset; //initial value is 1st index
+	volatile uint16_t duty_delay_line_finish_offset; //initial value is 512th index (513th value)
+	volatile uint16_t duty_delay_line_read_pointer_offset;
 };
 
 //FUNCTION DECLARATIONS
