@@ -8,15 +8,15 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	//SET THE CURRENT(prev) VALUES FOR THE MAIN OSCILLATOR//
 	////////////////////////////////////////////////////////
 	TIM16->EGR |= TIM_EGR_UG; //DO NOT DELETE THIS LINE, IT LITERALLY MAKES OR BREAKS THE BASTARD - It triggers an 'update' event
-	__HAL_TIM_SET_COUNTER(&htim16, TIM16_final_start_value); //this line must go here, or at least very near the beginning!
-	__HAL_TIM_SET_PRESCALER(&htim16, (TIM16_final_prescaler - 1)); //have to take one off the divisor
+	__HAL_TIM_SET_COUNTER(&htim16, params.final_start_value); //this line must go here, or at least very near the beginning!
+	__HAL_TIM_SET_PRESCALER(&htim16, (params.final_prescaler - 1)); //have to take one off the divisor
 	TIM1->EGR |= TIM_EGR_UG; //not sure if we really need this line but gonna keep it here because it worked wonders for TIM16
-	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, prev_duty); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
+	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, params.prev_duty); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
 
 	/////////////////////////////////////////////////////////////
 	//SET THE CURRENT(prev) VALUES FOR THE SECONDARY OSCILLATOR//
 	/////////////////////////////////////////////////////////////
-	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, duty_delayed); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
+	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, params.duty_delayed); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
 
 	/////////////////////////////
 	//CALCULATE THE NEXT VALUES//
@@ -119,50 +119,37 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 	HAL_ADC_Stop_DMA(hadc); //disable ADC DMA
 
 	//GET WAVESHAPE
-	uint16_t ADC_result = ADCResultsDMA[0]; //set ADC_Result to waveshape index value
+	uint16_t ADC_result = ADCResultsDMA_ptr[WAVESHAPE_ADC_RESULT_INDEX]; //set ADC_Result to waveshape index value
 
 	if(ADC_result <= TRIANGLE_MODE_ADC_THRESHOLD){
-		current_waveshape = TRIANGLE_MODE; //triangle wave
+		params_ptr->waveshape = TRIANGLE_MODE; //triangle wave
 	}
 	else if (ADC_result <= SINE_MODE_ADC_THRESHOLD){
-		current_waveshape = SINE_MODE; //sine wave
+		params_ptr->waveshape = SINE_MODE; //sine wave
 	}
 	else if (ADC_result <= SQUARE_MODE_ADC_THRESHOLD){
-		current_waveshape = SQUARE_MODE; //square wave
-	}
-	else{
-		current_waveshape = SINE_MODE; //if error, return sine
+		params_ptr->waveshape = SQUARE_MODE; //square wave
 	}
 
 	//GET SPEED
-	current_speed = ADCResultsDMA[1] >> 2; //convert to 10-bit
+	params_ptr->speed = ADCResultsDMA_ptr[SPEED_ADC_RESULT_INDEX] >> 2; //convert to 10-bit
 
 	//GET DEPTH
 	#if DEPTH_ON_OR_OFF == ON
-		//current_depth = ADCResultsDMA[2] >> 4; //convert to 8-bit
-		duty_delay_line_read_pointer_offset = ADCResultsDMA[2] >> 3;
+
+		params_ptr->depth = ADCResultsDMA_ptr[DEPTH_ADC_RESULT_INDEX] >> 4; //convert to 8-bit
 
 	#endif
 
 	//GET SYMMETRY
 	#if SYMMETRY_ON_OR_OFF == ON
 
-		#if SYMMETRY_ADC_RESOLUTION == 10
-			current_symmetry = ADCResultsDMA[3] >> 2;
-
-		#endif
-
-		#if SYMMETRY_ADC_RESOLUTION == 8
-			current_symmetry = ADCResultsDMA[3] >> 4;
-
-		#endif
-
-		#if SYMMETRY_ADC_RESOLUTION == 12
-			current_symmetry = ADCResultsDMA[3];
-
-		#endif
+		params_ptr->symmetry = ADCResultsDMA_ptr[SYMMETRY_ADC_RESULT_INDEX] >> 4; //convert to 8-bit
 
 	#endif
+
+	//GET DELAY LINE READ POINTER OFFSET
+	delay_line_ptr->duty_delay_line_read_pointer_offset = ADCResultsDMA_ptr[DUTY_DELAY_LINE_READ_POINTER_OFFSET_ADC_RESULT_INDEX] >> 3; //convert to 9-bit
 
 	//after initial conversion is complete, set the conversion complete flag
 	if(initial_ADC_conversion_complete == NO){
@@ -171,8 +158,8 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 
 	if(speed_pot_is_disabled == NO){
 
-		Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(current_speed, SPEED_ADC_RESOLUTION, NUMBER_OF_FREQUENCY_STEPS, &TIM16_raw_start_value, &TIM16_raw_prescaler);
-		Process_TIM16_Final_Start_Value_and_Final_Prescaler(TIM16_raw_start_value, &TIM16_final_start_value, TIM16_raw_prescaler, &TIM16_final_prescaler, current_symmetry, current_waveshape, current_halfcycle, current_quadrant, current_index);
+		Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(&params);
+		Process_TIM16_Final_Start_Value_and_Final_Prescaler(&params);
 	}
 }
 
@@ -886,7 +873,7 @@ void TIM17_callback_speed_pot_check(TIM_HandleTypeDef *htim){
 
 	Stop_OC_TIM(&htim17, TIM_CHANNEL_1);
 
-	Speed_pot_check();
+	Speed_Pot_Check(&params);
 
 	__HAL_TIM_SET_COUNTER(&htim17, 0);
 	Start_OC_TIM(&htim17, TIM_CHANNEL_1);

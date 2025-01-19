@@ -41,6 +41,13 @@
 //#define TIM17_DEBOUNCE_LENGTH 55
 #define SPEED_POT_CHECK_LENGTH 25
 #define COUNT_TO_DELAY_RISING_TAP_TEMPO_EDGE 1
+#define WAVESHAPE_ADC_RESULT_INDEX 0
+#define SPEED_ADC_RESULT_INDEX 1
+#define DEPTH_ADC_RESULT_INDEX 2
+#define SYMMETRY_ADC_RESULT_INDEX 3
+#define DUTY_DELAY_LINE_READ_POINTER_OFFSET_ADC_RESULT_INDEX 4
+#define PWM_DUTY_VALUE_MAX 1023
+#define PWM_DUTY_VALUE_MIN 0
 
 
 #if SINE_OR_TRIANGLE_WAVE_TEMPO_PERCEIVED_APEX_INDEX < SECOND_QUADRANT_START_INDEX
@@ -80,21 +87,13 @@
 #endif
 
 
-		//TURN ON/OFF SYMMETRY and SET RESOLUTION
-		//set SYMMETRY_ADC_RESOLUTION to either 8, 10, or 12
-		#define SYMMETRY_ADC_RESOLUTION 8
+		//TURN ON/OFF SYMMETRY
 		#define SYMMETRY_ON_OR_OFF ON
-
-		#if SYMMETRY_ADC_RESOLUTION == 8
-			#define SYMMETRY_ADC_HALF_SCALE_NO_BITS 7
-			#define SYMMETRY_ADC_FULL_SCALE 255
-			#define SYMMETRY_ADC_HALF_SCALE 128
-			#define SYMMETRY_ADC_NUM_BITS 8
-		#endif
 
 		//TURN ON/OFF DEPTH
 		#define DEPTH_ON_OR_OFF ON
 
+		#define SYMMETRY_ADC_RESOLUTION 8
 		#define SPEED_ADC_RESOLUTION 10
 		#define DEPTH_ADC_RESOLUTION 8
 		#define WAVESHAPE_ADC_RESOLUTION 12
@@ -107,45 +106,15 @@ extern const uint16_t tri_wavetable[512];
 extern const uint16_t TIM16_prescalers[6];
 
 //VARIABLES
-volatile extern uint16_t duty;
-volatile extern uint8_t current_waveshape;
-volatile extern uint16_t current_speed;
-volatile extern uint16_t current_depth;
-volatile extern uint16_t current_symmetry;
-volatile extern uint16_t current_index;
-volatile extern uint8_t current_halfcycle;
-volatile extern uint8_t current_quadrant;
-volatile extern uint16_t ADCResultsDMA[4];
+volatile extern uint16_t ADCResultsDMA[5];
 const extern uint8_t num_ADC_conversions;
 volatile extern enum Validate initial_ADC_conversion_complete;
-volatile extern uint16_t TIM16_raw_start_value;
-volatile extern uint16_t TIM16_final_start_value;
-volatile extern uint16_t TIM16_raw_prescaler;
-volatile extern enum Adjust_Prescaler_Action TIM16_prescaler_adjust;
-volatile extern uint16_t TIM16_final_prescaler;
-volatile extern uint16_t prev_duty;
 volatile extern enum Input_Capture_Event input_capture_event;
 volatile extern uint32_t TIM2_ch1_input_capture_value;
 volatile extern enum Validate input_capture_measurement_is_ongoing;
 volatile extern enum Validate speed_pot_is_disabled;
 volatile extern enum Validate input_capture_measurement_reelapse_is_ongoing;
 volatile extern uint16_t interrupt_period;
-volatile extern enum Adjust_Prescaler_Action TIM16_prescaler_adjust_to_be_loaded;
-volatile extern uint16_t TIM16_raw_start_value_to_be_loaded;
-volatile extern uint16_t TIM16_final_start_value_to_be_loaded;
-volatile extern uint16_t TIM16_raw_prescaler_to_be_loaded; //technically should be uint32_t but we'll never calculate a prescaler anywhere close to 65536
-volatile extern uint16_t TIM16_final_prescaler_to_be_loaded;
-volatile extern uint16_t duty_to_be_loaded;
-volatile extern uint8_t current_halfcycle_to_be_loaded;
-volatile extern uint8_t current_quadrant_to_be_loaded;
-volatile extern uint16_t current_index_to_be_loaded;
-volatile extern uint16_t current_depth_to_be_loaded;
-volatile extern uint16_t duty_delay_line_storage_array[513]; //one index larger than the number of indexes (wave samples) to allow us to 'wrap' the array into a kind of circular buffer
-volatile extern uint16_t duty_delay_line_start_offset; //initial value is 1st index
-volatile extern uint16_t duty_delay_line_finish_offset; //initial value is 512th index (513th value)
-volatile extern uint16_t duty_delay_line_read_pointer_offset;
-volatile extern uint16_t duty_delayed;
-volatile extern enum Validate TAP_TEMPO_EXTI4_15_IRQ_is_disabled;
 volatile extern enum Validate tap_tempo_mode_is_active;
 volatile extern uint8_t speed_pot_adc_measurement_num;
 volatile extern enum Validate is_very_first_oscillation;
@@ -238,13 +207,12 @@ uint8_t Start_Input_Capture_Timer(void);
 uint8_t Start_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel);
 uint8_t Stop_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel);
 uint8_t Start_IC_TIM(TIM_HandleTypeDef *TIM, uint32_t IC_TIM_channel);
-uint8_t Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(volatile uint16_t speed_adc_value, uint8_t adc_resolution_bits, uint16_t speed_range, volatile uint16_t *TIM16_raw_start_value_ptr, volatile uint16_t *TIM16_raw_prescaler_ptr);
-uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(volatile uint16_t TIM16_raw_start_value_value, volatile uint16_t *TIM16_final_start_value_ptr, volatile uint16_t TIM16_raw_prescaler_value, volatile uint16_t *TIM16_final_prescaler_ptr,
-																volatile uint16_t current_symmetry_value, volatile uint16_t current_waveshape_value, volatile uint8_t current_halfcycle_value, volatile uint8_t current_quadrant_value, volatile uint16_t current_index_value);
-uint8_t Adjust_TIM16_Prescaler(volatile enum Adjust_Prescaler_Action TIM16_prescaler_adjustment, volatile uint16_t *TIM16_final_prescaler_ptr, volatile uint16_t TIM16_raw_prescaler_value);
-uint32_t unsigned_bitwise_modulo(uint32_t dividend, uint8_t base_2_exponent);
-uint8_t Speed_pot_check(void);
+uint8_t Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(struct Params* params_ptr);
+uint8_t Speed_Pot_Check(struct Params* params_ptr);
+uint8_t Adjust_TIM16_Prescaler(struct Params* params_ptr);
+uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* params_ptr);
 uint8_t Check_Tap_Tempo_Switch_State(enum Tap_Tempo_Switch_State *tap_tempo_switch_state_ptr);
 uint8_t Start_Tap_Tempo_Monitoring_Timers_and_UART_Receive(void);
+uint32_t unsigned_bitwise_modulo(uint32_t dividend, uint8_t base_2_exponent);
 
 #endif
