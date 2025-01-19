@@ -53,6 +53,15 @@ volatile enum Validate UART_DMA_TX_is_complete = YES;
 uint8_t tap_tempo_switch_state_counter = TAP_TEMPO_SWITCH_CONFIDENCE_COUNT;
 enum Tap_Tempo_Switch_State tap_tempo_switch_state = NOT_DEPRESSED;
 
+//STRUCT VARIABLES
+struct Params params = {0};
+struct Params params_to_be_loaded = {0};
+struct Delay_Line delay_line = {.duty_delay_line_storage_array = 0, //one index larger than the number of indexes (wave samples) to allow us to 'wrap' the array into a kind of circular buffer - this is reinitialised to mid-scale on runtime
+								.duty_delay_line_start_offset = 1,  //initial value is 1st index - to give us space to fill index 0
+								.duty_delay_line_finish_offset = FINAL_INDEX + 1, //initial value is 512th index, one larger than the total number of samples in 1 oscillation
+								.duty_delay_line_read_pointer_offset = 0}; //determined in running
+
+
 //FUNCTION DEFINITIONS
 uint8_t Global_Interrupt_Enable(void){
 

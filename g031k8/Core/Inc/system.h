@@ -154,6 +154,11 @@ volatile extern char rx_buffer[1];
 extern uint8_t tap_tempo_switch_state_counter;
 extern enum Tap_Tempo_Switch_State tap_tempo_switch_state;
 
+//STRUCT VARIABLES
+extern struct Params params;
+extern struct Params params_to_be_loaded;
+extern struct Delay_Line delay_line;
+
 //CUSTOM TYPES
 enum Polarity{
 	NEGATIVE,
