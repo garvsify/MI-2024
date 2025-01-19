@@ -83,8 +83,11 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 			duty = 1023 - duty;
 		}
 		else if(current_depth != 0){
-			//duty = 1023 - duty*(current_depth >> 8);
-			Multiply_Duty_By_Current_Depth_and_Divide_By_256();
+
+			uint32_t multiply_product;
+			//Perform: (duty*current_depth) / 256
+			multiply_product = duty * current_depth; //compiler should compile this as a hardware multiplication, but need to check
+			duty = 1023 - (uint16_t)(multiply_product >> 8);
 		}
 		else{
 			duty = 1023; //if depth is 0, just output 1023
@@ -128,17 +131,6 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	TIM16_callback_active = NO;
 
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions); //this function takes ages to execute!
-}
-
-uint8_t Multiply_Duty_By_Current_Depth_and_Divide_By_256(void)
-{
-	volatile uint32_t multiply_product = 0;
-
-	//Perform: (duty*current_depth) / 256
-	multiply_product = duty * current_depth; //compiler should compile this as a hardware multiplication, but need to check
-    duty = 1023 - (uint16_t)(multiply_product >> 8);
-
-    return 1;
 }
 
 void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
