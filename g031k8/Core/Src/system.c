@@ -841,8 +841,8 @@ uint8_t Process_ADC_Conversion_Values(struct Params* params_ptr, struct Delay_Li
 	}
 
 	//GET SPEED
-	params_ptr->speed = ADCResultsDMA_ptr[SPEED_ADC_RESULT_INDEX] >> 4; //truncate to 8-bit
-	params_ptr->speed = params_ptr->speed << 2; //convert to 10-bit
+	params_ptr->speed = ADCResultsDMA_ptr[SPEED_ADC_RESULT_INDEX] >> 5; //truncate to 7-bit
+	params_ptr->speed = params_ptr->speed << 3; //convert to 10-bit
 
 	//GET DEPTH
 	#if DEPTH_ON_OR_OFF == ON

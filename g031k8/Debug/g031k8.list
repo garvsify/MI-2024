@@ -5353,13 +5353,13 @@ uint8_t Process_ADC_Conversion_Values(struct Params* params_ptr, struct Delay_Li
 	}
 
 	//GET SPEED
-	params_ptr->speed = ADCResultsDMA_ptr[SPEED_ADC_RESULT_INDEX] >> 4; //truncate to 8-bit
+	params_ptr->speed = ADCResultsDMA_ptr[SPEED_ADC_RESULT_INDEX] >> 5; //truncate to 7-bit
  8001de8:	8853      	ldrh	r3, [r2, #2]
- 8001dea:	091b      	lsrs	r3, r3, #4
+ 8001dea:	095b      	lsrs	r3, r3, #5
  8001dec:	8103      	strh	r3, [r0, #8]
-	params_ptr->speed = params_ptr->speed << 2; //convert to 10-bit
+	params_ptr->speed = params_ptr->speed << 3; //convert to 10-bit
  8001dee:	8903      	ldrh	r3, [r0, #8]
- 8001df0:	009b      	lsls	r3, r3, #2
+ 8001df0:	00db      	lsls	r3, r3, #3
  8001df2:	b29b      	uxth	r3, r3
  8001df4:	8103      	strh	r3, [r0, #8]
 
