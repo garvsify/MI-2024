@@ -41,7 +41,7 @@ int main(void)
 
 		if(input_capture_processing_can_be_started == YES){
 
-			Input_Capture_Processing(interrupt_period, &params_to_be_loaded);
+			//Input_Capture_Processing(interrupt_period, &params_to_be_loaded);
 		}
 	}
 	return 1;

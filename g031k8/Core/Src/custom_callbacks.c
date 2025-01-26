@@ -143,7 +143,24 @@ void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
 
 void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
 
-	if((GPIO_Pin == CLK_IN_Pin) && (HAL_GPIO_ReadPin(CLK_IN_GPIO_Port, CLK_IN_Pin) == 0)){ //if specifically CLK IN pin with falling interrupt
+	//DISABLE EXTI INTERRUPTS - in EXTI Callback before
+
+	//I think works better if SW IN is checked first here
+	if((GPIO_Pin == SW_IN_Pin) && HAL_GPIO_ReadPin(SW_IN_GPIO_Port, SW_IN_Pin) == 0){ //if specifically SW IN pin with falling interrupt
+
+		//SET MODES
+		tap_tempo_mode_is_active = YES;
+		external_clock_mode_is_active = NO;
+
+		//ENABLE TAP-TEMPO SWITCH CHECKING
+		HAL_NVIC_EnableIRQ(LPTIM1_IRQn);
+		HAL_LPTIM_SetOnce_Start_IT(&hlptim1, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK);
+
+		//START SPEED POT CHECKING
+		__HAL_TIM_SET_COUNTER(&htim17, 0);
+		Start_OC_TIM(&htim17, TIM_CHANNEL_1);
+	}
+	else if((GPIO_Pin == CLK_IN_Pin) && (HAL_GPIO_ReadPin(CLK_IN_GPIO_Port, CLK_IN_Pin) == 0)){ //if specifically CLK IN pin with falling interrupt
 
 		//Set SW OUT
 		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
@@ -159,21 +176,9 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
 		//START SPEED POT CHECKING
 		__HAL_TIM_SET_COUNTER(&htim17, 0);
 		Start_OC_TIM(&htim17, TIM_CHANNEL_1);
-	}
-	else if((GPIO_Pin == SW_IN_Pin) && HAL_GPIO_ReadPin(SW_IN_GPIO_Port, SW_IN_Pin) == 0){ //if specifically SW IN pin with falling interrupt
 
-		//SET MODES
-		tap_tempo_mode_is_active = YES;
-		external_clock_mode_is_active = NO;
-
-		//ENABLE TAP-TEMPO SWITCH CHECKING
-		HAL_NVIC_EnableIRQ(LPTIM1_IRQn);
-		HAL_LPTIM_SetOnce_Start_IT(&hlptim1, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK);
-
-		//START SPEED POT CHECKING
-		__HAL_TIM_SET_COUNTER(&htim17, 0);
-		Start_OC_TIM(&htim17, TIM_CHANNEL_1);
-	}
+		HAL_NVIC_EnableIRQ(EXTI4_15_IRQn); //allow clk to cause interrupts
+		}
 }
 
 void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
@@ -216,6 +221,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 		//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
 		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1); //reset
 		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+		HAL_NVIC_EnableIRQ(EXTI4_15_IRQn); //allow switch to cause interrupts once debounced
 	}
 
 	HAL_LPTIM_SetOnce_Start_IT(&hlptim1, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK);
