@@ -783,7 +783,7 @@ uint8_t Calculate_Next_Main_Oscillator_Values(struct Params* params_ptr, enum Ne
 			//duty = 1023 - duty*(current_depth >> 8);
 			uint32_t multiply_product = 0;
 			multiply_product = (params_ptr->duty) * (params_ptr->depth);
-			params_ptr->duty = PWM_DUTY_VALUE_MAX - (multiply_product >> 8);
+			params_ptr->duty = PWM_DUTY_VALUE_MAX - (multiply_product >> DEPTH_ADC_RESOLUTION);
 		}
 		else{
 			params_ptr->duty = PWM_DUTY_VALUE_MAX; //if depth is 0, just output 1023
@@ -849,25 +849,26 @@ uint8_t Process_ADC_Conversion_Values(struct Params* params_ptr, struct Delay_Li
 
 	//GET SPEED
 	params_ptr->speed = ADCResultsDMA_ptr[SPEED_ADC_RESULT_INDEX] >> 5; //truncate to 7-bit
-	params_ptr->speed = params_ptr->speed << 3; //convert to 10-bit
+	params_ptr->speed <<= 3; //convert to 10-bit
 
 	//GET DEPTH
 	#if DEPTH_ON_OR_OFF == ON
 
-		params_ptr->depth = ADCResultsDMA_ptr[DEPTH_ADC_RESULT_INDEX] >> 4; //convert to 8-bit
+		params_ptr->depth = ADCResultsDMA_ptr[DEPTH_ADC_RESULT_INDEX] >> 5; //truncate to 7-bit
 
 	#endif
 
 	//GET SYMMETRY
 	#if SYMMETRY_ON_OR_OFF == ON
 
-		params_ptr->symmetry = ADCResultsDMA_ptr[SYMMETRY_ADC_RESULT_INDEX] >> 4; //convert to 8-bit
+		params_ptr->symmetry = ADCResultsDMA_ptr[SYMMETRY_ADC_RESULT_INDEX] >> 5; //truncate to 7-bit
+		params_ptr->symmetry <<= 1; //convert to 8-bit
 
 	#endif
 
 	//GET DELAY LINE READ POINTER OFFSET
-	delay_line_ptr->duty_delay_line_read_pointer_offset = ADCResultsDMA_ptr[DUTY_DELAY_LINE_READ_POINTER_OFFSET_ADC_RESULT_INDEX] >> 4; //truncate to 8-bit
-	delay_line_ptr->duty_delay_line_read_pointer_offset = delay_line_ptr->duty_delay_line_read_pointer_offset << 1; //convert to 9-bit
+	delay_line_ptr->duty_delay_line_read_pointer_offset = ADCResultsDMA_ptr[DUTY_DELAY_LINE_READ_POINTER_OFFSET_ADC_RESULT_INDEX] >> 5; //truncate to 7-bit
+	delay_line_ptr->duty_delay_line_read_pointer_offset <<= 2; //convert to 9-bit
 
 	return 1;
 }
