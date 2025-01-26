@@ -123,6 +123,13 @@ uint8_t Calculate_Next_Main_Oscillator_Values(struct Params* params_ptr, enum Ne
 			params_ptr->halfcycle = CURRENT_HALFCYCLE_SQUARE_SYNCED;
 		}
 	}
+	else if(mode == STARTUP_MODE){
+
+		if(params_ptr->index == FIRST_QUADRANT_START_INDEX){
+			params_ptr->quadrant = FIRST_QUADRANT;
+			params_ptr->halfcycle = FIRST_HALFCYCLE;
+		}
+	}
 
 	//ONCE INDEX IS SET, FIND THE DUTY VALUE
 	if(params_ptr->waveshape == TRIANGLE_MODE){

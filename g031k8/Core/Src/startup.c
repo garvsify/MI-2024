@@ -9,25 +9,31 @@ uint8_t Startup(void){
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions);
 
 	//WAIT
-	while(initial_ADC_conversion_complete == NO){}; //wait while first ADC conversion is ongoing
+	while(initial_ADC_conversion_complete == NO){}; //wait while first ADC conversion is ongoing - raw and final values will be computed within this time
 
-	// re-initialise all values in delay line storage array to middle value of wave, as they are initialised to 0 on startup
-		for(uint16_t i = 0; i < FINAL_INDEX + 2; i++){ //513
+	// re-initialise all values in delay line storage array to middle value of wave (if sine/triangle mode) or bottom of wave if square mode, as they are initialised to 0 on startup
+	for(uint16_t i = 0; i < FINAL_INDEX + 2; i++){ //513
 
-			if(params.waveshape == SQUARE_MODE){
+		if(params.waveshape == SQUARE_MODE){
 
-				delay_line.duty_delay_line_storage_array[i] = PWM_DUTY_VALUE_MAX - ((params.depth * PWM_DUTY_VALUE_MAX) >> DEPTH_ADC_RESOLUTION);
-			}
-			else{
+			delay_line.duty_delay_line_storage_array[i] = PWM_DUTY_VALUE_MAX - ((params.depth * PWM_DUTY_VALUE_MAX) >> DEPTH_ADC_RESOLUTION);
+		}
+		else{
 
-				delay_line.duty_delay_line_storage_array[i] = PWM_DUTY_VALUE_MAX - (((params.depth * PWM_DUTY_VALUE_MAX) >> DEPTH_ADC_RESOLUTION) >> 1);
-			}
+			delay_line.duty_delay_line_storage_array[i] = PWM_DUTY_VALUE_MAX - (((params.depth * PWM_DUTY_VALUE_MAX) >> DEPTH_ADC_RESOLUTION) >> 1);
+		}
 	}
+
+	Calculate_Next_Main_Oscillator_Values(&params, (enum Next_Values_Processing_Mode)STARTUP_MODE);
+	Write_Next_Main_Oscillator_Values_to_Delay_Line(&params, &delay_line);
+	Set_Oscillator_Values(&params);
 
 	//SET DEFAULT PIN STATES
 	HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1); //latch high the debounced o/p
 	HAL_GPIO_WritePin(HACK_POT_HIGH_GPIO_Port, HACK_POT_HIGH_Pin, 1);
 	HAL_GPIO_WritePin(HACK_POT_LOW_GPIO_Port, HACK_POT_LOW_Pin, 0);
+
+
 
 	return 1;
 }

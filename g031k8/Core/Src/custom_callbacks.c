@@ -19,11 +19,6 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 	HAL_ADC_Stop_DMA(hadc); //disable ADC DMA
 	Process_ADC_Conversion_Values(&params, &delay_line, ADCResultsDMA);
 
-	//after initial conversion is complete, set the conversion complete flag
-	if(initial_ADC_conversion_complete == NO){
-		initial_ADC_conversion_complete = YES;
-	}
-
 	if((tap_tempo_mode_is_active == YES) || (external_clock_mode_is_active == YES)){
 
 		//COPY THE 'to be loaded' raw values into params such that the speed pot raw values are ignored in favour of the I/P cap processing raw values
@@ -35,6 +30,11 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 
 		Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(&params);
 		Process_TIM16_Final_Start_Value_and_Final_Prescaler(&params);
+	}
+
+	//after initial conversion is complete, set the conversion complete flag - leave this after raw/final value processing rather than actually when ADC values are converted for startup routine reasons.
+	if(initial_ADC_conversion_complete == NO){
+		initial_ADC_conversion_complete = YES;
 	}
 
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);

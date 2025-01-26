@@ -58,7 +58,8 @@ extern struct Delay_Line delay_line;
 //CUSTOM TYPES
 enum Next_Values_Processing_Mode{
 	REGULAR_MODE,
-	IP_CAPTURE_MODE
+	IP_CAPTURE_MODE,
+	STARTUP_MODE
 };
 
 struct Delay_Line{
