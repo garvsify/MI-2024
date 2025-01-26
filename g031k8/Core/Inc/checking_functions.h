@@ -1,5 +1,5 @@
-#ifndef INC_CHECKING_H_
-#define INC_CHECKING_H_
+#ifndef INC_CHECKING_FUNCTIONS_H_
+#define INC_CHECKING_FUNCTIONS_H_
 
 //MACROS
 //#define LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK 4001 - 1 //4ms overflow with prescaler of 128
@@ -14,6 +14,7 @@
 #include "utility.h"
 #include <oscillator_params_type.h>
 #include "oscillator.h"
+#include "timers.h"
 
 //CUSTOM TYPES
 enum Tap_Tempo_Switch_State{
@@ -32,4 +33,4 @@ volatile extern uint8_t speed_pot_adc_measurement_num;
 uint8_t Speed_Pot_Check(struct Params* params_ptr);
 uint8_t Check_Tap_Tempo_Switch_State(volatile enum Tap_Tempo_Switch_State *tap_tempo_switch_state_ptr);
 
-#endif /* INC_CHECKING_H_ */
+#endif /* INC_CHECKING_FUNCTIONS_H_ */

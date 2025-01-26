@@ -39,7 +39,8 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h ../Core/Inc/UART.h \
  ../Core/Inc/utility.h ../Core/Inc/oscillator.h \
  ../Core/Inc/symmetry_adjustment.h ../Core/Inc/oscillator_params_type.h \
  ../Core/Inc/symmetry_adjustment_types.h \
- ../Core/Inc/oscillator_params_type.h ../Core/Inc/input_capture.h
+ ../Core/Inc/oscillator_params_type.h ../Core/Inc/timers.h \
+ ../Core/Inc/input_capture.h ../Core/Inc/startup.h
 ../Core/Inc/main.h:
 ../Core/Inc/UART.h:
 ../Core/Inc/config.h:
@@ -86,4 +87,6 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h ../Core/Inc/UART.h \
 ../Core/Inc/oscillator_params_type.h:
 ../Core/Inc/symmetry_adjustment_types.h:
 ../Core/Inc/oscillator_params_type.h:
+../Core/Inc/timers.h:
 ../Core/Inc/input_capture.h:
+../Core/Inc/startup.h:

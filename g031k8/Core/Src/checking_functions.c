@@ -1,4 +1,4 @@
-#include "checking.h"
+#include <checking_functions.h>
 
 //VARIABLE DEFINITIONS
 volatile uint8_t tap_tempo_switch_state_counter = TAP_TEMPO_SWITCH_CONFIDENCE_COUNT;

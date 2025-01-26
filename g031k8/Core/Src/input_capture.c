@@ -48,3 +48,28 @@ uint8_t Input_Capture_Processing(volatile uint16_t interrupt_period_value, struc
 	return 1;
 }
 
+uint8_t Start_Input_Capture_Timer(void){
+
+	uint8_t ok = Start_IC_TIM(&htim2, TIM_CHANNEL_1);
+
+	if(ok != HAL_OK){
+
+		Error_Handler();
+	}
+
+	return ok;
+}
+
+uint8_t Start_IC_TIM(TIM_HandleTypeDef *TIM, uint32_t IC_TIM_channel){
+
+	uint8_t ok_AND = HAL_TIM_Base_Start_IT(&htim2);
+	ok_AND &= HAL_TIM_IC_Start_IT(&htim2, IC_TIM_channel);
+
+	if(ok_AND != HAL_OK){
+
+		Error_Handler();
+	}
+
+	return ok_AND;
+}
+

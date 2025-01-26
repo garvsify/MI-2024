@@ -20,44 +20,6 @@ struct Delay_Line delay_line = {.duty_delay_line_storage_array = 0, //one index 
 								.duty_delay_line_read_pointer_offset = 0}; //determined in running
 
 //FUNCTION DEFINITIONS
-uint8_t Global_Interrupt_Enable(void){
-
-	__enable_irq();
-	return 1;
-}
-
-uint8_t Global_Interrupt_Disable(void){
-
-	__disable_irq();
-	return 1;
-}
-
-uint8_t Startup(void){
-
-	// re-initialise all values in delay line storage array to 512 (mid scale) as they are initialised to 0 on startup
-	for(uint16_t i = 0; i < FINAL_INDEX + 1; i++){
-
-		delay_line.duty_delay_line_storage_array[i] = INITIAL_PWM_VALUE;
-	}
-
-	__HAL_TIM_ENABLE_IT(&htim2, TIM_IT_UPDATE); //make sure the overflow (update) interrupt is enabled for TIM2
-	__HAL_TIM_ENABLE_IT(&htim16, TIM_IT_UPDATE); //make sure the overflow (update) interrupt is enabled for TIM16
-
-	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions);
-
-	//WAIT
-	while(initial_ADC_conversion_complete == NO){}; //wait while first ADC conversion is ongoing
-
-	HAL_ADC_Stop_DMA(&hadc1);
-
-	//SET DEFAULT PIN STATES
-	HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1); //latch high the debounced o/p
-	HAL_GPIO_WritePin(HACK_POT_HIGH_GPIO_Port, HACK_POT_HIGH_Pin, 1);
-	HAL_GPIO_WritePin(HACK_POT_LOW_GPIO_Port, HACK_POT_LOW_Pin, 0);
-
-	return 1;
-}
-
 uint8_t Start_PWM_Gen_Timer_Main_and_Secondary_Oscillators(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel_1, uint32_t PWM_TIM_channel_2)
 {
 	uint8_t ok_AND = 1;
@@ -76,56 +38,6 @@ uint8_t Start_PWM_Gen_Timer_Main_and_Secondary_Oscillators(TIM_HandleTypeDef *TI
 uint8_t Start_Freq_Gen_Timer(void)
 {
 	uint8_t ok = Start_OC_TIM(&htim16, TIM_CHANNEL_1); //start freq. gen.
-
-	if(ok != HAL_OK){
-
-		Error_Handler();
-	}
-
-	return ok;
-}
-
-uint8_t Start_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t OC_TIM_channel){
-
-	uint8_t ok = HAL_TIM_OC_Start_IT(TIM, OC_TIM_channel); //_IT variant of function
-	//means the timer will generate an interrupt on delay_elapsed (CNT = CCR) condition
-
-	if(ok != HAL_OK){
-
-		Error_Handler();
-	}
-
-	return ok;
-}
-
-uint8_t Stop_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t OC_TIM_channel){
-
-	uint8_t ok = HAL_TIM_OC_Stop_IT(TIM, OC_TIM_channel);
-
-	if(ok != HAL_OK){
-
-		Error_Handler();
-	}
-
-	return ok;
-}
-
-uint8_t Start_IC_TIM(TIM_HandleTypeDef *TIM, uint32_t IC_TIM_channel){
-
-	uint8_t ok_AND = HAL_TIM_Base_Start_IT(&htim2);
-	ok_AND &= HAL_TIM_IC_Start_IT(&htim2, IC_TIM_channel);
-
-	if(ok_AND != HAL_OK){
-
-		Error_Handler();
-	}
-
-	return ok_AND;
-}
-
-uint8_t Start_Input_Capture_Timer(void){
-
-	uint8_t ok = Start_IC_TIM(&htim2, TIM_CHANNEL_1);
 
 	if(ok != HAL_OK){
 

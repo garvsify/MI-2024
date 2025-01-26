@@ -7,5 +7,6 @@
 #include "config.h"
 #include "oscillator.h"
 #include "input_capture.h"
+#include "startup.h"
 
 #endif /* INC_MAIN_H_ */

@@ -1,9 +1,6 @@
 Core/Src/input_capture.o: ../Core/Src/input_capture.c \
  ../Core/Inc/input_capture.h ../Core/Inc/oscillator.h \
- ../Core/Inc/utility.h ../Core/Inc/symmetry_adjustment.h \
- ../Core/Inc/oscillator_params_type.h \
- ../Core/Inc/symmetry_adjustment_types.h \
- ../Core/Inc/oscillator_params_type.h ../Core/Inc/config.h \
+ ../Core/Inc/utility.h ../Core/Inc/config.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal.h \
  ../Core/Inc/stm32g0xx_hal_conf.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_rcc.h \
@@ -40,14 +37,13 @@ Core/Src/input_capture.o: ../Core/Src/input_capture.c \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_tim.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_tim_ex.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart.h \
- ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart_ex.h
+ ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart_ex.h \
+ ../Core/Inc/symmetry_adjustment.h ../Core/Inc/oscillator_params_type.h \
+ ../Core/Inc/symmetry_adjustment_types.h \
+ ../Core/Inc/oscillator_params_type.h ../Core/Inc/timers.h
 ../Core/Inc/input_capture.h:
 ../Core/Inc/oscillator.h:
 ../Core/Inc/utility.h:
-../Core/Inc/symmetry_adjustment.h:
-../Core/Inc/oscillator_params_type.h:
-../Core/Inc/symmetry_adjustment_types.h:
-../Core/Inc/oscillator_params_type.h:
 ../Core/Inc/config.h:
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal.h:
 ../Core/Inc/stm32g0xx_hal_conf.h:
@@ -86,3 +82,8 @@ Core/Src/input_capture.o: ../Core/Src/input_capture.c \
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_tim_ex.h:
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart.h:
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart_ex.h:
+../Core/Inc/symmetry_adjustment.h:
+../Core/Inc/oscillator_params_type.h:
+../Core/Inc/symmetry_adjustment_types.h:
+../Core/Inc/oscillator_params_type.h:
+../Core/Inc/timers.h:

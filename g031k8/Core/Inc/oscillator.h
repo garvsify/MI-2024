@@ -6,6 +6,7 @@
 #include "symmetry_adjustment.h"
 #include "oscillator_params_type.h"
 #include "config.h"
+#include "timers.h"
 
 #include <stdint.h>
 
@@ -85,26 +86,31 @@
 
 #endif
 
-
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
 		//TURN ON/OFF SYMMETRY and SET RESOLUTION
 		//set SYMMETRY_ADC_RESOLUTION
-		#define SYMMETRY_ADC_RESOLUTION 8
 		#define SYMMETRY_ON_OR_OFF ON
-
-		#if SYMMETRY_ADC_RESOLUTION == 8
-			#define SYMMETRY_ADC_HALF_SCALE_NO_BITS 7
-			#define SYMMETRY_ADC_FULL_SCALE 255
-			#define SYMMETRY_ADC_HALF_SCALE 128
-			#define SYMMETRY_ADC_NUM_BITS 8
-		#endif
 
 		//TURN ON/OFF DEPTH
 		#define DEPTH_ON_OR_OFF ON
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
 
-		#define SPEED_ADC_RESOLUTION 10
-		#define DEPTH_ADC_RESOLUTION 7
-		#define WAVESHAPE_ADC_RESOLUTION 12
-		#define DELAY_ADC_RESOLUTION 9
+
+#define SPEED_ADC_RESOLUTION 10 //- even if resolutions are truncated, maths in the code needs these definitions
+#define DEPTH_ADC_RESOLUTION 7 //- even if resolutions are truncated, maths in the code needs these definitions
+#define WAVESHAPE_ADC_RESOLUTION 12 //- even if resolutions are truncated, maths in the code needs these definitions
+#define DELAY_ADC_RESOLUTION 9 //- even if resolutions are truncated, maths in the code needs these definitions
+
+#define SYMMETRY_ADC_RESOLUTION 8 //- even if resolutions are truncated, maths in the code needs these definitions
+
+#if SYMMETRY_ADC_RESOLUTION == 8
+	#define SYMMETRY_ADC_HALF_SCALE_NO_BITS 7
+	#define SYMMETRY_ADC_FULL_SCALE 255
+	#define SYMMETRY_ADC_HALF_SCALE 128
+	#define SYMMETRY_ADC_NUM_BITS 8
+#endif
 
 
 //CONSTANTS
@@ -137,15 +143,8 @@ struct Delay_Line{
 };
 
 //FUNCTION DECLARATIONS
-uint8_t Global_Interrupt_Enable(void);
-uint8_t Global_Interrupt_Disable(void);
-uint8_t Startup(void);
 uint8_t Start_PWM_Gen_Timer_Main_and_Secondary_Oscillators(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel_1, uint32_t PWM_TIM_channel_2);
 uint8_t Start_Freq_Gen_Timer(void);
-uint8_t Start_Input_Capture_Timer(void);
-uint8_t Start_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel);
-uint8_t Stop_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel);
-uint8_t Start_IC_TIM(TIM_HandleTypeDef *TIM, uint32_t IC_TIM_channel);
 
 uint8_t Set_Oscillator_Values(struct Params* params_ptr);
 uint8_t Calculate_Next_Main_Oscillator_Values(struct Params* params_ptr, enum Next_Values_Processing_Mode mode);
