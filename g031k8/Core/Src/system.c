@@ -257,9 +257,9 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
 			//HAVE TO BE uin16_t FOR 1ST AND 3RD VARIABLES HERE BECAUSE A uint8_t IS LIMITED TO 255!
 			uint16_t two_fifty_six_minus_TIM16_raw_start_value = 256 - params_ptr->raw_start_value;
 
-			uint16_t two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC = (two_fifty_six_minus_TIM16_raw_start_value * pot_rotation_corrected);
+			//uint16_t two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC = (two_fifty_six_minus_TIM16_raw_start_value * pot_rotation_corrected);
 			//COMMENT LINE BELOW IN AND LINE ABOVE OUT TO EXPERIMENT WITH MORE EXTREME SYMMETRY ADJUSTMENT
-			//uint16_t two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC = ((two_fifty_six_minus_TIM16_raw_start_value * pot_rotation_corrected) * 11) >> 3; //x(11/8)
+			uint16_t two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC = ((two_fifty_six_minus_TIM16_raw_start_value * pot_rotation_corrected) * 11) >> 3; //x(11/8)
 
 			uint16_t two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC_and_shifted_by_ADC_bits = (uint16_t)(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC >> SYMMETRY_ADC_NUM_BITS);
 
@@ -548,10 +548,6 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
 	            }
 	        }
 
-	        params_ptr->final_period = 256 - params_ptr->final_start_value;
-	        params_ptr->final_ARR = params_ptr->final_period - 1;
-	        params_ptr->final_prescaler_minus_one = params_ptr->final_prescaler - 1;
-
 	        Adjust_TIM16_Prescaler(params_ptr);
 
     #endif
@@ -561,6 +557,10 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
 		params_ptr->prescaler_adjust = DO_NOTHING;
         Adjust_TIM16_Prescaler(params_ptr);
     #endif
+
+    params_ptr->final_period = 256 - params_ptr->final_start_value;
+    params_ptr->final_ARR = params_ptr->final_period - 1;
+    params_ptr->final_prescaler_minus_one = params_ptr->final_prescaler - 1;
 
     return 1;
 }
