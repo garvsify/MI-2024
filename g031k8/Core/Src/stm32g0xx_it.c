@@ -152,6 +152,8 @@ void EXTI4_15_IRQHandler(void)
 
 	HAL_GPIO_EXTI_IRQHandler(CLK_IN_Pin);
 
+	HAL_GPIO_EXTI_IRQHandler(SW_IN_Pin);
+
   /* USER CODE BEGIN EXTI4_15_IRQn 1 */
 
   /* USER CODE END EXTI4_15_IRQn 1 */
