@@ -178,15 +178,19 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
 		Start_OC_TIM(&htim17, TIM_CHANNEL_1);
 
 		HAL_NVIC_EnableIRQ(EXTI4_15_IRQn); //allow clk to cause interrupts
-		}
+	}
 }
 
 void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
+
+	//DISABLE EXTI INTERRUPTS - in EXTI Callback before
 
 	if((GPIO_Pin == CLK_IN_Pin) && HAL_GPIO_ReadPin(CLK_IN_GPIO_Port, CLK_IN_Pin) == 1){ //if specifically CLK IN pin with rising interrupt
 
 		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1);
 	}
+
+	HAL_NVIC_EnableIRQ(EXTI4_15_IRQn); //allow clk to cause interrupts
 }
 
 void UART2_TX_transfer_complete_callback(UART_HandleTypeDef *huart){
