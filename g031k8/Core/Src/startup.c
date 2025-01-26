@@ -14,7 +14,14 @@ uint8_t Startup(void){
 	// re-initialise all values in delay line storage array to middle value of wave, as they are initialised to 0 on startup
 		for(uint16_t i = 0; i < FINAL_INDEX + 2; i++){ //513
 
-		delay_line.duty_delay_line_storage_array[i] = PWM_DUTY_VALUE_MAX - (((params.depth * PWM_DUTY_VALUE_MAX) >> DEPTH_ADC_RESOLUTION) >> 1);
+			if(params.waveshape == SQUARE_MODE){
+
+				delay_line.duty_delay_line_storage_array[i] = PWM_DUTY_VALUE_MAX - ((params.depth * PWM_DUTY_VALUE_MAX) >> DEPTH_ADC_RESOLUTION);
+			}
+			else{
+
+				delay_line.duty_delay_line_storage_array[i] = PWM_DUTY_VALUE_MAX - (((params.depth * PWM_DUTY_VALUE_MAX) >> DEPTH_ADC_RESOLUTION) >> 1);
+			}
 	}
 
 	//SET DEFAULT PIN STATES
