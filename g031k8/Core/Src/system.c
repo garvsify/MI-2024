@@ -835,7 +835,7 @@ uint8_t Write_Next_Main_Oscillator_Values_to_Delay_Line(struct Params* params_pt
 uint8_t Process_ADC_Conversion_Values(struct Params* params_ptr, struct Delay_Line* delay_line_ptr, volatile uint16_t* ADCResultsDMA_ptr){
 
 	//GET WAVESHAPE
-	uint16_t ADC_result = ADCResultsDMA_ptr[WAVESHAPE_ADC_RESULT_INDEX]; //set ADC_Result to waveshape index value
+	uint16_t ADC_result = ADCResultsDMA_ptr[WAVESHAPE_ADC_RESULT_INDEX] >> 5; //set ADC_Result to waveshape index value, truncate to 7-bit
 
 	if(ADC_result <= TRIANGLE_MODE_ADC_THRESHOLD){
 		params_ptr->waveshape = TRIANGLE_MODE; //triangle wave
