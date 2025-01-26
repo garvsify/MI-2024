@@ -20,7 +20,6 @@ int main(void)
 	//STARTUP BITS AND BOBS
 	Startup();
 
-
 	//START FREQ. GEN and PWM GEN TIMERS and ENABLE PWM OUTPUT
 	Start_PWM_Gen_Timer_Main_and_Secondary_Oscillators(&htim1, TIM_CHANNEL_2, TIM_CHANNEL_4);
 	Start_Freq_Gen_Timer();

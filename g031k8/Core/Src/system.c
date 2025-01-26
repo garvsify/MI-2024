@@ -55,6 +55,7 @@ uint8_t Startup(void){
 	}
 
 	__HAL_TIM_ENABLE_IT(&htim2, TIM_IT_UPDATE); //make sure the overflow (update) interrupt is enabled for TIM2
+	__HAL_TIM_ENABLE_IT(&htim16, TIM_IT_UPDATE); //make sure the overflow (update) interrupt is enabled for TIM16
 
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions);
 
@@ -669,7 +670,7 @@ uint8_t Start_UART_Receive(void){
 
 uint8_t Input_Capture_Processing(volatile uint16_t interrupt_period_value, struct Params* params_ptr){
 
-	HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
+	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
 
 	input_capture_processing_can_be_started = NO; //reset flag
 
@@ -700,7 +701,7 @@ uint8_t Input_Capture_Processing(volatile uint16_t interrupt_period_value, struc
 	Calculate_Next_Main_Oscillator_Values(params_ptr, (enum Next_Values_Processing_Mode)IP_CAPTURE_MODE);
 	Process_TIM16_Final_Start_Value_and_Final_Prescaler(params_ptr);
 
-	HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
+	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
 
 	return 1;
 }
@@ -708,9 +709,9 @@ uint8_t Input_Capture_Processing(volatile uint16_t interrupt_period_value, struc
 enum Validate isPrime(uint16_t x){
     for (int d = 2; d * d <= x; d++) {
         if (x % d == 0)
-            return YES;
+            return NO;
     }
-    return NO;
+    return YES;
 }
 
 uint8_t Calculate_Next_Main_Oscillator_Values(struct Params* params_ptr, enum Next_Values_Processing_Mode mode){

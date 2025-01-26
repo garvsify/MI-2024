@@ -666,7 +666,7 @@ void System_Init(void){
 	//I believe the correct CallbackID is HAL_TIM_OC_DELAY_ELAPSED_CB_ID, but if this doesn't work maybe
 	//HAL_TIM_PERIOD_ELAPSED_CB_ID will work. This should be basically the same because we've set up TIM16
 	//in Output Compare mode, where the ARR and CRR are the same.
-	HAL_TIM_RegisterCallback(&htim16, HAL_TIM_OC_DELAY_ELAPSED_CB_ID, &TIM16_callback);
+	HAL_TIM_RegisterCallback(&htim16, HAL_TIM_PERIOD_ELAPSED_CB_ID, &TIM16_callback);
 
 	//Set custom callback function for ADC (DMA) conversion complete.
 	HAL_ADC_RegisterCallback(&hadc1, HAL_ADC_CONVERSION_COMPLETE_CB_ID, &ADC_DMA_conversion_complete_callback);
@@ -679,9 +679,6 @@ void System_Init(void){
 
 	//Set custom callback function for TIM3_ch1 (Measurement Re-Elapse) (CCR match)
 	HAL_TIM_RegisterCallback(&htim3, HAL_TIM_OC_DELAY_ELAPSED_CB_ID, &TIM3_ch1_IP_capture_measurement_reelapse_callback);
-
-	//Set custom callback function for TIM17 debounce (CCR match)
-	//HAL_TIM_RegisterCallback(&htim17, HAL_TIM_OC_DELAY_ELAPSED_CB_ID, &TIM17_callback_debounce);
 
 	//Set custom callback function for TIM17 Speed Pot Check (CCR match)
 	HAL_TIM_RegisterCallback(&htim17, HAL_TIM_OC_DELAY_ELAPSED_CB_ID, &TIM17_callback_speed_pot_check);
