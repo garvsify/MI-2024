@@ -39,7 +39,8 @@ Core/Src/oscillator.o: ../Core/Src/oscillator.c ../Core/Inc/oscillator.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart_ex.h \
  ../Core/Inc/symmetry_adjustment.h ../Core/Inc/oscillator_params_type.h \
  ../Core/Inc/symmetry_adjustment_types.h ../Core/Inc/oscillator.h \
- ../Core/Inc/oscillator_params_type.h ../Core/Inc/timers.h
+ ../Core/Inc/oscillator_params_type.h ../Core/Inc/timers.h \
+ ../Core/Inc/oscillator_macros.h
 ../Core/Inc/oscillator.h:
 ../Core/Inc/utility.h:
 ../Core/Inc/config.h:
@@ -86,3 +87,4 @@ Core/Src/oscillator.o: ../Core/Src/oscillator.c ../Core/Inc/oscillator.h \
 ../Core/Inc/oscillator.h:
 ../Core/Inc/oscillator_params_type.h:
 ../Core/Inc/timers.h:
+../Core/Inc/oscillator_macros.h:

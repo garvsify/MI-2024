@@ -1,9 +1,5 @@
 /*NOTES ON THIS BUILD:
 
-Issues:
-
-- It works apart from speed pot being way too fast
-
 */
 
 //INCLUDES

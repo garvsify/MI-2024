@@ -40,7 +40,8 @@ Core/Src/stm32g0xx_it.o: ../Core/Src/stm32g0xx_it.c \
  ../Core/Inc/symmetry_adjustment.h ../Core/Inc/oscillator_params_type.h \
  ../Core/Inc/symmetry_adjustment_types.h ../Core/Inc/oscillator.h \
  ../Core/Inc/oscillator_params_type.h ../Core/Inc/timers.h \
- ../Core/Inc/config.h ../Core/Inc/stm32g0xx_it.h
+ ../Core/Inc/oscillator_macros.h ../Core/Inc/config.h \
+ ../Core/Inc/stm32g0xx_it.h
 ../Core/Inc/oscillator.h:
 ../Core/Inc/utility.h:
 ../Core/Inc/config.h:
@@ -87,5 +88,6 @@ Core/Src/stm32g0xx_it.o: ../Core/Src/stm32g0xx_it.c \
 ../Core/Inc/oscillator.h:
 ../Core/Inc/oscillator_params_type.h:
 ../Core/Inc/timers.h:
+../Core/Inc/oscillator_macros.h:
 ../Core/Inc/config.h:
 ../Core/Inc/stm32g0xx_it.h:

@@ -3,12 +3,6 @@
 
 uint8_t Startup(void){
 
-	// re-initialise all values in delay line storage array to 512 (mid scale) as they are initialised to 0 on startup
-	for(uint16_t i = 0; i < FINAL_INDEX + 1; i++){
-
-		delay_line.duty_delay_line_storage_array[i] = INITIAL_PWM_VALUE;
-	}
-
 	__HAL_TIM_ENABLE_IT(&htim2, TIM_IT_UPDATE); //make sure the overflow (update) interrupt is enabled for TIM2
 	__HAL_TIM_ENABLE_IT(&htim16, TIM_IT_UPDATE); //make sure the overflow (update) interrupt is enabled for TIM16
 
@@ -17,7 +11,11 @@ uint8_t Startup(void){
 	//WAIT
 	while(initial_ADC_conversion_complete == NO){}; //wait while first ADC conversion is ongoing
 
-	HAL_ADC_Stop_DMA(&hadc1);
+	// re-initialise all values in delay line storage array to middle value of wave, as they are initialised to 0 on startup
+		for(uint16_t i = 0; i < FINAL_INDEX + 2; i++){ //513
+
+		delay_line.duty_delay_line_storage_array[i] = PWM_DUTY_VALUE_MAX - (((params.depth * PWM_DUTY_VALUE_MAX) >> DEPTH_ADC_RESOLUTION) >> 1);
+	}
 
 	//SET DEFAULT PIN STATES
 	HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1); //latch high the debounced o/p
