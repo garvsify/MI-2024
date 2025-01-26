@@ -1,5 +1,9 @@
 Core/Src/MIDI_defines.o: ../Core/Src/MIDI_defines.c \
- ../Core/Inc/MIDI_defines.h ../Core/Inc/system.h ../Core/Inc/config.h \
+ ../Core/Inc/MIDI_defines.h ../Core/Inc/oscillator.h \
+ ../Core/Inc/utility.h ../Core/Inc/symmetry_adjustment.h \
+ ../Core/Inc/oscillator_params_type.h \
+ ../Core/Inc/symmetry_adjustment_types.h ../Core/Inc/oscillator.h \
+ ../Core/Inc/oscillator_params_type.h ../Core/Inc/config.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal.h \
  ../Core/Inc/stm32g0xx_hal_conf.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_rcc.h \
@@ -38,7 +42,13 @@ Core/Src/MIDI_defines.o: ../Core/Src/MIDI_defines.c \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart_ex.h
 ../Core/Inc/MIDI_defines.h:
-../Core/Inc/system.h:
+../Core/Inc/oscillator.h:
+../Core/Inc/utility.h:
+../Core/Inc/symmetry_adjustment.h:
+../Core/Inc/oscillator_params_type.h:
+../Core/Inc/symmetry_adjustment_types.h:
+../Core/Inc/oscillator.h:
+../Core/Inc/oscillator_params_type.h:
 ../Core/Inc/config.h:
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal.h:
 ../Core/Inc/stm32g0xx_hal_conf.h:

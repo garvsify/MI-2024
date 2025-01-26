@@ -1,9 +1,8 @@
-Core/Src/stm32g0xx_it.o: ../Core/Src/stm32g0xx_it.c \
- ../Core/Inc/oscillator.h ../Core/Inc/utility.h \
- ../Core/Inc/symmetry_adjustment.h ../Core/Inc/oscillator_params_type.h \
+Core/Src/checking.o: ../Core/Src/checking.c ../Core/Inc/checking.h \
+ ../Core/Inc/utility.h ../Core/Inc/oscillator_params_type.h \
  ../Core/Inc/symmetry_adjustment_types.h ../Core/Inc/oscillator.h \
- ../Core/Inc/oscillator_params_type.h ../Core/Inc/config.h \
- ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal.h \
+ ../Core/Inc/symmetry_adjustment.h ../Core/Inc/oscillator_params_type.h \
+ ../Core/Inc/config.h ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal.h \
  ../Core/Inc/stm32g0xx_hal_conf.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_rcc.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_def.h \
@@ -39,14 +38,13 @@ Core/Src/stm32g0xx_it.o: ../Core/Src/stm32g0xx_it.c \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_tim.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_tim_ex.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart.h \
- ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart_ex.h \
- ../Core/Inc/config.h ../Core/Inc/stm32g0xx_it.h
-../Core/Inc/oscillator.h:
+ ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart_ex.h
+../Core/Inc/checking.h:
 ../Core/Inc/utility.h:
-../Core/Inc/symmetry_adjustment.h:
 ../Core/Inc/oscillator_params_type.h:
 ../Core/Inc/symmetry_adjustment_types.h:
 ../Core/Inc/oscillator.h:
+../Core/Inc/symmetry_adjustment.h:
 ../Core/Inc/oscillator_params_type.h:
 ../Core/Inc/config.h:
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal.h:
@@ -86,5 +84,3 @@ Core/Src/stm32g0xx_it.o: ../Core/Src/stm32g0xx_it.c \
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_tim_ex.h:
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart.h:
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart_ex.h:
-../Core/Inc/config.h:
-../Core/Inc/stm32g0xx_it.h:

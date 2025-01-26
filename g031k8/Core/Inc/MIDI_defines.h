@@ -1,7 +1,7 @@
 #ifndef MIDI_DEFINES_H
 #define MIDI_DEFINES_H
 
-#include "system.h"
+#include <oscillator.h>
 
 #define MIDI_MS_NIBBLE_SHIFT 4
 

@@ -7,10 +7,9 @@ Issues:
 */
 
 //INCLUDES
-#include "system.h"
+#include "main.h"
 
-volatile char rx_buffer[1] = {0};
-const char one_byte_data = 'j';
+//const char one_byte_data = 'j';
 
 int main(void)
 {
@@ -41,7 +40,7 @@ int main(void)
 
 		if(input_capture_processing_can_be_started == YES){
 
-			//Input_Capture_Processing(interrupt_period, &params_to_be_loaded);
+			Input_Capture_Processing(interrupt_period, &params_to_be_loaded);
 		}
 	}
 	return 1;

@@ -1,6 +1,6 @@
 #include <custom_callbacks.h>
+#include <oscillator.h>
 #include "config.h"
-#include "system.h"
 
 //VARIABLES
 ADC_HandleTypeDef hadc1;
