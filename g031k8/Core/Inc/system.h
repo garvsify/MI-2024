@@ -193,8 +193,11 @@ struct Params{
 	volatile uint8_t quadrant;
 	volatile uint16_t raw_start_value;
 	volatile uint16_t final_start_value;
+	volatile uint16_t final_period;
+	volatile uint16_t final_ARR;
 	volatile uint16_t raw_prescaler;
 	volatile uint16_t final_prescaler;
+	volatile uint16_t final_prescaler_minus_one;
 	volatile enum Adjust_Prescaler_Action prescaler_adjust;
 };
 
