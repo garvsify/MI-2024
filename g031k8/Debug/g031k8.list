@@ -27,9 +27,9 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  11 .ARM.attributes 00000028  00000000  00000000  00009418  2**0
                   CONTENTS, READONLY
- 12 .debug_info   00028c53  00000000  00000000  00009440  2**0
+ 12 .debug_info   00028c50  00000000  00000000  00009440  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 13 .debug_abbrev 00004d8c  00000000  00000000  00032093  2**0
+ 13 .debug_abbrev 00004d8c  00000000  00000000  00032090  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  14 .debug_aranges 00001320  00000000  00000000  00036e20  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
@@ -37,17 +37,17 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  16 .debug_macro  0001971f  00000000  00000000  00039c5c  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   0002849d  00000000  00000000  0005337b  2**0
+ 17 .debug_line   000284a5  00000000  00000000  0005337b  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    0009ea81  00000000  00000000  0007b818  2**0
+ 18 .debug_str    0009ea81  00000000  00000000  0007b820  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000043  00000000  00000000  0011a299  2**0
+ 19 .comment      00000043  00000000  00000000  0011a2a1  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  000032ec  00000000  00000000  0011a2dc  2**2
+ 20 .debug_frame  000032ec  00000000  00000000  0011a2e4  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_loclists 0000f166  00000000  00000000  0011d5c8  2**0
+ 21 .debug_loclists 0000f166  00000000  00000000  0011d5d0  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 22 .debug_line_str 00000057  00000000  00000000  0012c72e  2**0
+ 22 .debug_line_str 00000057  00000000  00000000  0012c736  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -1602,8 +1602,8 @@ void Error_Handler(void)
 
 08000a28 <MX_TIM17_Init>:
 {
- 8000a28:	b530      	push	{r4, r5, lr}
- 8000a2a:	b097      	sub	sp, #92	@ 0x5c
+ 8000a28:	b510      	push	{r4, lr}
+ 8000a2a:	b096      	sub	sp, #88	@ 0x58
   TIM_OC_InitTypeDef sConfigOC = {0};
  8000a2c:	221c      	movs	r2, #28
  8000a2e:	2100      	movs	r1, #0
@@ -1617,30 +1617,30 @@ void Error_Handler(void)
   htim17.Instance = TIM17;
  8000a40:	4c23      	ldr	r4, [pc, #140]	@ (8000ad0 <MX_TIM17_Init+0xa8>)
  8000a42:	4b24      	ldr	r3, [pc, #144]	@ (8000ad4 <MX_TIM17_Init+0xac>)
-  htim17.Init.ClockDivision = TIM_CLOCKDIVISION_DIV4;
- 8000a44:	2280      	movs	r2, #128	@ 0x80
+  htim17.Init.Period = SPEED_POT_CHECK_COUNTER_LENGTH - 1;
+ 8000a44:	2218      	movs	r2, #24
   htim17.Instance = TIM17;
  8000a46:	6023      	str	r3, [r4, #0]
   htim17.Init.Prescaler = (512*64)- 1; //Still good for speed pot check
  8000a48:	4b23      	ldr	r3, [pc, #140]	@ (8000ad8 <MX_TIM17_Init+0xb0>)
   htim17.Init.Period = SPEED_POT_CHECK_COUNTER_LENGTH - 1;
- 8000a4a:	2518      	movs	r5, #24
+ 8000a4a:	60e2      	str	r2, [r4, #12]
   htim17.Init.Prescaler = (512*64)- 1; //Still good for speed pot check
  8000a4c:	6063      	str	r3, [r4, #4]
   htim17.Init.CounterMode = TIM_COUNTERMODE_UP;
  8000a4e:	2300      	movs	r3, #0
   htim17.Init.ClockDivision = TIM_CLOCKDIVISION_DIV4;
- 8000a50:	0092      	lsls	r2, r2, #2
+ 8000a50:	32e9      	adds	r2, #233	@ 0xe9
   htim17.Init.CounterMode = TIM_COUNTERMODE_UP;
  8000a52:	60a3      	str	r3, [r4, #8]
+  htim17.Init.ClockDivision = TIM_CLOCKDIVISION_DIV4;
+ 8000a54:	32ff      	adds	r2, #255	@ 0xff
   htim17.Init.RepetitionCounter = 0;
- 8000a54:	6163      	str	r3, [r4, #20]
+ 8000a56:	6163      	str	r3, [r4, #20]
   if (HAL_TIM_Base_Init(&htim17) != HAL_OK)
- 8000a56:	0020      	movs	r0, r4
+ 8000a58:	0020      	movs	r0, r4
   htim17.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
- 8000a58:	3380      	adds	r3, #128	@ 0x80
-  htim17.Init.Period = SPEED_POT_CHECK_COUNTER_LENGTH - 1;
- 8000a5a:	60e5      	str	r5, [r4, #12]
+ 8000a5a:	3380      	adds	r3, #128	@ 0x80
   htim17.Init.ClockDivision = TIM_CLOCKDIVISION_DIV4;
  8000a5c:	6122      	str	r2, [r4, #16]
   htim17.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
@@ -1665,20 +1665,20 @@ void Error_Handler(void)
  8000a7c:	2300      	movs	r3, #0
   sConfigOC.OCMode = TIM_OCMODE_TIMING;
  8000a7e:	9000      	str	r0, [sp, #0]
+  sConfigOC.Pulse = 0;
+ 8000a80:	9001      	str	r0, [sp, #4]
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
- 8000a80:	9002      	str	r0, [sp, #8]
+ 8000a82:	9002      	str	r0, [sp, #8]
   sConfigOC.OCNPolarity = TIM_OCNPOLARITY_HIGH;
- 8000a82:	9003      	str	r0, [sp, #12]
+ 8000a84:	9003      	str	r0, [sp, #12]
   sConfigOC.OCNIdleState = TIM_OCNIDLESTATE_RESET;
- 8000a84:	9006      	str	r0, [sp, #24]
+ 8000a86:	9006      	str	r0, [sp, #24]
   if (HAL_TIM_OC_ConfigChannel(&htim17, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
- 8000a86:	4669      	mov	r1, sp
- 8000a88:	0020      	movs	r0, r4
+ 8000a88:	4669      	mov	r1, sp
+ 8000a8a:	0020      	movs	r0, r4
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
- 8000a8a:	9204      	str	r2, [sp, #16]
- 8000a8c:	9305      	str	r3, [sp, #20]
-  sConfigOC.Pulse = SPEED_POT_CHECK_COUNTER_LENGTH - 1;
- 8000a8e:	9501      	str	r5, [sp, #4]
+ 8000a8c:	9204      	str	r2, [sp, #16]
+ 8000a8e:	9305      	str	r3, [sp, #20]
   if (HAL_TIM_OC_ConfigChannel(&htim17, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
  8000a90:	f004 f88c 	bl	8004bac <HAL_TIM_OC_ConfigChannel>
  8000a94:	2800      	cmp	r0, #0
@@ -1725,8 +1725,8 @@ void Error_Handler(void)
   while (1)
  8000aca:	e7fe      	b.n	8000aca <MX_TIM17_Init+0xa2>
 }
- 8000acc:	b017      	add	sp, #92	@ 0x5c
- 8000ace:	bd30      	pop	{r4, r5, pc}
+ 8000acc:	b016      	add	sp, #88	@ 0x58
+ 8000ace:	bd10      	pop	{r4, pc}
  8000ad0:	20000620 	.word	0x20000620
  8000ad4:	40014800 	.word	0x40014800
  8000ad8:	00007fff 	.word	0x00007fff
@@ -2157,8 +2157,8 @@ void System_Init(void){
  8000d16:	f004 fbed 	bl	80054f4 <HAL_TIM_RegisterCallback>
 
 	//Set custom callback function for TIM17 Speed Pot Check (CCR match)
-	HAL_TIM_RegisterCallback(&htim17, HAL_TIM_OC_DELAY_ELAPSED_CB_ID, &TIM17_callback_speed_pot_check);
- 8000d1a:	2114      	movs	r1, #20
+	HAL_TIM_RegisterCallback(&htim17, HAL_TIM_PERIOD_ELAPSED_CB_ID, &TIM17_callback_speed_pot_check);
+ 8000d1a:	210e      	movs	r1, #14
  8000d1c:	4a19      	ldr	r2, [pc, #100]	@ (8000d84 <System_Init+0x174>)
  8000d1e:	481a      	ldr	r0, [pc, #104]	@ (8000d88 <System_Init+0x178>)
  8000d20:	f004 fbe8 	bl	80054f4 <HAL_TIM_RegisterCallback>

@@ -433,7 +433,7 @@ void MX_TIM17_Init(void)
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_TIMING;
-  sConfigOC.Pulse = SPEED_POT_CHECK_COUNTER_LENGTH - 1;
+  sConfigOC.Pulse = 0;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCNPolarity = TIM_OCNPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
@@ -681,7 +681,7 @@ void System_Init(void){
 	HAL_TIM_RegisterCallback(&htim3, HAL_TIM_OC_DELAY_ELAPSED_CB_ID, &TIM3_ch1_IP_capture_measurement_reelapse_callback);
 
 	//Set custom callback function for TIM17 Speed Pot Check (CCR match)
-	HAL_TIM_RegisterCallback(&htim17, HAL_TIM_OC_DELAY_ELAPSED_CB_ID, &TIM17_callback_speed_pot_check);
+	HAL_TIM_RegisterCallback(&htim17, HAL_TIM_PERIOD_ELAPSED_CB_ID, &TIM17_callback_speed_pot_check);
 
 	//CANNOT SET CUSTOM CALLBACK FOR EXTI, however redefinition of 'weak' predefined EXTI callback is in custom_callbacks.c
 
