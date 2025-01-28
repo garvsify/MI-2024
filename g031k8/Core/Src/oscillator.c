@@ -22,17 +22,17 @@ struct Delay_Line delay_line = {.duty_delay_line_storage_array = 0, //one index 
 //FUNCTION DEFINITIONS
 uint8_t Start_PWM_Gen_Timer_Main_and_Secondary_Oscillators(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel_1, uint32_t PWM_TIM_channel_2)
 {
-	uint8_t ok_AND = 1;
-	ok_AND &= ~HAL_TIM_Base_Start(TIM);
-	ok_AND &= ~HAL_TIM_PWM_Start(TIM, PWM_TIM_channel_1); //start PWM
-	ok_AND &= ~HAL_TIM_PWM_Start(TIM, PWM_TIM_channel_2); //start PWM
+	uint8_t ok_OR = 0;
+	ok_OR |= HAL_TIM_Base_Start(TIM);
+	ok_OR |= HAL_TIM_PWM_Start(TIM, PWM_TIM_channel_1); //start PWM
+	ok_OR |= HAL_TIM_PWM_Start(TIM, PWM_TIM_channel_2); //start PWM
 
-	if(~ok_AND != HAL_OK){
+	if(ok_OR != HAL_OK){
 
 		Error_Handler();
 	}
 
-	return ok_AND;
+	return ok_OR;
 }
 
 uint8_t Start_Freq_Gen_Timer(void)

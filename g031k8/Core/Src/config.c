@@ -200,9 +200,6 @@ void MX_TIM16_Init(void)
   }
   /* USER CODE BEGIN TIM16_Init 2 */
 
-  HAL_NVIC_SetPriority(TIM16_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(TIM16_IRQn);
-
   /* USER CODE END TIM16_Init 2 */
 }
 
@@ -494,7 +491,7 @@ void MX_LPTIM1_Init(void)
 
   /* USER CODE END LPTIM1_Init 2 */
 
-  HAL_NVIC_SetPriority(LPTIM1_IRQn, 3, 3);
+  HAL_NVIC_SetPriority(LPTIM1_IRQn, 2, 2);
   HAL_NVIC_EnableIRQ(LPTIM1_IRQn);
 }
 
@@ -538,10 +535,10 @@ void MX_DMA_Init(void)
 
   /* DMA interrupt init */
   /* DMA1_Channel1_IRQn interrupt configuration */ // - ADC
-  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 1, 1);
+  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
   /* DMA1_Channel2_3_IRQn interrupt configuration */ // - UART RX is ch2, TX is ch3
-  HAL_NVIC_SetPriority(DMA1_Channel2_3_IRQn, 1, 1);
+  HAL_NVIC_SetPriority(DMA1_Channel2_3_IRQn, 2, 2);
   HAL_NVIC_EnableIRQ(DMA1_Channel2_3_IRQn);
 
 }

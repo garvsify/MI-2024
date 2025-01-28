@@ -152,13 +152,13 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
 		tap_tempo_mode_is_active = YES;
 		external_clock_mode_is_active = NO;
 
-		//ENABLE TAP-TEMPO SWITCH CHECKING
-		HAL_NVIC_EnableIRQ(LPTIM1_IRQn);
-		HAL_LPTIM_SetOnce_Start_IT(&hlptim1, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK);
-
 		//START SPEED POT CHECKING
 		__HAL_TIM_SET_COUNTER(&htim17, 0);
 		Start_OC_TIM(&htim17, TIM_CHANNEL_1);
+
+		//ENABLE TAP-TEMPO SWITCH CHECKING
+		HAL_NVIC_EnableIRQ(LPTIM1_IRQn);
+		HAL_LPTIM_SetOnce_Start_IT(&hlptim1, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK);
 	}
 	else if((GPIO_Pin == CLK_IN_Pin) && (HAL_GPIO_ReadPin(CLK_IN_GPIO_Port, CLK_IN_Pin) == 0)){ //if specifically CLK IN pin with falling interrupt
 
@@ -185,7 +185,7 @@ void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
 
 	//DISABLE EXTI INTERRUPTS - in EXTI Callback before
 
-	if((GPIO_Pin == CLK_IN_Pin) && HAL_GPIO_ReadPin(CLK_IN_GPIO_Port, CLK_IN_Pin) == 1){ //if specifically CLK IN pin with rising interrupt
+	if((GPIO_Pin == CLK_IN_Pin) && (HAL_GPIO_ReadPin(CLK_IN_GPIO_Port, CLK_IN_Pin) == 1) && (external_clock_mode_is_active == YES)){ //if specifically CLK IN pin with rising interrupt
 
 		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1);
 	}
@@ -218,7 +218,6 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 		//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
 		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
 		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
-		tap_tempo_mode_is_active = YES;
 
 	}
 	else{
