@@ -28,12 +28,11 @@ uint8_t Startup(void){
 	Write_Next_Main_Oscillator_Values_to_Delay_Line(&params, &delay_line);
 	Set_Oscillator_Values(&params);
 
+
 	//SET DEFAULT PIN STATES
 	HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1); //latch high the debounced o/p
 	HAL_GPIO_WritePin(HACK_POT_HIGH_GPIO_Port, HACK_POT_HIGH_Pin, 1);
 	HAL_GPIO_WritePin(HACK_POT_LOW_GPIO_Port, HACK_POT_LOW_Pin, 0);
-
-
 
 	return 1;
 }
