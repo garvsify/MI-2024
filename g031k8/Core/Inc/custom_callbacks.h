@@ -5,6 +5,7 @@
 #include <oscillator.h>
 #include "input_capture.h"
 #include "UART.h"
+#include "debug.h"
 
 void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc);
 void TIM16_callback(TIM_HandleTypeDef *htim);

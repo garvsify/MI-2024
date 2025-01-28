@@ -93,6 +93,10 @@ uint8_t Check_Tap_Tempo_Switch_State(volatile enum Tap_Tempo_Switch_State *tap_t
 
 		*tap_tempo_switch_state_ptr = NOT_DEPRESSED;
 	}
+	else{
+
+		*tap_tempo_switch_state_ptr = INTERMEDIATE;
+	}
 
 	return 1;
 }

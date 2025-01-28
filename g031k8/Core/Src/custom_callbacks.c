@@ -156,9 +156,13 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
 		__HAL_TIM_SET_COUNTER(&htim17, 0);
 		Start_OC_TIM(&htim17, TIM_CHANNEL_1);
 
+		flags = 1 << 0;
+
 		//ENABLE TAP-TEMPO SWITCH CHECKING
 		HAL_NVIC_EnableIRQ(LPTIM1_IRQn);
 		HAL_LPTIM_SetOnce_Start_IT(&hlptim1, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK);
+
+		flags = 1 << 1;
 	}
 	else if((GPIO_Pin == CLK_IN_Pin) && (HAL_GPIO_ReadPin(CLK_IN_GPIO_Port, CLK_IN_Pin) == 0)){ //if specifically CLK IN pin with falling interrupt
 
@@ -211,19 +215,34 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
 void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
+	flags = 1 << 2;
+
 	Check_Tap_Tempo_Switch_State(&tap_tempo_switch_state);
 
+	flags = 1 << 3;
+
 	if(tap_tempo_switch_state == DEPRESSED){
+
+		flags = 1 << 4;
 
 		//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
 		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
 		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
 
+		flags = 1 << 5;
+
 	}
-	else{
+	else if(tap_tempo_switch_state == NOT_DEPRESSED){
+
 		//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
 		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1); //reset
 		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+
+		flags = 1 << 6;
+	}
+
+	if(tap_tempo_switch_state != INTERMEDIATE){
+
 		HAL_NVIC_EnableIRQ(EXTI4_15_IRQn); //allow switch to cause interrupts once debounced
 	}
 
@@ -232,10 +251,18 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 void TIM17_callback_speed_pot_check(TIM_HandleTypeDef *htim){
 
+	flags = 1 << 7;
+
 	Stop_OC_TIM(&htim17, TIM_CHANNEL_1);
+
+	flags = 1 << 8;
 
 	Speed_Pot_Check(&params);
 
+	flags = 1 << 9;
+
 	__HAL_TIM_SET_COUNTER(&htim17, 0);
 	Start_OC_TIM(&htim17, TIM_CHANNEL_1);
+
+	flags = 1 << 10;
 }
