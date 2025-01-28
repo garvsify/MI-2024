@@ -1,6 +1,6 @@
 #include <custom_callbacks.h>
+#include <oscillator.h>
 #include "config.h"
-#include "system.h"
 
 //VARIABLES
 ADC_HandleTypeDef hadc1;
@@ -19,6 +19,7 @@ UART_HandleTypeDef huart2;
 DMA_HandleTypeDef hdma_usart2_rx;
 DMA_HandleTypeDef hdma_usart2_tx;
 
+LPTIM_HandleTypeDef hlptim1;
 
 //FUNCTIONS
 void SystemClock_Config(void)
@@ -71,7 +72,6 @@ void MX_ADC1_Init(void)
   */
   hadc1.Instance = ADC1;
   hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV2;
-  //hadc1.Init.ClockPrescaler = ADC_CLOCK_ASYNC_DIV16;
   hadc1.Init.Resolution = ADC_RESOLUTION_12B;
   hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
   hadc1.Init.ScanConvMode = ADC_SCAN_ENABLE;
@@ -79,7 +79,7 @@ void MX_ADC1_Init(void)
   hadc1.Init.LowPowerAutoWait = DISABLE;
   hadc1.Init.LowPowerAutoPowerOff = DISABLE;
   hadc1.Init.ContinuousConvMode = DISABLE;
-  hadc1.Init.NbrOfConversion = 4;
+  hadc1.Init.NbrOfConversion = 5;
   hadc1.Init.DiscontinuousConvMode = DISABLE;
   hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
   hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
@@ -133,6 +133,16 @@ void MX_ADC1_Init(void)
   {
     Error_Handler();
   }
+
+  /** Configure Channel 6
+  */
+  sConfig.Channel = ADC_CHANNEL_6;
+  sConfig.Rank = ADC_REGULAR_RANK_5;
+  sConfig.SamplingTime = ADC_SAMPLINGTIME_COMMON_1;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
 }
 
 void MX_TIM16_Init(void)
@@ -175,7 +185,7 @@ void MX_TIM16_Init(void)
   {
     Error_Handler();
   }
-  __HAL_TIM_ENABLE_OCxPRELOAD(&htim16, TIM_CHANNEL_1);
+  __HAL_TIM_DISABLE_OCxPRELOAD(&htim16, TIM_CHANNEL_1);
   sBreakDeadTimeConfig.OffStateRunMode = TIM_OSSR_DISABLE;
   sBreakDeadTimeConfig.OffStateIDLEMode = TIM_OSSI_DISABLE;
   sBreakDeadTimeConfig.LockLevel = TIM_LOCKLEVEL_OFF;
@@ -189,9 +199,6 @@ void MX_TIM16_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN TIM16_Init 2 */
-
-  HAL_NVIC_SetPriority(TIM16_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(TIM16_IRQn);
 
   /* USER CODE END TIM16_Init 2 */
 }
@@ -302,6 +309,7 @@ void MX_TIM3_Init(void)
   {
     Error_Handler();
   }
+  __HAL_TIM_DISABLE_OCxPRELOAD(&htim3, TIM_CHANNEL_1);
 
   /* USER CODE BEGIN TIM3_Init 2 */
 
@@ -352,7 +360,7 @@ void MX_TIM1_Init(void)
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = INITIAL_PWM_VALUE;
+  sConfigOC.Pulse = 0;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCNPolarity = TIM_OCNPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
@@ -362,10 +370,12 @@ void MX_TIM1_Init(void)
   {
     Error_Handler();
   }
+  __HAL_TIM_DISABLE_OCxPRELOAD(&htim1, TIM_CHANNEL_2);
   if (HAL_TIM_PWM_ConfigChannel(&htim1, &sConfigOC, TIM_CHANNEL_4) != HAL_OK)
   {
     Error_Handler();
   }
+  __HAL_TIM_DISABLE_OCxPRELOAD(&htim1, TIM_CHANNEL_4);
   sBreakDeadTimeConfig.OffStateRunMode = TIM_OSSR_DISABLE;
   sBreakDeadTimeConfig.OffStateIDLEMode = TIM_OSSI_DISABLE;
   sBreakDeadTimeConfig.LockLevel = TIM_LOCKLEVEL_OFF;
@@ -404,9 +414,10 @@ void MX_TIM17_Init(void)
 
   /* USER CODE END TIM17_Init 1 */
   htim17.Instance = TIM17;
-  htim17.Init.Prescaler = (512*64)- 1;
+  htim17.Init.Prescaler = (512*64)- 1; //Still good for speed pot check
   htim17.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim17.Init.Period = 50 - 1;
+  //htim17.Init.Period = TIM17_DEBOUNCE_LENGTH - 1;
+  htim17.Init.Period = SPEED_POT_CHECK_COUNTER_LENGTH - 1;
   htim17.Init.ClockDivision = TIM_CLOCKDIVISION_DIV4;
   htim17.Init.RepetitionCounter = 0;
   htim17.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
@@ -419,7 +430,7 @@ void MX_TIM17_Init(void)
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_TIMING;
-  sConfigOC.Pulse = 50 - 1;
+  sConfigOC.Pulse = 0;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCNPolarity = TIM_OCNPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
@@ -429,7 +440,7 @@ void MX_TIM17_Init(void)
   {
     Error_Handler();
   }
-  __HAL_TIM_ENABLE_OCxPRELOAD(&htim17, TIM_CHANNEL_1);
+  __HAL_TIM_DISABLE_OCxPRELOAD(&htim17, TIM_CHANNEL_1);
   sBreakDeadTimeConfig.OffStateRunMode = TIM_OSSR_DISABLE;
   sBreakDeadTimeConfig.OffStateIDLEMode = TIM_OSSI_DISABLE;
   sBreakDeadTimeConfig.LockLevel = TIM_LOCKLEVEL_OFF;
@@ -446,6 +457,42 @@ void MX_TIM17_Init(void)
 
   /* USER CODE END TIM17_Init 2 */
 
+}
+
+/**
+  * @brief LPTIM1 Initialization Function
+  * @param None
+  * @retval None
+  */
+void MX_LPTIM1_Init(void)
+{
+
+  /* USER CODE BEGIN LPTIM1_Init 0 */
+
+  /* USER CODE END LPTIM1_Init 0 */
+
+  /* USER CODE BEGIN LPTIM1_Init 1 */
+
+  /* USER CODE END LPTIM1_Init 1 */
+  hlptim1.Instance = LPTIM1;
+  hlptim1.Init.Clock.Source = LPTIM_CLOCKSOURCE_APBCLOCK_LPOSC;
+  hlptim1.Init.Clock.Prescaler = LPTIM_PRESCALER_DIV128;
+  hlptim1.Init.Trigger.Source = LPTIM_TRIGSOURCE_SOFTWARE;
+  hlptim1.Init.OutputPolarity = LPTIM_OUTPUTPOLARITY_HIGH;
+  hlptim1.Init.UpdateMode = LPTIM_UPDATE_ENDOFPERIOD;
+  hlptim1.Init.CounterSource = LPTIM_COUNTERSOURCE_INTERNAL;
+  hlptim1.Init.Input1Source = LPTIM_INPUT1SOURCE_GPIO;
+  hlptim1.Init.Input2Source = LPTIM_INPUT2SOURCE_GPIO;
+  if (HAL_LPTIM_Init(&hlptim1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN LPTIM1_Init 2 */
+
+  /* USER CODE END LPTIM1_Init 2 */
+
+  HAL_NVIC_SetPriority(LPTIM1_IRQn, 2, 2);
+  HAL_NVIC_EnableIRQ(LPTIM1_IRQn);
 }
 
 void MX_USART2_UART_Init(void)
@@ -488,10 +535,10 @@ void MX_DMA_Init(void)
 
   /* DMA interrupt init */
   /* DMA1_Channel1_IRQn interrupt configuration */ // - ADC
-  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 1, 1);
+  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
   /* DMA1_Channel2_3_IRQn interrupt configuration */ // - UART RX is ch2, TX is ch3
-  HAL_NVIC_SetPriority(DMA1_Channel2_3_IRQn, 1, 1);
+  HAL_NVIC_SetPriority(DMA1_Channel2_3_IRQn, 2, 2);
   HAL_NVIC_EnableIRQ(DMA1_Channel2_3_IRQn);
 
 }
@@ -541,6 +588,34 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(SW_IN_GPIO_Port, &GPIO_InitStruct);
 
+  //Configure general monitoring pin
+  GPIO_InitStruct.Pin = MONITOR_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(MONITOR_GPIO_Port, &GPIO_InitStruct);
+
+  //Configure CLK IN Pin - i.e. dedicated clock inputs to use this pin rather than the Tap-tempo switch debouncing SW IN pin
+  GPIO_InitStruct.Pin = CLK_IN_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(MONITOR_GPIO_Port, &GPIO_InitStruct);
+
+  //Configure hacked on pot high leg -> i.e. it is to be set high
+  GPIO_InitStruct.Pin = HACK_POT_HIGH_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(HACK_POT_HIGH_GPIO_Port, &GPIO_InitStruct);
+
+  //Configure hacked on pot low leg -> i.e. it is to be set low
+  GPIO_InitStruct.Pin = HACK_POT_LOW_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(HACK_POT_LOW_GPIO_Port, &GPIO_InitStruct);
+
   /* EXTI interrupt init*/
   HAL_NVIC_SetPriority(EXTI4_15_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);
@@ -559,14 +634,6 @@ void Error_Handler(void)
   }
 }
 
-void Calibrate_ADC(void){
-
-	hadc1.Instance->CR |= 0x0000; //Disable ADC, ADCVREGEN, AUTOFF
-	hadc1.Instance->CFGR1 |= 0b1; //Disable DMA
-	HAL_ADCEx_Calibration_Start(&hadc1);
-}
-
-
 void System_Init(void){
 	/* MCU Configuration--------------------------------------------------------*/
 
@@ -584,18 +651,19 @@ void System_Init(void){
 	MX_TIM16_Init(); //Frequency Gen.
 	MX_TIM2_Init(); //I/P Capture Measurement is TIM2_ch1
 	MX_TIM3_Init(); //I/P Capture Measurement Re-Elapse is TIM3_ch1
-	MX_TIM1_Init(); //PWM Gen. Main/Secondary Oscillator
-	MX_TIM17_Init(); //Tap Tempo Debouncing Timer
+	MX_TIM1_Init(); //PWM Gen. Main/Secondary Oscillator on ch2/ch4
+	MX_TIM17_Init(); //Speed Pot checking timer
 	//MX_IWDG_Init(); fucks up stuff - to be config'd
+	MX_LPTIM1_Init(); //Tap Tempo checking/debouncing timer
 
-	//Calibrate ADC
-	Calibrate_ADC(); //DO NOT MOVE THIS BEFORE ANY OTHER MX INIT, IT DOES NOT WORK WHEN PLACED BEFORE
+	//Calibrate ADC - DO NOT MOVE TO BEFORE OTHER CONFIG ABOVE
+	HAL_ADCEx_Calibration_Start(&hadc1);
 
 	//Set custom callback function for TIM16 (freq. gen.) to the callback function in TIMx_callback.c for TIM16.
 	//I believe the correct CallbackID is HAL_TIM_OC_DELAY_ELAPSED_CB_ID, but if this doesn't work maybe
 	//HAL_TIM_PERIOD_ELAPSED_CB_ID will work. This should be basically the same because we've set up TIM16
 	//in Output Compare mode, where the ARR and CRR are the same.
-	HAL_TIM_RegisterCallback(&htim16, HAL_TIM_OC_DELAY_ELAPSED_CB_ID, &TIM16_callback);
+	HAL_TIM_RegisterCallback(&htim16, HAL_TIM_PERIOD_ELAPSED_CB_ID, &TIM16_callback);
 
 	//Set custom callback function for ADC (DMA) conversion complete.
 	HAL_ADC_RegisterCallback(&hadc1, HAL_ADC_CONVERSION_COMPLETE_CB_ID, &ADC_DMA_conversion_complete_callback);
@@ -609,8 +677,8 @@ void System_Init(void){
 	//Set custom callback function for TIM3_ch1 (Measurement Re-Elapse) (CCR match)
 	HAL_TIM_RegisterCallback(&htim3, HAL_TIM_OC_DELAY_ELAPSED_CB_ID, &TIM3_ch1_IP_capture_measurement_reelapse_callback);
 
-	//Set custom callback function for TIM17 debounce (CCR match)
-	HAL_TIM_RegisterCallback(&htim17, HAL_TIM_OC_DELAY_ELAPSED_CB_ID, &TIM17_callback_debounce);
+	//Set custom callback function for TIM17 Speed Pot Check (CCR match)
+	HAL_TIM_RegisterCallback(&htim17, HAL_TIM_PERIOD_ELAPSED_CB_ID, &TIM17_callback_speed_pot_check);
 
 	//CANNOT SET CUSTOM CALLBACK FOR EXTI, however redefinition of 'weak' predefined EXTI callback is in custom_callbacks.c
 
@@ -619,6 +687,9 @@ void System_Init(void){
 
 	//Set custom callback function for DMA RX Transfer Complete
 	HAL_UART_RegisterCallback(&huart2, HAL_UART_RX_COMPLETE_CB_ID, &UART2_RX_transfer_complete_callback);
+
+	//Set custom callback for LPTIM1 (Tap Tempo SW state check)
+	 HAL_LPTIM_RegisterCallback(&hlptim1, HAL_LPTIM_COMPARE_MATCH_CB_ID, &LPTIM1_callback);
 }
 
 #ifdef  USE_FULL_ASSERT

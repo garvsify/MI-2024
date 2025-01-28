@@ -1,5 +1,5 @@
-Core/Src/MIDI_defines.o: ../Core/Src/MIDI_defines.c \
- ../Core/Inc/MIDI_defines.h ../Core/Inc/system.h ../Core/Inc/config.h \
+Core/Src/oscillator.o: ../Core/Src/oscillator.c ../Core/Inc/oscillator.h \
+ ../Core/Inc/utility.h ../Core/Inc/config.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal.h \
  ../Core/Inc/stm32g0xx_hal_conf.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_rcc.h \
@@ -30,14 +30,19 @@ Core/Src/MIDI_defines.o: ../Core/Src/MIDI_defines.c \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_flash.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_flash_ex.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_iwdg.h \
+ ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_lptim.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_pwr.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_pwr_ex.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_tim.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_tim_ex.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart.h \
- ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart_ex.h
-../Core/Inc/MIDI_defines.h:
-../Core/Inc/system.h:
+ ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart_ex.h \
+ ../Core/Inc/symmetry_adjustment.h ../Core/Inc/oscillator_params_type.h \
+ ../Core/Inc/symmetry_adjustment_types.h ../Core/Inc/oscillator.h \
+ ../Core/Inc/oscillator_params_type.h ../Core/Inc/timers.h \
+ ../Core/Inc/oscillator_macros.h
+../Core/Inc/oscillator.h:
+../Core/Inc/utility.h:
 ../Core/Inc/config.h:
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal.h:
 ../Core/Inc/stm32g0xx_hal_conf.h:
@@ -69,9 +74,17 @@ Core/Src/MIDI_defines.o: ../Core/Src/MIDI_defines.c \
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_flash.h:
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_flash_ex.h:
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_iwdg.h:
+../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_lptim.h:
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_pwr.h:
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_pwr_ex.h:
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_tim.h:
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_tim_ex.h:
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart.h:
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart_ex.h:
+../Core/Inc/symmetry_adjustment.h:
+../Core/Inc/oscillator_params_type.h:
+../Core/Inc/symmetry_adjustment_types.h:
+../Core/Inc/oscillator.h:
+../Core/Inc/oscillator_params_type.h:
+../Core/Inc/timers.h:
+../Core/Inc/oscillator_macros.h:

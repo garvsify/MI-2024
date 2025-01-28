@@ -3,14 +3,16 @@
 */
 
 //INCLUDES
-#include "system.h"
+#include "main.h"
 
-volatile char rx_buffer[1] = {0};
+//const char one_byte_data = 'j';
 
 int main(void)
 {
+	//SYSTEM INIT
 	System_Init();
 
+	//STARTUP BITS AND BOBS
 	Startup();
 
 	//START FREQ. GEN and PWM GEN TIMERS and ENABLE PWM OUTPUT
@@ -21,24 +23,24 @@ int main(void)
 	//ENABLE INTERRUPTS
 	Global_Interrupt_Enable();
 
-	const char one_byte_data = 'j';
-
-	HAL_UART_Receive_DMA(&huart2, (uint8_t*)rx_buffer, sizeof(rx_buffer));
+	//START UART RECEIVE
+	Start_UART_Receive();
 
 	while (1)
 	{
-		Speed_pot_check();
-
 		/*if(UART_DMA_TX_is_complete == YES){
 
 			UART_DMA_TX_is_complete = NO;
 			HAL_UART_Transmit_DMA(&huart2, (const uint8_t*)&one_byte_data, sizeof(one_byte_data));
 		}*/
-		HAL_Delay(50);
+
+		if(input_capture_processing_can_be_started == YES){
+
+			Input_Capture_Processing(interrupt_period, &params_to_be_loaded);
+		}
 	}
 	return 1;
 }
-
 
 
 

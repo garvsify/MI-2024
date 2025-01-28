@@ -34,9 +34,6 @@
 #define SECONDARY_OSCILLATOR_Pin GPIO_PIN_11
 #define SECONDARY_OSCILLATOR_GPIO_Port GPIOA
 
-#define ISR_MEAS_Pin GPIO_PIN_12
-#define ISR_MEAS_GPIO_Port GPIOA
-
 #define IP_CAP_Pin GPIO_PIN_15
 #define IP_CAP_GPIO_Port GPIOA
 
@@ -45,6 +42,18 @@
 
 #define SW_IN_Pin GPIO_PIN_10
 #define SW_IN_GPIO_Port GPIOA
+
+#define MONITOR_Pin GPIO_PIN_6
+#define MONITOR_GPIO_Port GPIOB
+
+#define CLK_IN_Pin GPIO_PIN_7
+#define CLK_IN_GPIO_Port GPIOB
+
+#define HACK_POT_HIGH_Pin GPIO_PIN_12
+#define HACK_POT_HIGH_GPIO_Port GPIOA
+
+#define HACK_POT_LOW_Pin GPIO_PIN_7
+#define HACK_POT_LOW_GPIO_Port GPIOA
 
 //create instance of peripheral structs (handles)
 extern ADC_HandleTypeDef hadc1;
@@ -62,6 +71,8 @@ extern DMA_HandleTypeDef hdma_usart2_tx;
 
 extern IWDG_HandleTypeDef hiwdg;
 
+extern LPTIM_HandleTypeDef hlptim1;
+
 void System_Init(void);
 void SystemClock_Config(void);
 void MX_GPIO_Init(void);
@@ -72,12 +83,11 @@ void MX_TIM16_Init(void); //Frequency Gen.
 void MX_TIM2_Init(void); //I/P Capture Measurement is TIM2_ch1,
 void MX_TIM3_Init(void); //I/P Capture Measurement Re-Elapse is TIM3_ch1,
 void MX_TIM1_Init(void); //PWM Gen. Main/Secondary Oscillator
-void MX_TIM17_Init(void); //Tap Tempo Debouncing Timer
+void MX_TIM17_Init(void); //Speed pot checking timer
 void MX_IWDG_Init(void);
+void MX_LPTIM1_Init(void); //Tap tempo checking/debouncing timer
 
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
-
-void Calibrate_ADC(void);
 
 void Error_Handler(void);
 
