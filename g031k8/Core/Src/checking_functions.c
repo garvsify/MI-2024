@@ -1,8 +1,6 @@
 #include <checking_functions.h>
 
 //VARIABLE DEFINITIONS
-volatile uint8_t tap_tempo_switch_state_counter = TAP_TEMPO_SWITCH_CONFIDENCE_COUNT;
-volatile enum Tap_Tempo_Switch_State tap_tempo_switch_state = NOT_DEPRESSED;
 volatile enum Validate external_clock_mode_is_active = NO;
 volatile enum Validate tap_tempo_mode_is_active = NO;
 volatile uint8_t speed_pot_adc_measurement_num = 0;
@@ -57,9 +55,10 @@ uint8_t Speed_Pot_Check(struct Params* params_ptr){
 	return 1;
 }
 
-uint8_t Check_Tap_Tempo_Switch_State(volatile enum Tap_Tempo_Switch_State *tap_tempo_switch_state_ptr){
+uint8_t Check_Tap_Tempo_Switch_State(volatile struct Tap_Tempo_Switch_States *tap_tempo_switch_states_ptr){
 
 	static uint8_t extend_rising_edge = 0;
+	static uint8_t tap_tempo_switch_state_counter = TAP_TEMPO_SWITCH_CONFIDENCE_COUNT;
 
 	uint8_t switch_state = (uint8_t)HAL_GPIO_ReadPin(SW_IN_GPIO_Port, SW_IN_Pin);
 
@@ -87,15 +86,11 @@ uint8_t Check_Tap_Tempo_Switch_State(volatile enum Tap_Tempo_Switch_State *tap_t
 
 	if(tap_tempo_switch_state_counter == 0){
 
-		*tap_tempo_switch_state_ptr = DEPRESSED;
+		tap_tempo_switch_states_ptr->tap_tempo_switch_state = DEPRESSED;
 	}
 	else if(tap_tempo_switch_state_counter == TAP_TEMPO_SWITCH_CONFIDENCE_COUNT){
 
-		*tap_tempo_switch_state_ptr = NOT_DEPRESSED;
-	}
-	else{
-
-		*tap_tempo_switch_state_ptr = INTERMEDIATE;
+		tap_tempo_switch_states_ptr->tap_tempo_switch_state = NOT_DEPRESSED;
 	}
 
 	return 1;

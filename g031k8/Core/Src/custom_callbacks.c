@@ -156,11 +156,7 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
 		__HAL_TIM_SET_COUNTER(&htim17, 0);
 		Start_OC_TIM(&htim17, TIM_CHANNEL_1);
 
-		flags = 1 << 0;
-
-		//ENABLE TAP-TEMPO SWITCH CHECKING
-		HAL_NVIC_EnableIRQ(LPTIM1_IRQn);
-		HAL_LPTIM_SetOnce_Start_IT(&hlptim1, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK);
+		//flags = 1 << 0;
 
 		flags = 1 << 1;
 	}
@@ -173,9 +169,9 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
 		external_clock_mode_is_active = YES;
 		tap_tempo_mode_is_active = NO;
 
-		//DISABLE TAP-TEMPO SWITCH CHECKING
+		/*//DISABLE TAP-TEMPO SWITCH CHECKING
 		HAL_NVIC_DisableIRQ(LPTIM1_IRQn);
-		HAL_LPTIM_SetOnce_Stop_IT(&hlptim1);
+		HAL_LPTIM_SetOnce_Stop_IT(&hlptim1);*/
 
 		//START SPEED POT CHECKING
 		__HAL_TIM_SET_COUNTER(&htim17, 0);
@@ -215,13 +211,18 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
 void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
+	HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
+
+	static volatile struct Tap_Tempo_Switch_States tap_tempo_switch_states = {0};
+	enum Validate switch_registered = NO;
+
 	flags = 1 << 2;
 
-	Check_Tap_Tempo_Switch_State(&tap_tempo_switch_state);
+	Check_Tap_Tempo_Switch_State(&tap_tempo_switch_states);
 
 	flags = 1 << 3;
 
-	if(tap_tempo_switch_state == DEPRESSED){
+	if(tap_tempo_switch_states.tap_tempo_switch_state == DEPRESSED){
 
 		flags = 1 << 4;
 
@@ -232,7 +233,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 		flags = 1 << 5;
 
 	}
-	else if(tap_tempo_switch_state == NOT_DEPRESSED){
+	else if(tap_tempo_switch_states.tap_tempo_switch_state == NOT_DEPRESSED){
 
 		//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
 		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1); //reset
@@ -241,12 +242,24 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 		flags = 1 << 6;
 	}
 
-	if(tap_tempo_switch_state != INTERMEDIATE){
+	if((tap_tempo_switch_states.tap_tempo_switch_state == NOT_DEPRESSED) && (tap_tempo_switch_states.tap_tempo_switch_prev_state == DEPRESSED)){
 
-		HAL_NVIC_EnableIRQ(EXTI4_15_IRQn); //allow switch to cause interrupts once debounced
+		switch_registered = YES;
 	}
 
+	if(switch_registered == YES){
+
+		switch_registered = NO;
+		HAL_NVIC_EnableIRQ(EXTI4_15_IRQn); //allow switch to cause interrupts again
+	}
+
+	//SET PREVIOUS STATE TO CURRENT STATE
+	tap_tempo_switch_states.tap_tempo_switch_prev_state = tap_tempo_switch_states.tap_tempo_switch_state;
+
+	//SET TIMER TRIGGER
 	HAL_LPTIM_SetOnce_Start_IT(&hlptim1, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK);
+
+	HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
 }
 
 void TIM17_callback_speed_pot_check(TIM_HandleTypeDef *htim){

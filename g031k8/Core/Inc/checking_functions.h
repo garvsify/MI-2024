@@ -19,19 +19,22 @@
 //CUSTOM TYPES
 enum Tap_Tempo_Switch_State{
 	NOT_DEPRESSED,
-	DEPRESSED,
-	INTERMEDIATE
+	DEPRESSED
+};
+
+struct Tap_Tempo_Switch_States{
+
+	enum Tap_Tempo_Switch_State tap_tempo_switch_state;
+	enum Tap_Tempo_Switch_State tap_tempo_switch_prev_state;
 };
 
 //VARIABLE DECLARATIONS
-volatile extern uint8_t tap_tempo_switch_state_counter;
-volatile extern enum Tap_Tempo_Switch_State tap_tempo_switch_state;
 volatile extern enum Validate external_clock_mode_is_active;
 volatile extern enum Validate tap_tempo_mode_is_active;
 volatile extern uint8_t speed_pot_adc_measurement_num;
 
 //FUNCTION DECLARATIONS
 uint8_t Speed_Pot_Check(struct Params* params_ptr);
-uint8_t Check_Tap_Tempo_Switch_State(volatile enum Tap_Tempo_Switch_State *tap_tempo_switch_state_ptr);
+uint8_t Check_Tap_Tempo_Switch_State(volatile struct Tap_Tempo_Switch_States *tap_tempo_switch_states_ptr);
 
 #endif /* INC_CHECKING_FUNCTIONS_H_ */

@@ -4,6 +4,7 @@
 //INCLUDES
 #include "oscillator.h"
 #include "config.h"
+#include "checking_functions.h"
 
 //FUNCTION DECLARATIONS
 uint8_t Startup(void);

@@ -491,7 +491,7 @@ void MX_LPTIM1_Init(void)
 
   /* USER CODE END LPTIM1_Init 2 */
 
-  HAL_NVIC_SetPriority(LPTIM1_IRQn, 2, 2);
+  HAL_NVIC_SetPriority(LPTIM1_IRQn, 3, 3);
   HAL_NVIC_EnableIRQ(LPTIM1_IRQn);
 }
 
