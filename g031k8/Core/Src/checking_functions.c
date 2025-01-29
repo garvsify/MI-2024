@@ -3,10 +3,11 @@
 //VARIABLE DEFINITIONS
 volatile enum Validate external_clock_mode_is_active = NO;
 volatile enum Validate tap_tempo_mode_is_active = NO;
-volatile uint8_t speed_pot_adc_measurement_num = 0;
 
 //FUNCTION DEFINITIONS
 uint8_t Speed_Pot_Check(struct Params* params_ptr){
+
+	static volatile uint8_t speed_pot_adc_measurement_num;
 
 	if((tap_tempo_mode_is_active == YES) || (external_clock_mode_is_active == YES)){
 

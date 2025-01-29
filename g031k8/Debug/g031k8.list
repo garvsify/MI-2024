@@ -27,27 +27,27 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  11 .ARM.attributes 00000028  00000000  00000000  00009418  2**0
                   CONTENTS, READONLY
- 12 .debug_info   00029016  00000000  00000000  00009440  2**0
+ 12 .debug_info   0002900c  00000000  00000000  00009440  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 13 .debug_abbrev 00004e3e  00000000  00000000  00032456  2**0
+ 13 .debug_abbrev 00004e3f  00000000  00000000  0003244c  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_aranges 00001338  00000000  00000000  00037298  2**3
+ 14 .debug_aranges 00001338  00000000  00000000  00037290  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_rnglists 00001b1d  00000000  00000000  000385d0  2**0
+ 15 .debug_rnglists 00001b1d  00000000  00000000  000385c8  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  000197b2  00000000  00000000  0003a0ed  2**0
+ 16 .debug_macro  0001981b  00000000  00000000  0003a0e5  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   00027da5  00000000  00000000  0005389f  2**0
+ 17 .debug_line   00027e5a  00000000  00000000  00053900  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    0009eb05  00000000  00000000  0007b644  2**0
+ 18 .debug_str    0009eb2f  00000000  00000000  0007b75a  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000043  00000000  00000000  0011a149  2**0
+ 19 .comment      00000043  00000000  00000000  0011a289  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  000032f4  00000000  00000000  0011a18c  2**2
+ 20 .debug_frame  000032f4  00000000  00000000  0011a2cc  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_loclists 0000f195  00000000  00000000  0011d480  2**0
+ 21 .debug_loclists 0000f195  00000000  00000000  0011d5c0  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 22 .debug_line_str 00000054  00000000  00000000  0012c615  2**0
+ 22 .debug_line_str 00000054  00000000  00000000  0012c755  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -530,13 +530,15 @@ uint8_t Start_UART_Receive(void){
  800045c:	20000554 	.word	0x20000554
 
 08000460 <Speed_Pot_Check>:
+//VARIABLE DEFINITIONS
 volatile enum Validate external_clock_mode_is_active = NO;
 volatile enum Validate tap_tempo_mode_is_active = NO;
-volatile uint8_t speed_pot_adc_measurement_num = 0;
 
 //FUNCTION DEFINITIONS
 uint8_t Speed_Pot_Check(struct Params* params_ptr){
  8000460:	b510      	push	{r4, lr}
+
+	static volatile uint8_t speed_pot_adc_measurement_num;
 
 	if((tap_tempo_mode_is_active == YES) || (external_clock_mode_is_active == YES)){
  8000462:	4a1c      	ldr	r2, [pc, #112]	@ (80004d4 <Speed_Pot_Check+0x74>)
@@ -686,7 +688,7 @@ uint8_t Check_Tap_Tempo_Switch_State(volatile struct Tap_Tempo_Switch_States *ta
 			if(extend_rising_edge == COUNT_TO_DELAY_RISING_TAP_TEMPO_EDGE){
  8000524:	4809      	ldr	r0, [pc, #36]	@ (800054c <Check_Tap_Tempo_Switch_State+0x60>)
  8000526:	7802      	ldrb	r2, [r0, #0]
- 8000528:	2a01      	cmp	r2, #1
+ 8000528:	2a05      	cmp	r2, #5
  800052a:	d007      	beq.n	800053c <Check_Tap_Tempo_Switch_State+0x50>
 				extend_rising_edge++;
  800052c:	3201      	adds	r2, #1
