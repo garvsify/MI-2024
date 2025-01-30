@@ -3,6 +3,7 @@
 
 //INCLUDES
 #include <stdint.h>
+
 #include "oscillator.h"
 
 //VARIABLE DECLARATIONS

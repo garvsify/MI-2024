@@ -7,6 +7,7 @@
 
 //INCLUDES
 #include <stdint.h>
+
 #include "config.h"
 
 //CUSTOM TYPES

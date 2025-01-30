@@ -3,6 +3,7 @@
 
 //INCLUDES
 #include <stdint.h>
+
 #include "symmetry_adjustment_types.h"
 
 //CUSTOM TYPES

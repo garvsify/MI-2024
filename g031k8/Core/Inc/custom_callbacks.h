@@ -1,6 +1,8 @@
 #ifndef INC_CUSTOM_CALLBACKS_H_
 #define INC_CUSTOM_CALLBACKS_H_
 
+#include <stdint.h>
+
 #include <checking_functions.h>
 #include <oscillator.h>
 #include "input_capture.h"

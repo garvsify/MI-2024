@@ -1,6 +1,8 @@
 #ifndef MIDI_DEFINES_H
 #define MIDI_DEFINES_H
 
+#include <stdint.h>
+
 #define MIDI_MS_NIBBLE_SHIFT 4
 
 extern struct MIDI_Message_Characteristics midi_channel_voice_control_change_msg;

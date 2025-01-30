@@ -1,4 +1,3 @@
-#include <stdint.h>
 #include "startup.h"
 
 uint8_t Startup(void){
@@ -25,10 +24,10 @@ uint8_t Startup(void){
 		}
 	}
 
+	//PREPARE OSCILLATORS
 	Calculate_Next_Main_Oscillator_Values(&params, (enum Next_Values_Processing_Mode)STARTUP_MODE);
 	Write_Next_Main_Oscillator_Values_to_Delay_Line(&params, &delay_line);
 	Set_Oscillator_Values(&params);
-
 
 	//SET DEFAULT PIN STATES
 	HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1); //latch high the debounced o/p

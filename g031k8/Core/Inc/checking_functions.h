@@ -5,6 +5,7 @@
 
 //INCLUDES
 #include <stdint.h>
+
 #include "utility.h"
 #include <oscillator_params_type.h>
 #include <speed_pot_check.h>

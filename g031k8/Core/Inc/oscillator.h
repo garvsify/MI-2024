@@ -2,14 +2,14 @@
 #define INC_OSCILLATOR_H_
 
 //INCLUDES
+#include <stdint.h>
+
 #include "utility.h"
 #include "symmetry_adjustment.h"
 #include "oscillator_params_type.h"
 #include "config.h"
 #include "timers.h"
 #include "oscillator_macros.h"
-
-#include <stdint.h>
 
 //MACROS
 

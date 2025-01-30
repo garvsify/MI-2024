@@ -2,6 +2,8 @@
 #define INC_STARTUP_H_
 
 //INCLUDES
+#include <stdint.h>
+
 #include "oscillator.h"
 #include "config.h"
 #include "checking_functions.h"

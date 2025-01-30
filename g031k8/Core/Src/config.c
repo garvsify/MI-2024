@@ -491,7 +491,7 @@ void MX_LPTIM1_Init(void)
 
   /* USER CODE END LPTIM1_Init 2 */
 
-  HAL_NVIC_SetPriority(LPTIM1_IRQn, 3, 3);
+  HAL_NVIC_SetPriority(LPTIM1_IRQn, 2, 2);
   HAL_NVIC_EnableIRQ(LPTIM1_IRQn);
 }
 
@@ -617,7 +617,7 @@ void MX_GPIO_Init(void)
   HAL_GPIO_Init(HACK_POT_LOW_GPIO_Port, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
-  HAL_NVIC_SetPriority(EXTI4_15_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(EXTI4_15_IRQn, 3, 3);
   HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
@@ -689,7 +689,7 @@ void System_Init(void){
 	HAL_UART_RegisterCallback(&huart2, HAL_UART_RX_COMPLETE_CB_ID, &UART2_RX_transfer_complete_callback);
 
 	//Set custom callback for LPTIM1 (Tap Tempo SW state check)
-	 HAL_LPTIM_RegisterCallback(&hlptim1, HAL_LPTIM_COMPARE_MATCH_CB_ID, &LPTIM1_callback);
+	HAL_LPTIM_RegisterCallback(&hlptim1, HAL_LPTIM_COMPARE_MATCH_CB_ID, &LPTIM1_callback);
 }
 
 #ifdef  USE_FULL_ASSERT

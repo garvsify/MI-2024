@@ -3,6 +3,7 @@
 
 //INCLUDES
 #include <stdint.h>
+
 #include "config.h"
 
 //FUNCTION DECLARATIONS
