@@ -170,6 +170,11 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 		tap_tempo_mode_is_active = NO;
 	}
 
+	if((tap_tempo_mode_is_active == YES) || (external_clock_mode_is_active == YES)){
+
+		Speed_Pot_Check(&params);
+	}
+
 
 	if(tap_tempo_mode_is_active == YES){
 
@@ -180,10 +185,6 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 			//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
 			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
 			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
-
-			//START SPEED POT CHECKING
-			//__HAL_TIM_SET_COUNTER(&htim17, 0);
-			//Start_OC_TIM(&htim17, TIM_CHANNEL_1);
 
 		}
 		else if(tap_tempo_switch_states.tap_tempo_switch_state == NOT_DEPRESSED){
@@ -198,7 +199,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 	//SET PREVIOUS STATE TO CURRENT STATE
 	//tap_tempo_switch_states.tap_tempo_switch_prev_state = tap_tempo_switch_states.tap_tempo_switch_state;
 
-	if(external_clock_mode_is_active == YES){
+	else if(external_clock_mode_is_active == YES){
 
 		Check_CLK_IN_State(&clk_in_state);
 
@@ -213,10 +214,6 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
 			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
-
-			//START SPEED POT CHECKING
-			//__HAL_TIM_SET_COUNTER(&htim17, 0);
-			//Start_OC_TIM(&htim17, TIM_CHANNEL_1);
 		}
 
 	}
@@ -226,14 +223,4 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 	//SET TIMER TRIGGER
 	HAL_LPTIM_SetOnce_Start_IT(&hlptim1, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK);
 
-}
-
-void TIM17_callback_speed_pot_check(TIM_HandleTypeDef *htim){
-
-	Stop_OC_TIM(&htim17, TIM_CHANNEL_1);
-
-	Speed_Pot_Check(&params);
-
-	__HAL_TIM_SET_COUNTER(&htim17, 0);
-	Start_OC_TIM(&htim17, TIM_CHANNEL_1);
 }

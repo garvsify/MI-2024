@@ -35,9 +35,6 @@ uint8_t Speed_Pot_Check(struct Params* params_ptr){
 
 					tap_tempo_mode_is_active = NO;
 					external_clock_mode_is_active = NO;
-
-					//STOP SPEED POT CHECKING
-					Stop_OC_TIM(&htim17, TIM_CHANNEL_1);
 				}
 			}
 			else if(second_speed_measurement > first_speed_measurement){
@@ -46,9 +43,6 @@ uint8_t Speed_Pot_Check(struct Params* params_ptr){
 
 					tap_tempo_mode_is_active = NO;
 					external_clock_mode_is_active = NO;
-
-					//STOP SPEED POT CHECKING
-					Stop_OC_TIM(&htim17, TIM_CHANNEL_1);
 				}
 			}
 		}
