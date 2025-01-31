@@ -87,8 +87,6 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 			}
 			else{
 
-				HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
-
 				//start TIM3 from 0 with CCR loaded with TIM2_ch1_input_capture_value
 				//CCR shouldn't be preloaded so *should* update instantaneously
 				__HAL_TIM_SET_COUNTER(&htim3, 0);
@@ -98,8 +96,6 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 				//set I/P capture measurement re-elapse is ongoing flag
 				input_capture_measurement_reelapse_is_ongoing = YES;
 			}
-
-			HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
 
 			input_capture_processing_can_be_started = YES;
 		}
@@ -208,14 +204,14 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 		//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
 		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
-		//HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
 
 	}
 	else if(tap_tempo_switch_states.tap_tempo_switch_state == NOT_DEPRESSED){
 
 		//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
 		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1); //reset
-		//HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
 
 		HAL_NVIC_EnableIRQ(EXTI4_15_IRQn); //allow switch to cause interrupts again
 	}
@@ -224,7 +220,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 	//tap_tempo_switch_states.tap_tempo_switch_prev_state = tap_tempo_switch_states.tap_tempo_switch_state;
 
 
-		//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
+	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
 
 	//SET TIMER TRIGGER
 	HAL_LPTIM_SetOnce_Start_IT(&hlptim1, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK);
