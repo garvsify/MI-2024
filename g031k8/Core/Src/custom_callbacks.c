@@ -159,41 +159,66 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 	static volatile struct Tap_Tempo_Switch_States tap_tempo_switch_states = {0};
 	volatile enum CLK_IN_State clk_in_state = LOW;
 
-	Check_Tap_Tempo_Switch_State(&tap_tempo_switch_states);
-
-	if(tap_tempo_switch_states.tap_tempo_switch_state == DEPRESSED){
+	if((uint8_t)HAL_GPIO_ReadPin(SW_IN_GPIO_Port, SW_IN_Pin) == 0){
 
 		tap_tempo_mode_is_active = YES;
 		external_clock_mode_is_active = NO;
-
-		//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
-		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
-		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
-
 	}
-	else if(tap_tempo_switch_states.tap_tempo_switch_state == NOT_DEPRESSED){
+	else if((uint8_t)HAL_GPIO_ReadPin(CLK_IN_GPIO_Port, CLK_IN_Pin) == 1){
 
-		//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
-		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1); //reset
-		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+		external_clock_mode_is_active = YES;
+		tap_tempo_mode_is_active = NO;
+	}
+
+
+	if(tap_tempo_mode_is_active == YES){
+
+		Check_Tap_Tempo_Switch_State(&tap_tempo_switch_states);
+
+		if(tap_tempo_switch_states.tap_tempo_switch_state == DEPRESSED){
+
+			//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
+			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+
+			//START SPEED POT CHECKING
+			//__HAL_TIM_SET_COUNTER(&htim17, 0);
+			//Start_OC_TIM(&htim17, TIM_CHANNEL_1);
+
+		}
+		else if(tap_tempo_switch_states.tap_tempo_switch_state == NOT_DEPRESSED){
+
+			//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
+			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1); //reset
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+		}
+
 	}
 
 	//SET PREVIOUS STATE TO CURRENT STATE
 	//tap_tempo_switch_states.tap_tempo_switch_prev_state = tap_tempo_switch_states.tap_tempo_switch_state;
 
+	if(external_clock_mode_is_active == YES){
 
-	Check_CLK_IN_State(&clk_in_state);
+		Check_CLK_IN_State(&clk_in_state);
 
-	if(clk_in_state == LOW){
+		if(clk_in_state == LOW){
 
-		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1);
+			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1);
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
 
-		tap_tempo_mode_is_active = NO;
-		external_clock_mode_is_active = YES;
-	}
-	else{
 
-		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
+		}
+		else{
+
+			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+
+			//START SPEED POT CHECKING
+			//__HAL_TIM_SET_COUNTER(&htim17, 0);
+			//Start_OC_TIM(&htim17, TIM_CHANNEL_1);
+		}
+
 	}
 
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
