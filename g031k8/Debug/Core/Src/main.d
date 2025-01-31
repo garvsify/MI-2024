@@ -43,7 +43,7 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h ../Core/Inc/UART.h \
  ../Core/Inc/oscillator_macros.h ../Core/Inc/input_capture.h \
  ../Core/Inc/startup.h ../Core/Inc/checking_functions.h \
  ../Core/Inc/speed_pot_check.h ../Core/Inc/tap_tempo.h \
- ../Core/Inc/CLK_IN.h
+ ../Core/Inc/CLK_IN.h ../Core/Inc/speed_control_state_machine.h
 ../Core/Inc/main.h:
 ../Core/Inc/UART.h:
 ../Core/Inc/config.h:
@@ -98,3 +98,4 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h ../Core/Inc/UART.h \
 ../Core/Inc/speed_pot_check.h:
 ../Core/Inc/tap_tempo.h:
 ../Core/Inc/CLK_IN.h:
+../Core/Inc/speed_control_state_machine.h:

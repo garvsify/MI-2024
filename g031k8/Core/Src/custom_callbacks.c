@@ -19,13 +19,13 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 	HAL_ADC_Stop_DMA(hadc); //disable ADC DMA
 	Process_ADC_Conversion_Values(&params, &delay_line, ADCResultsDMA);
 
-	if((tap_tempo_mode_is_active == YES) || (external_clock_mode_is_active == YES)){
+	if((state != STATE_0) && (state != STATE_3) && (sync_status == SYNC_TRIGGERED)){
 
 		//COPY THE 'to be loaded' raw values into params such that the speed pot raw values are ignored in favour of the I/P cap processing raw values
 		params.raw_start_value = params_to_be_loaded.raw_start_value;
 		params.raw_prescaler = params_to_be_loaded.raw_prescaler;
 	}
-	else{ //pot control mode
+	else if(state == STATE_0){ //pot control mode
 
 		Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(&params);
 	}
@@ -55,6 +55,8 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 		__HAL_TIM_SET_COUNTER(&htim2, 0); //begin measurement
 		input_capture_measurement_is_ongoing = YES;
 		input_capture_event = SECOND;
+
+		sync_status = SYNC_NOT_REQUESTED;
 	}
 	else{ //is second
 
@@ -68,6 +70,8 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 			__HAL_TIM_SET_COUNTER(&htim3, 0);
 			__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, interrupt_period);
 			Start_OC_TIM(&htim3, TIM_CHANNEL_1);
+
+			sync_status = SYNC_NOT_REQUESTED;
 		}
 		else{
 
@@ -83,6 +87,8 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 
 				//set I/P capture measurement re-elapse 1 is ongoing flag
 				input_capture_measurement_reelapse_is_ongoing = YES;
+
+				sync_status = SYNC_REQUESTED;
 			}
 
 			//No need to check longest period as that is tested inherently by the TIM2 overflow
@@ -97,6 +103,8 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 
 				//set I/P capture measurement re-elapse is ongoing flag
 				input_capture_measurement_reelapse_is_ongoing = YES;
+
+				sync_status = SYNC_REQUESTED;
 			}
 
 			input_capture_processing_can_be_started = YES;
@@ -127,7 +135,9 @@ void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
 	Set_Oscillator_Values(&params_to_be_loaded);
 
 	Stop_OC_TIM(&htim3, TIM_CHANNEL_1);
+
 	input_capture_measurement_reelapse_is_ongoing = NO;
+	sync_status = SYNC_TRIGGERED;
 
 	params.index = params_to_be_loaded.index;
 
@@ -163,22 +173,20 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 	if((uint8_t)HAL_GPIO_ReadPin(SW_IN_GPIO_Port, SW_IN_Pin) == 0){
 
-		tap_tempo_mode_is_active = YES;
-		external_clock_mode_is_active = NO;
+		state = STATE_1;
 	}
 	else if((uint8_t)HAL_GPIO_ReadPin(CLK_IN_GPIO_Port, CLK_IN_Pin) == 1){
 
-		external_clock_mode_is_active = YES;
-		tap_tempo_mode_is_active = NO;
+		state = STATE_2;
 	}
 
-	if((tap_tempo_mode_is_active == YES) || (external_clock_mode_is_active == YES)){
+	if((state == STATE_1) || (state == STATE_2)){
 
 		Speed_Pot_Check(&params);
 	}
 
 
-	if(tap_tempo_mode_is_active == YES){
+	if(state == STATE_1){
 
 		Check_Tap_Tempo_Switch_State(&tap_tempo_switch_states);
 
@@ -201,7 +209,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 	//SET PREVIOUS STATE TO CURRENT STATE
 	//tap_tempo_switch_states.tap_tempo_switch_prev_state = tap_tempo_switch_states.tap_tempo_switch_state;
 
-	else if(external_clock_mode_is_active == YES){
+	else if(state == STATE_2){
 
 		Check_CLK_IN_State(&clk_in_state);
 

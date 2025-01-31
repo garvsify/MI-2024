@@ -1,4 +1,4 @@
-#include <checking_functions.h>
+#include "checking_functions.h"
 
 //VARIABLE DEFINITIONS
 volatile enum Validate external_clock_mode_is_active = NO;
@@ -9,41 +9,36 @@ uint8_t Speed_Pot_Check(struct Params* params_ptr){
 
 	static volatile uint8_t speed_pot_adc_measurement_num;
 
-	if((tap_tempo_mode_is_active == YES) || (external_clock_mode_is_active == YES)){
+	static uint16_t first_speed_measurement;
 
-		static uint16_t first_speed_measurement;
+	static uint16_t second_speed_measurement;
 
-		static uint16_t second_speed_measurement;
+	if(speed_pot_adc_measurement_num == 0){
 
-		if(speed_pot_adc_measurement_num == 0){
+		first_speed_measurement = params_ptr->speed;
+		speed_pot_adc_measurement_num = 1;
+	}
+	else if(speed_pot_adc_measurement_num == 1){
 
-			first_speed_measurement = params_ptr->speed;
-			speed_pot_adc_measurement_num = 1;
-		}
-		else if(speed_pot_adc_measurement_num == 1){
+		second_speed_measurement = params_ptr->speed;
+		speed_pot_adc_measurement_num = 2;
+	}
+	else if(speed_pot_adc_measurement_num == 2){
 
-			second_speed_measurement = params_ptr->speed;
-			speed_pot_adc_measurement_num = 2;
-		}
-		else if(speed_pot_adc_measurement_num == 2){
+		speed_pot_adc_measurement_num = 0;
 
-			speed_pot_adc_measurement_num = 0;
+		if(first_speed_measurement > second_speed_measurement){
 
-			if(first_speed_measurement > second_speed_measurement){
+			if(first_speed_measurement - second_speed_measurement > SPEED_TOLERANCE){
 
-				if(first_speed_measurement - second_speed_measurement > SPEED_TOLERANCE){
-
-					tap_tempo_mode_is_active = NO;
-					external_clock_mode_is_active = NO;
-				}
+				state = STATE_0;
 			}
-			else if(second_speed_measurement > first_speed_measurement){
+		}
+		else if(second_speed_measurement > first_speed_measurement){
 
-				if(second_speed_measurement - first_speed_measurement > SPEED_TOLERANCE){
+			if(second_speed_measurement - first_speed_measurement > SPEED_TOLERANCE){
 
-					tap_tempo_mode_is_active = NO;
-					external_clock_mode_is_active = NO;
-				}
+				state = STATE_0;
 			}
 		}
 	}

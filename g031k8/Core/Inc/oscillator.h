@@ -52,6 +52,7 @@ extern const uint16_t TIM16_prescalers[6];
 volatile extern uint16_t ADCResultsDMA[5];
 const extern uint8_t num_ADC_conversions;
 volatile extern enum Validate initial_ADC_conversion_complete;
+volatile extern enum Sync_Status sync_status;
 
 //STRUCT VARIABLES
 extern struct Params params; //'normal' running variables of the oscillator/s
@@ -63,6 +64,12 @@ enum Next_Values_Processing_Mode{
 	REGULAR_MODE,
 	IP_CAPTURE_MODE,
 	STARTUP_MODE
+};
+
+enum Sync_Status{
+	SYNC_NOT_REQUESTED,
+	SYNC_REQUESTED,
+	SYNC_TRIGGERED
 };
 
 struct Delay_Line{
