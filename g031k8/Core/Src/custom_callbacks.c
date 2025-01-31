@@ -123,7 +123,7 @@ void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
 
 	//force update of timers to sync the wave to the TIM3 reelapse interrupt
 
-	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
+	HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
 
 	// @TODO //WRITE CODE TO LOAD CORRECT DUTY DELAYED VALUE TO SECONDARY OSCILLATOR
 	Set_Oscillator_Values(&params_to_be_loaded);
@@ -144,19 +144,7 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
 
 	//DISABLE EXTI INTERRUPTS - in EXTI Callback before
 
-	//I think works better if SW IN is checked first here?
-	if((GPIO_Pin == SW_IN_Pin) && HAL_GPIO_ReadPin(SW_IN_GPIO_Port, SW_IN_Pin) == 0){ //if specifically SW IN pin with falling interrupt
-
-		//SET MODES
-		tap_tempo_mode_is_active = YES;
-		external_clock_mode_is_active = NO;
-
-		//START SPEED POT CHECKING
-		__HAL_TIM_SET_COUNTER(&htim17, 0);
-		Start_OC_TIM(&htim17, TIM_CHANNEL_1);
-
-	}
-	else if((GPIO_Pin == CLK_IN_Pin) && (HAL_GPIO_ReadPin(CLK_IN_GPIO_Port, CLK_IN_Pin) == 0)){ //if specifically CLK IN pin with falling interrupt
+	if((GPIO_Pin == CLK_IN_Pin) && (HAL_GPIO_ReadPin(CLK_IN_GPIO_Port, CLK_IN_Pin) == 0)){ //if specifically CLK IN pin with falling interrupt
 
 		//Set SW OUT
 		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
@@ -207,45 +195,36 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
 void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
-	if((tap_tempo_mode_is_active == YES) && (external_clock_mode_is_active == NO)){
+	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
+
+	static volatile struct Tap_Tempo_Switch_States tap_tempo_switch_states = {0};
+
+	Check_Tap_Tempo_Switch_State(&tap_tempo_switch_states);
+
+	if(tap_tempo_switch_states.tap_tempo_switch_state == DEPRESSED){
+
+		tap_tempo_mode_is_active = YES;
+		external_clock_mode_is_active = NO;
+
+		//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
+		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
+		//HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+
+	}
+	else if(tap_tempo_switch_states.tap_tempo_switch_state == NOT_DEPRESSED){
 
 		//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
+		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1); //reset
+		//HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
 
-		static volatile struct Tap_Tempo_Switch_States tap_tempo_switch_states = {0};
+		HAL_NVIC_EnableIRQ(EXTI4_15_IRQn); //allow switch to cause interrupts again
+	}
 
-		Check_Tap_Tempo_Switch_State(&tap_tempo_switch_states);
-
-		if(tap_tempo_switch_states.tap_tempo_switch_state == DEPRESSED){
-
-			//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
-			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
-			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
-
-		}
-		else if(tap_tempo_switch_states.tap_tempo_switch_state == NOT_DEPRESSED){
-
-			//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
-			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1); //reset
-			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
-		}
-
-		//CHECK IF WE CAN RE-ENABLE INTERRUPTS
-		if((tap_tempo_switch_states.tap_tempo_switch_state == NOT_DEPRESSED) && (tap_tempo_switch_states.tap_tempo_switch_prev_state == DEPRESSED)){
-
-			HAL_NVIC_EnableIRQ(EXTI4_15_IRQn); //allow switch to cause interrupts again
-		}
-		else if((tap_tempo_switch_states.tap_tempo_switch_state == NOT_DEPRESSED) && (tap_tempo_switch_states.tap_tempo_switch_prev_state == NOT_DEPRESSED)){
-
-			HAL_NVIC_EnableIRQ(EXTI4_15_IRQn); //allow switch to cause interrupts again
-		}
-
-		//SET PREVIOUS STATE TO CURRENT STATE
-		tap_tempo_switch_states.tap_tempo_switch_prev_state = tap_tempo_switch_states.tap_tempo_switch_state;
+	//SET PREVIOUS STATE TO CURRENT STATE
+	//tap_tempo_switch_states.tap_tempo_switch_prev_state = tap_tempo_switch_states.tap_tempo_switch_state;
 
 
 		//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
-
-	}
 
 	//SET TIMER TRIGGER
 	HAL_LPTIM_SetOnce_Start_IT(&hlptim1, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK);
