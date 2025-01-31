@@ -42,8 +42,9 @@ Core/Src/config.o: ../Core/Src/config.c ../Core/Inc/custom_callbacks.h \
  ../Core/Inc/oscillator.h ../Core/Inc/symmetry_adjustment.h \
  ../Core/Inc/oscillator_params_type.h ../Core/Inc/timers.h \
  ../Core/Inc/oscillator_macros.h ../Core/Inc/tap_tempo.h \
- ../Core/Inc/oscillator.h ../Core/Inc/input_capture.h ../Core/Inc/UART.h \
- ../Core/Inc/debug.h ../Core/Inc/config.h
+ ../Core/Inc/CLK_IN.h ../Core/Inc/oscillator.h \
+ ../Core/Inc/input_capture.h ../Core/Inc/UART.h ../Core/Inc/debug.h \
+ ../Core/Inc/config.h
 ../Core/Inc/custom_callbacks.h:
 ../Core/Inc/checking_functions.h:
 ../Core/Inc/utility.h:
@@ -94,6 +95,7 @@ Core/Src/config.o: ../Core/Src/config.c ../Core/Inc/custom_callbacks.h \
 ../Core/Inc/timers.h:
 ../Core/Inc/oscillator_macros.h:
 ../Core/Inc/tap_tempo.h:
+../Core/Inc/CLK_IN.h:
 ../Core/Inc/oscillator.h:
 ../Core/Inc/input_capture.h:
 ../Core/Inc/UART.h:

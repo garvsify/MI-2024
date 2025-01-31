@@ -96,3 +96,19 @@ uint8_t Check_Tap_Tempo_Switch_State(volatile struct Tap_Tempo_Switch_States *ta
 
 	return 1;
 }
+
+uint8_t Check_CLK_IN_State(volatile enum CLK_IN_State *clk_in_state_ptr){
+
+	uint8_t state = (uint8_t)HAL_GPIO_ReadPin(CLK_IN_GPIO_Port, CLK_IN_Pin);
+
+	if(state == 0){
+
+		*clk_in_state_ptr = LOW;
+	}
+	else{
+
+		*clk_in_state_ptr = HIGH;
+	}
+
+	return 1;
+}

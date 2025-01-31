@@ -12,6 +12,7 @@
 #include "oscillator.h"
 #include "timers.h"
 #include "tap_tempo.h"
+#include "CLK_IN.h"
 
 //CUSTOM TYPES
 
@@ -22,5 +23,6 @@ volatile extern enum Validate tap_tempo_mode_is_active;
 //FUNCTION DECLARATIONS
 uint8_t Speed_Pot_Check(struct Params* params_ptr);
 uint8_t Check_Tap_Tempo_Switch_State(volatile struct Tap_Tempo_Switch_States *tap_tempo_switch_states_ptr);
+uint8_t Check_CLK_IN_State(volatile enum CLK_IN_State *clk_in_state_ptr);
 
 #endif /* INC_CHECKING_FUNCTIONS_H_ */

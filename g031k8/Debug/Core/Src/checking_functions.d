@@ -41,7 +41,8 @@ Core/Src/checking_functions.o: ../Core/Src/checking_functions.c \
  ../Core/Inc/symmetry_adjustment_types.h ../Core/Inc/speed_pot_check.h \
  ../Core/Inc/oscillator.h ../Core/Inc/symmetry_adjustment.h \
  ../Core/Inc/oscillator_params_type.h ../Core/Inc/timers.h \
- ../Core/Inc/oscillator_macros.h ../Core/Inc/tap_tempo.h
+ ../Core/Inc/oscillator_macros.h ../Core/Inc/tap_tempo.h \
+ ../Core/Inc/CLK_IN.h
 ../Core/Inc/checking_functions.h:
 ../Core/Inc/utility.h:
 ../Core/Inc/config.h:
@@ -91,3 +92,4 @@ Core/Src/checking_functions.o: ../Core/Src/checking_functions.c \
 ../Core/Inc/timers.h:
 ../Core/Inc/oscillator_macros.h:
 ../Core/Inc/tap_tempo.h:
+../Core/Inc/CLK_IN.h:

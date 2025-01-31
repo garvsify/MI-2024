@@ -136,43 +136,6 @@ void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
 }
 
-void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
-
-	//DISABLE EXTI INTERRUPTS - in EXTI Callback before
-
-	if((GPIO_Pin == CLK_IN_Pin) && (HAL_GPIO_ReadPin(CLK_IN_GPIO_Port, CLK_IN_Pin) == 0)){ //if specifically CLK IN pin with falling interrupt
-
-		//Set SW OUT
-		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
-
-		//SET MODES
-		external_clock_mode_is_active = YES;
-		tap_tempo_mode_is_active = NO;
-
-		/*//DISABLE TAP-TEMPO SWITCH CHECKING
-		HAL_NVIC_DisableIRQ(LPTIM1_IRQn);
-		HAL_LPTIM_SetOnce_Stop_IT(&hlptim1);*/
-
-		//START SPEED POT CHECKING
-		__HAL_TIM_SET_COUNTER(&htim17, 0);
-		Start_OC_TIM(&htim17, TIM_CHANNEL_1);
-
-		HAL_NVIC_EnableIRQ(EXTI4_15_IRQn); //allow clk to cause interrupts
-	}
-}
-
-void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
-
-	//DISABLE EXTI INTERRUPTS - in EXTI Callback before
-
-	if((GPIO_Pin == CLK_IN_Pin) && (HAL_GPIO_ReadPin(CLK_IN_GPIO_Port, CLK_IN_Pin) == 1) && (external_clock_mode_is_active == YES)){ //if specifically CLK IN pin with rising interrupt
-
-		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1);
-	}
-
-	HAL_NVIC_EnableIRQ(EXTI4_15_IRQn); //allow clk to cause interrupts
-}
-
 void UART2_TX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
 	UART_DMA_TX_is_complete = YES;
@@ -194,6 +157,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
 
 	static volatile struct Tap_Tempo_Switch_States tap_tempo_switch_states = {0};
+	volatile enum CLK_IN_State clk_in_state = LOW;
 
 	Check_Tap_Tempo_Switch_State(&tap_tempo_switch_states);
 
@@ -212,13 +176,25 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 		//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
 		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1); //reset
 		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
-
-		HAL_NVIC_EnableIRQ(EXTI4_15_IRQn); //allow switch to cause interrupts again
 	}
 
 	//SET PREVIOUS STATE TO CURRENT STATE
 	//tap_tempo_switch_states.tap_tempo_switch_prev_state = tap_tempo_switch_states.tap_tempo_switch_state;
 
+
+	Check_CLK_IN_State(&clk_in_state);
+
+	if(clk_in_state == LOW){
+
+		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1);
+
+		tap_tempo_mode_is_active = NO;
+		external_clock_mode_is_active = YES;
+	}
+	else{
+
+		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
+	}
 
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
 
