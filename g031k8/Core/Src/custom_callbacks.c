@@ -74,7 +74,6 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 			if(interrupt_period < HIGHEST_PRESCALER_TOP_SPEED_PERIOD){ //if the captured value/512 is less than 129, then the desired speed is not reproducable, so just set the absolute top speed (i.e. highest prescaler and shortest period)
 
 				interrupt_period = HIGHEST_PRESCALER_TOP_SPEED_PERIOD;
-				params_to_be_loaded.raw_prescaler = 64;
 
 				//start TIM3 from 0 with CCR loaded with TIM2_ch1_input_capture_value
 				//CCR shouldn't be preloaded so *should* update instantaneously
@@ -85,6 +84,9 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 				//set I/P capture measurement re-elapse 1 is ongoing flag
 				input_capture_measurement_reelapse_is_ongoing = YES;
 			}
+
+			//No need to check longest period as that is tested inherently by the TIM2 overflow
+
 			else{
 
 				//start TIM3 from 0 with CCR loaded with TIM2_ch1_input_capture_value
@@ -119,7 +121,7 @@ void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
 
 	//force update of timers to sync the wave to the TIM3 reelapse interrupt
 
-	HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
+	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
 
 	// @TODO //WRITE CODE TO LOAD CORRECT DUTY DELAYED VALUE TO SECONDARY OSCILLATOR
 	Set_Oscillator_Values(&params_to_be_loaded);
