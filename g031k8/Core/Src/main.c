@@ -25,7 +25,7 @@ int main(void)
 	//SYSTEM INIT
 	System_Init();
 
-	//STARTUP BITS AND BOBS
+	//STARTUP
 	Startup();
 
 	//START FREQ. GEN and PWM GEN TIMERS and ENABLE PWM OUTPUT

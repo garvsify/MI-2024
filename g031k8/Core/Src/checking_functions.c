@@ -1,8 +1,6 @@
 #include "checking_functions.h"
 
 //VARIABLE DEFINITIONS
-volatile enum Validate external_clock_mode_is_active = NO;
-volatile enum Validate tap_tempo_mode_is_active = NO;
 
 //FUNCTION DEFINITIONS
 uint8_t Speed_Pot_Check(struct Params* params_ptr){

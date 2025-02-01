@@ -18,8 +18,6 @@
 //CUSTOM TYPES
 
 //VARIABLE DECLARATIONS
-volatile extern enum Validate external_clock_mode_is_active;
-volatile extern enum Validate tap_tempo_mode_is_active;
 
 //FUNCTION DECLARATIONS
 uint8_t Speed_Pot_Check(struct Params* params_ptr);

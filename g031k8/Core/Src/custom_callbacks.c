@@ -19,13 +19,7 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 	HAL_ADC_Stop_DMA(hadc); //disable ADC DMA
 	Process_ADC_Conversion_Values(&params_pot_control, &delay_line, ADCResultsDMA);
 
-	if(state == STATE_0){
-
-		Copy_Params_Structs(&params_pot_control, &params);
-		Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(&params);
-	}
-
-	else if((state != STATE_0) && (first_sync_complete == NO)){
+	if((state == STATE_0) || ((state != STATE_0) && (first_sync_complete == NO))){
 
 		Copy_Params_Structs(&params_pot_control, &params);
 		Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(&params);
@@ -35,6 +29,10 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 
 		params.raw_start_value = params_working.raw_start_value;
 		params.raw_prescaler = params_working.raw_prescaler;
+		//so that the other pots keep working,
+		params.depth = params_pot_control.depth;
+		params.waveshape = params_pot_control.waveshape;
+		params.symmetry = params_pot_control.symmetry;
 	}
 
 	Process_TIM16_Final_Start_Value_and_Final_Prescaler(&params);
