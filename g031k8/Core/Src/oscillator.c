@@ -14,6 +14,7 @@ volatile enum Validate first_sync_complete = NO;
 
 //STRUCT VARIABLES
 struct Params params = {0};
+struct Params params_pot_control = {0};
 struct Params params_to_be_loaded = {0};
 struct Params params_working = {0};
 struct Delay_Line delay_line = {.duty_delay_line_storage_array = 0, //one index larger than the number of indexes (wave samples) to allow us to 'wrap' the array into a kind of circular buffer - this is reinitialised to mid-scale on runtime

@@ -55,8 +55,9 @@ volatile extern enum Validate initial_ADC_conversion_complete;
 volatile extern enum Validate first_sync_complete;
 
 //STRUCT VARIABLES
-extern struct Params params; //'normal' running variables of the oscillator/s
-extern struct Params params_to_be_loaded; //'to be loaded' variables for the oscillators for I/P capture purposes
+extern struct Params params; //running variables of the oscillator/s
+extern struct Params params_pot_control; //params for pot control mode
+extern struct Params params_to_be_loaded; //'to be loaded' params for the oscillators for when I/P capture states are active
 extern struct Params params_working; //upon overflow of re-elapse timer (TIM3), 'to_be_loaded' values are copied into this struct
 extern struct Delay_Line delay_line;
 

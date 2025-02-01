@@ -17,16 +17,17 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
 
 	HAL_ADC_Stop_DMA(hadc); //disable ADC DMA
-	Process_ADC_Conversion_Values(&params, &delay_line, ADCResultsDMA);
+	Process_ADC_Conversion_Values(&params_pot_control, &delay_line, ADCResultsDMA);
 
 	if(state == STATE_0){
 
+		Copy_Params_Structs(&params_pot_control, &params);
 		Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(&params);
 	}
 
 	else if((state != STATE_0) && (first_sync_complete == NO)){
 
-
+		Copy_Params_Structs(&params_pot_control, &params);
 		Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(&params);
 	}
 
@@ -181,7 +182,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 	if((state == STATE_1) || (state == STATE_2)){
 
-		Speed_Pot_Check(&params);
+		Speed_Pot_Check(&params_pot_control);
 	}
 
 
