@@ -10,11 +10,12 @@ const uint8_t num_ADC_conversions = sizeof(ADCResultsDMA) / sizeof(ADCResultsDMA
 //VARIABLE DEFINITIONS
 volatile uint16_t ADCResultsDMA[5] = {0};
 volatile enum Validate initial_ADC_conversion_complete = NO;
-volatile enum Sync_Status sync_status = SYNC_NOT_REQUESTED;
+volatile enum Validate first_sync_complete = NO;
 
 //STRUCT VARIABLES
 struct Params params = {0};
 struct Params params_to_be_loaded = {0};
+struct Params params_working = {0};
 struct Delay_Line delay_line = {.duty_delay_line_storage_array = 0, //one index larger than the number of indexes (wave samples) to allow us to 'wrap' the array into a kind of circular buffer - this is reinitialised to mid-scale on runtime
 								.duty_delay_line_start_offset = 1,  //initial value is 1st index - to give us space to fill index 0
 								.duty_delay_line_finish_offset = FINAL_INDEX + 1, //initial value is 512th index, one larger than the index of the final sample

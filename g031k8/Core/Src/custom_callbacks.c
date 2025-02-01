@@ -19,15 +19,21 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 	HAL_ADC_Stop_DMA(hadc); //disable ADC DMA
 	Process_ADC_Conversion_Values(&params, &delay_line, ADCResultsDMA);
 
-	if((state != STATE_0) && (state != STATE_3) && (sync_status == SYNC_TRIGGERED)){
-
-		//COPY THE 'to be loaded' raw values into params such that the speed pot raw values are ignored in favour of the I/P cap processing raw values
-		params.raw_start_value = params_to_be_loaded.raw_start_value;
-		params.raw_prescaler = params_to_be_loaded.raw_prescaler;
-	}
-	else if(state == STATE_0){ //pot control mode
+	if(state == STATE_0){
 
 		Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(&params);
+	}
+
+	else if((state != STATE_0) && (first_sync_complete == NO)){
+
+
+		Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(&params);
+	}
+
+	else if((state != STATE_0) && (first_sync_complete == YES)){
+
+		params.raw_start_value = params_working.raw_start_value;
+		params.raw_prescaler = params_working.raw_prescaler;
 	}
 
 	Process_TIM16_Final_Start_Value_and_Final_Prescaler(&params);
@@ -55,8 +61,6 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 		__HAL_TIM_SET_COUNTER(&htim2, 0); //begin measurement
 		input_capture_measurement_is_ongoing = YES;
 		input_capture_event = SECOND;
-
-		sync_status = SYNC_NOT_REQUESTED;
 	}
 	else{ //is second
 
@@ -70,8 +74,6 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 			__HAL_TIM_SET_COUNTER(&htim3, 0);
 			__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, interrupt_period);
 			Start_OC_TIM(&htim3, TIM_CHANNEL_1);
-
-			sync_status = SYNC_NOT_REQUESTED;
 		}
 		else{
 
@@ -87,8 +89,6 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 
 				//set I/P capture measurement re-elapse 1 is ongoing flag
 				input_capture_measurement_reelapse_is_ongoing = YES;
-
-				sync_status = SYNC_REQUESTED;
 			}
 
 			//No need to check longest period as that is tested inherently by the TIM2 overflow
@@ -103,8 +103,6 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 
 				//set I/P capture measurement re-elapse is ongoing flag
 				input_capture_measurement_reelapse_is_ongoing = YES;
-
-				sync_status = SYNC_REQUESTED;
 			}
 
 			input_capture_processing_can_be_started = YES;
@@ -137,9 +135,10 @@ void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
 	Stop_OC_TIM(&htim3, TIM_CHANNEL_1);
 
 	input_capture_measurement_reelapse_is_ongoing = NO;
-	sync_status = SYNC_TRIGGERED;
 
+	Copy_Params_Structs(&params_to_be_loaded, &params_working);
 	params.index = params_to_be_loaded.index;
+	first_sync_complete = YES;
 
 	Calculate_Next_Main_Oscillator_Values(&params, (enum Next_Values_Processing_Mode)REGULAR_MODE);
 	Write_Next_Main_Oscillator_Values_to_Delay_Line(&params, &delay_line);

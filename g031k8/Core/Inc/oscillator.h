@@ -52,11 +52,12 @@ extern const uint16_t TIM16_prescalers[6];
 volatile extern uint16_t ADCResultsDMA[5];
 const extern uint8_t num_ADC_conversions;
 volatile extern enum Validate initial_ADC_conversion_complete;
-volatile extern enum Sync_Status sync_status;
+volatile extern enum Validate first_sync_complete;
 
 //STRUCT VARIABLES
 extern struct Params params; //'normal' running variables of the oscillator/s
 extern struct Params params_to_be_loaded; //'to be loaded' variables for the oscillators for I/P capture purposes
+extern struct Params params_working; //upon overflow of re-elapse timer (TIM3), 'to_be_loaded' values are copied into this struct
 extern struct Delay_Line delay_line;
 
 //CUSTOM TYPES
@@ -64,12 +65,6 @@ enum Next_Values_Processing_Mode{
 	REGULAR_MODE,
 	IP_CAPTURE_MODE,
 	STARTUP_MODE
-};
-
-enum Sync_Status{
-	SYNC_NOT_REQUESTED,
-	SYNC_REQUESTED,
-	SYNC_TRIGGERED
 };
 
 struct Delay_Line{

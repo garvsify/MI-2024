@@ -73,3 +73,10 @@ uint8_t Start_IC_TIM(TIM_HandleTypeDef *TIM, uint32_t IC_TIM_channel){
 	return ok_AND;
 }
 
+uint8_t Copy_Params_Structs(struct Params* src_ptr, struct Params* dst_ptr){
+
+	*dst_ptr = *src_ptr;
+
+	return 1;
+}
+

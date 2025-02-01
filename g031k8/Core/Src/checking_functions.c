@@ -32,6 +32,7 @@ uint8_t Speed_Pot_Check(struct Params* params_ptr){
 			if(first_speed_measurement - second_speed_measurement > SPEED_TOLERANCE){
 
 				state = STATE_0;
+				first_sync_complete = NO;
 			}
 		}
 		else if(second_speed_measurement > first_speed_measurement){
@@ -39,6 +40,7 @@ uint8_t Speed_Pot_Check(struct Params* params_ptr){
 			if(second_speed_measurement - first_speed_measurement > SPEED_TOLERANCE){
 
 				state = STATE_0;
+				first_sync_complete = NO;
 			}
 		}
 	}
@@ -88,9 +90,9 @@ uint8_t Check_Tap_Tempo_Switch_State(volatile struct Tap_Tempo_Switch_States *ta
 
 uint8_t Check_CLK_IN_State(volatile enum CLK_IN_State *clk_in_state_ptr){
 
-	uint8_t state = (uint8_t)HAL_GPIO_ReadPin(CLK_IN_GPIO_Port, CLK_IN_Pin);
+	uint8_t clk_state = (uint8_t)HAL_GPIO_ReadPin(CLK_IN_GPIO_Port, CLK_IN_Pin);
 
-	if(state == 0){
+	if(clk_state == 0){
 
 		*clk_in_state_ptr = LOW;
 	}
