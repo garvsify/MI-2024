@@ -5,6 +5,13 @@ uint8_t Startup(void){
 	__HAL_TIM_ENABLE_IT(&htim2, TIM_IT_UPDATE); //make sure the overflow (update) interrupt is enabled for TIM2
 	__HAL_TIM_ENABLE_IT(&htim16, TIM_IT_UPDATE); //make sure the overflow (update) interrupt is enabled for TIM16
 
+	//SET DEFAULT PIN STATES
+	HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1); //latch high the debounced o/p
+	HAL_GPIO_WritePin(HACK_POT_HIGH_GPIO_Port, HACK_POT_HIGH_Pin, 1);
+	HAL_GPIO_WritePin(HACK_POT_LOW_GPIO_Port, HACK_POT_LOW_Pin, 0);
+
+
+	//GET ADC VALUES
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions);
 
 	//WAIT
@@ -28,10 +35,18 @@ uint8_t Startup(void){
 	Write_Next_Main_Oscillator_Values_to_Delay_Line(&params, &delay_line);
 	Set_Oscillator_Values(&params);
 
-	//SET DEFAULT PIN STATES
-	HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1); //latch high the debounced o/p
-	HAL_GPIO_WritePin(HACK_POT_HIGH_GPIO_Port, HACK_POT_HIGH_Pin, 1);
-	HAL_GPIO_WritePin(HACK_POT_LOW_GPIO_Port, HACK_POT_LOW_Pin, 0);
+	//START FREQ. GEN and PWM GEN TIMERS and ENABLE PWM OUTPUT
+	Start_PWM_Gen_Timer_Main_and_Secondary_Oscillators(&htim1, TIM_CHANNEL_2, TIM_CHANNEL_4);
+	Start_Freq_Gen_Timer();
+
+	//ENABLE INTERRUPTS
+	Global_Interrupt_Enable();
+
+	//START UART RECEIVE
+	Start_UART_Receive();
+
+	//START IP CAP
+	Start_Input_Capture_Timer();
 
 
 	#if TAPCLK_ON_OR_OFF == ON
