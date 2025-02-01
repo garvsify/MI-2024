@@ -20,18 +20,18 @@ uint8_t Startup(void){
 	// re-initialise all values in delay line storage array to middle value of wave (if sine/triangle mode) or bottom of wave if square mode, as they are initialised to 0 on startup
 	for(uint16_t i = 0; i < FINAL_INDEX + 2; i++){ //513
 
-		if(params.waveshape == SQUARE_MODE){
+		if(params_pot_control.waveshape == SQUARE_MODE){
 
-			delay_line.duty_delay_line_storage_array[i] = PWM_DUTY_VALUE_MAX - ((params.depth * PWM_DUTY_VALUE_MAX) >> DEPTH_ADC_RESOLUTION);
+			delay_line.duty_delay_line_storage_array[i] = PWM_DUTY_VALUE_MAX - ((params_pot_control.depth * PWM_DUTY_VALUE_MAX) >> DEPTH_ADC_RESOLUTION);
 		}
 		else{
 
-			delay_line.duty_delay_line_storage_array[i] = PWM_DUTY_VALUE_MAX - (((params.depth * PWM_DUTY_VALUE_MAX) >> DEPTH_ADC_RESOLUTION) >> 1);
+			delay_line.duty_delay_line_storage_array[i] = PWM_DUTY_VALUE_MAX - (((params_pot_control.depth * PWM_DUTY_VALUE_MAX) >> DEPTH_ADC_RESOLUTION) >> 1);
 		}
 	}
 
 	//PREPARE OSCILLATORS
-	Calculate_Next_Main_Oscillator_Values(&params, (enum Next_Values_Processing_Mode)STARTUP_MODE);
+	Calculate_Next_Main_Oscillator_Values(&all_params_structs, (enum Next_Values_Processing_Mode)STARTUP_MODE);
 	Write_Next_Main_Oscillator_Values_to_Delay_Line(&params, &delay_line);
 	Set_Oscillator_Values(&params);
 

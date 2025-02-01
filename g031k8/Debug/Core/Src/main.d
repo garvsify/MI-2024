@@ -36,10 +36,9 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_tim_ex.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart_ex.h \
- ../Core/Inc/oscillator.h ../Core/Inc/utility.h \
- ../Core/Inc/symmetry_adjustment.h ../Core/Inc/oscillator_params_type.h \
- ../Core/Inc/symmetry_adjustment_types.h \
- ../Core/Inc/oscillator_params_type.h ../Core/Inc/timers.h \
+ ../Core/Inc/oscillator.h ../Core/Inc/oscillator_params.h \
+ ../Core/Inc/symmetry_adjustment_types.h ../Core/Inc/utility.h \
+ ../Core/Inc/symmetry_adjustment.h ../Core/Inc/timers.h \
  ../Core/Inc/oscillator_macros.h ../Core/Inc/startup.h \
  ../Core/Inc/checking_functions.h ../Core/Inc/speed_pot_check.h \
  ../Core/Inc/tap_tempo.h ../Core/Inc/CLK_IN.h \
@@ -85,11 +84,10 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart.h:
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart_ex.h:
 ../Core/Inc/oscillator.h:
+../Core/Inc/oscillator_params.h:
+../Core/Inc/symmetry_adjustment_types.h:
 ../Core/Inc/utility.h:
 ../Core/Inc/symmetry_adjustment.h:
-../Core/Inc/oscillator_params_type.h:
-../Core/Inc/symmetry_adjustment_types.h:
-../Core/Inc/oscillator_params_type.h:
 ../Core/Inc/timers.h:
 ../Core/Inc/oscillator_macros.h:
 ../Core/Inc/startup.h:

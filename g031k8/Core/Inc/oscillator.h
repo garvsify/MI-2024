@@ -2,11 +2,11 @@
 #define INC_OSCILLATOR_H_
 
 //INCLUDES
+#include <oscillator_params.h>
 #include <stdint.h>
 
 #include "utility.h"
 #include "symmetry_adjustment.h"
-#include "oscillator_params_type.h"
 #include "config.h"
 #include "timers.h"
 #include "oscillator_macros.h"
@@ -59,6 +59,7 @@ extern struct Params params; //running variables of the oscillator/s
 extern struct Params params_pot_control; //params for pot control mode
 extern struct Params params_to_be_loaded; //'to be loaded' params for the oscillators for when I/P capture states are active
 extern struct Params params_working; //upon overflow of re-elapse timer (TIM3), 'to_be_loaded' values are copied into this struct
+extern const struct All_Params_Structs all_params_structs;
 extern struct Delay_Line delay_line;
 
 //CUSTOM TYPES
@@ -81,7 +82,7 @@ uint8_t Start_PWM_Gen_Timer_Main_and_Secondary_Oscillators(TIM_HandleTypeDef *TI
 uint8_t Start_Freq_Gen_Timer(void);
 
 uint8_t Set_Oscillator_Values(struct Params* params_ptr);
-uint8_t Calculate_Next_Main_Oscillator_Values(struct Params* params_ptr, enum Next_Values_Processing_Mode mode);
+uint8_t Calculate_Next_Main_Oscillator_Values(const struct All_Params_Structs *all_params_structs_ptr, enum Next_Values_Processing_Mode mode);
 uint8_t Write_Next_Main_Oscillator_Values_to_Delay_Line(struct Params* params_ptr, struct Delay_Line* delay_line_ptr);
 uint8_t Process_ADC_Conversion_Values(struct Params* params_ptr, struct Delay_Line* delay_line_ptr, volatile uint16_t* ADCResultsDMA_ptr);
 uint8_t Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(struct Params* params_ptr);

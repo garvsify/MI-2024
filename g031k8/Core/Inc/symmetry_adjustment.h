@@ -2,9 +2,9 @@
 #define INC_SYMMETRY_ADJUSTMENT_H_
 
 //INCLUDES
+#include <oscillator_params.h>
 #include <stdint.h>
 
-#include <oscillator_params_type.h>
 #include "symmetry_adjustment_types.h"
 #include "oscillator.h"
 

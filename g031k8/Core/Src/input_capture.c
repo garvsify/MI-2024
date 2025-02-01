@@ -40,7 +40,7 @@ uint8_t Input_Capture_Processing(volatile uint16_t interrupt_period_value, struc
 
 	params_ptr->raw_start_value = 256 - interrupt_period_value;
 
-	Calculate_Next_Main_Oscillator_Values(params_ptr, (enum Next_Values_Processing_Mode)IP_CAPTURE_MODE);
+	Calculate_Next_Main_Oscillator_Values(&all_params_structs, (enum Next_Values_Processing_Mode)IP_CAPTURE_MODE);
 	Process_TIM16_Final_Start_Value_and_Final_Prescaler(params_ptr);
 
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);

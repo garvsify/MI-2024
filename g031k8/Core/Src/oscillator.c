@@ -17,6 +17,11 @@ struct Params params = {0};
 struct Params params_pot_control = {0};
 struct Params params_to_be_loaded = {0};
 struct Params params_working = {0};
+const struct All_Params_Structs all_params_structs = {.running_params = &params,
+												.pot_control_params = &params_pot_control,
+												.to_be_loaded_params = &params_to_be_loaded,
+												.working_params = &params_working};
+
 struct Delay_Line delay_line = {.duty_delay_line_storage_array = 0, //one index larger than the number of indexes (wave samples) to allow us to 'wrap' the array into a kind of circular buffer - this is reinitialised to mid-scale on runtime
 								.duty_delay_line_start_offset = 1,  //initial value is 1st index - to give us space to fill index 0
 								.duty_delay_line_finish_offset = FINAL_INDEX + 1, //initial value is 512th index, one larger than the index of the final sample
@@ -84,92 +89,177 @@ uint8_t Set_Oscillator_Values(struct Params* params_ptr){
 	return 1;
 }
 
-uint8_t Calculate_Next_Main_Oscillator_Values(struct Params* params_ptr, enum Next_Values_Processing_Mode mode){
+uint8_t Calculate_Next_Main_Oscillator_Values(const struct All_Params_Structs *all_params_structs_ptr, enum Next_Values_Processing_Mode mode){
 
 	if(mode == REGULAR_MODE){
 
-		params_ptr->index++;
+		all_params_structs_ptr->running_params->index++;
 
-		if(params_ptr->index == FINAL_INDEX + 1){
-			params_ptr->index = 0;
+		if(all_params_structs_ptr->running_params->index == FINAL_INDEX + 1){
+			all_params_structs_ptr->running_params->index = 0;
 		}
 
-		if(params_ptr->index == FIRST_QUADRANT_START_INDEX){
-			params_ptr->quadrant = FIRST_QUADRANT;
-			params_ptr->halfcycle = FIRST_HALFCYCLE;
+		if(all_params_structs_ptr->running_params->index == FIRST_QUADRANT_START_INDEX){
+			all_params_structs_ptr->running_params->quadrant = FIRST_QUADRANT;
+			all_params_structs_ptr->running_params->halfcycle = FIRST_HALFCYCLE;
 		}
-		else if(params_ptr->index == SECOND_QUADRANT_START_INDEX){
-			params_ptr->quadrant = SECOND_QUADRANT;
-			params_ptr->halfcycle = FIRST_HALFCYCLE;
+		else if(all_params_structs_ptr->running_params->index == SECOND_QUADRANT_START_INDEX){
+			all_params_structs_ptr->running_params->quadrant = SECOND_QUADRANT;
+			all_params_structs_ptr->running_params->halfcycle = FIRST_HALFCYCLE;
 		}
-		else if(params_ptr->index == THIRD_QUADRANT_START_INDEX){
-			params_ptr->quadrant = FIRST_QUADRANT;
-			params_ptr->halfcycle = SECOND_HALFCYCLE;
+		else if(all_params_structs_ptr->running_params->index == THIRD_QUADRANT_START_INDEX){
+			all_params_structs_ptr->running_params->quadrant = FIRST_QUADRANT;
+			all_params_structs_ptr->running_params->halfcycle = SECOND_HALFCYCLE;
 		}
-		else if(params_ptr->index == FOURTH_QUADRANT_START_INDEX){
-			params_ptr->quadrant = SECOND_QUADRANT;
-			params_ptr->halfcycle = SECOND_HALFCYCLE;
+		else if(all_params_structs_ptr->running_params->index == FOURTH_QUADRANT_START_INDEX){
+			all_params_structs_ptr->running_params->quadrant = SECOND_QUADRANT;
+			all_params_structs_ptr->running_params->halfcycle = SECOND_HALFCYCLE;
 		}
+
+		//ONCE INDEX IS SET, FIND THE DUTY VALUE
+		if(all_params_structs_ptr->pot_control_params->waveshape == TRIANGLE_MODE){
+			all_params_structs_ptr->running_params->duty = tri_wavetable[all_params_structs_ptr->running_params->index];
+		}
+		else if(all_params_structs_ptr->pot_control_params->waveshape == SINE_MODE){
+			all_params_structs_ptr->running_params->duty = sine_wavetable[all_params_structs_ptr->running_params->index];
+		}
+		else if((all_params_structs_ptr->pot_control_params->waveshape == SQUARE_MODE) && (all_params_structs_ptr->running_params->index < THIRD_QUADRANT_START_INDEX)){
+			all_params_structs_ptr->running_params->duty = PWM_DUTY_VALUE_MAX;
+		}
+		else if((all_params_structs_ptr->pot_control_params->waveshape == SQUARE_MODE) && (all_params_structs_ptr->running_params->index >= THIRD_QUADRANT_START_INDEX)){
+			all_params_structs_ptr->running_params->duty = PWM_DUTY_VALUE_MIN;
+		}
+
+		//APPLY DEPTH
+		#if DEPTH_ON_OR_OFF == ON
+
+			//Apply Depth
+			if(all_params_structs_ptr->pot_control_params->depth == ((1 << DEPTH_ADC_RESOLUTION) - 1)){ //255
+				all_params_structs_ptr->running_params->duty = PWM_DUTY_VALUE_MAX - all_params_structs_ptr->running_params->duty;
+			}
+			else if(all_params_structs_ptr->pot_control_params->depth != 0){
+
+				//duty = 1023 - duty*(current_depth >> 8);
+				uint32_t multiply_product = 0;
+				multiply_product = (all_params_structs_ptr->running_params->duty) * (all_params_structs_ptr->pot_control_params->depth);
+				all_params_structs_ptr->running_params->duty = PWM_DUTY_VALUE_MAX - (multiply_product >> DEPTH_ADC_RESOLUTION);
+			}
+			else{
+				all_params_structs_ptr->running_params->duty = PWM_DUTY_VALUE_MAX; //if depth is 0, just output 1023
+			}
+
+		#endif
+
+		//SET THE NEXT VALUE FOR THE MAIN OSCILLATOR
+		all_params_structs_ptr->running_params->prev_duty = all_params_structs_ptr->running_params->duty;
+
 	}
 	else if(mode == IP_CAPTURE_MODE){
 
-		if(params_ptr->waveshape == SINE_MODE || params_ptr->waveshape == TRIANGLE_MODE){
+		if(all_params_structs_ptr->running_params->waveshape == SINE_MODE){
 
-			params_ptr->index = SINE_OR_TRIANGLE_WAVE_TEMPO_PERCEIVED_APEX_INDEX;
-			params_ptr->quadrant = CURRENT_QUADRANT_SINE_OR_TRI_SYNCED;
-			params_ptr->halfcycle = CURRENT_HALFCYCLE_SINE_OR_TRI_SYNCED;
+			all_params_structs_ptr->to_be_loaded_params->index = SINE_OR_TRIANGLE_WAVE_TEMPO_PERCEIVED_APEX_INDEX;
+			all_params_structs_ptr->to_be_loaded_params->quadrant = CURRENT_QUADRANT_SINE_OR_TRI_SYNCED;
+			all_params_structs_ptr->to_be_loaded_params->halfcycle = CURRENT_HALFCYCLE_SINE_OR_TRI_SYNCED;
+			all_params_structs_ptr->to_be_loaded_params->waveshape = SINE_MODE;
+		}
+		else if(all_params_structs_ptr->running_params->waveshape == TRIANGLE_MODE){
+
+			all_params_structs_ptr->to_be_loaded_params->index = SINE_OR_TRIANGLE_WAVE_TEMPO_PERCEIVED_APEX_INDEX;
+			all_params_structs_ptr->to_be_loaded_params->quadrant = CURRENT_QUADRANT_SINE_OR_TRI_SYNCED;
+			all_params_structs_ptr->to_be_loaded_params->halfcycle = CURRENT_HALFCYCLE_SINE_OR_TRI_SYNCED;
+			all_params_structs_ptr->to_be_loaded_params->waveshape = TRIANGLE_MODE;
 		}
 		else{
 
-			params_ptr->index = SQUARE_WAVE_TEMPO_APEX_INDEX;
-			params_ptr->quadrant = CURRENT_QUADRANT_SQUARE_SYNCED;
-			params_ptr->halfcycle = CURRENT_HALFCYCLE_SQUARE_SYNCED;
+			all_params_structs_ptr->to_be_loaded_params->index = SQUARE_WAVE_TEMPO_APEX_INDEX;
+			all_params_structs_ptr->to_be_loaded_params->quadrant = CURRENT_QUADRANT_SQUARE_SYNCED;
+			all_params_structs_ptr->to_be_loaded_params->halfcycle = CURRENT_HALFCYCLE_SQUARE_SYNCED;
+			all_params_structs_ptr->to_be_loaded_params->waveshape = SQUARE_MODE;
 		}
+
+		//ONCE INDEX IS SET, FIND THE DUTY VALUE
+		if(all_params_structs_ptr->to_be_loaded_params->waveshape == TRIANGLE_MODE){
+			all_params_structs_ptr->to_be_loaded_params->duty = tri_wavetable[all_params_structs_ptr->to_be_loaded_params->index];
+		}
+		else if(all_params_structs_ptr->to_be_loaded_params->waveshape == SINE_MODE){
+			all_params_structs_ptr->to_be_loaded_params->duty = sine_wavetable[all_params_structs_ptr->to_be_loaded_params->index];
+		}
+		else if((all_params_structs_ptr->to_be_loaded_params->waveshape == SQUARE_MODE) && (all_params_structs_ptr->to_be_loaded_params->index < THIRD_QUADRANT_START_INDEX)){
+			all_params_structs_ptr->to_be_loaded_params->duty = PWM_DUTY_VALUE_MAX;
+		}
+		else if((all_params_structs_ptr->to_be_loaded_params->waveshape == SQUARE_MODE) && (all_params_structs_ptr->to_be_loaded_params->index >= THIRD_QUADRANT_START_INDEX)){
+			all_params_structs_ptr->to_be_loaded_params->duty = PWM_DUTY_VALUE_MIN;
+		}
+
+		//APPLY DEPTH
+		#if DEPTH_ON_OR_OFF == ON
+
+			//Apply Depth
+			if(all_params_structs_ptr->pot_control_params->depth == ((1 << DEPTH_ADC_RESOLUTION) - 1)){ //255
+				all_params_structs_ptr->to_be_loaded_params->duty = PWM_DUTY_VALUE_MAX - all_params_structs_ptr->to_be_loaded_params->duty;
+			}
+			else if(all_params_structs_ptr->pot_control_params->depth != 0){
+
+				//duty = 1023 - duty*(current_depth >> 8);
+				uint32_t multiply_product = 0;
+				multiply_product = (all_params_structs_ptr->to_be_loaded_params->duty) * (all_params_structs_ptr->pot_control_params->depth);
+				all_params_structs_ptr->to_be_loaded_params->duty = PWM_DUTY_VALUE_MAX - (multiply_product >> DEPTH_ADC_RESOLUTION);
+			}
+			else{
+				all_params_structs_ptr->to_be_loaded_params->duty = PWM_DUTY_VALUE_MAX; //if depth is 0, just output 1023
+			}
+
+		#endif
+
+		//SET THE NEXT VALUE FOR THE MAIN OSCILLATOR
+			all_params_structs_ptr->to_be_loaded_params->prev_duty = all_params_structs_ptr->to_be_loaded_params->duty;
+
 	}
 	else if(mode == STARTUP_MODE){
 
-		if(params_ptr->index == FIRST_QUADRANT_START_INDEX){
-			params_ptr->quadrant = FIRST_QUADRANT;
-			params_ptr->halfcycle = FIRST_HALFCYCLE;
-		}
-	}
-
-	//ONCE INDEX IS SET, FIND THE DUTY VALUE
-	if(params_ptr->waveshape == TRIANGLE_MODE){
-		params_ptr->duty = tri_wavetable[params_ptr->index];
-	}
-	else if(params_ptr->waveshape == SINE_MODE){
-		params_ptr->duty = sine_wavetable[params_ptr->index];
-	}
-	else if((params_ptr->waveshape == SQUARE_MODE) && (params_ptr->index < THIRD_QUADRANT_START_INDEX)){
-		params_ptr->duty = PWM_DUTY_VALUE_MAX;
-	}
-	else if((params_ptr->waveshape == SQUARE_MODE) && (params_ptr->index >= THIRD_QUADRANT_START_INDEX)){
-		params_ptr->duty = PWM_DUTY_VALUE_MIN;
-	}
-
-	//APPLY DEPTH
-	#if DEPTH_ON_OR_OFF == 1
-
-		//Apply Depth
-		if(params_ptr->depth == ((1 << DEPTH_ADC_RESOLUTION) - 1)){ //255
-			params_ptr->duty = PWM_DUTY_VALUE_MAX - params_ptr->duty;
-		}
-		else if(params_ptr->depth != 0){
-
-			//duty = 1023 - duty*(current_depth >> 8);
-			uint32_t multiply_product = 0;
-			multiply_product = (params_ptr->duty) * (params_ptr->depth);
-			params_ptr->duty = PWM_DUTY_VALUE_MAX - (multiply_product >> DEPTH_ADC_RESOLUTION);
-		}
-		else{
-			params_ptr->duty = PWM_DUTY_VALUE_MAX; //if depth is 0, just output 1023
+		if(all_params_structs_ptr->pot_control_params->index == FIRST_QUADRANT_START_INDEX){
+			all_params_structs_ptr->pot_control_params->quadrant = FIRST_QUADRANT;
+			all_params_structs_ptr->pot_control_params->halfcycle = FIRST_HALFCYCLE;
 		}
 
-	#endif
+		//ONCE INDEX IS SET, FIND THE DUTY VALUE
+		if(all_params_structs_ptr->pot_control_params->waveshape == TRIANGLE_MODE){
+			all_params_structs_ptr->running_params->duty = tri_wavetable[all_params_structs_ptr->running_params->index];
+		}
+		else if(all_params_structs_ptr->pot_control_params->waveshape == SINE_MODE){
+			all_params_structs_ptr->running_params->duty = sine_wavetable[all_params_structs_ptr->running_params->index];
+		}
+		else if((all_params_structs_ptr->pot_control_params->waveshape == SQUARE_MODE) && (all_params_structs_ptr->running_params->index < THIRD_QUADRANT_START_INDEX)){
+			all_params_structs_ptr->running_params->duty = PWM_DUTY_VALUE_MAX;
+		}
+		else if((all_params_structs_ptr->pot_control_params->waveshape == SQUARE_MODE) && (all_params_structs_ptr->running_params->index >= THIRD_QUADRANT_START_INDEX)){
+			all_params_structs_ptr->running_params->duty = PWM_DUTY_VALUE_MIN;
+		}
 
-	//SET THE NEXT VALUE FOR THE MAIN OSCILLATOR
-	params_ptr->prev_duty = params_ptr->duty;
+		//APPLY DEPTH
+		#if DEPTH_ON_OR_OFF == ON
+
+			//Apply Depth
+			if(all_params_structs_ptr->pot_control_params->depth == ((1 << DEPTH_ADC_RESOLUTION) - 1)){ //255
+				all_params_structs_ptr->running_params->duty = PWM_DUTY_VALUE_MAX - all_params_structs_ptr->running_params->duty;
+			}
+			else if(all_params_structs_ptr->pot_control_params->depth != 0){
+
+				//duty = 1023 - duty*(current_depth >> 8);
+				uint32_t multiply_product = 0;
+				multiply_product = (all_params_structs_ptr->running_params->duty) * (all_params_structs_ptr->pot_control_params->depth);
+				all_params_structs_ptr->running_params->duty = PWM_DUTY_VALUE_MAX - (multiply_product >> DEPTH_ADC_RESOLUTION);
+			}
+			else{
+				all_params_structs_ptr->running_params->duty = PWM_DUTY_VALUE_MAX; //if depth is 0, just output 1023
+			}
+
+		#endif
+
+		//SET THE NEXT VALUE FOR THE MAIN OSCILLATOR
+		all_params_structs_ptr->running_params->prev_duty = all_params_structs_ptr->running_params->duty;
+	}
 
 	return 1;
 }

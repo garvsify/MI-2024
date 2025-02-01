@@ -1,5 +1,5 @@
-#ifndef INC_OSCILLATOR_PARAMS_TYPE_H_
-#define INC_OSCILLATOR_PARAMS_TYPE_H_
+#ifndef INC_OSCILLATOR_PARAMS_H_
+#define INC_OSCILLATOR_PARAMS_H_
 
 //INCLUDES
 #include <stdint.h>
@@ -30,4 +30,13 @@ struct Params{
 	volatile enum Adjust_Prescaler_Action prescaler_adjust;
 };
 
-#endif // - end INC_OSCILLATOR_PARAMS_TYPE_H_
+
+struct All_Params_Structs{
+
+	struct Params *running_params;
+	struct Params *pot_control_params;
+	struct Params *to_be_loaded_params;
+	struct Params *working_params;
+};
+
+#endif // - end INC_OSCILLATOR_PARAMS_H_
