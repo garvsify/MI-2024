@@ -5,7 +5,7 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
 
 	Set_Oscillator_Values(&params);
-	Calculate_Next_Main_Oscillator_Values(&params, (enum Next_Values_Processing_Mode)REGULAR_MODE);
+	Calculate_Next_Main_Oscillator_Values(&all_params_structs, (enum Next_Values_Processing_Mode)REGULAR_MODE);
 	Write_Next_Main_Oscillator_Values_to_Delay_Line(&params, &delay_line);
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions); //this function takes ages to execute!
 
@@ -19,20 +19,21 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 	HAL_ADC_Stop_DMA(hadc); //disable ADC DMA
 	Process_ADC_Conversion_Values(&params_pot_control, &delay_line, ADCResultsDMA);
 
-	if((state == STATE_0) || ((state != STATE_0) && (first_sync_complete == NO))){
+	params.depth = params_pot_control.depth;
+	params.waveshape = params_pot_control.waveshape;
+	params.symmetry = params_pot_control.symmetry;
+	params.speed = params_pot_control.speed;
 
-		Copy_Params_Structs(&params_pot_control, &params);
+	if((state == STATE_0) || ((state != STATE_0) && (sync_complete == NO))){
+
 		Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(&params);
 	}
 
-	else if((state != STATE_0) && (first_sync_complete == YES)){
+	else if((state != STATE_0) && (sync_complete == YES)){
 
 		params.raw_start_value = params_working.raw_start_value;
 		params.raw_prescaler = params_working.raw_prescaler;
 		//so that the other pots keep working,
-		params.depth = params_pot_control.depth;
-		params.waveshape = params_pot_control.waveshape;
-		params.symmetry = params_pot_control.symmetry;
 	}
 
 	Process_TIM16_Final_Start_Value_and_Final_Prescaler(&params);
@@ -136,10 +137,11 @@ void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
 	input_capture_measurement_reelapse_is_ongoing = NO;
 
 	Copy_Params_Structs(&params_to_be_loaded, &params_working);
+	Copy_Params_Structs(&params_to_be_loaded, &params);
 	params.index = params_to_be_loaded.index;
-	first_sync_complete = YES;
+	sync_complete = YES;
 
-	Calculate_Next_Main_Oscillator_Values(&params, (enum Next_Values_Processing_Mode)REGULAR_MODE);
+	Calculate_Next_Main_Oscillator_Values(&all_params_structs, (enum Next_Values_Processing_Mode)REGULAR_MODE);
 	Write_Next_Main_Oscillator_Values_to_Delay_Line(&params, &delay_line);
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions); //this function takes ages to execute!
 
@@ -176,6 +178,10 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 	else if((uint8_t)HAL_GPIO_ReadPin(CLK_IN_GPIO_Port, CLK_IN_Pin) == 1){
 
 		state = STATE_2;
+	}
+	else{
+
+		state = STATE_0;
 	}
 
 	if((state == STATE_1) || (state == STATE_2)){

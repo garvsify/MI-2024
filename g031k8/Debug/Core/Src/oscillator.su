@@ -1,7 +1,8 @@
-../Core/Src/oscillator.c:26:9:Start_PWM_Gen_Timer_Main_and_Secondary_Oscillators	24	static
-../Core/Src/oscillator.c:41:9:Start_Freq_Gen_Timer	8	static
-../Core/Src/oscillator.c:53:9:Process_TIM16_Raw_Start_Value_and_Raw_Prescaler	0	static
-../Core/Src/oscillator.c:69:9:Set_Oscillator_Values	0	static
-../Core/Src/oscillator.c:87:9:Calculate_Next_Main_Oscillator_Values	0	static
-../Core/Src/oscillator.c:177:9:Write_Next_Main_Oscillator_Values_to_Delay_Line	12	static
-../Core/Src/oscillator.c:212:9:Process_ADC_Conversion_Values	0	static
+../Core/Src/oscillator.c:30:9:Start_PWM_Gen_Timer_Main_and_Secondary_Oscillators	24	static
+../Core/Src/oscillator.c:45:9:Start_Freq_Gen_Timer	8	static
+../Core/Src/oscillator.c:57:9:Process_TIM16_Raw_Start_Value_and_Raw_Prescaler	0	static
+../Core/Src/oscillator.c:73:9:Set_Oscillator_Values	0	static
+../Core/Src/oscillator.c:91:9:Calculate_Next_Main_Oscillator_Values	16	static
+../Core/Src/oscillator.c:191:9:Write_Next_Main_Oscillator_Values_to_Delay_Line	12	static
+../Core/Src/oscillator.c:226:9:Process_ADC_Conversion_Values	0	static
+../Core/Src/oscillator.c:267:9:Copy_Params_Structs	8	static

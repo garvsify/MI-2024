@@ -47,12 +47,13 @@
 extern const uint16_t sine_wavetable[512];
 extern const uint16_t tri_wavetable[512];
 extern const uint16_t TIM16_prescalers[6];
+extern const struct All_Params_Structs all_params_structs;
 
 //VARIABLES
 volatile extern uint16_t ADCResultsDMA[5];
 const extern uint8_t num_ADC_conversions;
 volatile extern enum Validate initial_ADC_conversion_complete;
-volatile extern enum Validate first_sync_complete;
+volatile extern enum Validate sync_complete;
 
 //STRUCT VARIABLES
 extern struct Params params; //running variables of the oscillator/s
@@ -68,6 +69,13 @@ enum Next_Values_Processing_Mode{
 	STARTUP_MODE
 };
 
+struct All_Params_Structs{
+	struct Params *running_params;
+	struct Params *pot_control_params;
+	struct Params *to_be_loaded_params;
+	struct Params *working_params;
+};
+
 struct Delay_Line{
 
 	volatile uint16_t duty_delay_line_storage_array[513]; //one index larger than the number of indexes (wave samples) to allow us to 'wrap' the array into a kind of circular buffer
@@ -81,9 +89,10 @@ uint8_t Start_PWM_Gen_Timer_Main_and_Secondary_Oscillators(TIM_HandleTypeDef *TI
 uint8_t Start_Freq_Gen_Timer(void);
 
 uint8_t Set_Oscillator_Values(struct Params* params_ptr);
-uint8_t Calculate_Next_Main_Oscillator_Values(struct Params* params_ptr, enum Next_Values_Processing_Mode mode);
+uint8_t Calculate_Next_Main_Oscillator_Values(const struct All_Params_Structs *all_params_structs_ptr , enum Next_Values_Processing_Mode mode);
 uint8_t Write_Next_Main_Oscillator_Values_to_Delay_Line(struct Params* params_ptr, struct Delay_Line* delay_line_ptr);
 uint8_t Process_ADC_Conversion_Values(struct Params* params_ptr, struct Delay_Line* delay_line_ptr, volatile uint16_t* ADCResultsDMA_ptr);
 uint8_t Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(struct Params* params_ptr);
+uint8_t Copy_Params_Structs(struct Params* src_ptr, struct Params* dst_ptr);
 
 #endif

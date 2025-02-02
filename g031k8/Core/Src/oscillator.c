@@ -6,11 +6,15 @@ const uint16_t sine_wavetable[512]={512,518,524,530,537,543,549,555,562,568,574,
 const uint16_t tri_wavetable[512]={512,516,520,524,528,532,536,540,544,548,552,556,560,564,568,572,576,580,584,588,592,596,600,604,608,612,616,620,624,628,632,636,640,644,648,652,656,660,664,668,672,676,680,684,688,692,696,700,704,708,712,716,720,724,728,732,736,740,744,748,752,756,760,764,768,771,775,779,783,787,791,795,799,803,807,811,815,819,823,827,831,835,839,843,847,851,855,859,863,867,871,875,879,883,887,891,895,899,903,907,911,915,919,923,927,931,935,939,943,947,951,955,959,963,967,971,975,979,983,987,991,995,999,1003,1007,1011,1015,1019,1023,1019,1015,1011,1007,1003,999,995,991,987,983,979,975,971,967,963,959,955,951,947,943,939,935,931,927,923,919,915,911,907,903,899,895,891,887,883,879,875,871,867,863,859,855,851,847,843,839,835,831,827,823,819,815,811,807,803,799,795,791,787,783,779,775,771,767,763,759,755,751,747,743,739,735,731,727,723,719,715,711,707,703,699,695,691,687,683,679,675,671,667,663,659,655,651,647,643,639,635,631,627,623,619,615,611,607,603,599,595,591,587,583,579,575,571,567,563,559,555,551,547,543,539,535,531,527,523,519,515,512,508,504,500,496,492,488,484,480,476,472,468,464,460,456,452,448,444,440,436,432,428,424,420,416,412,408,404,400,396,392,388,384,380,376,372,368,364,360,356,352,348,344,340,336,332,328,324,320,316,312,308,304,300,296,292,288,284,280,276,272,268,264,260,256,252,248,244,240,236,232,228,224,220,216,212,208,204,200,196,192,188,184,180,176,172,168,164,160,156,152,148,144,140,136,132,128,124,120,116,112,108,104,100,96,92,88,84,80,76,72,68,64,60,56,52,48,44,40,36,32,28,24,20,16,12,8,4,0,4,8,12,16,20,24,28,32,36,40,44,48,52,56,60,64,68,72,76,80,84,88,92,96,100,104,108,112,116,120,124,128,132,136,140,144,148,152,156,160,164,168,172,176,180,184,188,192,196,200,204,208,212,216,220,224,228,232,236,240,244,248,252,256,260,264,268,272,276,280,284,288,292,296,300,304,308,312,316,320,324,328,332,336,340,344,348,352,356,360,364,368,372,376,380,384,388,392,396,400,404,408,412,416,420,424,428,432,436,440,444,448,452,456,460,464,468,472,476,480,484,488,492,496,500,504,508};
 const uint16_t TIM16_prescalers[6] = {2048, 1024, 512, 256, 128, 64}; //2048 is used only by base prescaler index == 1 during symmetry adjustment
 const uint8_t num_ADC_conversions = sizeof(ADCResultsDMA) / sizeof(ADCResultsDMA[0]);
+const struct All_Params_Structs all_params_structs = {.running_params = &params,
+													  .pot_control_params = &params_pot_control,
+													  .to_be_loaded_params = &params_to_be_loaded,
+													  .working_params = &params_working};
 
 //VARIABLE DEFINITIONS
 volatile uint16_t ADCResultsDMA[5] = {0};
 volatile enum Validate initial_ADC_conversion_complete = NO;
-volatile enum Validate first_sync_complete = NO;
+volatile enum Validate sync_complete = NO;
 
 //STRUCT VARIABLES
 struct Params params = {0};
@@ -84,9 +88,13 @@ uint8_t Set_Oscillator_Values(struct Params* params_ptr){
 	return 1;
 }
 
-uint8_t Calculate_Next_Main_Oscillator_Values(struct Params* params_ptr, enum Next_Values_Processing_Mode mode){
+uint8_t Calculate_Next_Main_Oscillator_Values(const struct All_Params_Structs *all_params_structs_ptr , enum Next_Values_Processing_Mode mode){
+
+	struct Params* params_ptr = NULL;
 
 	if(mode == REGULAR_MODE){
+
+		params_ptr = all_params_structs_ptr->running_params;
 
 		params_ptr->index++;
 
@@ -113,6 +121,10 @@ uint8_t Calculate_Next_Main_Oscillator_Values(struct Params* params_ptr, enum Ne
 	}
 	else if(mode == IP_CAPTURE_MODE){
 
+		Copy_Params_Structs(all_params_structs_ptr->running_params, all_params_structs_ptr->to_be_loaded_params);
+
+		params_ptr = all_params_structs_ptr->to_be_loaded_params;
+
 		if(params_ptr->waveshape == SINE_MODE || params_ptr->waveshape == TRIANGLE_MODE){
 
 			params_ptr->index = SINE_OR_TRIANGLE_WAVE_TEMPO_PERCEIVED_APEX_INDEX;
@@ -127,6 +139,8 @@ uint8_t Calculate_Next_Main_Oscillator_Values(struct Params* params_ptr, enum Ne
 		}
 	}
 	else if(mode == STARTUP_MODE){
+
+		params_ptr = all_params_structs_ptr->pot_control_params;
 
 		if(params_ptr->index == FIRST_QUADRANT_START_INDEX){
 			params_ptr->quadrant = FIRST_QUADRANT;
@@ -246,6 +260,13 @@ uint8_t Process_ADC_Conversion_Values(struct Params* params_ptr, struct Delay_Li
 	//GET DELAY LINE READ POINTER OFFSET
 	delay_line_ptr->duty_delay_line_read_pointer_offset = ADCResultsDMA_ptr[DUTY_DELAY_LINE_READ_POINTER_OFFSET_ADC_RESULT_INDEX] >> 5; //truncate to 7-bit
 	delay_line_ptr->duty_delay_line_read_pointer_offset <<= 2; //convert to 9-bit
+
+	return 1;
+}
+
+uint8_t Copy_Params_Structs(struct Params* src_ptr, struct Params* dst_ptr){
+
+	*dst_ptr = *src_ptr;
 
 	return 1;
 }

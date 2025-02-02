@@ -30,7 +30,7 @@ uint8_t Speed_Pot_Check(struct Params* params_ptr){
 			if(first_speed_measurement - second_speed_measurement > SPEED_TOLERANCE){
 
 				state = STATE_0;
-				first_sync_complete = NO;
+				sync_complete = NO;
 			}
 		}
 		else if(second_speed_measurement > first_speed_measurement){
@@ -38,7 +38,7 @@ uint8_t Speed_Pot_Check(struct Params* params_ptr){
 			if(second_speed_measurement - first_speed_measurement > SPEED_TOLERANCE){
 
 				state = STATE_0;
-				first_sync_complete = NO;
+				sync_complete = NO;
 			}
 		}
 	}

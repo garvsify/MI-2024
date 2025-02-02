@@ -10,11 +10,14 @@ volatile enum Validate input_capture_processing_can_be_started = NO;
 volatile uint16_t interrupt_period = 0;
 
 //FUNCTION DEFINITIONS
-uint8_t Input_Capture_Processing(volatile uint16_t interrupt_period_value, struct Params* params_ptr){
+uint8_t Input_Capture_Processing(volatile uint16_t interrupt_period_value){
 
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
 
 	input_capture_processing_can_be_started = NO; //reset flag
+
+
+	Calculate_Next_Main_Oscillator_Values(&all_params_structs, (enum Next_Values_Processing_Mode)IP_CAPTURE_MODE);
 
 	//DETERMINE WHAT TO SET THE RAW_START_VALUE AND BASE_PRESCALER TO BASED ON THE I/P CAPTURE VALUE
 	//CHECK FOR PRIMALITY
@@ -33,15 +36,14 @@ uint8_t Input_Capture_Processing(volatile uint16_t interrupt_period_value, struc
 
 		if(remainder == 0){ //check if no remainder -> integer
 
-			params_ptr->raw_prescaler = N / interrupt_period_value;
+			params_to_be_loaded.raw_prescaler = N / interrupt_period_value;
 			break;
 		}
 	}
 
-	params_ptr->raw_start_value = 256 - interrupt_period_value;
+	params_to_be_loaded.raw_start_value = 256 - interrupt_period_value; //has to go here as above function overwrites to_be_loaded with running params
 
-	Calculate_Next_Main_Oscillator_Values(params_ptr, (enum Next_Values_Processing_Mode)IP_CAPTURE_MODE);
-	Process_TIM16_Final_Start_Value_and_Final_Prescaler(params_ptr);
+	Process_TIM16_Final_Start_Value_and_Final_Prescaler(&params_to_be_loaded);
 
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
 
@@ -71,12 +73,5 @@ uint8_t Start_IC_TIM(TIM_HandleTypeDef *TIM, uint32_t IC_TIM_channel){
 	}
 
 	return ok_AND;
-}
-
-uint8_t Copy_Params_Structs(struct Params* src_ptr, struct Params* dst_ptr){
-
-	*dst_ptr = *src_ptr;
-
-	return 1;
 }
 
