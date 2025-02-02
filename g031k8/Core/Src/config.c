@@ -20,6 +20,7 @@ DMA_HandleTypeDef hdma_usart2_rx;
 DMA_HandleTypeDef hdma_usart2_tx;
 
 LPTIM_HandleTypeDef hlptim1;
+LPTIM_HandleTypeDef hlptim2;
 
 //FUNCTIONS
 void SystemClock_Config(void)
@@ -414,8 +415,7 @@ void MX_TIM17_Init(void)
 
   /* USER CODE END TIM17_Init 1 */
   htim17.Instance = TIM17;
-  htim17.Init.Prescaler = (512*64)- 1; //Still good for speed pot check
-  htim17.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim17.Init.Prescaler = (512*64)- 1;
   //htim17.Init.Period = TIM17_DEBOUNCE_LENGTH - 1;
   htim17.Init.Period = TIM17_OVERFLOW_LENGTH - 1;
   htim17.Init.ClockDivision = TIM_CLOCKDIVISION_DIV4;
@@ -493,6 +493,37 @@ void MX_LPTIM1_Init(void)
 
   HAL_NVIC_SetPriority(LPTIM1_IRQn, 2, 2);
   HAL_NVIC_EnableIRQ(LPTIM1_IRQn);
+}
+
+void MX_LPTIM2_Init(void)
+{
+
+  /* USER CODE BEGIN LPTIM1_Init 0 */
+
+  /* USER CODE END LPTIM1_Init 0 */
+
+  /* USER CODE BEGIN LPTIM1_Init 1 */
+
+  /* USER CODE END LPTIM1_Init 1 */
+  hlptim1.Instance = LPTIM2;
+  hlptim1.Init.Clock.Source = LPTIM_CLOCKSOURCE_APBCLOCK_LPOSC;
+  hlptim1.Init.Clock.Prescaler = LPTIM_PRESCALER_DIV128;
+  hlptim1.Init.Trigger.Source = LPTIM_TRIGSOURCE_SOFTWARE;
+  hlptim1.Init.OutputPolarity = LPTIM_OUTPUTPOLARITY_HIGH;
+  hlptim1.Init.UpdateMode = LPTIM_UPDATE_ENDOFPERIOD;
+  hlptim1.Init.CounterSource = LPTIM_COUNTERSOURCE_INTERNAL;
+  hlptim1.Init.Input1Source = LPTIM_INPUT1SOURCE_GPIO;
+  hlptim1.Init.Input2Source = LPTIM_INPUT2SOURCE_GPIO;
+  if (HAL_LPTIM_Init(&hlptim2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN LPTIM1_Init 2 */
+
+  /* USER CODE END LPTIM1_Init 2 */
+
+  HAL_NVIC_SetPriority(LPTIM2_IRQn, 2, 2);
+  HAL_NVIC_EnableIRQ(LPTIM2_IRQn);
 }
 
 void MX_USART2_UART_Init(void)
@@ -655,6 +686,7 @@ void System_Init(void){
 	MX_TIM17_Init();
 	//MX_IWDG_Init(); fucks up stuff - to be config'd
 	MX_LPTIM1_Init(); //Tap Tempo checking/debouncing timer
+	MX_LPTIM2_Init();
 
 	//Calibrate ADC - DO NOT MOVE TO BEFORE OTHER CONFIG ABOVE
 	HAL_ADCEx_Calibration_Start(&hadc1);
@@ -686,8 +718,11 @@ void System_Init(void){
 	//Set custom callback for LPTIM1 (Tap Tempo SW state check)
 	HAL_LPTIM_RegisterCallback(&hlptim1, HAL_LPTIM_COMPARE_MATCH_CB_ID, &LPTIM1_callback);
 
+	//Set custom callback for LPTIM2 - IP CAP event checker
+	HAL_LPTIM_RegisterCallback(&hlptim2, HAL_LPTIM_COMPARE_MATCH_CB_ID, &LPTIM2_callback);
+
 	//Set custom callback function for TIM17 EXTI Interrupt enable function
-	HAL_TIM_RegisterCallback(&htim17, HAL_TIM_PERIOD_ELAPSED_CB_ID, &TIM17_overflow_callback);
+	HAL_TIM_RegisterCallback(&htim17, HAL_TIM_OC_DELAY_ELAPSED_CB_ID, &TIM17_overflow_callback);
 }
 
 #ifdef  USE_FULL_ASSERT

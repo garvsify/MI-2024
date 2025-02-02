@@ -4,6 +4,8 @@
 //MACROS
 //#define LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK 4001 - 1 //4ms overflow with prescaler of 128
 #define LPTIM1_CCR_CHECK 251 - 1
+#define LPTIM2_LENGTH 65535
+#define LPTIM2_COUNT_MAX 24
 
 //INCLUDES
 #include <stdint.h>
@@ -20,6 +22,8 @@
 //CUSTOM TYPES
 
 //VARIABLE DECLARATIONS
+volatile extern uint8_t LPTIM2_overflow_count;
+volatile extern enum Validate IP_CAP_events_detection_timeout;
 
 //FUNCTION DECLARATIONS
 uint8_t Speed_Pot_Check(struct Params* params_ptr);

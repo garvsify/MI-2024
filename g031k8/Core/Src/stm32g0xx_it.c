@@ -153,9 +153,6 @@ void EXTI4_15_IRQHandler(void)
 	//DISABLE EXTI INTERRUPTS
 	HAL_NVIC_DisableIRQ(EXTI4_15_IRQn);
 
-	__HAL_TIM_SET_COUNTER(&htim17, 0);
-	Start_OC_TIM(&htim17, TIM_CHANNEL_1);
-
 	HAL_GPIO_EXTI_IRQHandler(CLK_IN_Pin);
 
 	//HAL_GPIO_EXTI_IRQHandler(SW_IN_Pin);
@@ -262,6 +259,12 @@ void LPTIM1_IRQHandler(void)
 {
   HAL_LPTIM_IRQHandler(&hlptim1);
 }
+
+void LPTIM2_IRQHandler(void)
+{
+  HAL_LPTIM_IRQHandler(&hlptim2);
+}
+
 
 
 void TIM17_IRQHandler(void)

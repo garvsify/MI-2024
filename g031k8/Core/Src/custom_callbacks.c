@@ -166,8 +166,19 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
 
 	if((GPIO_Pin == CLK_IN_Pin)){ //if specifically CLK IN pin with falling interrupt
 
+		flags = 1 << 15;
+
 		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1);
+
+		flags = 1 << 16;
+
 		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+
+		flags = 1 << 17;
+
+		HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);
+
+		flags = 1 << 19;
 	}
 }
 
@@ -177,12 +188,61 @@ void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
 
 	if((GPIO_Pin == CLK_IN_Pin)){ //if specifically CLK IN pin with rising interrupt
 
+		flags = 1 << 0;
+
 		//Set SW OUT
 		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
+
+		flags = 1 << 1;
+
 		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
 
-		//SET MODES
-		state = STATE_2;
+		flags = 1 << 2;
+
+		if(state == STATE_2){
+
+			flags = 1 << 5;
+
+			LPTIM2_overflow_count = 0;
+
+			flags = 1 << 6;
+
+			HAL_LPTIM_SetOnce_Stop_IT(&hlptim2);
+
+			flags = 1 << 7;
+
+			HAL_LPTIM_SetOnce_Start_IT(&hlptim2, LPTIM2_LENGTH, LPTIM2_LENGTH);
+
+			flags = 1 << 8;
+
+			IP_CAP_events_detection_timeout = NO;
+
+			flags = 1 << 9;
+		}
+		else if(state == STATE_0){
+
+			flags = 1 << 10;
+
+			LPTIM2_overflow_count = 0;
+
+			flags = 1 << 11;
+
+			HAL_LPTIM_SetOnce_Start_IT(&hlptim2, LPTIM2_LENGTH, LPTIM2_LENGTH);
+
+			flags = 1 << 12;
+
+			state = STATE_2;
+
+			flags = 1 << 13;
+
+			IP_CAP_events_detection_timeout = NO;
+
+			flags = 1 << 14;
+		}
+
+		HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);
+
+		flags = 1 << 18;
 	}
 }
 
@@ -204,9 +264,9 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 	//don't add conditional for STATE_0
 
-	if((state == STATE_1) || (state == STATE_2)){
+	if(IP_CAP_events_detection_timeout == YES){
 
-		//Speed_Pot_Check(&params);
+		Speed_Pot_Check(&params);
 	}
 
 
@@ -257,6 +317,20 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 	//SET TIMER TRIGGER
 	HAL_LPTIM_SetOnce_Start_IT(&hlptim1, LPTIM1_CCR_CHECK, LPTIM1_CCR_CHECK);
 
+}
+
+void LPTIM2_callback(LPTIM_HandleTypeDef *hlptim){
+
+	if(LPTIM2_overflow_count != LPTIM2_COUNT_MAX - 1){
+
+		LPTIM2_overflow_count++;
+		HAL_LPTIM_SetOnce_Start_IT(&hlptim2, LPTIM2_LENGTH, LPTIM2_LENGTH);
+	}
+	else{
+
+		IP_CAP_events_detection_timeout = YES;
+		HAL_LPTIM_SetOnce_Stop_IT(&hlptim2);
+	}
 }
 
 void TIM17_overflow_callback(TIM_HandleTypeDef *htim){

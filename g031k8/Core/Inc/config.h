@@ -72,6 +72,7 @@ extern DMA_HandleTypeDef hdma_usart2_tx;
 extern IWDG_HandleTypeDef hiwdg;
 
 extern LPTIM_HandleTypeDef hlptim1;
+extern LPTIM_HandleTypeDef hlptim2;
 
 void System_Init(void);
 void SystemClock_Config(void);
@@ -86,6 +87,7 @@ void MX_TIM1_Init(void); //PWM Gen. Main/Secondary Oscillator
 void MX_TIM17_Init(void); //EXTI Interrupt Enable
 void MX_IWDG_Init(void);
 void MX_LPTIM1_Init(void); //Tap tempo checking/debouncing timer
+void MX_LPTIM2_Init(void);
 
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 

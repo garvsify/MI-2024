@@ -1,6 +1,8 @@
 #include "checking_functions.h"
 
 //VARIABLE DEFINITIONS
+volatile uint8_t LPTIM2_overflow_count = 0;
+volatile enum Validate IP_CAP_events_detection_timeout = NO;
 
 //FUNCTION DEFINITIONS
 uint8_t Speed_Pot_Check(struct Params* params_ptr){
@@ -33,6 +35,7 @@ uint8_t Speed_Pot_Check(struct Params* params_ptr){
 
 				state = STATE_0;
 				first_sync_complete = NO;
+				IP_CAP_events_detection_timeout = NO;
 			}
 		}
 		else if(second_speed_measurement > first_speed_measurement){
@@ -41,6 +44,7 @@ uint8_t Speed_Pot_Check(struct Params* params_ptr){
 
 				state = STATE_0;
 				first_sync_complete = NO;
+				IP_CAP_events_detection_timeout = NO;
 			}
 		}
 	}
