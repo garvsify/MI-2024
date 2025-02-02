@@ -53,7 +53,7 @@ extern const struct All_Params_Structs all_params_structs;
 volatile extern uint16_t ADCResultsDMA[5];
 const extern uint8_t num_ADC_conversions;
 volatile extern enum Validate initial_ADC_conversion_complete;
-volatile extern enum Validate sync_complete;
+volatile extern enum Validate first_sync_complete;
 
 //STRUCT VARIABLES
 extern struct Params params; //running variables of the oscillator/s

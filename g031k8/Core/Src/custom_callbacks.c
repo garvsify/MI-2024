@@ -24,12 +24,12 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 	params.symmetry = params_pot_control.symmetry;
 	params.speed = params_pot_control.speed;
 
-	if((state == STATE_0) || ((state != STATE_0) && (sync_complete == NO))){
+	if((state == STATE_0) || ((state != STATE_0) && (first_sync_complete == NO))){
 
 		Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(&params);
 	}
 
-	else if((state != STATE_0) && (sync_complete == YES)){
+	else if((state != STATE_0) && (first_sync_complete == YES)){
 
 		params.raw_start_value = params_working.raw_start_value;
 		params.raw_prescaler = params_working.raw_prescaler;
@@ -139,7 +139,7 @@ void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
 	Copy_Params_Structs(&params_to_be_loaded, &params_working);
 	Copy_Params_Structs(&params_to_be_loaded, &params);
 	params.index = params_to_be_loaded.index;
-	sync_complete = YES;
+	first_sync_complete = YES;
 
 	Calculate_Next_Main_Oscillator_Values(&all_params_structs, (enum Next_Values_Processing_Mode)REGULAR_MODE);
 	Write_Next_Main_Oscillator_Values_to_Delay_Line(&params, &delay_line);

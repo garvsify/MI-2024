@@ -39,15 +39,15 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  17 .debug_line   00027d26  00000000  00000000  00051492  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    0009ec54  00000000  00000000  000791b8  2**0
+ 18 .debug_str    0009ec5a  00000000  00000000  000791b8  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000043  00000000  00000000  00117e0c  2**0
+ 19 .comment      00000043  00000000  00000000  00117e12  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  000032d8  00000000  00000000  00117e50  2**2
+ 20 .debug_frame  000032d8  00000000  00000000  00117e58  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_loclists 0000f237  00000000  00000000  0011b128  2**0
+ 21 .debug_loclists 0000f237  00000000  00000000  0011b130  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 22 .debug_line_str 00000054  00000000  00000000  0012a35f  2**0
+ 22 .debug_line_str 00000054  00000000  00000000  0012a367  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -548,7 +548,7 @@ uint8_t Start_UART_Receive(void){
 		speed_pot_adc_measurement_num = 1;
  800046e:	2201      	movs	r2, #1
  8000470:	701a      	strb	r2, [r3, #0]
-				sync_complete = NO;
+				first_sync_complete = NO;
 			}
 		}
 	}
@@ -583,7 +583,7 @@ uint8_t Start_UART_Receive(void){
 				state = STATE_0;
  8000498:	4b0b      	ldr	r3, [pc, #44]	@ (80004c8 <Speed_Pot_Check+0x68>)
  800049a:	7019      	strb	r1, [r3, #0]
-				sync_complete = NO;
+				first_sync_complete = NO;
  800049c:	4b0b      	ldr	r3, [pc, #44]	@ (80004cc <Speed_Pot_Check+0x6c>)
  800049e:	7019      	strb	r1, [r3, #0]
  80004a0:	e7e7      	b.n	8000472 <Speed_Pot_Check+0x12>
@@ -2132,7 +2132,7 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
  8000d10:	b29b      	uxth	r3, r3
  8000d12:	812b      	strh	r3, [r5, #8]
 
-	if((state == STATE_0) || ((state != STATE_0) && (sync_complete == NO))){
+	if((state == STATE_0) || ((state != STATE_0) && (first_sync_complete == NO))){
  8000d14:	4b17      	ldr	r3, [pc, #92]	@ (8000d74 <ADC_DMA_conversion_complete_callback+0x8c>)
  8000d16:	781a      	ldrb	r2, [r3, #0]
  8000d18:	2a00      	cmp	r2, #0
@@ -2171,7 +2171,7 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
 }
  8000d42:	bd70      	pop	{r4, r5, r6, pc}
-	else if((state != STATE_0) && (sync_complete == YES)){
+	else if((state != STATE_0) && (first_sync_complete == YES)){
  8000d44:	781b      	ldrb	r3, [r3, #0]
  8000d46:	2b00      	cmp	r3, #0
  8000d48:	d0f2      	beq.n	8000d30 <ADC_DMA_conversion_complete_callback+0x48>
@@ -2397,7 +2397,7 @@ void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
  8000e74:	0029      	movs	r1, r5
  8000e76:	f000 faa1 	bl	80013bc <Copy_Params_Structs>
 	params.index = params_to_be_loaded.index;
-	sync_complete = YES;
+	first_sync_complete = YES;
  8000e7a:	2201      	movs	r2, #1
 	params.index = params_to_be_loaded.index;
  8000e7c:	89e3      	ldrh	r3, [r4, #14]
@@ -2407,11 +2407,11 @@ void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
 	params.index = params_to_be_loaded.index;
  8000e80:	b29b      	uxth	r3, r3
  8000e82:	81eb      	strh	r3, [r5, #14]
-	sync_complete = YES;
+	first_sync_complete = YES;
  8000e84:	4b0c      	ldr	r3, [pc, #48]	@ (8000eb8 <TIM3_ch1_IP_capture_measurement_reelapse_callback+0x68>)
 	Calculate_Next_Main_Oscillator_Values(&all_params_structs, (enum Next_Values_Processing_Mode)REGULAR_MODE);
  8000e86:	480d      	ldr	r0, [pc, #52]	@ (8000ebc <TIM3_ch1_IP_capture_measurement_reelapse_callback+0x6c>)
-	sync_complete = YES;
+	first_sync_complete = YES;
  8000e88:	701a      	strb	r2, [r3, #0]
 	Calculate_Next_Main_Oscillator_Values(&all_params_structs, (enum Next_Values_Processing_Mode)REGULAR_MODE);
  8000e8a:	f000 f971 	bl	8001170 <Calculate_Next_Main_Oscillator_Values>

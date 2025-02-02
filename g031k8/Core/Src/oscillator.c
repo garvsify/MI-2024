@@ -14,7 +14,7 @@ const struct All_Params_Structs all_params_structs = {.running_params = &params,
 //VARIABLE DEFINITIONS
 volatile uint16_t ADCResultsDMA[5] = {0};
 volatile enum Validate initial_ADC_conversion_complete = NO;
-volatile enum Validate sync_complete = NO;
+volatile enum Validate first_sync_complete = NO;
 
 //STRUCT VARIABLES
 struct Params params = {0};
