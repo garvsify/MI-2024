@@ -56,7 +56,6 @@ volatile extern enum Validate first_sync_complete;
 
 //STRUCT VARIABLES
 extern struct Params params; //running variables of the oscillator/s
-extern struct Params params_pot_control; //params for pot control mode
 extern struct Params params_to_be_loaded; //'to be loaded' params for the oscillators for when I/P capture states are active
 extern struct Params params_working; //upon overflow of re-elapse timer (TIM3), 'to_be_loaded' values are copied into this struct
 extern const struct All_Params_Structs all_params_structs;

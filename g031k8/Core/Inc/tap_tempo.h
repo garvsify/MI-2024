@@ -2,8 +2,6 @@
 #define INC_TAP_TEMPO_H_
 
 //MACROS
-//#define LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK 4001 - 1 //4ms overflow with prescaler of 128
-#define LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK 126 - 1 //0.25ms overflow with prescaler of 128
 #define TAP_TEMPO_SWITCH_CONFIDENCE_COUNT 10
 #define COUNT_TO_DELAY_RISING_TAP_TEMPO_EDGE 10
 

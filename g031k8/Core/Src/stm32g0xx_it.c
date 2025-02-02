@@ -259,3 +259,21 @@ void LPTIM1_IRQHandler(void)
 {
   HAL_LPTIM_IRQHandler(&hlptim1);
 }
+
+void LPTIM2_IRQHandler(void)
+{
+  HAL_LPTIM_IRQHandler(&hlptim2);
+}
+
+
+
+void TIM17_IRQHandler(void)
+{
+  /* USER CODE BEGIN TIM17_IRQn 0 */
+
+  /* USER CODE END TIM17_IRQn 0 */
+  HAL_TIM_IRQHandler(&htim17);
+  /* USER CODE BEGIN TIM17_IRQn 1 */
+
+  /* USER CODE END TIM17_IRQn 1 */
+}

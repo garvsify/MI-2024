@@ -14,7 +14,6 @@ volatile enum Validate first_sync_complete = NO;
 
 //STRUCT VARIABLES
 struct Params params = {0};
-struct Params params_pot_control = {0};
 struct Params params_to_be_loaded = {0};
 struct Params params_working = {0};
 const struct All_Params_Structs all_params_structs = {.running_params = &params,
@@ -315,27 +314,32 @@ uint8_t Process_ADC_Conversion_Values(struct Params* params_ptr, struct Delay_Li
 	}
 
 	//GET SPEED
-	params_ptr->speed = ADCResultsDMA_ptr[SPEED_ADC_RESULT_INDEX] >> 5; //truncate to 7-bit
-	params_ptr->speed <<= 3; //convert to 10-bit
+	uint16_t temp_speed = ADCResultsDMA_ptr[SPEED_ADC_RESULT_INDEX] >> 5; //truncate to 7-bit
+	temp_speed <<= 3; //convert to 10-bit
+	params_ptr->speed = temp_speed;
 
 	//GET DEPTH
 	#if DEPTH_ON_OR_OFF == ON
 
-		params_ptr->depth = ADCResultsDMA_ptr[DEPTH_ADC_RESULT_INDEX] >> 5; //truncate to 7-bit
+		uint8_t temp_depth = ADCResultsDMA_ptr[DEPTH_ADC_RESULT_INDEX] >> 5; //truncate to 7-bit
+		params_ptr->depth = temp_depth;
 
 	#endif
 
 	//GET SYMMETRY
 	#if SYMMETRY_ON_OR_OFF == ON
 
-		params_ptr->symmetry = ADCResultsDMA_ptr[SYMMETRY_ADC_RESULT_INDEX] >> 5; //truncate to 7-bit
-		params_ptr->symmetry <<= 1; //convert to 8-bit
+		uint16_t temp_symmetry = ADCResultsDMA_ptr[SYMMETRY_ADC_RESULT_INDEX] >> 5; //truncate to 7-bit
+		temp_symmetry <<= 1; //convert to 8-bit
+		params_ptr->symmetry = temp_symmetry;
 
 	#endif
 
 	//GET DELAY LINE READ POINTER OFFSET
-	delay_line_ptr->duty_delay_line_read_pointer_offset = ADCResultsDMA_ptr[DUTY_DELAY_LINE_READ_POINTER_OFFSET_ADC_RESULT_INDEX] >> 5; //truncate to 7-bit
-	delay_line_ptr->duty_delay_line_read_pointer_offset <<= 2; //convert to 9-bit
+
+	uint16_t temp_delay = ADCResultsDMA_ptr[DUTY_DELAY_LINE_READ_POINTER_OFFSET_ADC_RESULT_INDEX] >> 5; //truncate to 7-bit
+	temp_delay <<= 2; //convert to 9-bit
+	delay_line_ptr->duty_delay_line_read_pointer_offset = temp_delay;
 
 	return 1;
 }
