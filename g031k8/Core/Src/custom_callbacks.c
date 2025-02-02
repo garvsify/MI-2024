@@ -17,11 +17,10 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
 
 	HAL_ADC_Stop_DMA(hadc); //disable ADC DMA
-	Process_ADC_Conversion_Values(&params_pot_control, &delay_line, ADCResultsDMA);
+	Process_ADC_Conversion_Values(&params, &delay_line, ADCResultsDMA);
 
 	if((state == STATE_0) || ((state != STATE_0) && (first_sync_complete == NO))){
 
-		Copy_Params_Structs(&params_pot_control, &params);
 		Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(&params);
 	}
 
@@ -29,10 +28,6 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 
 		params.raw_start_value = params_working.raw_start_value;
 		params.raw_prescaler = params_working.raw_prescaler;
-		//so that the other pots keep working,
-		params.depth = params_pot_control.depth;
-		params.waveshape = params_pot_control.waveshape;
-		params.symmetry = params_pot_control.symmetry;
 	}
 
 	Process_TIM16_Final_Start_Value_and_Final_Prescaler(&params);
@@ -76,9 +71,9 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 		}
 		else{
 
-			if(interrupt_period < HIGHEST_PRESCALER_TOP_SPEED_PERIOD){ //if the captured value/512 is less than 129, then the desired speed is not reproducable, so just set the absolute top speed (i.e. highest prescaler and shortest period)
+			if(interrupt_period < HIGHEST_PRESCALER_TOP_SPEED_PERIOD){ //if the captured value/512 is less than 129, then the desired speed is not reproducable, do not proceed witj ip capture
 
-				interrupt_period = HIGHEST_PRESCALER_TOP_SPEED_PERIOD;
+				/*interrupt_period = HIGHEST_PRESCALER_TOP_SPEED_PERIOD;
 
 				//start TIM3 from 0 with CCR loaded with TIM2_ch1_input_capture_value
 				//CCR shouldn't be preloaded so *should* update instantaneously
@@ -87,7 +82,9 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 				Start_OC_TIM(&htim3, TIM_CHANNEL_1);
 
 				//set I/P capture measurement re-elapse 1 is ongoing flag
-				input_capture_measurement_reelapse_is_ongoing = YES;
+				input_capture_measurement_reelapse_is_ongoing = YES;*/
+
+				input_capture_processing_can_be_started = NO;
 			}
 
 			//No need to check longest period as that is tested inherently by the TIM2 overflow
@@ -102,9 +99,10 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 
 				//set I/P capture measurement re-elapse is ongoing flag
 				input_capture_measurement_reelapse_is_ongoing = YES;
-			}
 
-			input_capture_processing_can_be_started = YES;
+				//begin processing
+				input_capture_processing_can_be_started = YES;
+			}
 		}
 	}
 }
@@ -136,6 +134,7 @@ void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
 	input_capture_measurement_reelapse_is_ongoing = NO;
 
 	Copy_Params_Structs(&params_to_be_loaded, &params_working);
+	Copy_Params_Structs(&params_to_be_loaded, &params);
 	params.index = params_to_be_loaded.index;
 	first_sync_complete = YES;
 
@@ -180,7 +179,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 	if((state == STATE_1) || (state == STATE_2)){
 
-		Speed_Pot_Check(&params_pot_control);
+		Speed_Pot_Check(&params);
 	}
 
 
