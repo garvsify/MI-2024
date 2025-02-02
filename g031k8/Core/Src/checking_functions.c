@@ -14,12 +14,14 @@ uint8_t Speed_Pot_Check(struct Params* params_ptr){
 	if(speed_pot_adc_measurement_num == 0){
 
 		first_speed_measurement = params_ptr->speed;
-		speed_pot_adc_measurement_num = 1;
+
+		speed_pot_adc_measurement_num++;
 	}
 	else if(speed_pot_adc_measurement_num == 1){
 
 		second_speed_measurement = params_ptr->speed;
-		speed_pot_adc_measurement_num = 2;
+
+		speed_pot_adc_measurement_num++;
 	}
 	else if(speed_pot_adc_measurement_num == 2){
 

@@ -135,7 +135,6 @@ void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
 
 	Copy_Params_Structs(&params_to_be_loaded, &params_working);
 	Copy_Params_Structs(&params_to_be_loaded, &params);
-	params.index = params_to_be_loaded.index;
 	first_sync_complete = YES;
 
 	Calculate_Next_Main_Oscillator_Values(&params, (enum Next_Values_Processing_Mode)REGULAR_MODE);
@@ -176,6 +175,8 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 		state = STATE_2;
 	}
+
+	//don't add conditional for STATE_0
 
 	if((state == STATE_1) || (state == STATE_2)){
 
