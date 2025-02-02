@@ -293,24 +293,6 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 	//SET PREVIOUS STATE TO CURRENT STATE
 	//tap_tempo_switch_states.tap_tempo_switch_prev_state = tap_tempo_switch_states.tap_tempo_switch_state;
 
-	/*else if(state == STATE_2){
-
-		Check_CLK_IN_State(&clk_in_state);
-
-		if(clk_in_state == LOW){
-
-			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1);
-			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
-
-
-		}
-		else{
-
-			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
-			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
-		}
-
-	}*/
 
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
 
@@ -321,7 +303,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 void LPTIM2_callback(LPTIM_HandleTypeDef *hlptim){
 
-	if(LPTIM2_overflow_count != LPTIM2_COUNT_MAX - 1){
+	/*if(LPTIM2_overflow_count != LPTIM2_COUNT_MAX - 1){
 
 		LPTIM2_overflow_count++;
 		HAL_LPTIM_SetOnce_Start_IT(&hlptim2, LPTIM2_LENGTH, LPTIM2_LENGTH);
@@ -330,12 +312,19 @@ void LPTIM2_callback(LPTIM_HandleTypeDef *hlptim){
 
 		IP_CAP_events_detection_timeout = YES;
 		HAL_LPTIM_SetOnce_Stop_IT(&hlptim2);
-	}
+	}*/
+
+
+	HAL_GPIO_TogglePin(MONITOR_GPIO_Port, MONITOR_Pin);
+
+	HAL_LPTIM_SetOnce_Start_IT(&hlptim2, LPTIM2_LENGTH, LPTIM2_LENGTH);
 }
 
 void TIM17_overflow_callback(TIM_HandleTypeDef *htim){
 
-	Stop_OC_TIM(&htim17, TIM_CHANNEL_1);
+	/*Stop_OC_TIM(&htim17, TIM_CHANNEL_1);
 
-	HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);
+	HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);*/
+
+
 }

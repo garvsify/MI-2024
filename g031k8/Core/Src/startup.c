@@ -1,5 +1,7 @@
 #include "startup.h"
 
+#include "stm32g0xx_ll_lptim.h"
+
 uint8_t Startup(void){
 
 	__HAL_TIM_ENABLE_IT(&htim2, TIM_IT_UPDATE); //make sure the overflow (update) interrupt is enabled for TIM2
@@ -57,6 +59,10 @@ uint8_t Startup(void){
 
 
 	#endif
+
+	LL_LPTIM_SetUpdateMode(LPTIM2, LPTIM_UPDATE_IMMEDIATE);
+
+	volatile uint8_t status_code = HAL_LPTIM_SetOnce_Start_IT(&hlptim2, LPTIM2_LENGTH, LPTIM2_LENGTH);
 
 	return 1;
 }
