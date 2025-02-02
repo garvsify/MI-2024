@@ -169,9 +169,6 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
 		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1);
 		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
 	}
-
-	HAL_NVIC_EnableIRQ(EXTI4_15_IRQn); //allow clk to cause interrupts
-
 }
 
 void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
@@ -187,8 +184,6 @@ void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
 		//SET MODES
 		state = STATE_2;
 	}
-
-	HAL_NVIC_EnableIRQ(EXTI4_15_IRQn); //allow clk to cause interrupts
 }
 
 void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
@@ -211,7 +206,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 	if((state == STATE_1) || (state == STATE_2)){
 
-		Speed_Pot_Check(&params);
+		//Speed_Pot_Check(&params);
 	}
 
 
@@ -262,4 +257,11 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 	//SET TIMER TRIGGER
 	HAL_LPTIM_SetOnce_Start_IT(&hlptim1, LPTIM1_CCR_CHECK, LPTIM1_CCR_CHECK);
 
+}
+
+void TIM17_overflow_callback(TIM_HandleTypeDef *htim){
+
+	Stop_OC_TIM(&htim17, TIM_CHANNEL_1);
+
+	HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);
 }

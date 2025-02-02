@@ -4,6 +4,7 @@ uint8_t Startup(void){
 
 	__HAL_TIM_ENABLE_IT(&htim2, TIM_IT_UPDATE); //make sure the overflow (update) interrupt is enabled for TIM2
 	__HAL_TIM_ENABLE_IT(&htim16, TIM_IT_UPDATE); //make sure the overflow (update) interrupt is enabled for TIM16
+	__HAL_TIM_ENABLE_IT(&htim17, TIM_IT_UPDATE); //make sure the overflow (update) interrupt is enabled for TIM17
 
 	//SET DEFAULT PIN STATES
 	HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1); //latch high the debounced o/p

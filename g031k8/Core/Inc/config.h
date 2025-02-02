@@ -60,6 +60,7 @@ extern ADC_HandleTypeDef hadc1;
 extern DMA_HandleTypeDef hdma_adc1;
 
 extern TIM_HandleTypeDef htim16;
+extern TIM_HandleTypeDef htim17;
 extern TIM_HandleTypeDef htim2;
 extern TIM_HandleTypeDef htim3;
 extern TIM_HandleTypeDef htim1;
@@ -82,7 +83,7 @@ void MX_TIM16_Init(void); //Frequency Gen.
 void MX_TIM2_Init(void); //I/P Capture Measurement is TIM2_ch1,
 void MX_TIM3_Init(void); //I/P Capture Measurement Re-Elapse is TIM3_ch1,
 void MX_TIM1_Init(void); //PWM Gen. Main/Secondary Oscillator
-void MX_TIM17_Init(void); //Speed pot checking timer
+void MX_TIM17_Init(void); //EXTI Interrupt Enable
 void MX_IWDG_Init(void);
 void MX_LPTIM1_Init(void); //Tap tempo checking/debouncing timer
 
