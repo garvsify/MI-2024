@@ -648,7 +648,7 @@ void MX_GPIO_Init(void)
   HAL_GPIO_Init(HACK_POT_LOW_GPIO_Port, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
-  HAL_NVIC_SetPriority(EXTI4_15_IRQn, 3, 3);
+  HAL_NVIC_SetPriority(EXTI4_15_IRQn, 2, 2);
   HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */

@@ -60,9 +60,15 @@ uint8_t Startup(void){
 
 	#endif
 
+	//DEBUG
+
 	LL_LPTIM_SetUpdateMode(LPTIM2, LPTIM_UPDATE_IMMEDIATE);
 
 	volatile uint8_t status_code = HAL_LPTIM_SetOnce_Start_IT(&hlptim2, LPTIM2_LENGTH, LPTIM2_LENGTH);
+
+	__HAL_TIM_SET_COUNTER(&htim17, 0);
+
+	Start_OC_TIM(&htim17, TIM_CHANNEL_1);
 
 	return 1;
 }
