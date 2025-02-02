@@ -5,4 +5,6 @@
 ../Core/Src/custom_callbacks.c:123:6:TIM3_ch1_IP_capture_measurement_reelapse_callback	1
 ../Core/Src/custom_callbacks.c:147:6:UART2_TX_transfer_complete_callback	1
 ../Core/Src/custom_callbacks.c:152:6:UART2_RX_transfer_complete_callback	2
-../Core/Src/custom_callbacks.c:163:6:LPTIM1_callback	10
+../Core/Src/custom_callbacks.c:163:6:HAL_GPIO_EXTI_Falling_Callback	2
+../Core/Src/custom_callbacks.c:177:6:HAL_GPIO_EXTI_Rising_Callback	2
+../Core/Src/custom_callbacks.c:194:6:LPTIM1_callback	7

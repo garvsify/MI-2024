@@ -537,7 +537,7 @@ void MX_GPIO_Init(void)
 
   //Configure CLK IN Pin - i.e. dedicated clock inputs to use this pin rather than the Tap-tempo switch debouncing SW IN pin
   GPIO_InitStruct.Pin = CLK_IN_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(MONITOR_GPIO_Port, &GPIO_InitStruct);
@@ -557,8 +557,8 @@ void MX_GPIO_Init(void)
   HAL_GPIO_Init(HACK_POT_LOW_GPIO_Port, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
-  //HAL_NVIC_SetPriority(EXTI4_15_IRQn, 3, 3);
-  //HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);
+  HAL_NVIC_SetPriority(EXTI4_15_IRQn, 3, 3);
+  HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */

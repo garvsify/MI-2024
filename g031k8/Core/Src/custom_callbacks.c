@@ -160,21 +160,52 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 	HAL_UART_Receive_DMA(&huart2, (uint8_t*)rx_buffer, sizeof(rx_buffer));
 }
 
+void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
+
+	//DISABLE EXTI INTERRUPTS - in EXTI Callback before
+
+	if((GPIO_Pin == CLK_IN_Pin)){ //if specifically CLK IN pin with falling interrupt
+
+		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1);
+		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+	}
+
+	HAL_NVIC_EnableIRQ(EXTI4_15_IRQn); //allow clk to cause interrupts
+
+}
+
+void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
+
+	//DISABLE EXTI INTERRUPTS - in EXTI Callback before
+
+	if((GPIO_Pin == CLK_IN_Pin)){ //if specifically CLK IN pin with rising interrupt
+
+		//Set SW OUT
+		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
+		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+
+		//SET MODES
+		state = STATE_2;
+	}
+
+	HAL_NVIC_EnableIRQ(EXTI4_15_IRQn); //allow clk to cause interrupts
+}
+
 void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
 
 	static volatile struct Tap_Tempo_Switch_States tap_tempo_switch_states = {0};
-	volatile enum CLK_IN_State clk_in_state = LOW;
+	//volatile enum CLK_IN_State clk_in_state = LOW;
 
 	if((uint8_t)HAL_GPIO_ReadPin(SW_IN_GPIO_Port, SW_IN_Pin) == 0){
 
 		state = STATE_1;
 	}
-	else if((uint8_t)HAL_GPIO_ReadPin(CLK_IN_GPIO_Port, CLK_IN_Pin) == 1){
+	/*else if((uint8_t)HAL_GPIO_ReadPin(CLK_IN_GPIO_Port, CLK_IN_Pin) == 1){
 
 		state = STATE_2;
-	}
+	}*/
 
 	//don't add conditional for STATE_0
 
@@ -207,7 +238,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 	//SET PREVIOUS STATE TO CURRENT STATE
 	//tap_tempo_switch_states.tap_tempo_switch_prev_state = tap_tempo_switch_states.tap_tempo_switch_state;
 
-	else if(state == STATE_2){
+	/*else if(state == STATE_2){
 
 		Check_CLK_IN_State(&clk_in_state);
 
@@ -224,7 +255,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
 		}
 
-	}
+	}*/
 
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
 
