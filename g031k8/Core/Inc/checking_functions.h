@@ -2,6 +2,8 @@
 #define INC_CHECKING_FUNCTIONS_H_
 
 //MACROS
+//#define LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK 4001 - 1 //4ms overflow with prescaler of 128
+#define LPTIM1_CCR_CHECK 251 - 1
 
 //INCLUDES
 #include <stdint.h>

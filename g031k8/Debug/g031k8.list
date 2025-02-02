@@ -27,19 +27,19 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  11 .ARM.attributes 00000028  00000000  00000000  00008418  2**0
                   CONTENTS, READONLY
- 12 .debug_info   00027bfd  00000000  00000000  00008440  2**0
+ 12 .debug_info   00027c01  00000000  00000000  00008440  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 13 .debug_abbrev 00004cc9  00000000  00000000  0003003d  2**0
+ 13 .debug_abbrev 00004cc9  00000000  00000000  00030041  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_aranges 00001320  00000000  00000000  00034d08  2**3
+ 14 .debug_aranges 00001320  00000000  00000000  00034d10  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_rnglists 00001af6  00000000  00000000  00036028  2**0
+ 15 .debug_rnglists 00001af6  00000000  00000000  00036030  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  00019899  00000000  00000000  00037b1e  2**0
+ 16 .debug_macro  0001989e  00000000  00000000  00037b26  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   00027c91  00000000  00000000  000513b7  2**0
+ 17 .debug_line   00027c91  00000000  00000000  000513c4  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    0009ebe9  00000000  00000000  00079048  2**0
+ 18 .debug_str    0009ebdc  00000000  00000000  00079055  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  19 .comment      00000043  00000000  00000000  00117c31  2**0
                   CONTENTS, READONLY
@@ -587,7 +587,7 @@ uint8_t Start_UART_Receive(void){
  8000494:	d90a      	bls.n	80004ac <Speed_Pot_Check+0x4c>
 			if(first_speed_measurement - second_speed_measurement > SPEED_TOLERANCE){
  8000496:	1a9b      	subs	r3, r3, r2
- 8000498:	2b1e      	cmp	r3, #30
+ 8000498:	2b05      	cmp	r3, #5
  800049a:	ddec      	ble.n	8000476 <Speed_Pot_Check+0x16>
 				state = STATE_0;
  800049c:	4b09      	ldr	r3, [pc, #36]	@ (80004c4 <Speed_Pot_Check+0x64>)
@@ -605,7 +605,7 @@ uint8_t Start_UART_Receive(void){
  80004ae:	d2e2      	bcs.n	8000476 <Speed_Pot_Check+0x16>
 			if(second_speed_measurement - first_speed_measurement > SPEED_TOLERANCE){
  80004b0:	1ad2      	subs	r2, r2, r3
- 80004b2:	2a1e      	cmp	r2, #30
+ 80004b2:	2a05      	cmp	r2, #5
  80004b4:	dddf      	ble.n	8000476 <Speed_Pot_Check+0x16>
  80004b6:	e7f1      	b.n	800049c <Speed_Pot_Check+0x3c>
  80004b8:	2000043a 	.word	0x2000043a
@@ -658,7 +658,7 @@ uint8_t Check_Tap_Tempo_Switch_State(volatile struct Tap_Tempo_Switch_States *ta
 		tap_tempo_switch_states_ptr->tap_tempo_switch_state = DEPRESSED;
 	}
 	else if(tap_tempo_switch_state_counter == TAP_TEMPO_SWITCH_CONFIDENCE_COUNT){
- 80004f2:	2b64      	cmp	r3, #100	@ 0x64
+ 80004f2:	2b0a      	cmp	r3, #10
  80004f4:	d110      	bne.n	8000518 <Check_Tap_Tempo_Switch_State+0x4c>
 
 		tap_tempo_switch_states_ptr->tap_tempo_switch_state = NOT_DEPRESSED;
@@ -668,7 +668,7 @@ uint8_t Check_Tap_Tempo_Switch_State(volatile struct Tap_Tempo_Switch_States *ta
 		if(tap_tempo_switch_state_counter != TAP_TEMPO_SWITCH_CONFIDENCE_COUNT){
  80004fc:	490a      	ldr	r1, [pc, #40]	@ (8000528 <Check_Tap_Tempo_Switch_State+0x5c>)
  80004fe:	780b      	ldrb	r3, [r1, #0]
- 8000500:	2b64      	cmp	r3, #100	@ 0x64
+ 8000500:	2b0a      	cmp	r3, #10
  8000502:	d0f8      	beq.n	80004f6 <Check_Tap_Tempo_Switch_State+0x2a>
 			if(extend_rising_edge == COUNT_TO_DELAY_RISING_TAP_TEMPO_EDGE){
  8000504:	4809      	ldr	r0, [pc, #36]	@ (800052c <Check_Tap_Tempo_Switch_State+0x60>)
@@ -2517,9 +2517,9 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
 
 	//SET TIMER TRIGGER
-	HAL_LPTIM_SetOnce_Start_IT(&hlptim1, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK);
- 8000f08:	2214      	movs	r2, #20
- 8000f0a:	2114      	movs	r1, #20
+	HAL_LPTIM_SetOnce_Start_IT(&hlptim1, LPTIM1_CCR_CHECK, LPTIM1_CCR_CHECK);
+ 8000f08:	22fa      	movs	r2, #250	@ 0xfa
+ 8000f0a:	21fa      	movs	r1, #250	@ 0xfa
  8000f0c:	4821      	ldr	r0, [pc, #132]	@ (8000f94 <LPTIM1_callback+0xc4>)
  8000f0e:	f002 f989 	bl	8003224 <HAL_LPTIM_SetOnce_Start_IT>
 
@@ -3562,9 +3562,9 @@ uint8_t Startup(void){
 	#if TAPCLK_ON_OR_OFF == ON
 
 		//ENABLE TAP-TEMPO SWITCH CHECKING
-		HAL_LPTIM_SetOnce_Start_IT(&hlptim1, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK, LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK);
- 8001424:	2214      	movs	r2, #20
- 8001426:	2114      	movs	r1, #20
+		HAL_LPTIM_SetOnce_Start_IT(&hlptim1, LPTIM1_CCR_CHECK, LPTIM1_CCR_CHECK);
+ 8001424:	22fa      	movs	r2, #250	@ 0xfa
+ 8001426:	21fa      	movs	r1, #250	@ 0xfa
  8001428:	480d      	ldr	r0, [pc, #52]	@ (8001460 <Startup+0xfc>)
  800142a:	f001 fefb 	bl	8003224 <HAL_LPTIM_SetOnce_Start_IT>
 
