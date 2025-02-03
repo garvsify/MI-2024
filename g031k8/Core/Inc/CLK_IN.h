@@ -3,6 +3,7 @@
 
 //MACROS
 #define TIM17_OVERFLOW_LENGTH 5 //w/ prescaler 512*64
+#define TIM14_OVERFLOW_LENGTH 20
 
 //INCLUDES
 #include <stdint.h>

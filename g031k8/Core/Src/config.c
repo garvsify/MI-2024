@@ -20,7 +20,6 @@ DMA_HandleTypeDef hdma_usart2_rx;
 DMA_HandleTypeDef hdma_usart2_tx;
 
 LPTIM_HandleTypeDef hlptim1;
-LPTIM_HandleTypeDef hlptim2;
 
 //FUNCTIONS
 void SystemClock_Config(void)
@@ -495,35 +494,44 @@ void MX_LPTIM1_Init(void)
   HAL_NVIC_EnableIRQ(LPTIM1_IRQn);
 }
 
-void MX_LPTIM2_Init(void)
+void MX_TIM14_Init(void)
 {
 
-  /* USER CODE BEGIN LPTIM1_Init 0 */
+  /* USER CODE BEGIN TIM14_Init 0 */
 
-  /* USER CODE END LPTIM1_Init 0 */
+  /* USER CODE END TIM14_Init 0 */
 
-  /* USER CODE BEGIN LPTIM1_Init 1 */
+  TIM_OC_InitTypeDef sConfigOC = {0};
 
-  /* USER CODE END LPTIM1_Init 1 */
-  hlptim1.Instance = LPTIM2;
-  hlptim1.Init.Clock.Source = LPTIM_CLOCKSOURCE_APBCLOCK_LPOSC;
-  hlptim1.Init.Clock.Prescaler = LPTIM_PRESCALER_DIV128;
-  hlptim1.Init.Trigger.Source = LPTIM_TRIGSOURCE_SOFTWARE;
-  hlptim1.Init.OutputPolarity = LPTIM_OUTPUTPOLARITY_HIGH;
-  hlptim1.Init.UpdateMode = LPTIM_UPDATE_ENDOFPERIOD;
-  hlptim1.Init.CounterSource = LPTIM_COUNTERSOURCE_INTERNAL;
-  hlptim1.Init.Input1Source = LPTIM_INPUT1SOURCE_GPIO;
-  hlptim1.Init.Input2Source = LPTIM_INPUT2SOURCE_GPIO;
-  if (HAL_LPTIM_Init(&hlptim2) != HAL_OK)
+  /* USER CODE BEGIN TIM14_Init 1 */
+
+  /* USER CODE END TIM14_Init 1 */
+  htim14.Instance = TIM14;
+  htim14.Init.Prescaler = (512 * 64) - 1;
+  htim14.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim14.Init.Period = TIM14_OVERFLOW_LENGTH - 1;
+  htim14.Init.ClockDivision = TIM_CLOCKDIVISION_DIV4;
+  htim14.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim14) != HAL_OK)
   {
     Error_Handler();
   }
-  /* USER CODE BEGIN LPTIM1_Init 2 */
+  if (HAL_TIM_OC_Init(&htim14) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sConfigOC.OCMode = TIM_OCMODE_TIMING;
+  sConfigOC.Pulse = TIM14_OVERFLOW_LENGTH - 1;
+  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+  if (HAL_TIM_OC_ConfigChannel(&htim14, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM14_Init 2 */
 
-  /* USER CODE END LPTIM1_Init 2 */
+  /* USER CODE END TIM14_Init 2 */
 
-  HAL_NVIC_SetPriority(LPTIM2_IRQn, 2, 2);
-  HAL_NVIC_EnableIRQ(LPTIM2_IRQn);
 }
 
 void MX_USART2_UART_Init(void)
@@ -684,9 +692,9 @@ void System_Init(void){
 	MX_TIM3_Init(); //I/P Capture Measurement Re-Elapse is TIM3_ch1
 	MX_TIM1_Init(); //PWM Gen. Main/Secondary Oscillator on ch2/ch4
 	MX_TIM17_Init();
+	MX_TIM14_Init();
 	//MX_IWDG_Init(); fucks up stuff - to be config'd
 	MX_LPTIM1_Init(); //Tap Tempo checking/debouncing timer
-	MX_LPTIM2_Init();
 
 	//Calibrate ADC - DO NOT MOVE TO BEFORE OTHER CONFIG ABOVE
 	HAL_ADCEx_Calibration_Start(&hadc1);
@@ -718,11 +726,11 @@ void System_Init(void){
 	//Set custom callback for LPTIM1 (Tap Tempo SW state check)
 	HAL_LPTIM_RegisterCallback(&hlptim1, HAL_LPTIM_COMPARE_MATCH_CB_ID, &LPTIM1_callback);
 
-	//Set custom callback for LPTIM2 - IP CAP event checker
-	HAL_LPTIM_RegisterCallback(&hlptim2, HAL_LPTIM_COMPARE_MATCH_CB_ID, &LPTIM2_callback);
+	//Set custom callback function for TIM17
+	HAL_TIM_RegisterCallback(&htim17, HAL_TIM_OC_DELAY_ELAPSED_CB_ID, &TIM17_callback);
 
-	//Set custom callback function for TIM17 EXTI Interrupt enable function
-	HAL_TIM_RegisterCallback(&htim17, HAL_TIM_OC_DELAY_ELAPSED_CB_ID, &TIM17_overflow_callback);
+	//Set custom callback function for TIM14
+	HAL_TIM_RegisterCallback(&htim14, HAL_TIM_OC_DELAY_ELAPSED_CB_ID, &TIM14_callback);
 }
 
 #ifdef  USE_FULL_ASSERT

@@ -61,6 +61,7 @@ extern DMA_HandleTypeDef hdma_adc1;
 
 extern TIM_HandleTypeDef htim16;
 extern TIM_HandleTypeDef htim17;
+extern TIM_HandleTypeDef htim14;
 extern TIM_HandleTypeDef htim2;
 extern TIM_HandleTypeDef htim3;
 extern TIM_HandleTypeDef htim1;
@@ -72,7 +73,6 @@ extern DMA_HandleTypeDef hdma_usart2_tx;
 extern IWDG_HandleTypeDef hiwdg;
 
 extern LPTIM_HandleTypeDef hlptim1;
-extern LPTIM_HandleTypeDef hlptim2;
 
 void System_Init(void);
 void SystemClock_Config(void);
@@ -85,9 +85,9 @@ void MX_TIM2_Init(void); //I/P Capture Measurement is TIM2_ch1,
 void MX_TIM3_Init(void); //I/P Capture Measurement Re-Elapse is TIM3_ch1,
 void MX_TIM1_Init(void); //PWM Gen. Main/Secondary Oscillator
 void MX_TIM17_Init(void); //EXTI Interrupt Enable
+void MX_TIM14_Init(void);
 void MX_IWDG_Init(void);
 void MX_LPTIM1_Init(void); //Tap tempo checking/debouncing timer
-void MX_LPTIM2_Init(void);
 
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 

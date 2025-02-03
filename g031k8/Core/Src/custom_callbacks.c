@@ -186,7 +186,7 @@ void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
 
 	//DISABLE EXTI INTERRUPTS - in EXTI Callback before
 
-	if((GPIO_Pin == CLK_IN_Pin)){ //if specifically CLK IN pin with rising interrupt
+	/*if((GPIO_Pin == CLK_IN_Pin)){ //if specifically CLK IN pin with rising interrupt
 
 		flags = 1 << 0;
 
@@ -243,7 +243,7 @@ void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
 		HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);
 
 		flags = 1 << 18;
-	}
+	}*/
 }
 
 void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
@@ -313,25 +313,37 @@ void LPTIM2_callback(LPTIM_HandleTypeDef *hlptim){
 		IP_CAP_events_detection_timeout = YES;
 		HAL_LPTIM_SetOnce_Stop_IT(&hlptim2);
 	}*/
-
-
-	HAL_GPIO_TogglePin(MONITOR_GPIO_Port, MONITOR_Pin);
-
-	HAL_LPTIM_SetOnce_Start_IT(&hlptim2, LPTIM2_LENGTH, LPTIM2_LENGTH);
 }
 
-void TIM17_overflow_callback(TIM_HandleTypeDef *htim){
+void TIM17_callback(TIM_HandleTypeDef *htim){
 
 	/*Stop_OC_TIM(&htim17, TIM_CHANNEL_1);
 
 	HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);*/
 
-	Stop_OC_TIM(&htim17, TIM_CHANNEL_1);
+	//DEBUG CODE
+	/*Stop_OC_TIM(&htim17, TIM_CHANNEL_1);
 
 	HAL_GPIO_TogglePin(MONITOR_GPIO_Port, MONITOR_Pin);
 
 	__HAL_TIM_SET_COUNTER(&htim17, 0);
 
-	Start_OC_TIM(&htim17, TIM_CHANNEL_1);
+	Start_OC_TIM(&htim17, TIM_CHANNEL_1);*/
+
+}
+
+void TIM14_callback(TIM_HandleTypeDef *htim){
+
+	/*Stop_OC_TIM(&htim17, TIM_CHANNEL_1);
+
+	HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);*/
+
+	Stop_OC_TIM(&htim14, TIM_CHANNEL_1);
+
+	HAL_GPIO_TogglePin(MONITOR_GPIO_Port, MONITOR_Pin);
+
+	__HAL_TIM_SET_COUNTER(&htim14, 0);
+
+	Start_OC_TIM(&htim14, TIM_CHANNEL_1);
 
 }
