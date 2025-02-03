@@ -65,8 +65,6 @@ uint8_t Startup(void){
 	//ENABLE EXTI
 	HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);
 
-	HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
-
 	//DEBUG
 	/*__HAL_TIM_SET_COUNTER(&htim14, 0);
 	Start_OC_TIM(&htim14, TIM_CHANNEL_1);*/

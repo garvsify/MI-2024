@@ -279,8 +279,6 @@ void TIM14_callback(TIM_HandleTypeDef *htim){
 
 	IP_CAP_events_detection_timeout = YES;
 
-	HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
-
 	//DEBUG
 	/*Stop_OC_TIM(&htim14, TIM_CHANNEL_1);
 
