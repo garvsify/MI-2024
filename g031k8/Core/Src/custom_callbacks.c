@@ -172,8 +172,6 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
 
 		//Start_OC_TIM(&htim17, TIM_CHANNEL_1);
 	}
-
-	HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);
 }
 
 void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
@@ -199,14 +197,12 @@ void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
 
 			state = STATE_2;
 
-			__HAL_TIM_SET_COUNTER(&htim3, 0);
+			__HAL_TIM_SET_COUNTER(&htim14, 0);
 
 			Start_OC_TIM(&htim14, TIM_CHANNEL_1);
 
 			IP_CAP_events_detection_timeout = NO;
 		}
-
-		HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);
 	}
 }
 
