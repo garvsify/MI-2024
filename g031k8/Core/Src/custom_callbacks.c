@@ -170,8 +170,10 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
 
 		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
 
-		Start_OC_TIM(&htim17, TIM_CHANNEL_1);
+		//Start_OC_TIM(&htim17, TIM_CHANNEL_1);
 	}
+
+	HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);
 }
 
 void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
@@ -185,17 +187,19 @@ void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
 
 		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
 
+		//Start_OC_TIM(&htim17, TIM_CHANNEL_1);
+
 		if(state == STATE_2){
 
-			Stop_OC_TIM(&htim14, TIM_CHANNEL_1);
-
-			Start_OC_TIM(&htim14, TIM_CHANNEL_1);
+			__HAL_TIM_SET_COUNTER(&htim14, 0);
 
 			IP_CAP_events_detection_timeout = NO;
 		}
 		else if(state == STATE_0){
 
 			state = STATE_2;
+
+			__HAL_TIM_SET_COUNTER(&htim3, 0);
 
 			Start_OC_TIM(&htim14, TIM_CHANNEL_1);
 
@@ -212,7 +216,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 	static volatile struct Tap_Tempo_Switch_States tap_tempo_switch_states = {0};
 
-	if((uint8_t)HAL_GPIO_ReadPin(SW_IN_GPIO_Port, SW_IN_Pin) == 0){
+	if((state == STATE_0) && (uint8_t)HAL_GPIO_ReadPin(SW_IN_GPIO_Port, SW_IN_Pin) == 0){ //can only go into state 1 if no other 'ip cap' source is active
 
 		state = STATE_1;
 	}
@@ -278,6 +282,8 @@ void TIM14_callback(TIM_HandleTypeDef *htim){
 	Stop_OC_TIM(&htim14, TIM_CHANNEL_1);
 
 	IP_CAP_events_detection_timeout = YES;
+
+	HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
 
 	//DEBUG
 	/*Stop_OC_TIM(&htim14, TIM_CHANNEL_1);

@@ -4,6 +4,8 @@
 
 uint8_t Startup(void){
 
+	HAL_NVIC_DisableIRQ(EXTI4_15_IRQn);
+
 	__HAL_TIM_ENABLE_IT(&htim2, TIM_IT_UPDATE); //make sure the overflow (update) interrupt is enabled for TIM2
 	__HAL_TIM_ENABLE_IT(&htim16, TIM_IT_UPDATE); //make sure the overflow (update) interrupt is enabled for TIM16
 
@@ -60,9 +62,14 @@ uint8_t Startup(void){
 
 	#endif
 
+	//ENABLE EXTI
+	HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);
+
+	HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
+
 	//DEBUG
-	__HAL_TIM_SET_COUNTER(&htim14, 0);
-	Start_OC_TIM(&htim14, TIM_CHANNEL_1);
+	/*__HAL_TIM_SET_COUNTER(&htim14, 0);
+	Start_OC_TIM(&htim14, TIM_CHANNEL_1);*/
 
 	return 1;
 }
