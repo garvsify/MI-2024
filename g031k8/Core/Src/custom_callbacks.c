@@ -191,7 +191,6 @@ void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
 
 			__HAL_TIM_SET_COUNTER(&htim14, 0);
 
-			IP_CAP_events_detection_timeout = NO;
 		}
 		else if(state == STATE_0){
 
@@ -200,8 +199,6 @@ void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
 			__HAL_TIM_SET_COUNTER(&htim14, 0);
 
 			Start_OC_TIM(&htim14, TIM_CHANNEL_1);
-
-			IP_CAP_events_detection_timeout = NO;
 		}
 	}
 }
@@ -258,18 +255,6 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 void TIM17_callback(TIM_HandleTypeDef *htim){
 
-	Stop_OC_TIM(&htim17, TIM_CHANNEL_1);
-
-	HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);
-
-	//DEBUG CODE
-	/*Stop_OC_TIM(&htim17, TIM_CHANNEL_1);
-
-	HAL_GPIO_TogglePin(MONITOR_GPIO_Port, MONITOR_Pin);
-
-	__HAL_TIM_SET_COUNTER(&htim17, 0);
-
-	Start_OC_TIM(&htim17, TIM_CHANNEL_1);*/
 
 }
 
