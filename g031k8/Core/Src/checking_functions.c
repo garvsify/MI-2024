@@ -1,7 +1,6 @@
 #include "checking_functions.h"
 
 //VARIABLE DEFINITIONS
-volatile uint8_t LPTIM2_overflow_count = 0;
 volatile enum Validate IP_CAP_events_detection_timeout = NO;
 
 //FUNCTION DEFINITIONS
@@ -87,22 +86,6 @@ uint8_t Check_Tap_Tempo_Switch_State(volatile struct Tap_Tempo_Switch_States *ta
 	else if(tap_tempo_switch_state_counter == TAP_TEMPO_SWITCH_CONFIDENCE_COUNT){
 
 		tap_tempo_switch_states_ptr->tap_tempo_switch_state = NOT_DEPRESSED;
-	}
-
-	return 1;
-}
-
-uint8_t Check_CLK_IN_State(volatile enum CLK_IN_State *clk_in_state_ptr){
-
-	uint8_t clk_state = (uint8_t)HAL_GPIO_ReadPin(CLK_IN_GPIO_Port, CLK_IN_Pin);
-
-	if(clk_state == 0){
-
-		*clk_in_state_ptr = LOW;
-	}
-	else{
-
-		*clk_in_state_ptr = HIGH;
 	}
 
 	return 1;

@@ -61,8 +61,8 @@ uint8_t Startup(void){
 	#endif
 
 	//DEBUG
-	__HAL_TIM_SET_COUNTER(&htim17, 0);
-	Start_OC_TIM(&htim17, TIM_CHANNEL_1);
+	__HAL_TIM_SET_COUNTER(&htim14, 0);
+	Start_OC_TIM(&htim14, TIM_CHANNEL_1);
 
 	return 1;
 }

@@ -6,8 +6,7 @@
 ../Core/Src/custom_callbacks.c:147:6:UART2_TX_transfer_complete_callback	1
 ../Core/Src/custom_callbacks.c:152:6:UART2_RX_transfer_complete_callback	2
 ../Core/Src/custom_callbacks.c:163:6:HAL_GPIO_EXTI_Falling_Callback	2
-../Core/Src/custom_callbacks.c:185:6:HAL_GPIO_EXTI_Rising_Callback	1
-../Core/Src/custom_callbacks.c:249:6:LPTIM1_callback	6
-../Core/Src/custom_callbacks.c:304:6:LPTIM2_callback	1
-../Core/Src/custom_callbacks.c:318:6:TIM17_callback	1
-../Core/Src/custom_callbacks.c:335:6:TIM14_callback	1
+../Core/Src/custom_callbacks.c:177:6:HAL_GPIO_EXTI_Rising_Callback	4
+../Core/Src/custom_callbacks.c:209:6:LPTIM1_callback	7
+../Core/Src/custom_callbacks.c:259:6:TIM17_callback	1
+../Core/Src/custom_callbacks.c:276:6:TIM14_callback	1

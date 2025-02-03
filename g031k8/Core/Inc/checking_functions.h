@@ -5,7 +5,7 @@
 //#define LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK 4001 - 1 //4ms overflow with prescaler of 128
 #define LPTIM1_CCR_CHECK 251 - 1
 #define LPTIM2_COUNT_MAX 24
-#define TIM14_OVERFLOW_LENGTH 20 // 20-1 is about 10ms overflow period with /4/512/64 division-prescaler
+#define TIM14_OVERFLOW_LENGTH 2050 // 4096/2 is min osc frequency period
 
 //INCLUDES
 #include <stdint.h>
@@ -22,12 +22,10 @@
 //CUSTOM TYPES
 
 //VARIABLE DECLARATIONS
-volatile extern uint8_t LPTIM2_overflow_count;
 volatile extern enum Validate IP_CAP_events_detection_timeout;
 
 //FUNCTION DECLARATIONS
 uint8_t Speed_Pot_Check(struct Params* params_ptr);
 uint8_t Check_Tap_Tempo_Switch_State(volatile struct Tap_Tempo_Switch_States *tap_tempo_switch_states_ptr);
-uint8_t Check_CLK_IN_State(volatile enum CLK_IN_State *clk_in_state_ptr);
 
 #endif /* INC_CHECKING_FUNCTIONS_H_ */
