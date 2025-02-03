@@ -96,7 +96,7 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
 
 			//uint16_t two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC = (two_fifty_six_minus_TIM16_raw_start_value * pot_rotation_corrected);
 			//COMMENT LINE BELOW IN AND LINE ABOVE OUT TO EXPERIMENT WITH MORE EXTREME SYMMETRY ADJUSTMENT
-			uint16_t two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC = ((two_fifty_six_minus_TIM16_raw_start_value * pot_rotation_corrected) * 11) >> 3; //x(11/8)
+			uint16_t two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC = ((two_fifty_six_minus_TIM16_raw_start_value * pot_rotation_corrected) * 12) >> 3; //x(12/8) - 12/8 is the absolute maximum we can get away with
 
 			uint16_t two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC_and_shifted_by_ADC_bits = (uint16_t)(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC >> SYMMETRY_ADC_NUM_BITS);
 
