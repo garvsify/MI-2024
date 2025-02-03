@@ -4,8 +4,8 @@
 //MACROS
 //#define LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK 4001 - 1 //4ms overflow with prescaler of 128
 #define LPTIM1_CCR_CHECK 251 - 1
-#define LPTIM2_LENGTH 65535
 #define LPTIM2_COUNT_MAX 24
+#define TIM14_OVERFLOW_LENGTH 20 // 20-1 is about 10ms overflow period with /4/512/64 division-prescaler
 
 //INCLUDES
 #include <stdint.h>

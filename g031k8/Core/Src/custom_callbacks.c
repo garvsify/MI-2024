@@ -322,13 +322,13 @@ void TIM17_callback(TIM_HandleTypeDef *htim){
 	HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);*/
 
 	//DEBUG CODE
-	/*Stop_OC_TIM(&htim17, TIM_CHANNEL_1);
+	Stop_OC_TIM(&htim17, TIM_CHANNEL_1);
 
 	HAL_GPIO_TogglePin(MONITOR_GPIO_Port, MONITOR_Pin);
 
 	__HAL_TIM_SET_COUNTER(&htim17, 0);
 
-	Start_OC_TIM(&htim17, TIM_CHANNEL_1);*/
+	Start_OC_TIM(&htim17, TIM_CHANNEL_1);
 
 }
 
