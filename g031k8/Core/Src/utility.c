@@ -24,3 +24,26 @@ uint8_t Global_Interrupt_Disable(void){
 	__disable_irq();
 	return 1;
 }
+
+enum Validate Get_Status_Bit(volatile uint32_t *bits, enum Status_Bit bit){
+
+    if(*bits & bit){
+
+        return (enum Validate) YES;
+    }
+
+    else{
+
+        return (enum Validate) NO;
+    }
+}
+
+void Set_Status_Bit(volatile uint32_t *bits, enum Status_Bit bit){
+
+	*bits |= bit;
+}
+
+void Clear_Status_Bit(volatile uint32_t *bits, enum Status_Bit bit){
+
+	*bits &= ~bit;
+}

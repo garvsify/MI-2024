@@ -3,18 +3,15 @@
 //VARIABLE DEFINITIONS
 volatile enum Input_Capture_Event input_capture_event = FIRST;
 volatile uint32_t TIM2_ch1_input_capture_value;
-volatile enum Validate input_capture_measurement_is_ongoing = NO;
-volatile enum Validate input_capture_measurement_reelapse_is_ongoing = NO;
-volatile enum Validate input_capture_processing_can_be_started = NO;
 
 volatile uint16_t interrupt_period = 0;
 
 //FUNCTION DEFINITIONS
-uint8_t Input_Capture_Processing(volatile uint16_t interrupt_period_value, struct Params* params_ptr){
+uint8_t Input_Capture_Processing(volatile uint16_t interrupt_period_value, struct Params *params_ptr){
 
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
 
-	input_capture_processing_can_be_started = NO; //reset flag
+	Clear_Status_Bit(&statuses, Input_Capture_Processing_Can_Be_Started); //reset flag
 
 	//DETERMINE WHAT TO SET THE RAW_START_VALUE AND BASE_PRESCALER TO BASED ON THE I/P CAPTURE VALUE
 	//CHECK FOR PRIMALITY
@@ -73,7 +70,7 @@ uint8_t Start_IC_TIM(TIM_HandleTypeDef *TIM, uint32_t IC_TIM_channel){
 	return ok_AND;
 }
 
-uint8_t Copy_Params_Structs(struct Params* src_ptr, struct Params* dst_ptr){
+uint8_t Copy_Params_Structs(struct Params *src_ptr, struct Params *dst_ptr){
 
 	*dst_ptr = *src_ptr;
 

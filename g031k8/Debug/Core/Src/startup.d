@@ -1,5 +1,6 @@
 Core/Src/startup.o: ../Core/Src/startup.c ../Core/Inc/startup.h \
- ../Core/Inc/oscillator.h ../Core/Inc/utility.h ../Core/Inc/config.h \
+ ../Core/Inc/oscillator.h ../Core/Inc/utility.h \
+ ../Core/Inc/input_capture.h ../Core/Inc/main.h ../Core/Inc/config.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal.h \
  ../Core/Inc/stm32g0xx_hal_conf.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_rcc.h \
@@ -37,17 +38,19 @@ Core/Src/startup.o: ../Core/Src/startup.c ../Core/Inc/startup.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_tim_ex.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart_ex.h \
+ ../Core/Inc/startup.h ../Core/Inc/oscillator_params_type.h \
+ ../Core/Inc/symmetry_adjustment_types.h ../Core/Inc/oscillator_macros.h \
  ../Core/Inc/symmetry_adjustment.h ../Core/Inc/oscillator_params_type.h \
- ../Core/Inc/symmetry_adjustment_types.h \
- ../Core/Inc/oscillator_params_type.h ../Core/Inc/timers.h \
- ../Core/Inc/oscillator_macros.h ../Core/Inc/checking_functions.h \
+ ../Core/Inc/timers.h ../Core/Inc/checking_functions.h \
  ../Core/Inc/speed_pot_check.h ../Core/Inc/tap_tempo.h \
  ../Core/Inc/CLK_IN.h ../Core/Inc/speed_control_state_machine.h \
- ../Core/Inc/UART.h ../Core/Inc/input_capture.h \
+ ../Core/Inc/UART.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_ll_lptim.h
 ../Core/Inc/startup.h:
 ../Core/Inc/oscillator.h:
 ../Core/Inc/utility.h:
+../Core/Inc/input_capture.h:
+../Core/Inc/main.h:
 ../Core/Inc/config.h:
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal.h:
 ../Core/Inc/stm32g0xx_hal_conf.h:
@@ -86,17 +89,17 @@ Core/Src/startup.o: ../Core/Src/startup.c ../Core/Inc/startup.h \
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_tim_ex.h:
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart.h:
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart_ex.h:
-../Core/Inc/symmetry_adjustment.h:
+../Core/Inc/startup.h:
 ../Core/Inc/oscillator_params_type.h:
 ../Core/Inc/symmetry_adjustment_types.h:
+../Core/Inc/oscillator_macros.h:
+../Core/Inc/symmetry_adjustment.h:
 ../Core/Inc/oscillator_params_type.h:
 ../Core/Inc/timers.h:
-../Core/Inc/oscillator_macros.h:
 ../Core/Inc/checking_functions.h:
 ../Core/Inc/speed_pot_check.h:
 ../Core/Inc/tap_tempo.h:
 ../Core/Inc/CLK_IN.h:
 ../Core/Inc/speed_control_state_machine.h:
 ../Core/Inc/UART.h:
-../Core/Inc/input_capture.h:
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_ll_lptim.h:

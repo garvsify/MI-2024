@@ -19,7 +19,9 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 	HAL_ADC_Stop_DMA(hadc); //disable ADC DMA
 	Process_ADC_Conversion_Values(&params, &delay_line, ADCResultsDMA);
 
-	if((state == STATE_0) || ((state != STATE_0) && (first_sync_complete == NO))){
+	enum Validate first_sync_complete = Get_Status_Bit(&statuses, First_Sync_Complete);
+
+	if((state == STATE_0) || ((state != STATE_0) && first_sync_complete == NO)){
 
 		Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(&params);
 	}
@@ -33,8 +35,8 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 	Process_TIM16_Final_Start_Value_and_Final_Prescaler(&params);
 
 	//after initial conversion is complete, set the conversion complete flag - leave this after raw/final value processing rather than actually when ADC values are converted for startup routine reasons.
-	if(initial_ADC_conversion_complete == NO){
-		initial_ADC_conversion_complete = YES;
+	if(Get_Status_Bit(&statuses, Initial_ADC_Conversion_Complete) == NO){
+		Set_Status_Bit(&statuses, Initial_ADC_Conversion_Complete);
 	}
 
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
@@ -53,15 +55,15 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 	if(input_capture_event == FIRST){ //edge detected is the first
 
 		__HAL_TIM_SET_COUNTER(&htim2, 0); //begin measurement
-		input_capture_measurement_is_ongoing = YES;
+		Set_Status_Bit(&statuses, Input_Capture_Measurement_Is_Ongoing);
 		input_capture_event = SECOND;
 	}
 	else{ //is second
 
 		input_capture_event = FIRST; //reset event name
-		input_capture_measurement_is_ongoing = NO;
+		Clear_Status_Bit(&statuses, Input_Capture_Measurement_Is_Ongoing);
 
-		if(input_capture_measurement_reelapse_is_ongoing == YES){
+		if(Get_Status_Bit(&statuses, Input_Capture_Measurement_Reelapse_Is_Ongoing) == YES){
 
 			//second edge was received when the measurement reelapse was ongoing
 			//This should restart the measurement reelapse (discarding the previous measurement)
@@ -84,7 +86,7 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 				//set I/P capture measurement re-elapse 1 is ongoing flag
 				input_capture_measurement_reelapse_is_ongoing = YES;*/
 
-				input_capture_processing_can_be_started = NO;
+				Clear_Status_Bit(&statuses, Input_Capture_Processing_Can_Be_Started);
 			}
 
 			//No need to check longest period as that is tested inherently by the TIM2 overflow
@@ -98,10 +100,10 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 				Start_OC_TIM(&htim3, TIM_CHANNEL_1);
 
 				//set I/P capture measurement re-elapse is ongoing flag
-				input_capture_measurement_reelapse_is_ongoing = YES;
+				Set_Status_Bit(&statuses, Input_Capture_Measurement_Reelapse_Is_Ongoing);
 
 				//begin processing
-				input_capture_processing_can_be_started = YES;
+				Set_Status_Bit(&statuses, Input_Capture_Processing_Can_Be_Started);
 			}
 		}
 	}
@@ -109,13 +111,13 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 
 void TIM2_ch1_overflow_callback(TIM_HandleTypeDef *htim){
 
-	if(input_capture_measurement_is_ongoing == YES && input_capture_event == SECOND){
+	if(Get_Status_Bit(&statuses, Input_Capture_Measurement_Is_Ongoing) == YES && input_capture_event == SECOND){
 
 		//overflow has occurred at a time when an input capture measurement is occurring, which means input capture event would have been the second if it it did occur.
 		//This means that the user has depressed the switch once, and hasn't pressed again within the timeout period.
 		//Thus, reset everything requiring the user to press the switch again to start another capture
 
-		input_capture_measurement_is_ongoing = NO;
+		Clear_Status_Bit(&statuses, Input_Capture_Measurement_Is_Ongoing);
 		input_capture_event = FIRST;
 	}
 }
@@ -131,11 +133,12 @@ void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
 
 	Stop_OC_TIM(&htim3, TIM_CHANNEL_1);
 
-	input_capture_measurement_reelapse_is_ongoing = NO;
+	Clear_Status_Bit(&statuses, Input_Capture_Measurement_Reelapse_Is_Ongoing);
 
 	Copy_Params_Structs(&params_to_be_loaded, &params_working);
 	Copy_Params_Structs(&params_to_be_loaded, &params);
-	first_sync_complete = YES;
+
+	Set_Status_Bit(&statuses, First_Sync_Complete);
 
 	Calculate_Next_Main_Oscillator_Values(&params, (enum Next_Values_Processing_Mode)REGULAR_MODE);
 	Write_Next_Main_Oscillator_Values_to_Delay_Line(&params, &delay_line);
@@ -162,8 +165,6 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
 void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
 
-	//DISABLE EXTI INTERRUPTS - in EXTI Callback before
-
 	if((GPIO_Pin == CLK_IN_Pin)){ //if specifically CLK IN pin with falling interrupt
 
 		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1);
@@ -175,8 +176,6 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
 }
 
 void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
-
-	//DISABLE EXTI INTERRUPTS - in EXTI Callback before
 
 	if((GPIO_Pin == CLK_IN_Pin)){ //if specifically CLK IN pin with rising interrupt
 
@@ -197,7 +196,6 @@ void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
 			state = STATE_2;
 
 			__HAL_TIM_SET_COUNTER(&htim14, 0);
-
 			Start_OC_TIM(&htim14, TIM_CHANNEL_1);
 		}
 	}
@@ -212,11 +210,18 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 	if((state == STATE_0) && (uint8_t)HAL_GPIO_ReadPin(SW_IN_GPIO_Port, SW_IN_Pin) == 0){ //can only go into state 1 if no other 'ip cap' source is active
 
 		state = STATE_1;
+
+		Stop_OC_TIM(&htim14, TIM_CHANNEL_1); //stop checking for timeout
 	}
 
 	//don't add conditional for STATE_0
 
-	if(IP_CAP_events_detection_timeout == YES && state != STATE_0){
+	if(Get_Status_Bit(&statuses, IP_CAP_Events_Detection_Timeout) == YES && (state == STATE_2)){
+
+		Speed_Pot_Check(&params);
+	}
+
+	if(state == STATE_1){
 
 		Speed_Pot_Check(&params);
 	}
@@ -262,7 +267,7 @@ void TIM14_callback(TIM_HandleTypeDef *htim){
 
 	Stop_OC_TIM(&htim14, TIM_CHANNEL_1);
 
-	IP_CAP_events_detection_timeout = YES;
+	Set_Status_Bit(&statuses, IP_CAP_Events_Detection_Timeout);
 
 	//DEBUG
 	/*Stop_OC_TIM(&htim14, TIM_CHANNEL_1);

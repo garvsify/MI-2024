@@ -20,7 +20,7 @@ uint8_t Startup(void){
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions);
 
 	//WAIT
-	while(initial_ADC_conversion_complete == NO){}; //wait while first ADC conversion is ongoing - raw and final values will be computed within this time
+	while(Get_Status_Bit(&statuses, Initial_ADC_Conversion_Complete) == NO){}; //wait while first ADC conversion is ongoing - raw and final values will be computed within this time
 
 	// re-initialise all values in delay line storage array to middle value of wave (if sine/triangle mode) or bottom of wave if square mode, as they are initialised to 0 on startup
 	for(uint16_t i = 0; i < FINAL_INDEX + 2; i++){ //513

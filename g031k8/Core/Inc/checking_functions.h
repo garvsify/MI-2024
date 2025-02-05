@@ -22,7 +22,6 @@
 //CUSTOM TYPES
 
 //VARIABLE DECLARATIONS
-volatile extern enum Validate IP_CAP_events_detection_timeout;
 
 //FUNCTION DECLARATIONS
 uint8_t Speed_Pot_Check(struct Params* params_ptr);

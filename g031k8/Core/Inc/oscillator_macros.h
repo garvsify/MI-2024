@@ -75,4 +75,7 @@
 
 #endif
 
+#define FIRST_SYNC_COMPLETE (0b1 << 3)
+#define INITIAL_ADC_CONVERSION_COMPLETE (0b1 << 4)
+
 #endif /* OSCILLATOR_MACROS_H_ */
