@@ -31,5 +31,7 @@ uint8_t Input_Capture_Processing(volatile uint16_t interrupt_period_value, struc
 uint8_t Start_Input_Capture_Timer(void);
 uint8_t Start_IC_TIM(TIM_HandleTypeDef *TIM, uint32_t IC_TIM_channel);
 uint8_t Copy_Params_Structs(struct Params* src_ptr, struct Params* dst_ptr);
+uint8_t Start_Measurement_Reelapse_Timer(void);
+uint8_t Begin_Input_Capture_Measurement(void);
 
 #endif /* INC_INPUT_CAPTURE_H_ */

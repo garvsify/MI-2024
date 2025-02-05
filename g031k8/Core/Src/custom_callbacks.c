@@ -54,60 +54,33 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 
 	if(input_capture_event == FIRST){ //edge detected is the first
 
-		__HAL_TIM_SET_COUNTER(&htim2, 0); //begin measurement
+		Begin_Input_Capture_Measurement();
+
 		Set_Status_Bit(&statuses, Input_Capture_Measurement_Is_Ongoing);
+
 		input_capture_event = SECOND;
 	}
 	else{ //is second
 
 		input_capture_event = FIRST; //reset event name
+
 		Clear_Status_Bit(&statuses, Input_Capture_Measurement_Is_Ongoing);
 
-		if(Get_Status_Bit(&statuses, Input_Capture_Measurement_Reelapse_Is_Ongoing) == YES){
-
-			//second edge was received when the measurement reelapse was ongoing
-			//This should restart the measurement reelapse (discarding the previous measurement)
-			__HAL_TIM_SET_COUNTER(&htim3, 0);
-			__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, interrupt_period);
-			Start_OC_TIM(&htim3, TIM_CHANNEL_1);
-		}
-		else{
-
-			if(interrupt_period < HIGHEST_PRESCALER_TOP_SPEED_PERIOD){ //if the captured value/512 is less than 129, then the desired speed is not reproducable, do not proceed witj ip capture
-
-				/*interrupt_period = HIGHEST_PRESCALER_TOP_SPEED_PERIOD;
-
-				//start TIM3 from 0 with CCR loaded with TIM2_ch1_input_capture_value
-				//CCR shouldn't be preloaded so *should* update instantaneously
-				__HAL_TIM_SET_COUNTER(&htim3, 0);
-				__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, HIGHEST_PRESCALER_TOP_SPEED_PERIOD);
-				Start_OC_TIM(&htim3, TIM_CHANNEL_1);
-
-				//set I/P capture measurement re-elapse 1 is ongoing flag
-				input_capture_measurement_reelapse_is_ongoing = YES;*/
-
-				Clear_Status_Bit(&statuses, Input_Capture_Processing_Can_Be_Started);
-			}
+		if(interrupt_period >= HIGHEST_PRESCALER_TOP_SPEED_PERIOD){ //if the captured value/512 is >= than 129
 
 			//No need to check longest period as that is tested inherently by the TIM2 overflow
 
-			else{
+			Start_Measurement_Reelapse_Timer();
 
-				//start TIM3 from 0 with CCR loaded with TIM2_ch1_input_capture_value
-				//CCR shouldn't be preloaded so *should* update instantaneously
-				__HAL_TIM_SET_COUNTER(&htim3, 0);
-				__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, interrupt_period); //measured value divided by 512
-				Start_OC_TIM(&htim3, TIM_CHANNEL_1);
+			//set I/P capture measurement re-elapse is ongoing flag
+			Set_Status_Bit(&statuses, Input_Capture_Measurement_Reelapse_Is_Ongoing);
 
-				//set I/P capture measurement re-elapse is ongoing flag
-				Set_Status_Bit(&statuses, Input_Capture_Measurement_Reelapse_Is_Ongoing);
-
-				//begin processing
-				Set_Status_Bit(&statuses, Input_Capture_Processing_Can_Be_Started);
-			}
+			//begin processing
+			Set_Status_Bit(&statuses, Input_Capture_Processing_Can_Be_Started);
 		}
 	}
 }
+
 
 void TIM2_ch1_overflow_callback(TIM_HandleTypeDef *htim){
 
@@ -168,10 +141,7 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
 	if((GPIO_Pin == CLK_IN_Pin)){ //if specifically CLK IN pin with falling interrupt
 
 		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1);
-
 		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
-
-		//Start_OC_TIM(&htim17, TIM_CHANNEL_1);
 	}
 }
 
@@ -181,22 +151,18 @@ void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
 
 		//Set SW OUT
 		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
-
 		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
-
-		//Start_OC_TIM(&htim17, TIM_CHANNEL_1);
 
 		if(state == STATE_2){
 
-			__HAL_TIM_SET_COUNTER(&htim14, 0);
+			Reset_Timeout_Timer();
 
 		}
-		else if(state == STATE_0){
+		else{
 
 			state = STATE_2;
 
-			__HAL_TIM_SET_COUNTER(&htim14, 0);
-			Start_OC_TIM(&htim14, TIM_CHANNEL_1);
+			Start_Timeout_Timer();
 		}
 	}
 }
@@ -211,17 +177,13 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 		state = STATE_1;
 
-		Stop_OC_TIM(&htim14, TIM_CHANNEL_1); //stop checking for timeout
+		Stop_Timeout_Timer();
+		Clear_Status_Bit(&statuses, IP_CAP_Events_Detection_Timeout);
 	}
 
 	//don't add conditional for STATE_0
 
-	if(Get_Status_Bit(&statuses, IP_CAP_Events_Detection_Timeout) == YES && (state == STATE_2)){
-
-		Speed_Pot_Check(&params);
-	}
-
-	if(state == STATE_1){
+	if((Get_Status_Bit(&statuses, IP_CAP_Events_Detection_Timeout) == YES && (state == STATE_2)) || (state == STATE_1)){
 
 		Speed_Pot_Check(&params);
 	}
@@ -265,17 +227,7 @@ void TIM17_callback(TIM_HandleTypeDef *htim){
 
 void TIM14_callback(TIM_HandleTypeDef *htim){
 
-	Stop_OC_TIM(&htim14, TIM_CHANNEL_1);
+	Stop_Timeout_Timer();
 
 	Set_Status_Bit(&statuses, IP_CAP_Events_Detection_Timeout);
-
-	//DEBUG
-	/*Stop_OC_TIM(&htim14, TIM_CHANNEL_1);
-
-	HAL_GPIO_TogglePin(MONITOR_GPIO_Port, MONITOR_Pin);
-
-	__HAL_TIM_SET_COUNTER(&htim14, 0);
-
-	Start_OC_TIM(&htim14, TIM_CHANNEL_1);*/
-
 }

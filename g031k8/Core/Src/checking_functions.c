@@ -89,3 +89,27 @@ uint8_t Check_Tap_Tempo_Switch_State(volatile struct Tap_Tempo_Switch_States *ta
 
 	return 1;
 }
+
+uint8_t Start_Timeout_Timer(void){
+
+	__HAL_TIM_SET_COUNTER(&htim14, 0);
+	Start_OC_TIM(&htim14, TIM_CHANNEL_1);
+
+	return 1;
+}
+
+uint8_t Reset_Timeout_Timer(void){
+
+	__HAL_TIM_SET_COUNTER(&htim14, 0);
+
+	return 1;
+}
+
+uint8_t Stop_Timeout_Timer(void){
+
+	Stop_OC_TIM(&htim14, TIM_CHANNEL_1);
+
+	return 1;
+}
+
+

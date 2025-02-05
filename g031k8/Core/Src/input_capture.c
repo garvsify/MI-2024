@@ -77,3 +77,19 @@ uint8_t Copy_Params_Structs(struct Params *src_ptr, struct Params *dst_ptr){
 	return 1;
 }
 
+uint8_t Start_Measurement_Reelapse_Timer(void){
+
+	__HAL_TIM_SET_COUNTER(&htim3, 0);
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, interrupt_period);
+	Start_OC_TIM(&htim3, TIM_CHANNEL_1);
+
+	return 1;
+}
+
+uint8_t Begin_Input_Capture_Measurement(void){
+
+	__HAL_TIM_SET_COUNTER(&htim2, 0); //begin measurement
+
+	return 1;
+}
+
