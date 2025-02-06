@@ -169,15 +169,11 @@ void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
 
 void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
-	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
-
 	static volatile struct Tap_Tempo_Switch_States tap_tempo_switch_states = {0};
 
 	if((state == STATE_0) && (uint8_t)HAL_GPIO_ReadPin(SW_IN_GPIO_Port, SW_IN_Pin) == 0){ //can only go into state 1 if no other 'ip cap' source is active
 
 		state = STATE_1;
-
-		Stop_Timeout_Timer();
 		Clear_Status_Bit(&statuses, IP_CAP_Events_Detection_Timeout);
 	}
 
@@ -212,9 +208,6 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 	//SET PREVIOUS STATE TO CURRENT STATE
 	//tap_tempo_switch_states.tap_tempo_switch_prev_state = tap_tempo_switch_states.tap_tempo_switch_state;
 
-
-	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
-
 	//SET TIMER TRIGGER
 	HAL_LPTIM_SetOnce_Start_IT(&hlptim1, LPTIM1_CCR_CHECK, LPTIM1_CCR_CHECK);
 
@@ -228,6 +221,5 @@ void TIM17_callback(TIM_HandleTypeDef *htim){
 void TIM14_callback(TIM_HandleTypeDef *htim){
 
 	Stop_Timeout_Timer();
-
 	Set_Status_Bit(&statuses, IP_CAP_Events_Detection_Timeout);
 }

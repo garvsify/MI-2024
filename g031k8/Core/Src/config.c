@@ -623,7 +623,7 @@ void MX_GPIO_Init(void)
 
   /*Configure GPIO pin : SW_IN_Pin */
   GPIO_InitStruct.Pin = SW_IN_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(SW_IN_GPIO_Port, &GPIO_InitStruct);
 
