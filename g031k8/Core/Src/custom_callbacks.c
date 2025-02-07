@@ -171,11 +171,30 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 	static volatile struct Tap_Tempo_Switch_States tap_tempo_switch_states = {0};
 
-	if((state == STATE_0) && (uint8_t)HAL_GPIO_ReadPin(SW_IN_GPIO_Port, SW_IN_Pin) == 0){ //can only go into state 1 if no other 'ip cap' source is active
+	//TO STATE 1 TRANSITIONS
+
+	if((state == STATE_0) && ((uint8_t)HAL_GPIO_ReadPin(SW_IN_GPIO_Port, SW_IN_Pin) == 0)){
+
+		state = STATE_1;
+	}
+
+	else if((state == STATE_2) && ((uint8_t)HAL_GPIO_ReadPin(SW_IN_GPIO_Port, SW_IN_Pin) == 0) && (Get_Status_Bit(&statuses, IP_CAP_Events_Detection_Timeout) == YES)){
 
 		state = STATE_1;
 		Clear_Status_Bit(&statuses, IP_CAP_Events_Detection_Timeout);
 	}
+
+	else if((state == STATE_3) && ((uint8_t)HAL_GPIO_ReadPin(SW_IN_GPIO_Port, SW_IN_Pin) == 0) && (Get_Status_Bit(&statuses, IP_CAP_Events_Detection_Timeout) == YES)){
+
+		state = STATE_1;
+		Clear_Status_Bit(&statuses, IP_CAP_Events_Detection_Timeout);
+	}
+
+
+
+
+
+
 
 	//don't add conditional for STATE_0
 
