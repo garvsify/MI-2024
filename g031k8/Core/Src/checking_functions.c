@@ -32,7 +32,7 @@ uint8_t Speed_Pot_Check(struct Params* params_ptr){
 			if(first_speed_measurement - second_speed_measurement > SPEED_TOLERANCE){
 
 				speed_fsm.prev_state = speed_fsm.current_state;
-				speed_fsm.current_state = SPEED_MANUAL;
+				speed_fsm.current_state.shared_state = MANUAL_MODE;
 				Clear_Status_Bit(&statuses, First_Sync_Complete);
 			}
 		}
@@ -41,7 +41,7 @@ uint8_t Speed_Pot_Check(struct Params* params_ptr){
 			if(second_speed_measurement - first_speed_measurement > SPEED_TOLERANCE){
 
 				speed_fsm.prev_state = speed_fsm.current_state;
-				speed_fsm.current_state = SPEED_MANUAL;
+				speed_fsm.current_state.shared_state = MANUAL_MODE;
 				Clear_Status_Bit(&statuses, First_Sync_Complete);
 			}
 		}

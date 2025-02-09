@@ -12,28 +12,36 @@ volatile extern struct Normal_FSM waveshape_fsm;
 volatile extern struct Normal_FSM symmetry_fsm;
 volatile extern struct Normal_FSM phase_fsm;
 volatile extern struct IP_CAP_FSM IP_CAP_fsm;
+volatile extern enum MIDI_CLK_FSM_State MIDI_CLK_FSM_state;
 
-enum Speed_FSM_States{
+enum MIDI_CLK_FSM_State{
 
-	SPEED_MANUAL,
-	SPEED_CC,
-	SPEED_PC,
-	SPEED_TAP,
-	SPEED_TAP_PENDING,
-	SPEED_CLK_IN,
-	SPEED_CLK_IN_PENDING,
-	SPEED_MIDI_CLK,
-	SPEED_MIDI_CLK_PENDING,
-	SPEED_NONE //startup only
-
+	NOT_COMPILING,
+	COMPILING
 };
 
-enum Normal_FSM_States{
+enum Speed_Exclusive_FSM_States{
 
-	NORMAL_MANUAL,
-	NORMAL_CC,
-	NORMAL_PC,
-	NORMAL_NONE //startup only
+	TAP_MODE = 4,
+	TAP_PENDING_MODE = 5,
+	CLK_IN_MODE = 6,
+	CLK_IN_PENDING_MODE = 7,
+	MIDI_CLK_MODE = 8,
+	MIDI_CLK_PENDING_MODE = 9
+};
+
+enum Shared_FSM_States{
+
+	MANUAL_MODE = 1,
+	CC_MODE = 2,
+	PC_MODE = 3,
+	NONE = 0 //startup only
+};
+
+union Speed_FSM_States{
+
+	enum Speed_Exclusive_FSM_States speed_exclusive_state;
+	enum Shared_FSM_States shared_state;
 };
 
 enum IP_CAP_FSM_States{
@@ -47,14 +55,14 @@ enum IP_CAP_FSM_States{
 
 struct Speed_FSM{
 
-	enum Speed_FSM_States current_state;
-	enum Speed_FSM_States prev_state;
+	union Speed_FSM_States current_state;
+	union Speed_FSM_States prev_state;
 };
 
 struct Normal_FSM{
 
-	enum Normal_FSM_States current_state;
-	enum Normal_FSM_States prev_state;
+	enum Shared_FSM_States current_state;
+	enum Shared_FSM_States prev_state;
 };
 
 struct IP_CAP_FSM{

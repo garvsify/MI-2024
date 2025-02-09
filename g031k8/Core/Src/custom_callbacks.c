@@ -106,10 +106,10 @@ void TIM2_ch1_overflow_callback(TIM_HandleTypeDef *htim){
 		IP_CAP_fsm.prev_state = MEASUREMENT_PENDING;
 	}
 
-	if((speed_fsm.current_state == SPEED_TAP_PENDING) || (speed_fsm.current_state == SPEED_CLK_IN_PENDING) || (speed_fsm.current_state == SPEED_MIDI_CLK_PENDING)){
+	if((speed_fsm.current_state.speed_exclusive_state == TAP_PENDING_MODE) || (speed_fsm.current_state.speed_exclusive_state == CLK_IN_PENDING_MODE) || (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_MODE)){
 
-		speed_fsm.current_state = speed_fsm.prev_state;
-		speed_fsm.prev_state = SPEED_CLK_IN_PENDING;
+		speed_fsm.current_state.speed_exclusive_state = speed_fsm.prev_state.speed_exclusive_state;
+		speed_fsm.prev_state.speed_exclusive_state = CLK_IN_PENDING_MODE;
 	}
 }
 
@@ -150,20 +150,25 @@ void UART2_TX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
 void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
-	if(rx_buffer[0] == 'y'){
+	/*if(rx_buffer[0] == 'y'){
 
 		params.final_prescaler = 64;
 		params.final_start_value = 127;
 		rx_buffer[0] = 0;
 	}
-	HAL_UART_Receive_DMA(&huart2, (uint8_t*)rx_buffer, sizeof(rx_buffer));
+	HAL_UART_Receive_DMA(&huart2, (uint8_t*)rx_buffer, sizeof(rx_buffer));*/
+
+	if(MIDI_CLK_FSM_state == NOT_COMPILING){
+
+
+	}
 }
 
 void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
 
 	if((GPIO_Pin == CLK_IN_Pin)){ //if specifically CLK IN pin with falling interrupt
 
-		if(speed_fsm.current_state == SPEED_CLK_IN){
+		if(speed_fsm.current_state.speed_exclusive_state == CLK_IN_MODE){
 
 			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1);
 			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
@@ -175,41 +180,41 @@ void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
 
 	if((GPIO_Pin == CLK_IN_Pin)){ //if specifically CLK IN pin with rising interrupt
 
-		if(speed_fsm.current_state == SPEED_MANUAL){
+		if(speed_fsm.current_state.shared_state == MANUAL_MODE){
 
 			//Set SW OUT
 			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
 			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
 
-			speed_fsm.prev_state = SPEED_MANUAL;
-			speed_fsm.current_state = SPEED_CLK_IN_PENDING;
+			speed_fsm.prev_state.shared_state = MANUAL_MODE;
+			speed_fsm.current_state.speed_exclusive_state = CLK_IN_PENDING_MODE;
 		}
-		else if(speed_fsm.current_state == SPEED_PC){
+		else if(speed_fsm.current_state.shared_state == PC_MODE){
 
 			//Set SW OUT
 			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
 			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
 
-			speed_fsm.prev_state = SPEED_PC;
-			speed_fsm.current_state = SPEED_CLK_IN_PENDING;
+			speed_fsm.prev_state.shared_state = PC_MODE;
+			speed_fsm.current_state.speed_exclusive_state = CLK_IN_PENDING_MODE;
 		}
-		else if(speed_fsm.current_state == SPEED_CC){
+		else if(speed_fsm.current_state.shared_state == CC_MODE){
 
 			//Set SW OUT
 			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
 			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
 
-			speed_fsm.prev_state = SPEED_CC;
-			speed_fsm.current_state = SPEED_CLK_IN_PENDING;
+			speed_fsm.prev_state.shared_state = CC_MODE;
+			speed_fsm.current_state.speed_exclusive_state = CLK_IN_PENDING_MODE;
 		}
-		else if((speed_fsm.current_state == SPEED_TAP) && (IP_CAP_fsm.current_state == IDLE)){
+		else if((speed_fsm.current_state.speed_exclusive_state == TAP_MODE) && (IP_CAP_fsm.current_state == IDLE)){
 
 			//Set SW OUT
 			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
 			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
 
-			speed_fsm.prev_state = SPEED_TAP;
-			speed_fsm.current_state = SPEED_CLK_IN_PENDING;
+			speed_fsm.prev_state.speed_exclusive_state = TAP_MODE;
+			speed_fsm.current_state.speed_exclusive_state = CLK_IN_PENDING_MODE;
 		}
 		//DON'T COMMENT BACK IN - IN THIS CONDITION WE DON'T WANT TO CHANGE STATE
 		/*else if(speed_fsm.current_state == SPEED_CLK_IN){
@@ -221,21 +226,21 @@ void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
 			speed_fsm.prev_state = SPEED_CLK_IN;
 			speed_fsm.current_state == SPEED_CLK_IN_PENDING;
 		}*/
-		else if((speed_fsm.current_state == SPEED_MIDI_CLK) && (IP_CAP_fsm.current_state == IDLE)){
+		else if((speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_MODE) && (IP_CAP_fsm.current_state == IDLE)){
 
 			//Set SW OUT
 			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
 			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
 
-			speed_fsm.prev_state = SPEED_MIDI_CLK;
-			speed_fsm.current_state = SPEED_CLK_IN_PENDING;
+			speed_fsm.prev_state.speed_exclusive_state = MIDI_CLK_MODE;
+			speed_fsm.current_state.speed_exclusive_state = CLK_IN_PENDING_MODE;
 		}
 
 		//IF ALREADY IN PENDING MODE, CHECK FOR SECOND EDGE
-		else if(speed_fsm.current_state == SPEED_CLK_IN_PENDING){ //second edge
+		else if(speed_fsm.current_state.speed_exclusive_state == CLK_IN_PENDING_MODE){ //second edge
 
-			speed_fsm.prev_state = SPEED_CLK_IN_PENDING;
-			speed_fsm.current_state = SPEED_CLK_IN;
+			speed_fsm.prev_state.speed_exclusive_state = CLK_IN_PENDING_MODE;
+			speed_fsm.current_state.speed_exclusive_state = CLK_IN_MODE;
 		}
 	}
 }
@@ -248,34 +253,34 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 	uint8_t pin_state = (uint8_t)HAL_GPIO_ReadPin(SW_IN_GPIO_Port, SW_IN_Pin);
 
-	if((speed_fsm.current_state == SPEED_MANUAL) && (pin_state == 0)){
+	if((speed_fsm.current_state.shared_state == MANUAL_MODE) && (pin_state == 0)){
 
-		speed_fsm.current_state = SPEED_TAP_PENDING;
-		speed_fsm.prev_state = SPEED_MANUAL;
+		speed_fsm.current_state.speed_exclusive_state = TAP_PENDING_MODE;
+		speed_fsm.prev_state.shared_state = MANUAL_MODE;
 	}
-	else if((speed_fsm.current_state == SPEED_CC) && (pin_state == 0)){
+	else if((speed_fsm.current_state.shared_state == CC_MODE) && (pin_state == 0)){
 
-		speed_fsm.current_state = SPEED_TAP_PENDING;
-		speed_fsm.prev_state = SPEED_CC;
+		speed_fsm.current_state.speed_exclusive_state = TAP_PENDING_MODE;
+		speed_fsm.prev_state.shared_state = CC_MODE;
 	}
-	else if((speed_fsm.current_state == SPEED_PC) && (pin_state == 0)){
+	else if((speed_fsm.current_state.shared_state == PC_MODE) && (pin_state == 0)){
 
-		speed_fsm.current_state = SPEED_TAP_PENDING;
-		speed_fsm.prev_state = SPEED_PC;
+		speed_fsm.current_state.speed_exclusive_state = TAP_PENDING_MODE;
+		speed_fsm.prev_state.shared_state = PC_MODE;
 	}
-	else if((speed_fsm.current_state == SPEED_CLK_IN) && (pin_state == 0) && IP_CAP_fsm.current_state == IDLE){
+	else if((speed_fsm.current_state.speed_exclusive_state == CLK_IN_MODE) && (pin_state == 0) && IP_CAP_fsm.current_state == IDLE){
 
-		speed_fsm.current_state = SPEED_TAP_PENDING;
-		speed_fsm.prev_state = SPEED_CLK_IN;
+		speed_fsm.current_state.speed_exclusive_state = TAP_PENDING_MODE;
+		speed_fsm.prev_state.speed_exclusive_state = CLK_IN_MODE;
 	}
-	else if((speed_fsm.current_state == SPEED_MIDI_CLK) && (pin_state == 0) && IP_CAP_fsm.current_state == IDLE){
+	else if((speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_MODE) && (pin_state == 0) && IP_CAP_fsm.current_state == IDLE){
 
-		speed_fsm.current_state = SPEED_TAP_PENDING;
-		speed_fsm.prev_state = SPEED_MIDI_CLK;
+		speed_fsm.current_state.speed_exclusive_state = TAP_PENDING_MODE;
+		speed_fsm.prev_state.speed_exclusive_state = MIDI_CLK_MODE;
 	}
 
 	//CHECK TAP TEMPO STATE
-	if((speed_fsm.current_state == SPEED_TAP_PENDING) || (speed_fsm.current_state == SPEED_TAP)){
+	if((speed_fsm.current_state.speed_exclusive_state == TAP_PENDING_MODE) || (speed_fsm.current_state.speed_exclusive_state == TAP_MODE)){
 
 		Check_Tap_Tempo_Switch_State(&tap_tempo_switch_states);
 
@@ -300,19 +305,19 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 
 	//PERFORM SPEED POT CHECKING
-	if((speed_fsm.current_state == SPEED_PC) || (speed_fsm.current_state == SPEED_CC)){
+	if((speed_fsm.current_state.shared_state == PC_MODE) || (speed_fsm.current_state.shared_state == CC_MODE)){
 
 		Speed_Pot_Check(&params);
 	}
-	else if((speed_fsm.current_state == SPEED_CLK_IN) && (IP_CAP_fsm.current_state == IDLE)){
+	else if((speed_fsm.current_state.speed_exclusive_state == CLK_IN_MODE) && (IP_CAP_fsm.current_state == IDLE)){
 
 		Speed_Pot_Check(&params);
 	}
-	else if((speed_fsm.current_state == SPEED_MIDI_CLK) && (IP_CAP_fsm.current_state == IDLE)){
+	else if((speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_MODE) && (IP_CAP_fsm.current_state == IDLE)){
 
 		Speed_Pot_Check(&params);
 	}
-	else if((speed_fsm.current_state == SPEED_TAP) && (IP_CAP_fsm.current_state == IDLE)){
+	else if((speed_fsm.current_state.speed_exclusive_state == TAP_MODE) && (IP_CAP_fsm.current_state == IDLE)){
 
 		Speed_Pot_Check(&params);
 	}
