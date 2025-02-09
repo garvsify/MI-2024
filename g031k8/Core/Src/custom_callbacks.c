@@ -230,6 +230,8 @@ void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
 			speed_fsm.prev_state = SPEED_MIDI_CLK;
 			speed_fsm.current_state = SPEED_CLK_IN_PENDING;
 		}
+
+		//IF ALREADY PENDING MODE, CHECK FOR SECOND EDGE
 		else if(speed_fsm.current_state == SPEED_CLK_IN_PENDING){ //second edge
 
 			speed_fsm.prev_state = SPEED_CLK_IN_PENDING;
@@ -242,40 +244,38 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 	static volatile struct Tap_Tempo_Switch_States tap_tempo_switch_states = {0};
 
-	//TO STATE 1 TRANSITIONS
+	//CHECK IF NEED TO TAP_PENDING TRANSITION
 
-	if((state == STATE_0) && ((uint8_t)HAL_GPIO_ReadPin(SW_IN_GPIO_Port, SW_IN_Pin) == 0)){
+	uint8_t pin_state = (uint8_t)HAL_GPIO_ReadPin(SW_IN_GPIO_Port, SW_IN_Pin);
 
-		state = STATE_1;
+	if((speed_fsm.current_state == SPEED_MANUAL) && (pin_state == 0)){
+
+		speed_fsm.current_state = SPEED_TAP_PENDING;
+		speed_fsm.prev_state = SPEED_MANUAL;
+	}
+	else if((speed_fsm.current_state == SPEED_CC) && (pin_state == 0)){
+
+		speed_fsm.current_state = SPEED_TAP_PENDING;
+		speed_fsm.prev_state = SPEED_CC;
+	}
+	else if((speed_fsm.current_state == SPEED_PC) && (pin_state == 0)){
+
+		speed_fsm.current_state = SPEED_TAP_PENDING;
+		speed_fsm.prev_state = SPEED_PC;
+	}
+	else if((speed_fsm.current_state == SPEED_CLK_IN) && (pin_state == 0) && IP_CAP_fsm.current_state == IDLE){
+
+		speed_fsm.current_state = SPEED_TAP_PENDING;
+		speed_fsm.prev_state = SPEED_CLK_IN;
+	}
+	else if((speed_fsm.current_state == SPEED_MIDI_CLK) && (pin_state == 0) && IP_CAP_fsm.current_state == IDLE){
+
+		speed_fsm.current_state = SPEED_TAP_PENDING;
+		speed_fsm.prev_state = SPEED_MIDI_CLK;
 	}
 
-	else if((state == STATE_2) && ((uint8_t)HAL_GPIO_ReadPin(SW_IN_GPIO_Port, SW_IN_Pin) == 0) && (Get_Status_Bit(&statuses, IP_CAP_Events_Detection_Timeout) == YES)){
-
-		state = STATE_1;
-		Clear_Status_Bit(&statuses, IP_CAP_Events_Detection_Timeout);
-	}
-
-	else if((state == STATE_3) && ((uint8_t)HAL_GPIO_ReadPin(SW_IN_GPIO_Port, SW_IN_Pin) == 0) && (Get_Status_Bit(&statuses, IP_CAP_Events_Detection_Timeout) == YES)){
-
-		state = STATE_1;
-		Clear_Status_Bit(&statuses, IP_CAP_Events_Detection_Timeout);
-	}
-
-
-
-
-
-
-
-	//don't add conditional for STATE_0
-
-	if((Get_Status_Bit(&statuses, IP_CAP_Events_Detection_Timeout) == YES && (state == STATE_2)) || (state == STATE_1)){
-
-		Speed_Pot_Check(&params);
-	}
-
-
-	if(state == STATE_1){
+	//CHECK TAP TEMPO STATE
+	if((speed_fsm.current_state == SPEED_TAP_PENDING) || (speed_fsm.current_state == SPEED_TAP)){
 
 		Check_Tap_Tempo_Switch_State(&tap_tempo_switch_states);
 
@@ -297,6 +297,25 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 	//SET PREVIOUS STATE TO CURRENT STATE
 	//tap_tempo_switch_states.tap_tempo_switch_prev_state = tap_tempo_switch_states.tap_tempo_switch_state;
+
+
+	//PERFORM SPEED POT CHECKING
+	if((speed_fsm.current_state == SPEED_PC) || (speed_fsm.current_state == SPEED_CC)){
+
+		Speed_Pot_Check(&params);
+	}
+	else if((speed_fsm.current_state == SPEED_CLK_IN) && (IP_CAP_fsm.current_state == IDLE)){
+
+		Speed_Pot_Check(&params);
+	}
+	else if((speed_fsm.current_state == SPEED_MIDI_CLK) && (IP_CAP_fsm.current_state == IDLE)){
+
+		Speed_Pot_Check(&params);
+	}
+	else if((speed_fsm.current_state == SPEED_TAP) && (IP_CAP_fsm.current_state == IDLE)){
+
+		Speed_Pot_Check(&params);
+	}
 
 	//SET TIMER TRIGGER
 	HAL_LPTIM_SetOnce_Start_IT(&hlptim1, LPTIM1_CCR_CHECK, LPTIM1_CCR_CHECK);
