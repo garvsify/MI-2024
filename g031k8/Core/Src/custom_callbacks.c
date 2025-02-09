@@ -52,19 +52,15 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 	//period = z/512 as the 'elapse period value' if we also set the elapse timer prescaler to 512x less than the
 	//input capture measurement timer
 
-	if(input_capture_event == FIRST){ //edge detected is the first
+
+	if(IP_CAP_fsm.current_state == IDLE){
 
 		Begin_Input_Capture_Measurement();
-
-		Set_Status_Bit(&statuses, Input_Capture_Measurement_Is_Ongoing);
-
-		input_capture_event = SECOND;
+		IP_CAP_fsm.current_state = MEASUREMENT_PENDING;
+		IP_CAP_fsm.prev_state = IDLE;
 	}
-	else{ //is second
 
-		input_capture_event = FIRST; //reset event name
-
-		Clear_Status_Bit(&statuses, Input_Capture_Measurement_Is_Ongoing);
+	else if(IP_CAP_fsm.current_state == MEASUREMENT_PENDING){ //second edge
 
 		if(interrupt_period >= HIGHEST_PRESCALER_TOP_SPEED_PERIOD){ //if the captured value/512 is >= than 129
 
@@ -72,41 +68,63 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 
 			Start_Measurement_Reelapse_Timer();
 
-			//set I/P capture measurement re-elapse is ongoing flag
-			Set_Status_Bit(&statuses, Input_Capture_Measurement_Reelapse_Is_Ongoing);
+			IP_CAP_fsm.current_state = MEASUREMENT_REELAPSE;
+			IP_CAP_fsm.prev_state = MEASUREMENT_PENDING;
 
-			//begin processing
+			//BEGIN PROCESSING
 			Set_Status_Bit(&statuses, Input_Capture_Processing_Can_Be_Started);
 		}
+		else{
+
+			IP_CAP_fsm.current_state = IDLE;
+			IP_CAP_fsm.prev_state = MEASUREMENT_PENDING;
+		}
+	}
+
+	else if(IP_CAP_fsm.current_state == MEASUREMENT_REELAPSE){ //first edge
+
+		Begin_Input_Capture_Measurement();
+
+		IP_CAP_fsm.current_state = MEASUREMENT_REELAPSE_AND_MEASUREMENT_PENDING;
+		IP_CAP_fsm.prev_state = MEASUREMENT_REELAPSE;
+	}
+
+	else if(IP_CAP_fsm.current_state == MEASUREMENT_REELAPSE_AND_MEASUREMENT_PENDING){ //second edge
+
+		Start_Measurement_Reelapse_Timer();
+
+		IP_CAP_fsm.current_state = MEASUREMENT_PENDING;
+		IP_CAP_fsm.prev_state = MEASUREMENT_REELAPSE_AND_MEASUREMENT_PENDING;
 	}
 }
 
 
 void TIM2_ch1_overflow_callback(TIM_HandleTypeDef *htim){
 
-	if(Get_Status_Bit(&statuses, Input_Capture_Measurement_Is_Ongoing) == YES && input_capture_event == SECOND){
+	if(IP_CAP_fsm.current_state == MEASUREMENT_PENDING){
 
-		//overflow has occurred at a time when an input capture measurement is occurring, which means input capture event would have been the second if it it did occur.
-		//This means that the user has depressed the switch once, and hasn't pressed again within the timeout period.
-		//Thus, reset everything requiring the user to press the switch again to start another capture
-
-		Clear_Status_Bit(&statuses, Input_Capture_Measurement_Is_Ongoing);
-		input_capture_event = FIRST;
+		IP_CAP_fsm.current_state = IDLE;
+		IP_CAP_fsm.prev_state = MEASUREMENT_PENDING;
 	}
 }
 
 void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
-
-	//force update of timers to sync the wave to the TIM3 reelapse interrupt
-
-	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
 
 	// @TODO //WRITE CODE TO LOAD CORRECT DUTY DELAYED VALUE TO SECONDARY OSCILLATOR
 	Set_Oscillator_Values(&params_to_be_loaded);
 
 	Stop_OC_TIM(&htim3, TIM_CHANNEL_1);
 
-	Clear_Status_Bit(&statuses, Input_Capture_Measurement_Reelapse_Is_Ongoing);
+	if(IP_CAP_fsm.current_state == MEASUREMENT_REELAPSE){
+
+		IP_CAP_fsm.current_state = IDLE;
+		IP_CAP_fsm.prev_state = MEASUREMENT_REELAPSE;
+	}
+	else if(IP_CAP_fsm.current_state == MEASUREMENT_REELAPSE_AND_MEASUREMENT_PENDING){
+
+		IP_CAP_fsm.current_state = MEASUREMENT_REELAPSE;
+		IP_CAP_fsm.prev_state = MEASUREMENT_REELAPSE_AND_MEASUREMENT_PENDING;
+	}
 
 	Copy_Params_Structs(&params_to_be_loaded, &params_working);
 	Copy_Params_Structs(&params_to_be_loaded, &params);

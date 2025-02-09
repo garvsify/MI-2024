@@ -17,7 +17,7 @@
 #include "timers.h"
 #include "tap_tempo.h"
 #include "CLK_IN.h"
-#include "speed_control_state_machine.h"
+#include <state_machine.h>
 
 //CUSTOM TYPES
 

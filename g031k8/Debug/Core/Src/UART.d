@@ -43,8 +43,8 @@ Core/Src/UART.o: ../Core/Src/UART.c ../Core/Inc/UART.h \
  ../Core/Inc/oscillator_params_type.h ../Core/Inc/timers.h \
  ../Core/Inc/oscillator_macros.h ../Core/Inc/startup.h \
  ../Core/Inc/checking_functions.h ../Core/Inc/speed_pot_check.h \
- ../Core/Inc/tap_tempo.h ../Core/Inc/CLK_IN.h \
- ../Core/Inc/speed_control_state_machine.h ../Core/Inc/UART.h
+ ../Core/Inc/tap_tempo.h ../Core/Inc/CLK_IN.h ../Core/Inc/state_machine.h \
+ ../Core/Inc/UART.h
 ../Core/Inc/UART.h:
 ../Core/Inc/config.h:
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal.h:
@@ -99,5 +99,5 @@ Core/Src/UART.o: ../Core/Src/UART.c ../Core/Inc/UART.h \
 ../Core/Inc/speed_pot_check.h:
 ../Core/Inc/tap_tempo.h:
 ../Core/Inc/CLK_IN.h:
-../Core/Inc/speed_control_state_machine.h:
+../Core/Inc/state_machine.h:
 ../Core/Inc/UART.h:
