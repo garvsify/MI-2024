@@ -1,26 +1,11 @@
 /*NOTES ON THIS BUILD:
 
-Kinda works! Can lock frequencies in range of 1-15Hz, with not so much obvious error seen on the scope, i.e. there being a jump in the index upon sync
-because of a inaccurate frequerncy.
-
-Issues:
-- Square mode is locking to the 'SINE_OR_TRI' perceived apex indexes
--Tap tempo has stopped working?
-
-Improvements in the build:
-- Have made all the status bits part of 1 uint32_t and all flags are just specific bits of that integer :)
-- Making CLK_IN interrupt driven works absolute wonders on the accuracy of the frequency implemented by input capture, DO
-NOT BE TEMPTED TO MAKE CLK_IN NOT TRIGGERED BY INTERRUPTS.
-- Obvs leave tap tempo done by LPTIM checking
+NOT TESTED
 
 */
 
-//BOTH CLK AND TAP TEMPO NOT WORKING????
-
 //INCLUDES
 #include "main.h"
-
-//const char one_byte_data = 'j';
 
 volatile uint32_t statuses = 0; //set of all status bits (to reduce memory usage)
 

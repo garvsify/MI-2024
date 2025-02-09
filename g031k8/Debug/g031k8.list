@@ -27,27 +27,27 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  11 .ARM.attributes 00000028  00000000  00000000  00009420  2**0
                   CONTENTS, READONLY
- 12 .debug_info   00028689  00000000  00000000  00009448  2**0
+ 12 .debug_info   000285dc  00000000  00000000  00009448  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 13 .debug_abbrev 00004df6  00000000  00000000  00031ad1  2**0
+ 13 .debug_abbrev 00004df8  00000000  00000000  00031a24  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_aranges 00001380  00000000  00000000  000368c8  2**3
+ 14 .debug_aranges 00001380  00000000  00000000  00036820  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_rnglists 00001b84  00000000  00000000  00037c48  2**0
+ 15 .debug_rnglists 00001b84  00000000  00000000  00037ba0  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  00019e17  00000000  00000000  000397cc  2**0
+ 16 .debug_macro  00019e05  00000000  00000000  00039724  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   000287dd  00000000  00000000  000535e3  2**0
+ 17 .debug_line   000287db  00000000  00000000  00053529  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    0009fbf9  00000000  00000000  0007bdc0  2**0
+ 18 .debug_str    0009fac3  00000000  00000000  0007bd04  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000043  00000000  00000000  0011b9b9  2**0
+ 19 .comment      00000043  00000000  00000000  0011b7c7  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  000033d0  00000000  00000000  0011b9fc  2**2
+ 20 .debug_frame  000033d0  00000000  00000000  0011b80c  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_loclists 0000f204  00000000  00000000  0011edcc  2**0
+ 21 .debug_loclists 0000f204  00000000  00000000  0011ebdc  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 22 .debug_line_str 00000054  00000000  00000000  0012dfd0  2**0
+ 22 .debug_line_str 00000054  00000000  00000000  0012dde0  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -3098,8 +3098,8 @@ void TIM14_callback(TIM_HandleTypeDef *htim){
  8001256:	46c0      	nop			@ (mov r8, r8)
 
 08001258 <Input_Capture_Processing>:
+//VARIABLE DEFINITIONS
 volatile uint32_t TIM2_ch1_input_capture_value;
-
 volatile uint16_t interrupt_period = 0;
 
 //FUNCTION DEFINITIONS
@@ -3310,7 +3310,7 @@ uint8_t Begin_Input_Capture_Measurement(void){
  8001348:	200007a0 	.word	0x200007a0
 
 0800134c <main>:
-//const char one_byte_data = 'j';
+#include "main.h"
 
 volatile uint32_t statuses = 0; //set of all status bits (to reduce memory usage)
 

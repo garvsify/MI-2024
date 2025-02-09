@@ -1,9 +1,7 @@
 #include "input_capture.h"
 
 //VARIABLE DEFINITIONS
-volatile enum Input_Capture_Event input_capture_event = FIRST;
 volatile uint32_t TIM2_ch1_input_capture_value;
-
 volatile uint16_t interrupt_period = 0;
 
 //FUNCTION DEFINITIONS

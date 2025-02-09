@@ -231,7 +231,7 @@ void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
 			speed_fsm.current_state = SPEED_CLK_IN_PENDING;
 		}
 
-		//IF ALREADY PENDING MODE, CHECK FOR SECOND EDGE
+		//IF ALREADY IN PENDING MODE, CHECK FOR SECOND EDGE
 		else if(speed_fsm.current_state == SPEED_CLK_IN_PENDING){ //second edge
 
 			speed_fsm.prev_state = SPEED_CLK_IN_PENDING;

@@ -24,12 +24,9 @@ enum Validate{
 };
 
 enum Status_Bit{
-	Input_Capture_Measurement_Is_Ongoing = INPUT_CAPTURE_MEASUREMENT_IS_ONGOING,
-	Input_Capture_Measurement_Reelapse_Is_Ongoing = INPUT_CAPTURE_MEASUREMENT_REELAPSE_IS_ONGOING,
 	Input_Capture_Processing_Can_Be_Started = INPUT_CAPTURE_PROCESSING_CAN_BE_STARTED,
 	First_Sync_Complete = FIRST_SYNC_COMPLETE,
-	Initial_ADC_Conversion_Complete = INITIAL_ADC_CONVERSION_COMPLETE,
-	IP_CAP_Events_Detection_Timeout = IP_CAP_EVENTS_DETECTION_TIMEOUT
+	Initial_ADC_Conversion_Complete = INITIAL_ADC_CONVERSION_COMPLETE
 };
 
 //FUNCTION DECLARATIONS
