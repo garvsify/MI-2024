@@ -21,15 +21,14 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 
 	enum Validate first_sync_complete = Get_Status_Bit(&statuses, First_Sync_Complete);
 
-	if((state == STATE_0) || ((state != STATE_0) && first_sync_complete == NO)){
-
-		Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(&params);
-	}
-
-	else if((state != STATE_0) && (first_sync_complete == YES)){
+	if(first_sync_complete == YES){
 
 		params.raw_start_value = params_working.raw_start_value;
 		params.raw_prescaler = params_working.raw_prescaler;
+	}
+	else{
+
+		Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(&params);
 	}
 
 	Process_TIM16_Final_Start_Value_and_Final_Prescaler(&params);
@@ -106,6 +105,12 @@ void TIM2_ch1_overflow_callback(TIM_HandleTypeDef *htim){
 		IP_CAP_fsm.current_state = IDLE;
 		IP_CAP_fsm.prev_state = MEASUREMENT_PENDING;
 	}
+
+	if((speed_fsm.current_state == SPEED_TAP_PENDING) || (speed_fsm.current_state == SPEED_CLK_IN_PENDING) || (speed_fsm.current_state == SPEED_MIDI_CLK_PENDING)){
+
+		speed_fsm.current_state = speed_fsm.prev_state;
+		speed_fsm.prev_state = SPEED_CLK_IN_PENDING;
+	}
 }
 
 void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
@@ -122,7 +127,7 @@ void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
 	}
 	else if(IP_CAP_fsm.current_state == MEASUREMENT_REELAPSE_AND_MEASUREMENT_PENDING){
 
-		IP_CAP_fsm.current_state = MEASUREMENT_REELAPSE;
+		IP_CAP_fsm.current_state = MEASUREMENT_PENDING;
 		IP_CAP_fsm.prev_state = MEASUREMENT_REELAPSE_AND_MEASUREMENT_PENDING;
 	}
 
@@ -158,8 +163,11 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
 
 	if((GPIO_Pin == CLK_IN_Pin)){ //if specifically CLK IN pin with falling interrupt
 
-		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1);
-		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+		if(speed_fsm.current_state == SPEED_CLK_IN){
+
+			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1);
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+		}
 	}
 }
 
@@ -167,20 +175,65 @@ void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
 
 	if((GPIO_Pin == CLK_IN_Pin)){ //if specifically CLK IN pin with rising interrupt
 
-		//Set SW OUT
-		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
-		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+		if(speed_fsm.current_state == SPEED_MANUAL){
 
-		if(state == STATE_2){
+			//Set SW OUT
+			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
 
-			Reset_Timeout_Timer();
-
+			speed_fsm.prev_state = SPEED_MANUAL;
+			speed_fsm.current_state = SPEED_CLK_IN_PENDING;
 		}
-		else{
+		else if(speed_fsm.current_state == SPEED_PC){
 
-			state = STATE_2;
+			//Set SW OUT
+			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
 
-			Start_Timeout_Timer();
+			speed_fsm.prev_state = SPEED_PC;
+			speed_fsm.current_state = SPEED_CLK_IN_PENDING;
+		}
+		else if(speed_fsm.current_state == SPEED_CC){
+
+			//Set SW OUT
+			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+
+			speed_fsm.prev_state = SPEED_CC;
+			speed_fsm.current_state = SPEED_CLK_IN_PENDING;
+		}
+		else if((speed_fsm.current_state == SPEED_TAP) && (IP_CAP_fsm.current_state == IDLE)){
+
+			//Set SW OUT
+			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+
+			speed_fsm.prev_state = SPEED_TAP;
+			speed_fsm.current_state = SPEED_CLK_IN_PENDING;
+		}
+		//DON'T COMMENT BACK IN - IN THIS CONDITION WE DON'T WANT TO CHANGE STATE
+		/*else if(speed_fsm.current_state == SPEED_CLK_IN){
+
+			//Set SW OUT
+			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+
+			speed_fsm.prev_state = SPEED_CLK_IN;
+			speed_fsm.current_state == SPEED_CLK_IN_PENDING;
+		}*/
+		else if((speed_fsm.current_state == SPEED_MIDI_CLK) && (IP_CAP_fsm.current_state == IDLE)){
+
+			//Set SW OUT
+			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+
+			speed_fsm.prev_state = SPEED_MIDI_CLK;
+			speed_fsm.current_state = SPEED_CLK_IN_PENDING;
+		}
+		else if(speed_fsm.current_state == SPEED_CLK_IN_PENDING){ //second edge
+
+			speed_fsm.prev_state = SPEED_CLK_IN_PENDING;
+			speed_fsm.current_state = SPEED_CLK_IN;
 		}
 	}
 }
@@ -257,6 +310,5 @@ void TIM17_callback(TIM_HandleTypeDef *htim){
 
 void TIM14_callback(TIM_HandleTypeDef *htim){
 
-	Stop_Timeout_Timer();
-	Set_Status_Bit(&statuses, IP_CAP_Events_Detection_Timeout);
+
 }

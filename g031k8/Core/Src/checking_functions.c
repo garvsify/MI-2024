@@ -33,7 +33,6 @@ uint8_t Speed_Pot_Check(struct Params* params_ptr){
 
 				state = STATE_0;
 				Clear_Status_Bit(&statuses, First_Sync_Complete);
-				Clear_Status_Bit(&statuses, IP_CAP_Events_Detection_Timeout);
 			}
 		}
 		else if(second_speed_measurement > first_speed_measurement){
@@ -42,7 +41,6 @@ uint8_t Speed_Pot_Check(struct Params* params_ptr){
 
 				state = STATE_0;
 				Clear_Status_Bit(&statuses, First_Sync_Complete);
-				Clear_Status_Bit(&statuses, IP_CAP_Events_Detection_Timeout);
 			}
 		}
 	}
@@ -86,28 +84,6 @@ uint8_t Check_Tap_Tempo_Switch_State(volatile struct Tap_Tempo_Switch_States *ta
 
 		tap_tempo_switch_states_ptr->tap_tempo_switch_state = NOT_DEPRESSED;
 	}
-
-	return 1;
-}
-
-uint8_t Start_Timeout_Timer(void){
-
-	__HAL_TIM_SET_COUNTER(&htim14, 0);
-	Start_OC_TIM(&htim14, TIM_CHANNEL_1);
-
-	return 1;
-}
-
-uint8_t Reset_Timeout_Timer(void){
-
-	__HAL_TIM_SET_COUNTER(&htim14, 0);
-
-	return 1;
-}
-
-uint8_t Stop_Timeout_Timer(void){
-
-	Stop_OC_TIM(&htim14, TIM_CHANNEL_1);
 
 	return 1;
 }

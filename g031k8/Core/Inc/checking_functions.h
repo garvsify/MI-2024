@@ -26,8 +26,5 @@
 //FUNCTION DECLARATIONS
 uint8_t Speed_Pot_Check(struct Params* params_ptr);
 uint8_t Check_Tap_Tempo_Switch_State(volatile struct Tap_Tempo_Switch_States *tap_tempo_switch_states_ptr);
-uint8_t Start_Timeout_Timer(void);
-uint8_t Reset_Timeout_Timer(void);
-uint8_t Stop_Timeout_Timer(void);
 
 #endif /* INC_CHECKING_FUNCTIONS_H_ */
