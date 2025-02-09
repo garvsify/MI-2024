@@ -5,10 +5,7 @@
 
 #define MIDI_MS_NIBBLE_SHIFT 4
 
-extern struct MIDI_Message_Characteristics midi_channel_voice_control_change_msg;
-extern struct MIDI_Message_Characteristics midi_channel_voice_program_change_msg;
-extern struct MIDI_Message_Characteristics midi_system_exclusive_msg;
-extern struct MIDI_Message_Characteristics midi_system_real_time_msg;
+volatile extern uint8_t MIDI_CLK_tag;
 
 enum MIDI_Status_Byte{
 
@@ -26,7 +23,7 @@ enum MIDI_Status_Byte{
 	SYSTEM_EXCLUSIVE_END = 0xF7,
 
 	//SYSTEM COMMON
-	//SYSTEM_COMMON_MIDI_TIME_CODE_QUARTER_FRAME = 0xF1,
+	SYSTEM_COMMON_MIDI_TIME_CODE_QUARTER_FRAME = 0xF1,
 	//SYSTEM_COMMON_SONG_POSITION_POINTER = 0xF2,
 	//SYSTEM_COMMON_SONG_SELECT = 0xF3,
 	//SYSTEM_COMMON_TUNE_REQUEST = 0xF6,
@@ -41,19 +38,12 @@ enum MIDI_Status_Byte{
 };
 
 enum MIDI_Channel_Mode_Data_Byte_0{
-	LOCAL_CONTROL = 122, //not sure if needed?
+	LOCAL_CONTROL = 122,
 	//ALL_NOTES_OFF = 123,
 	OMNI_OFF = 124,
 	OMNI_ON = 125,
 	//MONO_ON = 126,
 	//POLY_ON = 127
-};
-
-struct MIDI_Message_Characteristics{
-	uint8_t num_status_bytes;
-	uint8_t num_data_bytes;
-	enum Validate has_channel_nibble;
-	enum Validate has_system_exclusive_end_byte;
 };
 
 #endif

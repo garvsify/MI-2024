@@ -104,12 +104,24 @@ void TIM2_ch1_overflow_callback(TIM_HandleTypeDef *htim){
 
 		IP_CAP_fsm.current_state = IDLE;
 		IP_CAP_fsm.prev_state = MEASUREMENT_PENDING;
-	}
 
-	if((speed_fsm.current_state.speed_exclusive_state == TAP_PENDING_MODE) || (speed_fsm.current_state.speed_exclusive_state == CLK_IN_PENDING_MODE) || (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_MODE)){
+		if((speed_fsm.current_state.speed_exclusive_state == TAP_PENDING_MODE) || (speed_fsm.current_state.speed_exclusive_state == CLK_IN_PENDING_MODE) || (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_MODE)){
 
-		speed_fsm.current_state.speed_exclusive_state = speed_fsm.prev_state.speed_exclusive_state;
-		speed_fsm.prev_state.speed_exclusive_state = CLK_IN_PENDING_MODE;
+			if(speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_MODE){
+
+				MIDI_CLK_FSM_state = NOT_COMPILING;
+				MIDI_CLK_tag = 0;
+			}
+
+			struct Speed_FSM current_state = speed_fsm.current_state;
+			speed_fsm.current_state = speed_fsm.prev_state;
+			speed_fsm.prev_state = current_state;
+		}
+		else if(speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_MODE){
+
+			MIDI_CLK_FSM_state = NOT_COMPILING;
+			MIDI_CLK_tag = 0;
+		}
 	}
 }
 
@@ -150,6 +162,48 @@ void UART2_TX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
 void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
+	if(*rx_buffer == SYSTEM_COMMON_MIDI_TIME_CODE_QUARTER_FRAME){
+
+		if(MIDI_CLK_FSM_state == NOT_COMPILING){
+
+			speed_fsm.prev_state = speed_fsm.current_state;
+			speed_fsm.current_state.speed_exclusive_state = MIDI_CLK_PENDING_MODE;
+
+			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+
+			MIDI_CLK_FSM_state = COMPILING;
+			MIDI_CLK_tag++;
+		}
+		else{
+
+			MIDI_CLK_tag++;
+
+			if(MIDI_CLK_tag < 12){
+
+				HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
+				HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+			}
+			else if(MIDI_CLK_tag < 25){
+
+				HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1);
+				HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+			}
+			else{
+
+				if(speed_fsm.current_state.speed_exclusive_state != MIDI_CLK_MODE){
+
+					speed_fsm.prev_state = speed_fsm.current_state;
+				}
+
+				speed_fsm.current_state.speed_exclusive_state = MIDI_CLK_MODE;
+
+				MIDI_CLK_tag = 1;
+			}
+		}
+		*rx_buffer = 0;
+	}
+
 	/*if(rx_buffer[0] == 'y'){
 
 		params.final_prescaler = 64;
@@ -157,11 +211,6 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 		rx_buffer[0] = 0;
 	}
 	HAL_UART_Receive_DMA(&huart2, (uint8_t*)rx_buffer, sizeof(rx_buffer));*/
-
-	if(MIDI_CLK_FSM_state == NOT_COMPILING){
-
-
-	}
 }
 
 void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){

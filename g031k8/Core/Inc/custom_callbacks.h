@@ -7,6 +7,7 @@
 #include <oscillator.h>
 #include <state_machine.h>
 #include "input_capture.h"
+#include "MIDI_defines.h"
 #include "UART.h"
 #include "debug.h"
 

@@ -3,6 +3,7 @@
 //VARIABLE DEFINITIONS
 volatile uint32_t TIM2_ch1_input_capture_value;
 volatile uint16_t interrupt_period = 0;
+volatile uint8_t MIDI_CLK_tag = 0;
 
 //FUNCTION DEFINITIONS
 uint8_t Input_Capture_Processing(volatile uint16_t interrupt_period_value, struct Params *params_ptr){

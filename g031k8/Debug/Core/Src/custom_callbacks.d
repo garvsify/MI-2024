@@ -46,7 +46,7 @@ Core/Src/custom_callbacks.o: ../Core/Src/custom_callbacks.c \
  ../Core/Inc/checking_functions.h ../Core/Inc/UART.h \
  ../Core/Inc/speed_pot_check.h ../Core/Inc/tap_tempo.h \
  ../Core/Inc/CLK_IN.h ../Core/Inc/state_machine.h \
- ../Core/Inc/oscillator.h ../Core/Inc/debug.h
+ ../Core/Inc/oscillator.h ../Core/Inc/MIDI_defines.h ../Core/Inc/debug.h
 ../Core/Inc/custom_callbacks.h:
 ../Core/Inc/checking_functions.h:
 ../Core/Inc/utility.h:
@@ -105,4 +105,5 @@ Core/Src/custom_callbacks.o: ../Core/Src/custom_callbacks.c \
 ../Core/Inc/CLK_IN.h:
 ../Core/Inc/state_machine.h:
 ../Core/Inc/oscillator.h:
+../Core/Inc/MIDI_defines.h:
 ../Core/Inc/debug.h:
