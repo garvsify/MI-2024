@@ -113,9 +113,9 @@ void TIM2_ch1_overflow_callback(TIM_HandleTypeDef *htim){
 				MIDI_CLK_tag = 0;
 			}
 
-			struct Speed_FSM current_state = speed_fsm.current_state;
+			enum Speed_Exclusive_FSM_States current_state = speed_fsm.current_state.speed_exclusive_state;
 			speed_fsm.current_state = speed_fsm.prev_state;
-			speed_fsm.prev_state = current_state;
+			speed_fsm.prev_state.speed_exclusive_state = current_state;
 		}
 		else if(speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_MODE){
 
@@ -157,7 +157,7 @@ void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
 
 void UART2_TX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
-	UART_DMA_TX_is_complete = YES;
+	//UART_DMA_TX_is_complete = YES;
 }
 
 void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
@@ -209,8 +209,8 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 		params.final_prescaler = 64;
 		params.final_start_value = 127;
 		rx_buffer[0] = 0;
-	}
-	HAL_UART_Receive_DMA(&huart2, (uint8_t*)rx_buffer, sizeof(rx_buffer));*/
+	}*/
+	HAL_UART_Receive_DMA(&huart2, (uint8_t*)rx_buffer, sizeof(rx_buffer));
 }
 
 void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
