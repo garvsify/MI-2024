@@ -253,7 +253,7 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
 
 	if((GPIO_Pin == CLK_IN_Pin)){ //if specifically CLK IN pin with falling interrupt
 
-		if(speed_fsm.current_state.speed_exclusive_state == CLK_IN_MODE){
+		if((speed_fsm.current_state.speed_exclusive_state == CLK_IN_MODE) || (speed_fsm.current_state.speed_exclusive_state == CLK_IN_PENDING_MODE)){
 
 			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1);
 			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
@@ -324,9 +324,22 @@ void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
 		//IF ALREADY IN PENDING MODE, CHECK FOR SECOND EDGE
 		else if(speed_fsm.current_state.speed_exclusive_state == CLK_IN_PENDING_MODE){ //second edge
 
+			//Set SW OUT
+			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+
 			speed_fsm.prev_state.speed_exclusive_state = CLK_IN_PENDING_MODE;
 			speed_fsm.current_state.speed_exclusive_state = CLK_IN_MODE;
 		}
+
+		//IF ALREADY IN CLK MODE
+		else if(speed_fsm.current_state.speed_exclusive_state == CLK_IN_MODE){
+
+			//Set SW OUT
+			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+		}
+
 	}
 }
 
