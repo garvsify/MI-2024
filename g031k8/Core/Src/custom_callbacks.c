@@ -134,13 +134,49 @@ void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
 
 	if(IP_CAP_fsm.current_state == MEASUREMENT_REELAPSE){
 
+		//UPDATE IP CAP FSM
 		IP_CAP_fsm.current_state = IDLE;
 		IP_CAP_fsm.prev_state = MEASUREMENT_REELAPSE;
+
+		//UPDATE SPEED FSM
+		union Speed_FSM_States current_state = speed_fsm.current_state;
+
+		if(speed_fsm.current_state.speed_exclusive_state == TAP_PENDING_MODE){
+
+			speed_fsm.current_state.speed_exclusive_state = TAP_MODE;
+		}
+		else if(speed_fsm.current_state.speed_exclusive_state == CLK_IN_PENDING_MODE){
+
+			speed_fsm.current_state.speed_exclusive_state = CLK_IN_MODE;
+		}
+		else if(speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_MODE){
+
+			speed_fsm.current_state.speed_exclusive_state = MIDI_CLK_MODE;
+		}
+		speed_fsm.prev_state = current_state;
 	}
 	else if(IP_CAP_fsm.current_state == MEASUREMENT_REELAPSE_AND_MEASUREMENT_PENDING){
 
+		//UPDATE IP CAP FSM
 		IP_CAP_fsm.current_state = MEASUREMENT_PENDING;
 		IP_CAP_fsm.prev_state = MEASUREMENT_REELAPSE_AND_MEASUREMENT_PENDING;
+
+		//UPDATE SPEED FSM
+		union Speed_FSM_States current_state = speed_fsm.current_state;
+
+		if(speed_fsm.current_state.speed_exclusive_state == TAP_PENDING_MODE){
+
+			speed_fsm.current_state.speed_exclusive_state = TAP_MODE;
+		}
+		else if(speed_fsm.current_state.speed_exclusive_state == CLK_IN_PENDING_MODE){
+
+			speed_fsm.current_state.speed_exclusive_state = CLK_IN_MODE;
+		}
+		else if(speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_MODE){
+
+			speed_fsm.current_state.speed_exclusive_state = MIDI_CLK_MODE;
+		}
+		speed_fsm.prev_state = current_state;
 	}
 
 	Copy_Params_Structs(&params_to_be_loaded, &params_working);
