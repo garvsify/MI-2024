@@ -27,27 +27,27 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  11 .ARM.attributes 00000028  00000000  00000000  00009420  2**0
                   CONTENTS, READONLY
- 12 .debug_info   00028909  00000000  00000000  00009448  2**0
+ 12 .debug_info   000289f7  00000000  00000000  00009448  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 13 .debug_abbrev 00004f08  00000000  00000000  00031d51  2**0
+ 13 .debug_abbrev 00004f74  00000000  00000000  00031e3f  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_aranges 00001388  00000000  00000000  00036c60  2**3
+ 14 .debug_aranges 00001388  00000000  00000000  00036db8  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_rnglists 00001ba9  00000000  00000000  00037fe8  2**0
+ 15 .debug_rnglists 00001ba9  00000000  00000000  00038140  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  00019db4  00000000  00000000  00039b91  2**0
+ 16 .debug_macro  00019db4  00000000  00000000  00039ce9  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   0002884c  00000000  00000000  00053945  2**0
+ 17 .debug_line   0002884c  00000000  00000000  00053a9d  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    0009fc00  00000000  00000000  0007c191  2**0
+ 18 .debug_str    0009fc00  00000000  00000000  0007c2e9  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000043  00000000  00000000  0011bd91  2**0
+ 19 .comment      00000043  00000000  00000000  0011bee9  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  000033f4  00000000  00000000  0011bdd4  2**2
+ 20 .debug_frame  000033f4  00000000  00000000  0011bf2c  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_loclists 0000f283  00000000  00000000  0011f1c8  2**0
+ 21 .debug_loclists 0000f283  00000000  00000000  0011f320  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 22 .debug_line_str 00000054  00000000  00000000  0012e44b  2**0
+ 22 .debug_line_str 00000054  00000000  00000000  0012e5a3  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -2286,12 +2286,12 @@ void System_Init(void){
  8000dd4:	08000f41 	.word	0x08000f41
  8000dd8:	08000fa5 	.word	0x08000fa5
  8000ddc:	200006e4 	.word	0x200006e4
- 8000de0:	08001059 	.word	0x08001059
- 8000de4:	0800105d 	.word	0x0800105d
- 8000de8:	08001219 	.word	0x08001219
- 8000dec:	08001369 	.word	0x08001369
+ 8000de0:	08001041 	.word	0x08001041
+ 8000de4:	08001045 	.word	0x08001045
+ 8000de8:	08001201 	.word	0x08001201
+ 8000dec:	08001351 	.word	0x08001351
  8000df0:	20000918 	.word	0x20000918
- 8000df4:	0800136d 	.word	0x0800136d
+ 8000df4:	08001355 	.word	0x08001355
  8000df8:	200009d4 	.word	0x200009d4
 
 08000dfc <TIM16_callback>:
@@ -2483,7 +2483,7 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
  8000ee4:	7065      	strb	r5, [r4, #1]
  8000ee6:	e7f7      	b.n	8000ed8 <TIM2_ch1_IP_capture_callback+0x38>
 		Begin_Input_Capture_Measurement();
- 8000ee8:	f000 fab4 	bl	8001454 <Begin_Input_Capture_Measurement>
+ 8000ee8:	f000 faa8 	bl	800143c <Begin_Input_Capture_Measurement>
 		IP_CAP_fsm.current_state = MEASUREMENT_PENDING;
  8000eec:	2301      	movs	r3, #1
  8000eee:	7023      	strb	r3, [r4, #0]
@@ -2491,7 +2491,7 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
  8000ef0:	7065      	strb	r5, [r4, #1]
  8000ef2:	e7f1      	b.n	8000ed8 <TIM2_ch1_IP_capture_callback+0x38>
 			Start_Measurement_Reelapse_Timer();
- 8000ef4:	f000 fa9c 	bl	8001430 <Start_Measurement_Reelapse_Timer>
+ 8000ef4:	f000 fa90 	bl	8001418 <Start_Measurement_Reelapse_Timer>
 			IP_CAP_fsm.current_state = MEASUREMENT_REELAPSE;
  8000ef8:	2302      	movs	r3, #2
 			Copy_Params_Structs(&params, &params_to_be_loaded);
@@ -2502,14 +2502,14 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 			IP_CAP_fsm.prev_state = MEASUREMENT_PENDING;
  8000f00:	7065      	strb	r5, [r4, #1]
 			Copy_Params_Structs(&params, &params_to_be_loaded);
- 8000f02:	f000 fa8b 	bl	800141c <Copy_Params_Structs>
+ 8000f02:	f000 fa7f 	bl	8001404 <Copy_Params_Structs>
 			Set_Status_Bit(&statuses, Input_Capture_Processing_Can_Be_Started);
  8000f06:	2104      	movs	r1, #4
  8000f08:	480c      	ldr	r0, [pc, #48]	@ (8000f3c <TIM2_ch1_IP_capture_callback+0x9c>)
  8000f0a:	f001 f901 	bl	8002110 <Set_Status_Bit>
  8000f0e:	e7e3      	b.n	8000ed8 <TIM2_ch1_IP_capture_callback+0x38>
 		Begin_Input_Capture_Measurement();
- 8000f10:	f000 faa0 	bl	8001454 <Begin_Input_Capture_Measurement>
+ 8000f10:	f000 fa94 	bl	800143c <Begin_Input_Capture_Measurement>
 		IP_CAP_fsm.current_state = MEASUREMENT_REELAPSE_AND_MEASUREMENT_PENDING;
  8000f14:	2303      	movs	r3, #3
  8000f16:	7023      	strb	r3, [r4, #0]
@@ -2517,7 +2517,7 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
  8000f18:	7065      	strb	r5, [r4, #1]
  8000f1a:	e7dd      	b.n	8000ed8 <TIM2_ch1_IP_capture_callback+0x38>
 		Start_Measurement_Reelapse_Timer();
- 8000f1c:	f000 fa88 	bl	8001430 <Start_Measurement_Reelapse_Timer>
+ 8000f1c:	f000 fa7c 	bl	8001418 <Start_Measurement_Reelapse_Timer>
 		IP_CAP_fsm.current_state = MEASUREMENT_PENDING;
  8000f20:	2301      	movs	r3, #1
  8000f22:	7023      	strb	r3, [r4, #0]
@@ -2610,918 +2610,920 @@ void TIM2_ch1_overflow_callback(TIM_HandleTypeDef *htim){
 08000fa4 <TIM3_ch1_IP_capture_measurement_reelapse_callback>:
 
 void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
+ 8000fa4:	b570      	push	{r4, r5, r6, lr}
 
-	HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
- 8000fa4:	2201      	movs	r2, #1
-void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
- 8000fa6:	b570      	push	{r4, r5, r6, lr}
-	HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
- 8000fa8:	2140      	movs	r1, #64	@ 0x40
- 8000faa:	4820      	ldr	r0, [pc, #128]	@ (800102c <TIM3_ch1_IP_capture_measurement_reelapse_callback+0x88>)
- 8000fac:	f002 f9a8 	bl	8003300 <HAL_GPIO_WritePin>
+	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
 
 	// @TODO //WRITE CODE TO LOAD CORRECT DUTY DELAYED VALUE TO SECONDARY OSCILLATOR
 	Set_Oscillator_Values(&params_to_be_loaded);
- 8000fb0:	4d1f      	ldr	r5, [pc, #124]	@ (8001030 <TIM3_ch1_IP_capture_measurement_reelapse_callback+0x8c>)
- 8000fb2:	0028      	movs	r0, r5
- 8000fb4:	f000 fab0 	bl	8001518 <Set_Oscillator_Values>
+ 8000fa6:	4d1c      	ldr	r5, [pc, #112]	@ (8001018 <TIM3_ch1_IP_capture_measurement_reelapse_callback+0x74>)
+ 8000fa8:	0028      	movs	r0, r5
+ 8000faa:	f000 fab5 	bl	8001518 <Set_Oscillator_Values>
 
 	Stop_OC_TIM(&htim3, TIM_CHANNEL_1);
- 8000fb8:	2100      	movs	r1, #0
- 8000fba:	481e      	ldr	r0, [pc, #120]	@ (8001034 <TIM3_ch1_IP_capture_measurement_reelapse_callback+0x90>)
- 8000fbc:	f001 f874 	bl	80020a8 <Stop_OC_TIM>
+ 8000fae:	2100      	movs	r1, #0
+ 8000fb0:	481a      	ldr	r0, [pc, #104]	@ (800101c <TIM3_ch1_IP_capture_measurement_reelapse_callback+0x78>)
+ 8000fb2:	f001 f879 	bl	80020a8 <Stop_OC_TIM>
 
 	if(IP_CAP_fsm.current_state == MEASUREMENT_REELAPSE){
- 8000fc0:	4b1d      	ldr	r3, [pc, #116]	@ (8001038 <TIM3_ch1_IP_capture_measurement_reelapse_callback+0x94>)
- 8000fc2:	781a      	ldrb	r2, [r3, #0]
- 8000fc4:	b2d1      	uxtb	r1, r2
- 8000fc6:	2a02      	cmp	r2, #2
- 8000fc8:	d024      	beq.n	8001014 <TIM3_ch1_IP_capture_measurement_reelapse_callback+0x70>
+ 8000fb6:	4b1a      	ldr	r3, [pc, #104]	@ (8001020 <TIM3_ch1_IP_capture_measurement_reelapse_callback+0x7c>)
+ 8000fb8:	781a      	ldrb	r2, [r3, #0]
+ 8000fba:	b2d1      	uxtb	r1, r2
+ 8000fbc:	2a02      	cmp	r2, #2
+ 8000fbe:	d01f      	beq.n	8001000 <TIM3_ch1_IP_capture_measurement_reelapse_callback+0x5c>
 		IP_CAP_fsm.current_state = IDLE;
 		IP_CAP_fsm.prev_state = MEASUREMENT_REELAPSE;
 
 		Advance_Pending_States();
 	}
 	else if(IP_CAP_fsm.current_state == MEASUREMENT_REELAPSE_AND_MEASUREMENT_PENDING){
- 8000fca:	781a      	ldrb	r2, [r3, #0]
- 8000fcc:	b2d1      	uxtb	r1, r2
- 8000fce:	2a03      	cmp	r2, #3
- 8000fd0:	d026      	beq.n	8001020 <TIM3_ch1_IP_capture_measurement_reelapse_callback+0x7c>
+ 8000fc0:	781a      	ldrb	r2, [r3, #0]
+ 8000fc2:	b2d1      	uxtb	r1, r2
+ 8000fc4:	2a03      	cmp	r2, #3
+ 8000fc6:	d021      	beq.n	800100c <TIM3_ch1_IP_capture_measurement_reelapse_callback+0x68>
 		IP_CAP_fsm.prev_state = MEASUREMENT_REELAPSE_AND_MEASUREMENT_PENDING;
 
 		Advance_Pending_States();
 	}
 
 	Copy_Params_Structs(&params_to_be_loaded, &params_working);
- 8000fd2:	0028      	movs	r0, r5
- 8000fd4:	4919      	ldr	r1, [pc, #100]	@ (800103c <TIM3_ch1_IP_capture_measurement_reelapse_callback+0x98>)
- 8000fd6:	f000 fa21 	bl	800141c <Copy_Params_Structs>
+ 8000fc8:	0028      	movs	r0, r5
+ 8000fca:	4916      	ldr	r1, [pc, #88]	@ (8001024 <TIM3_ch1_IP_capture_measurement_reelapse_callback+0x80>)
+ 8000fcc:	f000 fa1a 	bl	8001404 <Copy_Params_Structs>
 	Copy_Params_Structs(&params_to_be_loaded, &params);
- 8000fda:	4c19      	ldr	r4, [pc, #100]	@ (8001040 <TIM3_ch1_IP_capture_measurement_reelapse_callback+0x9c>)
- 8000fdc:	0028      	movs	r0, r5
- 8000fde:	0021      	movs	r1, r4
- 8000fe0:	f000 fa1c 	bl	800141c <Copy_Params_Structs>
+ 8000fd0:	4c15      	ldr	r4, [pc, #84]	@ (8001028 <TIM3_ch1_IP_capture_measurement_reelapse_callback+0x84>)
+ 8000fd2:	0028      	movs	r0, r5
+ 8000fd4:	0021      	movs	r1, r4
+ 8000fd6:	f000 fa15 	bl	8001404 <Copy_Params_Structs>
 
 	Set_Status_Bit(&statuses, First_Sync_Complete);
- 8000fe4:	2108      	movs	r1, #8
- 8000fe6:	4817      	ldr	r0, [pc, #92]	@ (8001044 <TIM3_ch1_IP_capture_measurement_reelapse_callback+0xa0>)
- 8000fe8:	f001 f892 	bl	8002110 <Set_Status_Bit>
+ 8000fda:	2108      	movs	r1, #8
+ 8000fdc:	4813      	ldr	r0, [pc, #76]	@ (800102c <TIM3_ch1_IP_capture_measurement_reelapse_callback+0x88>)
+ 8000fde:	f001 f897 	bl	8002110 <Set_Status_Bit>
 
 	Calculate_Next_Main_Oscillator_Values(&params, (enum Next_Values_Processing_Mode)REGULAR_MODE);
- 8000fec:	2100      	movs	r1, #0
- 8000fee:	0020      	movs	r0, r4
- 8000ff0:	f000 faaa 	bl	8001548 <Calculate_Next_Main_Oscillator_Values>
+ 8000fe2:	2100      	movs	r1, #0
+ 8000fe4:	0020      	movs	r0, r4
+ 8000fe6:	f000 faaf 	bl	8001548 <Calculate_Next_Main_Oscillator_Values>
 	Write_Next_Main_Oscillator_Values_to_Delay_Line(&params, &delay_line);
- 8000ff4:	0020      	movs	r0, r4
- 8000ff6:	4914      	ldr	r1, [pc, #80]	@ (8001048 <TIM3_ch1_IP_capture_measurement_reelapse_callback+0xa4>)
- 8000ff8:	f000 fb34 	bl	8001664 <Write_Next_Main_Oscillator_Values_to_Delay_Line>
+ 8000fea:	0020      	movs	r0, r4
+ 8000fec:	4910      	ldr	r1, [pc, #64]	@ (8001030 <TIM3_ch1_IP_capture_measurement_reelapse_callback+0x8c>)
+ 8000fee:	f000 fb39 	bl	8001664 <Write_Next_Main_Oscillator_Values_to_Delay_Line>
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions); //this function takes ages to execute!
- 8000ffc:	4b13      	ldr	r3, [pc, #76]	@ (800104c <TIM3_ch1_IP_capture_measurement_reelapse_callback+0xa8>)
- 8000ffe:	4914      	ldr	r1, [pc, #80]	@ (8001050 <TIM3_ch1_IP_capture_measurement_reelapse_callback+0xac>)
- 8001000:	781a      	ldrb	r2, [r3, #0]
- 8001002:	4814      	ldr	r0, [pc, #80]	@ (8001054 <TIM3_ch1_IP_capture_measurement_reelapse_callback+0xb0>)
- 8001004:	f001 fcba 	bl	800297c <HAL_ADC_Start_DMA>
+ 8000ff2:	4b10      	ldr	r3, [pc, #64]	@ (8001034 <TIM3_ch1_IP_capture_measurement_reelapse_callback+0x90>)
+ 8000ff4:	4910      	ldr	r1, [pc, #64]	@ (8001038 <TIM3_ch1_IP_capture_measurement_reelapse_callback+0x94>)
+ 8000ff6:	781a      	ldrb	r2, [r3, #0]
+ 8000ff8:	4810      	ldr	r0, [pc, #64]	@ (800103c <TIM3_ch1_IP_capture_measurement_reelapse_callback+0x98>)
+ 8000ffa:	f001 fcbf 	bl	800297c <HAL_ADC_Start_DMA>
 
-	HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
- 8001008:	2200      	movs	r2, #0
- 800100a:	2140      	movs	r1, #64	@ 0x40
- 800100c:	4807      	ldr	r0, [pc, #28]	@ (800102c <TIM3_ch1_IP_capture_measurement_reelapse_callback+0x88>)
- 800100e:	f002 f977 	bl	8003300 <HAL_GPIO_WritePin>
+	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
 }
- 8001012:	bd70      	pop	{r4, r5, r6, pc}
+ 8000ffe:	bd70      	pop	{r4, r5, r6, pc}
 		IP_CAP_fsm.current_state = IDLE;
- 8001014:	2200      	movs	r2, #0
- 8001016:	701a      	strb	r2, [r3, #0]
+ 8001000:	2200      	movs	r2, #0
+ 8001002:	701a      	strb	r2, [r3, #0]
 		IP_CAP_fsm.prev_state = MEASUREMENT_REELAPSE;
- 8001018:	7059      	strb	r1, [r3, #1]
+ 8001004:	7059      	strb	r1, [r3, #1]
 		Advance_Pending_States();
- 800101a:	f000 fc2d 	bl	8001878 <Advance_Pending_States>
- 800101e:	e7d8      	b.n	8000fd2 <TIM3_ch1_IP_capture_measurement_reelapse_callback+0x2e>
+ 8001006:	f000 fc37 	bl	8001878 <Advance_Pending_States>
+ 800100a:	e7dd      	b.n	8000fc8 <TIM3_ch1_IP_capture_measurement_reelapse_callback+0x24>
 		IP_CAP_fsm.current_state = MEASUREMENT_PENDING;
- 8001020:	3a02      	subs	r2, #2
- 8001022:	701a      	strb	r2, [r3, #0]
+ 800100c:	3a02      	subs	r2, #2
+ 800100e:	701a      	strb	r2, [r3, #0]
 		IP_CAP_fsm.prev_state = MEASUREMENT_REELAPSE_AND_MEASUREMENT_PENDING;
- 8001024:	7059      	strb	r1, [r3, #1]
+ 8001010:	7059      	strb	r1, [r3, #1]
 		Advance_Pending_States();
- 8001026:	f000 fc27 	bl	8001878 <Advance_Pending_States>
- 800102a:	e7d2      	b.n	8000fd2 <TIM3_ch1_IP_capture_measurement_reelapse_callback+0x2e>
- 800102c:	50000400 	.word	0x50000400
- 8001030:	20000ba8 	.word	0x20000ba8
- 8001034:	200006e4 	.word	0x200006e4
- 8001038:	2000040c 	.word	0x2000040c
- 800103c:	20000b84 	.word	0x20000b84
- 8001040:	20000bcc 	.word	0x20000bcc
- 8001044:	20000b80 	.word	0x20000b80
- 8001048:	20000004 	.word	0x20000004
- 800104c:	080068bc 	.word	0x080068bc
- 8001050:	20000bf0 	.word	0x20000bf0
- 8001054:	20000aec 	.word	0x20000aec
+ 8001012:	f000 fc31 	bl	8001878 <Advance_Pending_States>
+ 8001016:	e7d7      	b.n	8000fc8 <TIM3_ch1_IP_capture_measurement_reelapse_callback+0x24>
+ 8001018:	20000ba8 	.word	0x20000ba8
+ 800101c:	200006e4 	.word	0x200006e4
+ 8001020:	2000040c 	.word	0x2000040c
+ 8001024:	20000b84 	.word	0x20000b84
+ 8001028:	20000bcc 	.word	0x20000bcc
+ 800102c:	20000b80 	.word	0x20000b80
+ 8001030:	20000004 	.word	0x20000004
+ 8001034:	080068bc 	.word	0x080068bc
+ 8001038:	20000bf0 	.word	0x20000bf0
+ 800103c:	20000aec 	.word	0x20000aec
 
-08001058 <UART2_TX_transfer_complete_callback>:
+08001040 <UART2_TX_transfer_complete_callback>:
 
 void UART2_TX_transfer_complete_callback(UART_HandleTypeDef *huart){
- 8001058:	4770      	bx	lr
- 800105a:	46c0      	nop			@ (mov r8, r8)
+ 8001040:	4770      	bx	lr
+ 8001042:	46c0      	nop			@ (mov r8, r8)
 
-0800105c <UART2_RX_transfer_complete_callback>:
+08001044 <UART2_RX_transfer_complete_callback>:
 
 	//UART_DMA_TX_is_complete = YES;
 }
 
 void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
- 800105c:	b570      	push	{r4, r5, r6, lr}
+ 8001044:	b570      	push	{r4, r5, r6, lr}
 
 	if(*rx_buffer == SYSTEM_COMMON_MIDI_TIME_CODE_QUARTER_FRAME){
- 800105e:	4c2c      	ldr	r4, [pc, #176]	@ (8001110 <UART2_RX_transfer_complete_callback+0xb4>)
- 8001060:	7823      	ldrb	r3, [r4, #0]
- 8001062:	2bf1      	cmp	r3, #241	@ 0xf1
- 8001064:	d005      	beq.n	8001072 <UART2_RX_transfer_complete_callback+0x16>
+ 8001046:	4c2c      	ldr	r4, [pc, #176]	@ (80010f8 <UART2_RX_transfer_complete_callback+0xb4>)
+ 8001048:	7823      	ldrb	r3, [r4, #0]
+ 800104a:	2bf1      	cmp	r3, #241	@ 0xf1
+ 800104c:	d005      	beq.n	800105a <UART2_RX_transfer_complete_callback+0x16>
 
 		params.final_prescaler = 64;
 		params.final_start_value = 127;
 		rx_buffer[0] = 0;
 	}*/
 	HAL_UART_Receive_DMA(&huart2, (uint8_t*)rx_buffer, sizeof(rx_buffer));
- 8001066:	2201      	movs	r2, #1
- 8001068:	0021      	movs	r1, r4
- 800106a:	482a      	ldr	r0, [pc, #168]	@ (8001114 <UART2_RX_transfer_complete_callback+0xb8>)
- 800106c:	f004 fe28 	bl	8005cc0 <HAL_UART_Receive_DMA>
+ 800104e:	2201      	movs	r2, #1
+ 8001050:	0021      	movs	r1, r4
+ 8001052:	482a      	ldr	r0, [pc, #168]	@ (80010fc <UART2_RX_transfer_complete_callback+0xb8>)
+ 8001054:	f004 fe34 	bl	8005cc0 <HAL_UART_Receive_DMA>
 }
- 8001070:	bd70      	pop	{r4, r5, r6, pc}
+ 8001058:	bd70      	pop	{r4, r5, r6, pc}
 		if(MIDI_CLK_FSM_state == NOT_COMPILING){
- 8001072:	4d29      	ldr	r5, [pc, #164]	@ (8001118 <UART2_RX_transfer_complete_callback+0xbc>)
- 8001074:	782b      	ldrb	r3, [r5, #0]
- 8001076:	2b00      	cmp	r3, #0
- 8001078:	d024      	beq.n	80010c4 <UART2_RX_transfer_complete_callback+0x68>
+ 800105a:	4d29      	ldr	r5, [pc, #164]	@ (8001100 <UART2_RX_transfer_complete_callback+0xbc>)
+ 800105c:	782b      	ldrb	r3, [r5, #0]
+ 800105e:	2b00      	cmp	r3, #0
+ 8001060:	d024      	beq.n	80010ac <UART2_RX_transfer_complete_callback+0x68>
 			MIDI_CLK_tag++;
- 800107a:	4a28      	ldr	r2, [pc, #160]	@ (800111c <UART2_RX_transfer_complete_callback+0xc0>)
- 800107c:	7813      	ldrb	r3, [r2, #0]
- 800107e:	3301      	adds	r3, #1
- 8001080:	b2db      	uxtb	r3, r3
- 8001082:	7013      	strb	r3, [r2, #0]
+ 8001062:	4a28      	ldr	r2, [pc, #160]	@ (8001104 <UART2_RX_transfer_complete_callback+0xc0>)
+ 8001064:	7813      	ldrb	r3, [r2, #0]
+ 8001066:	3301      	adds	r3, #1
+ 8001068:	b2db      	uxtb	r3, r3
+ 800106a:	7013      	strb	r3, [r2, #0]
 			if(MIDI_CLK_tag < 12){
- 8001084:	7813      	ldrb	r3, [r2, #0]
- 8001086:	2b0b      	cmp	r3, #11
- 8001088:	d90f      	bls.n	80010aa <UART2_RX_transfer_complete_callback+0x4e>
+ 800106c:	7813      	ldrb	r3, [r2, #0]
+ 800106e:	2b0b      	cmp	r3, #11
+ 8001070:	d90f      	bls.n	8001092 <UART2_RX_transfer_complete_callback+0x4e>
 			else if(MIDI_CLK_tag < 25){
- 800108a:	7813      	ldrb	r3, [r2, #0]
- 800108c:	2b18      	cmp	r3, #24
- 800108e:	d932      	bls.n	80010f6 <UART2_RX_transfer_complete_callback+0x9a>
+ 8001072:	7813      	ldrb	r3, [r2, #0]
+ 8001074:	2b18      	cmp	r3, #24
+ 8001076:	d932      	bls.n	80010de <UART2_RX_transfer_complete_callback+0x9a>
 				if(speed_fsm.current_state.speed_exclusive_state != MIDI_CLK_MODE){
- 8001090:	4b23      	ldr	r3, [pc, #140]	@ (8001120 <UART2_RX_transfer_complete_callback+0xc4>)
- 8001092:	7819      	ldrb	r1, [r3, #0]
- 8001094:	2908      	cmp	r1, #8
- 8001096:	d001      	beq.n	800109c <UART2_RX_transfer_complete_callback+0x40>
+ 8001078:	4b23      	ldr	r3, [pc, #140]	@ (8001108 <UART2_RX_transfer_complete_callback+0xc4>)
+ 800107a:	7819      	ldrb	r1, [r3, #0]
+ 800107c:	2908      	cmp	r1, #8
+ 800107e:	d001      	beq.n	8001084 <UART2_RX_transfer_complete_callback+0x40>
 					speed_fsm.prev_state = speed_fsm.current_state;
- 8001098:	7819      	ldrb	r1, [r3, #0]
- 800109a:	7059      	strb	r1, [r3, #1]
+ 8001080:	7819      	ldrb	r1, [r3, #0]
+ 8001082:	7059      	strb	r1, [r3, #1]
 				speed_fsm.current_state.speed_exclusive_state = MIDI_CLK_MODE;
- 800109c:	2108      	movs	r1, #8
- 800109e:	7019      	strb	r1, [r3, #0]
+ 8001084:	2108      	movs	r1, #8
+ 8001086:	7019      	strb	r1, [r3, #0]
 				MIDI_CLK_tag = 1;
- 80010a0:	2301      	movs	r3, #1
- 80010a2:	7013      	strb	r3, [r2, #0]
+ 8001088:	2301      	movs	r3, #1
+ 800108a:	7013      	strb	r3, [r2, #0]
 		*rx_buffer = 0;
- 80010a4:	2300      	movs	r3, #0
- 80010a6:	7023      	strb	r3, [r4, #0]
- 80010a8:	e7dd      	b.n	8001066 <UART2_RX_transfer_complete_callback+0xa>
+ 800108c:	2300      	movs	r3, #0
+ 800108e:	7023      	strb	r3, [r4, #0]
+ 8001090:	e7dd      	b.n	800104e <UART2_RX_transfer_complete_callback+0xa>
 				HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
- 80010aa:	2180      	movs	r1, #128	@ 0x80
- 80010ac:	20a0      	movs	r0, #160	@ 0xa0
- 80010ae:	2200      	movs	r2, #0
- 80010b0:	0089      	lsls	r1, r1, #2
- 80010b2:	05c0      	lsls	r0, r0, #23
- 80010b4:	f002 f924 	bl	8003300 <HAL_GPIO_WritePin>
+ 8001092:	2180      	movs	r1, #128	@ 0x80
+ 8001094:	20a0      	movs	r0, #160	@ 0xa0
+ 8001096:	2200      	movs	r2, #0
+ 8001098:	0089      	lsls	r1, r1, #2
+ 800109a:	05c0      	lsls	r0, r0, #23
+ 800109c:	f002 f930 	bl	8003300 <HAL_GPIO_WritePin>
 				HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
- 80010b8:	2201      	movs	r2, #1
- 80010ba:	2140      	movs	r1, #64	@ 0x40
- 80010bc:	4819      	ldr	r0, [pc, #100]	@ (8001124 <UART2_RX_transfer_complete_callback+0xc8>)
- 80010be:	f002 f91f 	bl	8003300 <HAL_GPIO_WritePin>
- 80010c2:	e7ef      	b.n	80010a4 <UART2_RX_transfer_complete_callback+0x48>
+ 80010a0:	2201      	movs	r2, #1
+ 80010a2:	2140      	movs	r1, #64	@ 0x40
+ 80010a4:	4819      	ldr	r0, [pc, #100]	@ (800110c <UART2_RX_transfer_complete_callback+0xc8>)
+ 80010a6:	f002 f92b 	bl	8003300 <HAL_GPIO_WritePin>
+ 80010aa:	e7ef      	b.n	800108c <UART2_RX_transfer_complete_callback+0x48>
 			speed_fsm.prev_state = speed_fsm.current_state;
- 80010c4:	4b16      	ldr	r3, [pc, #88]	@ (8001120 <UART2_RX_transfer_complete_callback+0xc4>)
+ 80010ac:	4b16      	ldr	r3, [pc, #88]	@ (8001108 <UART2_RX_transfer_complete_callback+0xc4>)
 			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
- 80010c6:	2180      	movs	r1, #128	@ 0x80
+ 80010ae:	2180      	movs	r1, #128	@ 0x80
 			speed_fsm.prev_state = speed_fsm.current_state;
- 80010c8:	781a      	ldrb	r2, [r3, #0]
+ 80010b0:	781a      	ldrb	r2, [r3, #0]
 			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
- 80010ca:	20a0      	movs	r0, #160	@ 0xa0
+ 80010b2:	20a0      	movs	r0, #160	@ 0xa0
 			speed_fsm.prev_state = speed_fsm.current_state;
- 80010cc:	705a      	strb	r2, [r3, #1]
+ 80010b4:	705a      	strb	r2, [r3, #1]
 			speed_fsm.current_state.speed_exclusive_state = MIDI_CLK_PENDING_MODE;
- 80010ce:	2209      	movs	r2, #9
+ 80010b6:	2209      	movs	r2, #9
 			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
- 80010d0:	0089      	lsls	r1, r1, #2
+ 80010b8:	0089      	lsls	r1, r1, #2
 			speed_fsm.current_state.speed_exclusive_state = MIDI_CLK_PENDING_MODE;
- 80010d2:	701a      	strb	r2, [r3, #0]
+ 80010ba:	701a      	strb	r2, [r3, #0]
 			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
- 80010d4:	05c0      	lsls	r0, r0, #23
- 80010d6:	2200      	movs	r2, #0
- 80010d8:	f002 f912 	bl	8003300 <HAL_GPIO_WritePin>
+ 80010bc:	05c0      	lsls	r0, r0, #23
+ 80010be:	2200      	movs	r2, #0
+ 80010c0:	f002 f91e 	bl	8003300 <HAL_GPIO_WritePin>
 			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
- 80010dc:	2201      	movs	r2, #1
- 80010de:	2140      	movs	r1, #64	@ 0x40
- 80010e0:	4810      	ldr	r0, [pc, #64]	@ (8001124 <UART2_RX_transfer_complete_callback+0xc8>)
- 80010e2:	f002 f90d 	bl	8003300 <HAL_GPIO_WritePin>
+ 80010c4:	2201      	movs	r2, #1
+ 80010c6:	2140      	movs	r1, #64	@ 0x40
+ 80010c8:	4810      	ldr	r0, [pc, #64]	@ (800110c <UART2_RX_transfer_complete_callback+0xc8>)
+ 80010ca:	f002 f919 	bl	8003300 <HAL_GPIO_WritePin>
 			MIDI_CLK_FSM_state = COMPILING;
- 80010e6:	2301      	movs	r3, #1
+ 80010ce:	2301      	movs	r3, #1
 			MIDI_CLK_tag++;
- 80010e8:	4a0c      	ldr	r2, [pc, #48]	@ (800111c <UART2_RX_transfer_complete_callback+0xc0>)
+ 80010d0:	4a0c      	ldr	r2, [pc, #48]	@ (8001104 <UART2_RX_transfer_complete_callback+0xc0>)
 			MIDI_CLK_FSM_state = COMPILING;
- 80010ea:	702b      	strb	r3, [r5, #0]
+ 80010d2:	702b      	strb	r3, [r5, #0]
 			MIDI_CLK_tag++;
- 80010ec:	7813      	ldrb	r3, [r2, #0]
- 80010ee:	3301      	adds	r3, #1
- 80010f0:	b2db      	uxtb	r3, r3
- 80010f2:	7013      	strb	r3, [r2, #0]
- 80010f4:	e7d6      	b.n	80010a4 <UART2_RX_transfer_complete_callback+0x48>
+ 80010d4:	7813      	ldrb	r3, [r2, #0]
+ 80010d6:	3301      	adds	r3, #1
+ 80010d8:	b2db      	uxtb	r3, r3
+ 80010da:	7013      	strb	r3, [r2, #0]
+ 80010dc:	e7d6      	b.n	800108c <UART2_RX_transfer_complete_callback+0x48>
 				HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1);
- 80010f6:	2180      	movs	r1, #128	@ 0x80
- 80010f8:	20a0      	movs	r0, #160	@ 0xa0
- 80010fa:	2201      	movs	r2, #1
- 80010fc:	0089      	lsls	r1, r1, #2
- 80010fe:	05c0      	lsls	r0, r0, #23
- 8001100:	f002 f8fe 	bl	8003300 <HAL_GPIO_WritePin>
+ 80010de:	2180      	movs	r1, #128	@ 0x80
+ 80010e0:	20a0      	movs	r0, #160	@ 0xa0
+ 80010e2:	2201      	movs	r2, #1
+ 80010e4:	0089      	lsls	r1, r1, #2
+ 80010e6:	05c0      	lsls	r0, r0, #23
+ 80010e8:	f002 f90a 	bl	8003300 <HAL_GPIO_WritePin>
 				HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
- 8001104:	2200      	movs	r2, #0
- 8001106:	2140      	movs	r1, #64	@ 0x40
- 8001108:	4806      	ldr	r0, [pc, #24]	@ (8001124 <UART2_RX_transfer_complete_callback+0xc8>)
- 800110a:	f002 f8f9 	bl	8003300 <HAL_GPIO_WritePin>
- 800110e:	e7c9      	b.n	80010a4 <UART2_RX_transfer_complete_callback+0x48>
- 8001110:	2000043c 	.word	0x2000043c
- 8001114:	2000055c 	.word	0x2000055c
- 8001118:	20000bfa 	.word	0x20000bfa
- 800111c:	20000b76 	.word	0x20000b76
- 8001120:	20000410 	.word	0x20000410
- 8001124:	50000800 	.word	0x50000800
+ 80010ec:	2200      	movs	r2, #0
+ 80010ee:	2140      	movs	r1, #64	@ 0x40
+ 80010f0:	4806      	ldr	r0, [pc, #24]	@ (800110c <UART2_RX_transfer_complete_callback+0xc8>)
+ 80010f2:	f002 f905 	bl	8003300 <HAL_GPIO_WritePin>
+ 80010f6:	e7c9      	b.n	800108c <UART2_RX_transfer_complete_callback+0x48>
+ 80010f8:	2000043c 	.word	0x2000043c
+ 80010fc:	2000055c 	.word	0x2000055c
+ 8001100:	20000bfa 	.word	0x20000bfa
+ 8001104:	20000b76 	.word	0x20000b76
+ 8001108:	20000410 	.word	0x20000410
+ 800110c:	50000800 	.word	0x50000800
 
-08001128 <HAL_GPIO_EXTI_Falling_Callback>:
+08001110 <HAL_GPIO_EXTI_Falling_Callback>:
 
 void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
- 8001128:	b510      	push	{r4, lr}
+ 8001110:	b510      	push	{r4, lr}
 
 	if((GPIO_Pin == CLK_IN_Pin)){ //if specifically CLK IN pin with falling interrupt
- 800112a:	2880      	cmp	r0, #128	@ 0x80
- 800112c:	d000      	beq.n	8001130 <HAL_GPIO_EXTI_Falling_Callback+0x8>
+ 8001112:	2880      	cmp	r0, #128	@ 0x80
+ 8001114:	d000      	beq.n	8001118 <HAL_GPIO_EXTI_Falling_Callback+0x8>
 
 			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1);
 			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
 		}
 	}
 }
- 800112e:	bd10      	pop	{r4, pc}
+ 8001116:	bd10      	pop	{r4, pc}
 		if((speed_fsm.current_state.speed_exclusive_state == CLK_IN_MODE) || (speed_fsm.current_state.speed_exclusive_state == CLK_IN_PENDING_MODE)){
- 8001130:	4b09      	ldr	r3, [pc, #36]	@ (8001158 <HAL_GPIO_EXTI_Falling_Callback+0x30>)
- 8001132:	781a      	ldrb	r2, [r3, #0]
- 8001134:	2a06      	cmp	r2, #6
- 8001136:	d002      	beq.n	800113e <HAL_GPIO_EXTI_Falling_Callback+0x16>
- 8001138:	781b      	ldrb	r3, [r3, #0]
- 800113a:	2b07      	cmp	r3, #7
- 800113c:	d1f7      	bne.n	800112e <HAL_GPIO_EXTI_Falling_Callback+0x6>
+ 8001118:	4b09      	ldr	r3, [pc, #36]	@ (8001140 <HAL_GPIO_EXTI_Falling_Callback+0x30>)
+ 800111a:	781a      	ldrb	r2, [r3, #0]
+ 800111c:	2a06      	cmp	r2, #6
+ 800111e:	d002      	beq.n	8001126 <HAL_GPIO_EXTI_Falling_Callback+0x16>
+ 8001120:	781b      	ldrb	r3, [r3, #0]
+ 8001122:	2b07      	cmp	r3, #7
+ 8001124:	d1f7      	bne.n	8001116 <HAL_GPIO_EXTI_Falling_Callback+0x6>
 			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1);
- 800113e:	2180      	movs	r1, #128	@ 0x80
- 8001140:	20a0      	movs	r0, #160	@ 0xa0
- 8001142:	2201      	movs	r2, #1
- 8001144:	0089      	lsls	r1, r1, #2
- 8001146:	05c0      	lsls	r0, r0, #23
- 8001148:	f002 f8da 	bl	8003300 <HAL_GPIO_WritePin>
+ 8001126:	2180      	movs	r1, #128	@ 0x80
+ 8001128:	20a0      	movs	r0, #160	@ 0xa0
+ 800112a:	2201      	movs	r2, #1
+ 800112c:	0089      	lsls	r1, r1, #2
+ 800112e:	05c0      	lsls	r0, r0, #23
+ 8001130:	f002 f8e6 	bl	8003300 <HAL_GPIO_WritePin>
 			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
- 800114c:	2200      	movs	r2, #0
- 800114e:	2140      	movs	r1, #64	@ 0x40
- 8001150:	4802      	ldr	r0, [pc, #8]	@ (800115c <HAL_GPIO_EXTI_Falling_Callback+0x34>)
- 8001152:	f002 f8d5 	bl	8003300 <HAL_GPIO_WritePin>
+ 8001134:	2200      	movs	r2, #0
+ 8001136:	2140      	movs	r1, #64	@ 0x40
+ 8001138:	4802      	ldr	r0, [pc, #8]	@ (8001144 <HAL_GPIO_EXTI_Falling_Callback+0x34>)
+ 800113a:	f002 f8e1 	bl	8003300 <HAL_GPIO_WritePin>
 }
- 8001156:	e7ea      	b.n	800112e <HAL_GPIO_EXTI_Falling_Callback+0x6>
- 8001158:	20000410 	.word	0x20000410
- 800115c:	50000800 	.word	0x50000800
+ 800113e:	e7ea      	b.n	8001116 <HAL_GPIO_EXTI_Falling_Callback+0x6>
+ 8001140:	20000410 	.word	0x20000410
+ 8001144:	50000800 	.word	0x50000800
 
-08001160 <HAL_GPIO_EXTI_Rising_Callback>:
+08001148 <HAL_GPIO_EXTI_Rising_Callback>:
 
 void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
- 8001160:	b570      	push	{r4, r5, r6, lr}
+ 8001148:	b570      	push	{r4, r5, r6, lr}
 
 	if((GPIO_Pin == CLK_IN_Pin)){ //if specifically CLK IN pin with rising interrupt
- 8001162:	2880      	cmp	r0, #128	@ 0x80
- 8001164:	d000      	beq.n	8001168 <HAL_GPIO_EXTI_Rising_Callback+0x8>
+ 800114a:	2880      	cmp	r0, #128	@ 0x80
+ 800114c:	d000      	beq.n	8001150 <HAL_GPIO_EXTI_Rising_Callback+0x8>
 			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
 			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
 		}
 
 	}
 }
- 8001166:	bd70      	pop	{r4, r5, r6, pc}
+ 800114e:	bd70      	pop	{r4, r5, r6, pc}
 		if(speed_fsm.current_state.shared_state == MANUAL_MODE){
- 8001168:	4c28      	ldr	r4, [pc, #160]	@ (800120c <HAL_GPIO_EXTI_Rising_Callback+0xac>)
+ 8001150:	4c28      	ldr	r4, [pc, #160]	@ (80011f4 <HAL_GPIO_EXTI_Rising_Callback+0xac>)
+ 8001152:	7823      	ldrb	r3, [r4, #0]
+ 8001154:	b2dd      	uxtb	r5, r3
+ 8001156:	2b01      	cmp	r3, #1
+ 8001158:	d027      	beq.n	80011aa <HAL_GPIO_EXTI_Rising_Callback+0x62>
+		else if(speed_fsm.current_state.shared_state == PC_MODE){
+ 800115a:	7823      	ldrb	r3, [r4, #0]
+ 800115c:	b2dd      	uxtb	r5, r3
+ 800115e:	2b03      	cmp	r3, #3
+ 8001160:	d023      	beq.n	80011aa <HAL_GPIO_EXTI_Rising_Callback+0x62>
+		else if(speed_fsm.current_state.shared_state == CC_MODE){
+ 8001162:	7823      	ldrb	r3, [r4, #0]
+ 8001164:	b2dd      	uxtb	r5, r3
+ 8001166:	2b02      	cmp	r3, #2
+ 8001168:	d01f      	beq.n	80011aa <HAL_GPIO_EXTI_Rising_Callback+0x62>
+		else if((speed_fsm.current_state.speed_exclusive_state == TAP_MODE) && (IP_CAP_fsm.current_state == IDLE)){
  800116a:	7823      	ldrb	r3, [r4, #0]
  800116c:	b2dd      	uxtb	r5, r3
- 800116e:	2b01      	cmp	r3, #1
- 8001170:	d027      	beq.n	80011c2 <HAL_GPIO_EXTI_Rising_Callback+0x62>
-		else if(speed_fsm.current_state.shared_state == PC_MODE){
+ 800116e:	2b04      	cmp	r3, #4
+ 8001170:	d017      	beq.n	80011a2 <HAL_GPIO_EXTI_Rising_Callback+0x5a>
+		else if((speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_MODE) && (IP_CAP_fsm.current_state == IDLE)){
  8001172:	7823      	ldrb	r3, [r4, #0]
  8001174:	b2dd      	uxtb	r5, r3
- 8001176:	2b03      	cmp	r3, #3
- 8001178:	d023      	beq.n	80011c2 <HAL_GPIO_EXTI_Rising_Callback+0x62>
-		else if(speed_fsm.current_state.shared_state == CC_MODE){
+ 8001176:	2b08      	cmp	r3, #8
+ 8001178:	d027      	beq.n	80011ca <HAL_GPIO_EXTI_Rising_Callback+0x82>
+		else if(speed_fsm.current_state.speed_exclusive_state == CLK_IN_PENDING_MODE){ //second edge
  800117a:	7823      	ldrb	r3, [r4, #0]
  800117c:	b2dd      	uxtb	r5, r3
- 800117e:	2b02      	cmp	r3, #2
- 8001180:	d01f      	beq.n	80011c2 <HAL_GPIO_EXTI_Rising_Callback+0x62>
-		else if((speed_fsm.current_state.speed_exclusive_state == TAP_MODE) && (IP_CAP_fsm.current_state == IDLE)){
- 8001182:	7823      	ldrb	r3, [r4, #0]
- 8001184:	b2dd      	uxtb	r5, r3
- 8001186:	2b04      	cmp	r3, #4
- 8001188:	d017      	beq.n	80011ba <HAL_GPIO_EXTI_Rising_Callback+0x5a>
-		else if((speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_MODE) && (IP_CAP_fsm.current_state == IDLE)){
- 800118a:	7823      	ldrb	r3, [r4, #0]
- 800118c:	b2dd      	uxtb	r5, r3
- 800118e:	2b08      	cmp	r3, #8
- 8001190:	d027      	beq.n	80011e2 <HAL_GPIO_EXTI_Rising_Callback+0x82>
-		else if(speed_fsm.current_state.speed_exclusive_state == CLK_IN_PENDING_MODE){ //second edge
- 8001192:	7823      	ldrb	r3, [r4, #0]
- 8001194:	b2dd      	uxtb	r5, r3
- 8001196:	2b07      	cmp	r3, #7
- 8001198:	d028      	beq.n	80011ec <HAL_GPIO_EXTI_Rising_Callback+0x8c>
+ 800117e:	2b07      	cmp	r3, #7
+ 8001180:	d028      	beq.n	80011d4 <HAL_GPIO_EXTI_Rising_Callback+0x8c>
 		else if(speed_fsm.current_state.speed_exclusive_state == CLK_IN_MODE){
- 800119a:	7823      	ldrb	r3, [r4, #0]
- 800119c:	2b06      	cmp	r3, #6
- 800119e:	d1e2      	bne.n	8001166 <HAL_GPIO_EXTI_Rising_Callback+0x6>
+ 8001182:	7823      	ldrb	r3, [r4, #0]
+ 8001184:	2b06      	cmp	r3, #6
+ 8001186:	d1e2      	bne.n	800114e <HAL_GPIO_EXTI_Rising_Callback+0x6>
 			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
- 80011a0:	2180      	movs	r1, #128	@ 0x80
- 80011a2:	20a0      	movs	r0, #160	@ 0xa0
- 80011a4:	2200      	movs	r2, #0
- 80011a6:	0089      	lsls	r1, r1, #2
- 80011a8:	05c0      	lsls	r0, r0, #23
- 80011aa:	f002 f8a9 	bl	8003300 <HAL_GPIO_WritePin>
+ 8001188:	2180      	movs	r1, #128	@ 0x80
+ 800118a:	20a0      	movs	r0, #160	@ 0xa0
+ 800118c:	2200      	movs	r2, #0
+ 800118e:	0089      	lsls	r1, r1, #2
+ 8001190:	05c0      	lsls	r0, r0, #23
+ 8001192:	f002 f8b5 	bl	8003300 <HAL_GPIO_WritePin>
 			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
- 80011ae:	2201      	movs	r2, #1
- 80011b0:	2140      	movs	r1, #64	@ 0x40
- 80011b2:	4817      	ldr	r0, [pc, #92]	@ (8001210 <HAL_GPIO_EXTI_Rising_Callback+0xb0>)
- 80011b4:	f002 f8a4 	bl	8003300 <HAL_GPIO_WritePin>
+ 8001196:	2201      	movs	r2, #1
+ 8001198:	2140      	movs	r1, #64	@ 0x40
+ 800119a:	4817      	ldr	r0, [pc, #92]	@ (80011f8 <HAL_GPIO_EXTI_Rising_Callback+0xb0>)
+ 800119c:	f002 f8b0 	bl	8003300 <HAL_GPIO_WritePin>
 }
- 80011b8:	e7d5      	b.n	8001166 <HAL_GPIO_EXTI_Rising_Callback+0x6>
+ 80011a0:	e7d5      	b.n	800114e <HAL_GPIO_EXTI_Rising_Callback+0x6>
 		else if((speed_fsm.current_state.speed_exclusive_state == TAP_MODE) && (IP_CAP_fsm.current_state == IDLE)){
- 80011ba:	4b16      	ldr	r3, [pc, #88]	@ (8001214 <HAL_GPIO_EXTI_Rising_Callback+0xb4>)
- 80011bc:	781b      	ldrb	r3, [r3, #0]
- 80011be:	2b00      	cmp	r3, #0
- 80011c0:	d1e3      	bne.n	800118a <HAL_GPIO_EXTI_Rising_Callback+0x2a>
+ 80011a2:	4b16      	ldr	r3, [pc, #88]	@ (80011fc <HAL_GPIO_EXTI_Rising_Callback+0xb4>)
+ 80011a4:	781b      	ldrb	r3, [r3, #0]
+ 80011a6:	2b00      	cmp	r3, #0
+ 80011a8:	d1e3      	bne.n	8001172 <HAL_GPIO_EXTI_Rising_Callback+0x2a>
 			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
- 80011c2:	2180      	movs	r1, #128	@ 0x80
- 80011c4:	20a0      	movs	r0, #160	@ 0xa0
- 80011c6:	2200      	movs	r2, #0
- 80011c8:	0089      	lsls	r1, r1, #2
- 80011ca:	05c0      	lsls	r0, r0, #23
- 80011cc:	f002 f898 	bl	8003300 <HAL_GPIO_WritePin>
+ 80011aa:	2180      	movs	r1, #128	@ 0x80
+ 80011ac:	20a0      	movs	r0, #160	@ 0xa0
+ 80011ae:	2200      	movs	r2, #0
+ 80011b0:	0089      	lsls	r1, r1, #2
+ 80011b2:	05c0      	lsls	r0, r0, #23
+ 80011b4:	f002 f8a4 	bl	8003300 <HAL_GPIO_WritePin>
 			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
- 80011d0:	2201      	movs	r2, #1
- 80011d2:	2140      	movs	r1, #64	@ 0x40
- 80011d4:	480e      	ldr	r0, [pc, #56]	@ (8001210 <HAL_GPIO_EXTI_Rising_Callback+0xb0>)
- 80011d6:	f002 f893 	bl	8003300 <HAL_GPIO_WritePin>
+ 80011b8:	2201      	movs	r2, #1
+ 80011ba:	2140      	movs	r1, #64	@ 0x40
+ 80011bc:	480e      	ldr	r0, [pc, #56]	@ (80011f8 <HAL_GPIO_EXTI_Rising_Callback+0xb0>)
+ 80011be:	f002 f89f 	bl	8003300 <HAL_GPIO_WritePin>
 			speed_fsm.current_state.speed_exclusive_state = CLK_IN_PENDING_MODE;
- 80011da:	2307      	movs	r3, #7
+ 80011c2:	2307      	movs	r3, #7
 			speed_fsm.prev_state.speed_exclusive_state = MIDI_CLK_MODE;
- 80011dc:	7065      	strb	r5, [r4, #1]
+ 80011c4:	7065      	strb	r5, [r4, #1]
 			speed_fsm.current_state.speed_exclusive_state = CLK_IN_PENDING_MODE;
- 80011de:	7023      	strb	r3, [r4, #0]
- 80011e0:	e7c1      	b.n	8001166 <HAL_GPIO_EXTI_Rising_Callback+0x6>
+ 80011c6:	7023      	strb	r3, [r4, #0]
+ 80011c8:	e7c1      	b.n	800114e <HAL_GPIO_EXTI_Rising_Callback+0x6>
 		else if((speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_MODE) && (IP_CAP_fsm.current_state == IDLE)){
- 80011e2:	4b0c      	ldr	r3, [pc, #48]	@ (8001214 <HAL_GPIO_EXTI_Rising_Callback+0xb4>)
- 80011e4:	781b      	ldrb	r3, [r3, #0]
- 80011e6:	2b00      	cmp	r3, #0
- 80011e8:	d1d3      	bne.n	8001192 <HAL_GPIO_EXTI_Rising_Callback+0x32>
- 80011ea:	e7ea      	b.n	80011c2 <HAL_GPIO_EXTI_Rising_Callback+0x62>
+ 80011ca:	4b0c      	ldr	r3, [pc, #48]	@ (80011fc <HAL_GPIO_EXTI_Rising_Callback+0xb4>)
+ 80011cc:	781b      	ldrb	r3, [r3, #0]
+ 80011ce:	2b00      	cmp	r3, #0
+ 80011d0:	d1d3      	bne.n	800117a <HAL_GPIO_EXTI_Rising_Callback+0x32>
+ 80011d2:	e7ea      	b.n	80011aa <HAL_GPIO_EXTI_Rising_Callback+0x62>
 			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
- 80011ec:	2180      	movs	r1, #128	@ 0x80
- 80011ee:	20a0      	movs	r0, #160	@ 0xa0
- 80011f0:	2200      	movs	r2, #0
- 80011f2:	0089      	lsls	r1, r1, #2
- 80011f4:	05c0      	lsls	r0, r0, #23
- 80011f6:	f002 f883 	bl	8003300 <HAL_GPIO_WritePin>
+ 80011d4:	2180      	movs	r1, #128	@ 0x80
+ 80011d6:	20a0      	movs	r0, #160	@ 0xa0
+ 80011d8:	2200      	movs	r2, #0
+ 80011da:	0089      	lsls	r1, r1, #2
+ 80011dc:	05c0      	lsls	r0, r0, #23
+ 80011de:	f002 f88f 	bl	8003300 <HAL_GPIO_WritePin>
 			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
- 80011fa:	2201      	movs	r2, #1
- 80011fc:	2140      	movs	r1, #64	@ 0x40
- 80011fe:	4804      	ldr	r0, [pc, #16]	@ (8001210 <HAL_GPIO_EXTI_Rising_Callback+0xb0>)
- 8001200:	f002 f87e 	bl	8003300 <HAL_GPIO_WritePin>
+ 80011e2:	2201      	movs	r2, #1
+ 80011e4:	2140      	movs	r1, #64	@ 0x40
+ 80011e6:	4804      	ldr	r0, [pc, #16]	@ (80011f8 <HAL_GPIO_EXTI_Rising_Callback+0xb0>)
+ 80011e8:	f002 f88a 	bl	8003300 <HAL_GPIO_WritePin>
 			speed_fsm.current_state.speed_exclusive_state = CLK_IN_MODE;
- 8001204:	2306      	movs	r3, #6
+ 80011ec:	2306      	movs	r3, #6
 			speed_fsm.prev_state.speed_exclusive_state = CLK_IN_PENDING_MODE;
- 8001206:	7065      	strb	r5, [r4, #1]
+ 80011ee:	7065      	strb	r5, [r4, #1]
 			speed_fsm.current_state.speed_exclusive_state = CLK_IN_MODE;
- 8001208:	7023      	strb	r3, [r4, #0]
- 800120a:	e7ac      	b.n	8001166 <HAL_GPIO_EXTI_Rising_Callback+0x6>
- 800120c:	20000410 	.word	0x20000410
- 8001210:	50000800 	.word	0x50000800
- 8001214:	2000040c 	.word	0x2000040c
+ 80011f0:	7023      	strb	r3, [r4, #0]
+ 80011f2:	e7ac      	b.n	800114e <HAL_GPIO_EXTI_Rising_Callback+0x6>
+ 80011f4:	20000410 	.word	0x20000410
+ 80011f8:	50000800 	.word	0x50000800
+ 80011fc:	2000040c 	.word	0x2000040c
 
-08001218 <LPTIM1_callback>:
+08001200 <LPTIM1_callback>:
 
 	static volatile struct Tap_Tempo_Switch_States tap_tempo_switch_states = {0};
 
 	//CHECK IF NEED TO TAP_PENDING TRANSITION
 
 	uint8_t pin_state = (uint8_t)HAL_GPIO_ReadPin(SW_IN_GPIO_Port, SW_IN_Pin);
- 8001218:	2180      	movs	r1, #128	@ 0x80
- 800121a:	20a0      	movs	r0, #160	@ 0xa0
+ 8001200:	2180      	movs	r1, #128	@ 0x80
+ 8001202:	20a0      	movs	r0, #160	@ 0xa0
 void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
- 800121c:	b570      	push	{r4, r5, r6, lr}
+ 8001204:	b570      	push	{r4, r5, r6, lr}
 	uint8_t pin_state = (uint8_t)HAL_GPIO_ReadPin(SW_IN_GPIO_Port, SW_IN_Pin);
- 800121e:	00c9      	lsls	r1, r1, #3
- 8001220:	05c0      	lsls	r0, r0, #23
- 8001222:	f002 f867 	bl	80032f4 <HAL_GPIO_ReadPin>
+ 8001206:	00c9      	lsls	r1, r1, #3
+ 8001208:	05c0      	lsls	r0, r0, #23
+ 800120a:	f002 f873 	bl	80032f4 <HAL_GPIO_ReadPin>
 
 	if((speed_fsm.current_state.shared_state == MANUAL_MODE) && (pin_state == 0)){
- 8001226:	4c4a      	ldr	r4, [pc, #296]	@ (8001350 <LPTIM1_callback+0x138>)
- 8001228:	7823      	ldrb	r3, [r4, #0]
- 800122a:	b2da      	uxtb	r2, r3
- 800122c:	2b01      	cmp	r3, #1
- 800122e:	d03a      	beq.n	80012a6 <LPTIM1_callback+0x8e>
+ 800120e:	4c4a      	ldr	r4, [pc, #296]	@ (8001338 <LPTIM1_callback+0x138>)
+ 8001210:	7823      	ldrb	r3, [r4, #0]
+ 8001212:	b2da      	uxtb	r2, r3
+ 8001214:	2b01      	cmp	r3, #1
+ 8001216:	d03a      	beq.n	800128e <LPTIM1_callback+0x8e>
 
 		speed_fsm.current_state.speed_exclusive_state = TAP_PENDING_MODE;
 		speed_fsm.prev_state.shared_state = MANUAL_MODE;
 	}
 	else if((speed_fsm.current_state.shared_state == CC_MODE) && (pin_state == 0)){
- 8001230:	7823      	ldrb	r3, [r4, #0]
- 8001232:	b2da      	uxtb	r2, r3
- 8001234:	2b02      	cmp	r3, #2
- 8001236:	d016      	beq.n	8001266 <LPTIM1_callback+0x4e>
+ 8001218:	7823      	ldrb	r3, [r4, #0]
+ 800121a:	b2da      	uxtb	r2, r3
+ 800121c:	2b02      	cmp	r3, #2
+ 800121e:	d016      	beq.n	800124e <LPTIM1_callback+0x4e>
 
 		speed_fsm.current_state.speed_exclusive_state = TAP_PENDING_MODE;
 		speed_fsm.prev_state.shared_state = CC_MODE;
 	}
 	else if((speed_fsm.current_state.shared_state == PC_MODE) && (pin_state == 0)){
- 8001238:	7823      	ldrb	r3, [r4, #0]
- 800123a:	b2da      	uxtb	r2, r3
- 800123c:	2b03      	cmp	r3, #3
- 800123e:	d100      	bne.n	8001242 <LPTIM1_callback+0x2a>
- 8001240:	e074      	b.n	800132c <LPTIM1_callback+0x114>
+ 8001220:	7823      	ldrb	r3, [r4, #0]
+ 8001222:	b2da      	uxtb	r2, r3
+ 8001224:	2b03      	cmp	r3, #3
+ 8001226:	d100      	bne.n	800122a <LPTIM1_callback+0x2a>
+ 8001228:	e074      	b.n	8001314 <LPTIM1_callback+0x114>
 
 		speed_fsm.current_state.speed_exclusive_state = TAP_PENDING_MODE;
 		speed_fsm.prev_state.shared_state = PC_MODE;
 	}
 	else if((speed_fsm.current_state.speed_exclusive_state == CLK_IN_MODE) && (pin_state == 0) && IP_CAP_fsm.current_state == IDLE){
- 8001242:	7823      	ldrb	r3, [r4, #0]
- 8001244:	b2da      	uxtb	r2, r3
- 8001246:	2b06      	cmp	r3, #6
- 8001248:	d053      	beq.n	80012f2 <LPTIM1_callback+0xda>
+ 800122a:	7823      	ldrb	r3, [r4, #0]
+ 800122c:	b2da      	uxtb	r2, r3
+ 800122e:	2b06      	cmp	r3, #6
+ 8001230:	d053      	beq.n	80012da <LPTIM1_callback+0xda>
 
 		speed_fsm.current_state.speed_exclusive_state = TAP_PENDING_MODE;
 		speed_fsm.prev_state.speed_exclusive_state = CLK_IN_MODE;
 	}
 	else if((speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_MODE) && (pin_state == 0) && IP_CAP_fsm.current_state == IDLE){
- 800124a:	7823      	ldrb	r3, [r4, #0]
- 800124c:	2b08      	cmp	r3, #8
- 800124e:	d10f      	bne.n	8001270 <LPTIM1_callback+0x58>
- 8001250:	2800      	cmp	r0, #0
- 8001252:	d10d      	bne.n	8001270 <LPTIM1_callback+0x58>
- 8001254:	4b3f      	ldr	r3, [pc, #252]	@ (8001354 <LPTIM1_callback+0x13c>)
- 8001256:	781b      	ldrb	r3, [r3, #0]
- 8001258:	2b00      	cmp	r3, #0
- 800125a:	d109      	bne.n	8001270 <LPTIM1_callback+0x58>
+ 8001232:	7823      	ldrb	r3, [r4, #0]
+ 8001234:	2b08      	cmp	r3, #8
+ 8001236:	d10f      	bne.n	8001258 <LPTIM1_callback+0x58>
+ 8001238:	2800      	cmp	r0, #0
+ 800123a:	d10d      	bne.n	8001258 <LPTIM1_callback+0x58>
+ 800123c:	4b3f      	ldr	r3, [pc, #252]	@ (800133c <LPTIM1_callback+0x13c>)
+ 800123e:	781b      	ldrb	r3, [r3, #0]
+ 8001240:	2b00      	cmp	r3, #0
+ 8001242:	d109      	bne.n	8001258 <LPTIM1_callback+0x58>
 
 		speed_fsm.current_state.speed_exclusive_state = TAP_PENDING_MODE;
- 800125c:	3305      	adds	r3, #5
- 800125e:	7023      	strb	r3, [r4, #0]
+ 8001244:	3305      	adds	r3, #5
+ 8001246:	7023      	strb	r3, [r4, #0]
 		speed_fsm.prev_state.speed_exclusive_state = MIDI_CLK_MODE;
- 8001260:	3303      	adds	r3, #3
- 8001262:	7063      	strb	r3, [r4, #1]
- 8001264:	e004      	b.n	8001270 <LPTIM1_callback+0x58>
+ 8001248:	3303      	adds	r3, #3
+ 800124a:	7063      	strb	r3, [r4, #1]
+ 800124c:	e004      	b.n	8001258 <LPTIM1_callback+0x58>
 	else if((speed_fsm.current_state.shared_state == CC_MODE) && (pin_state == 0)){
- 8001266:	2800      	cmp	r0, #0
- 8001268:	d120      	bne.n	80012ac <LPTIM1_callback+0x94>
+ 800124e:	2800      	cmp	r0, #0
+ 8001250:	d120      	bne.n	8001294 <LPTIM1_callback+0x94>
 		speed_fsm.current_state.speed_exclusive_state = TAP_PENDING_MODE;
- 800126a:	2305      	movs	r3, #5
- 800126c:	7023      	strb	r3, [r4, #0]
+ 8001252:	2305      	movs	r3, #5
+ 8001254:	7023      	strb	r3, [r4, #0]
 		speed_fsm.prev_state.speed_exclusive_state = CLK_IN_MODE;
- 800126e:	7062      	strb	r2, [r4, #1]
+ 8001256:	7062      	strb	r2, [r4, #1]
 	}
 
 	//CHECK TAP TEMPO STATE
 	if((speed_fsm.current_state.speed_exclusive_state == TAP_PENDING_MODE) || (speed_fsm.current_state.speed_exclusive_state == TAP_MODE)){
- 8001270:	7823      	ldrb	r3, [r4, #0]
- 8001272:	2b05      	cmp	r3, #5
- 8001274:	d020      	beq.n	80012b8 <LPTIM1_callback+0xa0>
- 8001276:	7823      	ldrb	r3, [r4, #0]
- 8001278:	2b04      	cmp	r3, #4
- 800127a:	d01d      	beq.n	80012b8 <LPTIM1_callback+0xa0>
+ 8001258:	7823      	ldrb	r3, [r4, #0]
+ 800125a:	2b05      	cmp	r3, #5
+ 800125c:	d020      	beq.n	80012a0 <LPTIM1_callback+0xa0>
+ 800125e:	7823      	ldrb	r3, [r4, #0]
+ 8001260:	2b04      	cmp	r3, #4
+ 8001262:	d01d      	beq.n	80012a0 <LPTIM1_callback+0xa0>
 	//SET PREVIOUS STATE TO CURRENT STATE
 	//tap_tempo_switch_states.tap_tempo_switch_prev_state = tap_tempo_switch_states.tap_tempo_switch_state;
 
 
 	//PERFORM SPEED POT CHECKING
 	if((speed_fsm.current_state.shared_state == PC_MODE) || (speed_fsm.current_state.shared_state == CC_MODE)){
- 800127c:	7823      	ldrb	r3, [r4, #0]
- 800127e:	2b03      	cmp	r3, #3
- 8001280:	d033      	beq.n	80012ea <LPTIM1_callback+0xd2>
- 8001282:	7823      	ldrb	r3, [r4, #0]
- 8001284:	2b02      	cmp	r3, #2
- 8001286:	d030      	beq.n	80012ea <LPTIM1_callback+0xd2>
+ 8001264:	7823      	ldrb	r3, [r4, #0]
+ 8001266:	2b03      	cmp	r3, #3
+ 8001268:	d033      	beq.n	80012d2 <LPTIM1_callback+0xd2>
+ 800126a:	7823      	ldrb	r3, [r4, #0]
+ 800126c:	2b02      	cmp	r3, #2
+ 800126e:	d030      	beq.n	80012d2 <LPTIM1_callback+0xd2>
 
 		Speed_Pot_Check(&params);
 	}
 	else if((speed_fsm.current_state.speed_exclusive_state == CLK_IN_MODE) && (IP_CAP_fsm.current_state == IDLE)){
- 8001288:	7823      	ldrb	r3, [r4, #0]
- 800128a:	2b06      	cmp	r3, #6
- 800128c:	d03b      	beq.n	8001306 <LPTIM1_callback+0xee>
+ 8001270:	7823      	ldrb	r3, [r4, #0]
+ 8001272:	2b06      	cmp	r3, #6
+ 8001274:	d03b      	beq.n	80012ee <LPTIM1_callback+0xee>
 
 		Speed_Pot_Check(&params);
 	}
 	else if((speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_MODE) && (IP_CAP_fsm.current_state == IDLE)){
- 800128e:	7823      	ldrb	r3, [r4, #0]
- 8001290:	2b08      	cmp	r3, #8
- 8001292:	d03f      	beq.n	8001314 <LPTIM1_callback+0xfc>
+ 8001276:	7823      	ldrb	r3, [r4, #0]
+ 8001278:	2b08      	cmp	r3, #8
+ 800127a:	d03f      	beq.n	80012fc <LPTIM1_callback+0xfc>
 
 		Speed_Pot_Check(&params);
 	}
 	else if((speed_fsm.current_state.speed_exclusive_state == TAP_MODE) && (IP_CAP_fsm.current_state == IDLE)){
- 8001294:	7823      	ldrb	r3, [r4, #0]
- 8001296:	2b04      	cmp	r3, #4
- 8001298:	d043      	beq.n	8001322 <LPTIM1_callback+0x10a>
+ 800127c:	7823      	ldrb	r3, [r4, #0]
+ 800127e:	2b04      	cmp	r3, #4
+ 8001280:	d043      	beq.n	800130a <LPTIM1_callback+0x10a>
 
 		Speed_Pot_Check(&params);
 	}
 
 	//SET TIMER TRIGGER
 	HAL_LPTIM_SetOnce_Start_IT(&hlptim1, LPTIM1_CCR_CHECK, LPTIM1_CCR_CHECK);
- 800129a:	22fa      	movs	r2, #250	@ 0xfa
- 800129c:	21fa      	movs	r1, #250	@ 0xfa
- 800129e:	482e      	ldr	r0, [pc, #184]	@ (8001358 <LPTIM1_callback+0x140>)
- 80012a0:	f002 fa58 	bl	8003754 <HAL_LPTIM_SetOnce_Start_IT>
+ 8001282:	22fa      	movs	r2, #250	@ 0xfa
+ 8001284:	21fa      	movs	r1, #250	@ 0xfa
+ 8001286:	482e      	ldr	r0, [pc, #184]	@ (8001340 <LPTIM1_callback+0x140>)
+ 8001288:	f002 fa64 	bl	8003754 <HAL_LPTIM_SetOnce_Start_IT>
 
 }
- 80012a4:	bd70      	pop	{r4, r5, r6, pc}
+ 800128c:	bd70      	pop	{r4, r5, r6, pc}
 	if((speed_fsm.current_state.shared_state == MANUAL_MODE) && (pin_state == 0)){
- 80012a6:	2800      	cmp	r0, #0
- 80012a8:	d0df      	beq.n	800126a <LPTIM1_callback+0x52>
+ 800128e:	2800      	cmp	r0, #0
+ 8001290:	d0df      	beq.n	8001252 <LPTIM1_callback+0x52>
 	else if((speed_fsm.current_state.shared_state == CC_MODE) && (pin_state == 0)){
- 80012aa:	7823      	ldrb	r3, [r4, #0]
+ 8001292:	7823      	ldrb	r3, [r4, #0]
 	else if((speed_fsm.current_state.shared_state == PC_MODE) && (pin_state == 0)){
- 80012ac:	7823      	ldrb	r3, [r4, #0]
+ 8001294:	7823      	ldrb	r3, [r4, #0]
 	else if((speed_fsm.current_state.speed_exclusive_state == CLK_IN_MODE) && (pin_state == 0) && IP_CAP_fsm.current_state == IDLE){
- 80012ae:	7823      	ldrb	r3, [r4, #0]
+ 8001296:	7823      	ldrb	r3, [r4, #0]
 	else if((speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_MODE) && (pin_state == 0) && IP_CAP_fsm.current_state == IDLE){
- 80012b0:	7823      	ldrb	r3, [r4, #0]
+ 8001298:	7823      	ldrb	r3, [r4, #0]
 	if((speed_fsm.current_state.speed_exclusive_state == TAP_PENDING_MODE) || (speed_fsm.current_state.speed_exclusive_state == TAP_MODE)){
- 80012b2:	7823      	ldrb	r3, [r4, #0]
- 80012b4:	2b05      	cmp	r3, #5
- 80012b6:	d1de      	bne.n	8001276 <LPTIM1_callback+0x5e>
+ 800129a:	7823      	ldrb	r3, [r4, #0]
+ 800129c:	2b05      	cmp	r3, #5
+ 800129e:	d1de      	bne.n	800125e <LPTIM1_callback+0x5e>
 		Check_Tap_Tempo_Switch_State(&tap_tempo_switch_states);
- 80012b8:	4d28      	ldr	r5, [pc, #160]	@ (800135c <LPTIM1_callback+0x144>)
- 80012ba:	0028      	movs	r0, r5
- 80012bc:	f7ff f90c 	bl	80004d8 <Check_Tap_Tempo_Switch_State>
+ 80012a0:	4d28      	ldr	r5, [pc, #160]	@ (8001344 <LPTIM1_callback+0x144>)
+ 80012a2:	0028      	movs	r0, r5
+ 80012a4:	f7ff f918 	bl	80004d8 <Check_Tap_Tempo_Switch_State>
 		if(tap_tempo_switch_states.tap_tempo_switch_state == DEPRESSED){
- 80012c0:	782b      	ldrb	r3, [r5, #0]
- 80012c2:	2b01      	cmp	r3, #1
- 80012c4:	d036      	beq.n	8001334 <LPTIM1_callback+0x11c>
+ 80012a8:	782b      	ldrb	r3, [r5, #0]
+ 80012aa:	2b01      	cmp	r3, #1
+ 80012ac:	d036      	beq.n	800131c <LPTIM1_callback+0x11c>
 		else if(tap_tempo_switch_states.tap_tempo_switch_state == NOT_DEPRESSED){
- 80012c6:	782b      	ldrb	r3, [r5, #0]
- 80012c8:	2b00      	cmp	r3, #0
- 80012ca:	d1d7      	bne.n	800127c <LPTIM1_callback+0x64>
+ 80012ae:	782b      	ldrb	r3, [r5, #0]
+ 80012b0:	2b00      	cmp	r3, #0
+ 80012b2:	d1d7      	bne.n	8001264 <LPTIM1_callback+0x64>
 			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1); //reset
- 80012cc:	2180      	movs	r1, #128	@ 0x80
- 80012ce:	20a0      	movs	r0, #160	@ 0xa0
- 80012d0:	2201      	movs	r2, #1
- 80012d2:	0089      	lsls	r1, r1, #2
- 80012d4:	05c0      	lsls	r0, r0, #23
- 80012d6:	f002 f813 	bl	8003300 <HAL_GPIO_WritePin>
+ 80012b4:	2180      	movs	r1, #128	@ 0x80
+ 80012b6:	20a0      	movs	r0, #160	@ 0xa0
+ 80012b8:	2201      	movs	r2, #1
+ 80012ba:	0089      	lsls	r1, r1, #2
+ 80012bc:	05c0      	lsls	r0, r0, #23
+ 80012be:	f002 f81f 	bl	8003300 <HAL_GPIO_WritePin>
 			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
- 80012da:	2200      	movs	r2, #0
- 80012dc:	2140      	movs	r1, #64	@ 0x40
- 80012de:	4820      	ldr	r0, [pc, #128]	@ (8001360 <LPTIM1_callback+0x148>)
- 80012e0:	f002 f80e 	bl	8003300 <HAL_GPIO_WritePin>
+ 80012c2:	2200      	movs	r2, #0
+ 80012c4:	2140      	movs	r1, #64	@ 0x40
+ 80012c6:	4820      	ldr	r0, [pc, #128]	@ (8001348 <LPTIM1_callback+0x148>)
+ 80012c8:	f002 f81a 	bl	8003300 <HAL_GPIO_WritePin>
 	if((speed_fsm.current_state.shared_state == PC_MODE) || (speed_fsm.current_state.shared_state == CC_MODE)){
- 80012e4:	7823      	ldrb	r3, [r4, #0]
- 80012e6:	2b03      	cmp	r3, #3
- 80012e8:	d1cb      	bne.n	8001282 <LPTIM1_callback+0x6a>
+ 80012cc:	7823      	ldrb	r3, [r4, #0]
+ 80012ce:	2b03      	cmp	r3, #3
+ 80012d0:	d1cb      	bne.n	800126a <LPTIM1_callback+0x6a>
 		Speed_Pot_Check(&params);
- 80012ea:	481e      	ldr	r0, [pc, #120]	@ (8001364 <LPTIM1_callback+0x14c>)
- 80012ec:	f7ff f8b8 	bl	8000460 <Speed_Pot_Check>
- 80012f0:	e7d3      	b.n	800129a <LPTIM1_callback+0x82>
+ 80012d2:	481e      	ldr	r0, [pc, #120]	@ (800134c <LPTIM1_callback+0x14c>)
+ 80012d4:	f7ff f8c4 	bl	8000460 <Speed_Pot_Check>
+ 80012d8:	e7d3      	b.n	8001282 <LPTIM1_callback+0x82>
 	else if((speed_fsm.current_state.speed_exclusive_state == CLK_IN_MODE) && (pin_state == 0) && IP_CAP_fsm.current_state == IDLE){
- 80012f2:	2800      	cmp	r0, #0
- 80012f4:	d1dc      	bne.n	80012b0 <LPTIM1_callback+0x98>
- 80012f6:	4b17      	ldr	r3, [pc, #92]	@ (8001354 <LPTIM1_callback+0x13c>)
- 80012f8:	7819      	ldrb	r1, [r3, #0]
- 80012fa:	2900      	cmp	r1, #0
- 80012fc:	d0b5      	beq.n	800126a <LPTIM1_callback+0x52>
+ 80012da:	2800      	cmp	r0, #0
+ 80012dc:	d1dc      	bne.n	8001298 <LPTIM1_callback+0x98>
+ 80012de:	4b17      	ldr	r3, [pc, #92]	@ (800133c <LPTIM1_callback+0x13c>)
+ 80012e0:	7819      	ldrb	r1, [r3, #0]
+ 80012e2:	2900      	cmp	r1, #0
+ 80012e4:	d0b5      	beq.n	8001252 <LPTIM1_callback+0x52>
 	else if((speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_MODE) && (pin_state == 0) && IP_CAP_fsm.current_state == IDLE){
- 80012fe:	7822      	ldrb	r2, [r4, #0]
- 8001300:	2a08      	cmp	r2, #8
- 8001302:	d1b5      	bne.n	8001270 <LPTIM1_callback+0x58>
- 8001304:	e7a7      	b.n	8001256 <LPTIM1_callback+0x3e>
+ 80012e6:	7822      	ldrb	r2, [r4, #0]
+ 80012e8:	2a08      	cmp	r2, #8
+ 80012ea:	d1b5      	bne.n	8001258 <LPTIM1_callback+0x58>
+ 80012ec:	e7a7      	b.n	800123e <LPTIM1_callback+0x3e>
 	else if((speed_fsm.current_state.speed_exclusive_state == CLK_IN_MODE) && (IP_CAP_fsm.current_state == IDLE)){
- 8001306:	4b13      	ldr	r3, [pc, #76]	@ (8001354 <LPTIM1_callback+0x13c>)
- 8001308:	781b      	ldrb	r3, [r3, #0]
- 800130a:	2b00      	cmp	r3, #0
- 800130c:	d0ed      	beq.n	80012ea <LPTIM1_callback+0xd2>
+ 80012ee:	4b13      	ldr	r3, [pc, #76]	@ (800133c <LPTIM1_callback+0x13c>)
+ 80012f0:	781b      	ldrb	r3, [r3, #0]
+ 80012f2:	2b00      	cmp	r3, #0
+ 80012f4:	d0ed      	beq.n	80012d2 <LPTIM1_callback+0xd2>
 	else if((speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_MODE) && (IP_CAP_fsm.current_state == IDLE)){
- 800130e:	7823      	ldrb	r3, [r4, #0]
- 8001310:	2b08      	cmp	r3, #8
- 8001312:	d1bf      	bne.n	8001294 <LPTIM1_callback+0x7c>
- 8001314:	4b0f      	ldr	r3, [pc, #60]	@ (8001354 <LPTIM1_callback+0x13c>)
- 8001316:	781b      	ldrb	r3, [r3, #0]
- 8001318:	2b00      	cmp	r3, #0
- 800131a:	d0e6      	beq.n	80012ea <LPTIM1_callback+0xd2>
+ 80012f6:	7823      	ldrb	r3, [r4, #0]
+ 80012f8:	2b08      	cmp	r3, #8
+ 80012fa:	d1bf      	bne.n	800127c <LPTIM1_callback+0x7c>
+ 80012fc:	4b0f      	ldr	r3, [pc, #60]	@ (800133c <LPTIM1_callback+0x13c>)
+ 80012fe:	781b      	ldrb	r3, [r3, #0]
+ 8001300:	2b00      	cmp	r3, #0
+ 8001302:	d0e6      	beq.n	80012d2 <LPTIM1_callback+0xd2>
 	else if((speed_fsm.current_state.speed_exclusive_state == TAP_MODE) && (IP_CAP_fsm.current_state == IDLE)){
- 800131c:	7823      	ldrb	r3, [r4, #0]
- 800131e:	2b04      	cmp	r3, #4
- 8001320:	d1bb      	bne.n	800129a <LPTIM1_callback+0x82>
- 8001322:	4b0c      	ldr	r3, [pc, #48]	@ (8001354 <LPTIM1_callback+0x13c>)
- 8001324:	781b      	ldrb	r3, [r3, #0]
- 8001326:	2b00      	cmp	r3, #0
- 8001328:	d1b7      	bne.n	800129a <LPTIM1_callback+0x82>
- 800132a:	e7de      	b.n	80012ea <LPTIM1_callback+0xd2>
+ 8001304:	7823      	ldrb	r3, [r4, #0]
+ 8001306:	2b04      	cmp	r3, #4
+ 8001308:	d1bb      	bne.n	8001282 <LPTIM1_callback+0x82>
+ 800130a:	4b0c      	ldr	r3, [pc, #48]	@ (800133c <LPTIM1_callback+0x13c>)
+ 800130c:	781b      	ldrb	r3, [r3, #0]
+ 800130e:	2b00      	cmp	r3, #0
+ 8001310:	d1b7      	bne.n	8001282 <LPTIM1_callback+0x82>
+ 8001312:	e7de      	b.n	80012d2 <LPTIM1_callback+0xd2>
 	else if((speed_fsm.current_state.shared_state == PC_MODE) && (pin_state == 0)){
- 800132c:	2800      	cmp	r0, #0
- 800132e:	d09c      	beq.n	800126a <LPTIM1_callback+0x52>
+ 8001314:	2800      	cmp	r0, #0
+ 8001316:	d09c      	beq.n	8001252 <LPTIM1_callback+0x52>
 	else if((speed_fsm.current_state.speed_exclusive_state == CLK_IN_MODE) && (pin_state == 0) && IP_CAP_fsm.current_state == IDLE){
- 8001330:	7823      	ldrb	r3, [r4, #0]
- 8001332:	e7bd      	b.n	80012b0 <LPTIM1_callback+0x98>
+ 8001318:	7823      	ldrb	r3, [r4, #0]
+ 800131a:	e7bd      	b.n	8001298 <LPTIM1_callback+0x98>
 			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
- 8001334:	2180      	movs	r1, #128	@ 0x80
- 8001336:	20a0      	movs	r0, #160	@ 0xa0
- 8001338:	2200      	movs	r2, #0
- 800133a:	0089      	lsls	r1, r1, #2
- 800133c:	05c0      	lsls	r0, r0, #23
- 800133e:	f001 ffdf 	bl	8003300 <HAL_GPIO_WritePin>
+ 800131c:	2180      	movs	r1, #128	@ 0x80
+ 800131e:	20a0      	movs	r0, #160	@ 0xa0
+ 8001320:	2200      	movs	r2, #0
+ 8001322:	0089      	lsls	r1, r1, #2
+ 8001324:	05c0      	lsls	r0, r0, #23
+ 8001326:	f001 ffeb 	bl	8003300 <HAL_GPIO_WritePin>
 			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
- 8001342:	2201      	movs	r2, #1
- 8001344:	2140      	movs	r1, #64	@ 0x40
- 8001346:	4806      	ldr	r0, [pc, #24]	@ (8001360 <LPTIM1_callback+0x148>)
- 8001348:	f001 ffda 	bl	8003300 <HAL_GPIO_WritePin>
- 800134c:	e796      	b.n	800127c <LPTIM1_callback+0x64>
- 800134e:	46c0      	nop			@ (mov r8, r8)
- 8001350:	20000410 	.word	0x20000410
- 8001354:	2000040c 	.word	0x2000040c
- 8001358:	20000448 	.word	0x20000448
- 800135c:	20000b74 	.word	0x20000b74
- 8001360:	50000800 	.word	0x50000800
- 8001364:	20000bcc 	.word	0x20000bcc
+ 800132a:	2201      	movs	r2, #1
+ 800132c:	2140      	movs	r1, #64	@ 0x40
+ 800132e:	4806      	ldr	r0, [pc, #24]	@ (8001348 <LPTIM1_callback+0x148>)
+ 8001330:	f001 ffe6 	bl	8003300 <HAL_GPIO_WritePin>
+ 8001334:	e796      	b.n	8001264 <LPTIM1_callback+0x64>
+ 8001336:	46c0      	nop			@ (mov r8, r8)
+ 8001338:	20000410 	.word	0x20000410
+ 800133c:	2000040c 	.word	0x2000040c
+ 8001340:	20000448 	.word	0x20000448
+ 8001344:	20000b74 	.word	0x20000b74
+ 8001348:	50000800 	.word	0x50000800
+ 800134c:	20000bcc 	.word	0x20000bcc
 
-08001368 <TIM17_callback>:
+08001350 <TIM17_callback>:
 
 void TIM17_callback(TIM_HandleTypeDef *htim){
 
 
 }
- 8001368:	4770      	bx	lr
- 800136a:	46c0      	nop			@ (mov r8, r8)
+ 8001350:	4770      	bx	lr
+ 8001352:	46c0      	nop			@ (mov r8, r8)
 
-0800136c <TIM14_callback>:
+08001354 <TIM14_callback>:
 
 void TIM14_callback(TIM_HandleTypeDef *htim){
- 800136c:	4770      	bx	lr
- 800136e:	46c0      	nop			@ (mov r8, r8)
+ 8001354:	4770      	bx	lr
+ 8001356:	46c0      	nop			@ (mov r8, r8)
 
-08001370 <Input_Capture_Processing>:
+08001358 <Input_Capture_Processing>:
 volatile uint32_t TIM2_ch1_input_capture_value;
 volatile uint16_t interrupt_period = 0;
 volatile uint8_t MIDI_CLK_tag = 0;
 
 //FUNCTION DEFINITIONS
 uint8_t Input_Capture_Processing(volatile uint16_t interrupt_period_value, struct Params *params_ptr){
- 8001370:	b5f0      	push	{r4, r5, r6, r7, lr}
- 8001372:	b083      	sub	sp, #12
- 8001374:	466b      	mov	r3, sp
- 8001376:	000f      	movs	r7, r1
- 8001378:	80d8      	strh	r0, [r3, #6]
+ 8001358:	b5f0      	push	{r4, r5, r6, r7, lr}
+ 800135a:	b083      	sub	sp, #12
+ 800135c:	466b      	mov	r3, sp
+ 800135e:	000f      	movs	r7, r1
+ 8001360:	80d8      	strh	r0, [r3, #6]
 
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
 
 	Clear_Status_Bit(&statuses, Input_Capture_Processing_Can_Be_Started); //reset flag
- 800137a:	2104      	movs	r1, #4
- 800137c:	481a      	ldr	r0, [pc, #104]	@ (80013e8 <Input_Capture_Processing+0x78>)
+ 8001362:	2104      	movs	r1, #4
+ 8001364:	481a      	ldr	r0, [pc, #104]	@ (80013d0 <Input_Capture_Processing+0x78>)
 uint8_t Input_Capture_Processing(volatile uint16_t interrupt_period_value, struct Params *params_ptr){
- 800137e:	1d9d      	adds	r5, r3, #6
+ 8001366:	1d9d      	adds	r5, r3, #6
 	Clear_Status_Bit(&statuses, Input_Capture_Processing_Can_Be_Started); //reset flag
- 8001380:	f000 feca 	bl	8002118 <Clear_Status_Bit>
+ 8001368:	f000 fed6 	bl	8002118 <Clear_Status_Bit>
 
 	//DETERMINE WHAT TO SET THE RAW_START_VALUE AND BASE_PRESCALER TO BASED ON THE I/P CAPTURE VALUE
 	//CHECK FOR PRIMALITY
 	if(isPrime(interrupt_period_value) == YES){
- 8001384:	8828      	ldrh	r0, [r5, #0]
- 8001386:	b280      	uxth	r0, r0
- 8001388:	f000 fe98 	bl	80020bc <isPrime>
- 800138c:	2801      	cmp	r0, #1
- 800138e:	d103      	bne.n	8001398 <Input_Capture_Processing+0x28>
+ 800136c:	8828      	ldrh	r0, [r5, #0]
+ 800136e:	b280      	uxth	r0, r0
+ 8001370:	f000 fea4 	bl	80020bc <isPrime>
+ 8001374:	2801      	cmp	r0, #1
+ 8001376:	d103      	bne.n	8001380 <Input_Capture_Processing+0x28>
 
 		interrupt_period_value += 1;
- 8001390:	882b      	ldrh	r3, [r5, #0]
- 8001392:	3301      	adds	r3, #1
- 8001394:	b29b      	uxth	r3, r3
- 8001396:	802b      	strh	r3, [r5, #0]
+ 8001378:	882b      	ldrh	r3, [r5, #0]
+ 800137a:	3301      	adds	r3, #1
+ 800137c:	b29b      	uxth	r3, r3
+ 800137e:	802b      	strh	r3, [r5, #0]
 	}
 
 	//START FINDING FACTORS
 	uint32_t N = interrupt_period_value << 6; //calculate the N-value which is prescaler_meas * interrupt_period_meas. The measurement prescaler is used which is 64. (TIM2 has a prescaler of 64*512, but since we divide this value by 512, the prescaler is then just 64).
- 8001398:	2480      	movs	r4, #128	@ 0x80
- 800139a:	882e      	ldrh	r6, [r5, #0]
- 800139c:	0064      	lsls	r4, r4, #1
- 800139e:	01b6      	lsls	r6, r6, #6
+ 8001380:	2480      	movs	r4, #128	@ 0x80
+ 8001382:	882e      	ldrh	r6, [r5, #0]
+ 8001384:	0064      	lsls	r4, r4, #1
+ 8001386:	01b6      	lsls	r6, r6, #6
 
 	for(uint8_t i = 0; i < 129; i++){ //check from period = 264 to 128 - there will be a prescaler for every non-prime value of N
- 80013a0:	e003      	b.n	80013aa <Input_Capture_Processing+0x3a>
- 80013a2:	3c01      	subs	r4, #1
- 80013a4:	b2a4      	uxth	r4, r4
- 80013a6:	2c7f      	cmp	r4, #127	@ 0x7f
- 80013a8:	d00e      	beq.n	80013c8 <Input_Capture_Processing+0x58>
+ 8001388:	e003      	b.n	8001392 <Input_Capture_Processing+0x3a>
+ 800138a:	3c01      	subs	r4, #1
+ 800138c:	b2a4      	uxth	r4, r4
+ 800138e:	2c7f      	cmp	r4, #127	@ 0x7f
+ 8001390:	d00e      	beq.n	80013b0 <Input_Capture_Processing+0x58>
 
 		interrupt_period_value = 256 - i;
- 80013aa:	802c      	strh	r4, [r5, #0]
+ 8001392:	802c      	strh	r4, [r5, #0]
 		uint16_t remainder = N % interrupt_period_value;
- 80013ac:	8829      	ldrh	r1, [r5, #0]
- 80013ae:	0030      	movs	r0, r6
- 80013b0:	b289      	uxth	r1, r1
- 80013b2:	f7fe ff2d 	bl	8000210 <__aeabi_uidivmod>
+ 8001394:	8829      	ldrh	r1, [r5, #0]
+ 8001396:	0030      	movs	r0, r6
+ 8001398:	b289      	uxth	r1, r1
+ 800139a:	f7fe ff39 	bl	8000210 <__aeabi_uidivmod>
 
 		if(remainder == 0){ //check if no remainder -> integer
- 80013b6:	2900      	cmp	r1, #0
- 80013b8:	d1f3      	bne.n	80013a2 <Input_Capture_Processing+0x32>
+ 800139e:	2900      	cmp	r1, #0
+ 80013a0:	d1f3      	bne.n	800138a <Input_Capture_Processing+0x32>
 
 			params_ptr->raw_prescaler = N / interrupt_period_value;
- 80013ba:	8829      	ldrh	r1, [r5, #0]
- 80013bc:	0030      	movs	r0, r6
- 80013be:	b289      	uxth	r1, r1
- 80013c0:	f7fe fea0 	bl	8000104 <__udivsi3>
- 80013c4:	b280      	uxth	r0, r0
- 80013c6:	8378      	strh	r0, [r7, #26]
+ 80013a2:	8829      	ldrh	r1, [r5, #0]
+ 80013a4:	0030      	movs	r0, r6
+ 80013a6:	b289      	uxth	r1, r1
+ 80013a8:	f7fe feac 	bl	8000104 <__udivsi3>
+ 80013ac:	b280      	uxth	r0, r0
+ 80013ae:	8378      	strh	r0, [r7, #26]
 			break;
 		}
 	}
 
 	params_ptr->raw_start_value = 256 - interrupt_period_value;
- 80013c8:	2380      	movs	r3, #128	@ 0x80
- 80013ca:	882a      	ldrh	r2, [r5, #0]
- 80013cc:	005b      	lsls	r3, r3, #1
- 80013ce:	1a9b      	subs	r3, r3, r2
- 80013d0:	b29b      	uxth	r3, r3
+ 80013b0:	2380      	movs	r3, #128	@ 0x80
+ 80013b2:	882a      	ldrh	r2, [r5, #0]
+ 80013b4:	005b      	lsls	r3, r3, #1
+ 80013b6:	1a9b      	subs	r3, r3, r2
+ 80013b8:	b29b      	uxth	r3, r3
 
 	Calculate_Next_Main_Oscillator_Values(params_ptr, (enum Next_Values_Processing_Mode)IP_CAPTURE_MODE);
- 80013d2:	2101      	movs	r1, #1
+ 80013ba:	2101      	movs	r1, #1
 	params_ptr->raw_start_value = 256 - interrupt_period_value;
- 80013d4:	827b      	strh	r3, [r7, #18]
+ 80013bc:	827b      	strh	r3, [r7, #18]
 	Calculate_Next_Main_Oscillator_Values(params_ptr, (enum Next_Values_Processing_Mode)IP_CAPTURE_MODE);
- 80013d6:	0038      	movs	r0, r7
- 80013d8:	f000 f8b6 	bl	8001548 <Calculate_Next_Main_Oscillator_Values>
+ 80013be:	0038      	movs	r0, r7
+ 80013c0:	f000 f8c2 	bl	8001548 <Calculate_Next_Main_Oscillator_Values>
 	Process_TIM16_Final_Start_Value_and_Final_Prescaler(params_ptr);
- 80013dc:	0038      	movs	r0, r7
- 80013de:	f000 fd07 	bl	8001df0 <Process_TIM16_Final_Start_Value_and_Final_Prescaler>
+ 80013c4:	0038      	movs	r0, r7
+ 80013c6:	f000 fd13 	bl	8001df0 <Process_TIM16_Final_Start_Value_and_Final_Prescaler>
 
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
 
 	return 1;
 }
- 80013e2:	2001      	movs	r0, #1
- 80013e4:	b003      	add	sp, #12
- 80013e6:	bdf0      	pop	{r4, r5, r6, r7, pc}
- 80013e8:	20000b80 	.word	0x20000b80
+ 80013ca:	2001      	movs	r0, #1
+ 80013cc:	b003      	add	sp, #12
+ 80013ce:	bdf0      	pop	{r4, r5, r6, r7, pc}
+ 80013d0:	20000b80 	.word	0x20000b80
 
-080013ec <Start_Input_Capture_Timer>:
+080013d4 <Start_Input_Capture_Timer>:
 
 uint8_t Start_Input_Capture_Timer(void){
- 80013ec:	b570      	push	{r4, r5, r6, lr}
+ 80013d4:	b570      	push	{r4, r5, r6, lr}
 	return ok;
 }
 
 uint8_t Start_IC_TIM(TIM_HandleTypeDef *TIM, uint32_t IC_TIM_channel){
 
 	uint8_t ok_AND = HAL_TIM_Base_Start_IT(&htim2);
- 80013ee:	4d0a      	ldr	r5, [pc, #40]	@ (8001418 <Start_Input_Capture_Timer+0x2c>)
- 80013f0:	0028      	movs	r0, r5
- 80013f2:	f002 ffdd 	bl	80043b0 <HAL_TIM_Base_Start_IT>
+ 80013d6:	4d0a      	ldr	r5, [pc, #40]	@ (8001400 <Start_Input_Capture_Timer+0x2c>)
+ 80013d8:	0028      	movs	r0, r5
+ 80013da:	f002 ffe9 	bl	80043b0 <HAL_TIM_Base_Start_IT>
 	ok_AND &= HAL_TIM_IC_Start_IT(&htim2, IC_TIM_channel);
- 80013f6:	2100      	movs	r1, #0
+ 80013de:	2100      	movs	r1, #0
 	uint8_t ok_AND = HAL_TIM_Base_Start_IT(&htim2);
- 80013f8:	0004      	movs	r4, r0
+ 80013e0:	0004      	movs	r4, r0
 	ok_AND &= HAL_TIM_IC_Start_IT(&htim2, IC_TIM_channel);
- 80013fa:	0028      	movs	r0, r5
- 80013fc:	f003 fbcc 	bl	8004b98 <HAL_TIM_IC_Start_IT>
- 8001400:	4004      	ands	r4, r0
- 8001402:	b2e4      	uxtb	r4, r4
+ 80013e2:	0028      	movs	r0, r5
+ 80013e4:	f003 fbd8 	bl	8004b98 <HAL_TIM_IC_Start_IT>
+ 80013e8:	4004      	ands	r4, r0
+ 80013ea:	b2e4      	uxtb	r4, r4
 
 	if(ok_AND != HAL_OK){
- 8001404:	2c00      	cmp	r4, #0
- 8001406:	d101      	bne.n	800140c <Start_Input_Capture_Timer+0x20>
+ 80013ec:	2c00      	cmp	r4, #0
+ 80013ee:	d101      	bne.n	80013f4 <Start_Input_Capture_Timer+0x20>
 }
- 8001408:	0020      	movs	r0, r4
- 800140a:	bd70      	pop	{r4, r5, r6, pc}
+ 80013f0:	0020      	movs	r0, r4
+ 80013f2:	bd70      	pop	{r4, r5, r6, pc}
 
 		Error_Handler();
- 800140c:	f7ff fc26 	bl	8000c5c <Error_Handler>
+ 80013f4:	f7ff fc32 	bl	8000c5c <Error_Handler>
 		Error_Handler();
- 8001410:	f7ff fc24 	bl	8000c5c <Error_Handler>
- 8001414:	e7f8      	b.n	8001408 <Start_Input_Capture_Timer+0x1c>
- 8001416:	46c0      	nop			@ (mov r8, r8)
- 8001418:	200007a0 	.word	0x200007a0
+ 80013f8:	f7ff fc30 	bl	8000c5c <Error_Handler>
+ 80013fc:	e7f8      	b.n	80013f0 <Start_Input_Capture_Timer+0x1c>
+ 80013fe:	46c0      	nop			@ (mov r8, r8)
+ 8001400:	200007a0 	.word	0x200007a0
 
-0800141c <Copy_Params_Structs>:
+08001404 <Copy_Params_Structs>:
 	}
 
 	return ok_AND;
 }
 
 uint8_t Copy_Params_Structs(struct Params *src_ptr, struct Params *dst_ptr){
- 800141c:	0003      	movs	r3, r0
- 800141e:	b510      	push	{r4, lr}
- 8001420:	0008      	movs	r0, r1
+ 8001404:	0003      	movs	r3, r0
+ 8001406:	b510      	push	{r4, lr}
+ 8001408:	0008      	movs	r0, r1
 
 	*dst_ptr = *src_ptr;
- 8001422:	2222      	movs	r2, #34	@ 0x22
- 8001424:	0019      	movs	r1, r3
- 8001426:	f005 fa33 	bl	8006890 <memcpy>
+ 800140a:	2222      	movs	r2, #34	@ 0x22
+ 800140c:	0019      	movs	r1, r3
+ 800140e:	f005 fa3f 	bl	8006890 <memcpy>
 
 	return 1;
 }
- 800142a:	2001      	movs	r0, #1
- 800142c:	bd10      	pop	{r4, pc}
- 800142e:	46c0      	nop			@ (mov r8, r8)
+ 8001412:	2001      	movs	r0, #1
+ 8001414:	bd10      	pop	{r4, pc}
+ 8001416:	46c0      	nop			@ (mov r8, r8)
 
-08001430 <Start_Measurement_Reelapse_Timer>:
+08001418 <Start_Measurement_Reelapse_Timer>:
 
 uint8_t Start_Measurement_Reelapse_Timer(void){
 
 	__HAL_TIM_SET_COUNTER(&htim3, 0);
- 8001430:	2300      	movs	r3, #0
- 8001432:	4806      	ldr	r0, [pc, #24]	@ (800144c <Start_Measurement_Reelapse_Timer+0x1c>)
+ 8001418:	2300      	movs	r3, #0
+ 800141a:	4806      	ldr	r0, [pc, #24]	@ (8001434 <Start_Measurement_Reelapse_Timer+0x1c>)
 uint8_t Start_Measurement_Reelapse_Timer(void){
- 8001434:	b510      	push	{r4, lr}
+ 800141c:	b510      	push	{r4, lr}
 	__HAL_TIM_SET_COUNTER(&htim3, 0);
- 8001436:	6802      	ldr	r2, [r0, #0]
+ 800141e:	6802      	ldr	r2, [r0, #0]
 	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, interrupt_period);
 	Start_OC_TIM(&htim3, TIM_CHANNEL_1);
- 8001438:	2100      	movs	r1, #0
+ 8001420:	2100      	movs	r1, #0
 	__HAL_TIM_SET_COUNTER(&htim3, 0);
- 800143a:	6253      	str	r3, [r2, #36]	@ 0x24
+ 8001422:	6253      	str	r3, [r2, #36]	@ 0x24
 	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, interrupt_period);
- 800143c:	4b04      	ldr	r3, [pc, #16]	@ (8001450 <Start_Measurement_Reelapse_Timer+0x20>)
- 800143e:	881b      	ldrh	r3, [r3, #0]
- 8001440:	b29b      	uxth	r3, r3
- 8001442:	6353      	str	r3, [r2, #52]	@ 0x34
+ 8001424:	4b04      	ldr	r3, [pc, #16]	@ (8001438 <Start_Measurement_Reelapse_Timer+0x20>)
+ 8001426:	881b      	ldrh	r3, [r3, #0]
+ 8001428:	b29b      	uxth	r3, r3
+ 800142a:	6353      	str	r3, [r2, #52]	@ 0x34
 	Start_OC_TIM(&htim3, TIM_CHANNEL_1);
- 8001444:	f000 fe26 	bl	8002094 <Start_OC_TIM>
+ 800142c:	f000 fe32 	bl	8002094 <Start_OC_TIM>
 
 	return 1;
 }
- 8001448:	2001      	movs	r0, #1
- 800144a:	bd10      	pop	{r4, pc}
- 800144c:	200006e4 	.word	0x200006e4
- 8001450:	20000b78 	.word	0x20000b78
+ 8001430:	2001      	movs	r0, #1
+ 8001432:	bd10      	pop	{r4, pc}
+ 8001434:	200006e4 	.word	0x200006e4
+ 8001438:	20000b78 	.word	0x20000b78
 
-08001454 <Begin_Input_Capture_Measurement>:
+0800143c <Begin_Input_Capture_Measurement>:
 
 uint8_t Begin_Input_Capture_Measurement(void){
 
 	__HAL_TIM_SET_COUNTER(&htim2, 0); //begin measurement
- 8001454:	2200      	movs	r2, #0
- 8001456:	4b02      	ldr	r3, [pc, #8]	@ (8001460 <Begin_Input_Capture_Measurement+0xc>)
+ 800143c:	2200      	movs	r2, #0
+ 800143e:	4b02      	ldr	r3, [pc, #8]	@ (8001448 <Begin_Input_Capture_Measurement+0xc>)
 
 	return 1;
 }
- 8001458:	2001      	movs	r0, #1
+ 8001440:	2001      	movs	r0, #1
 	__HAL_TIM_SET_COUNTER(&htim2, 0); //begin measurement
- 800145a:	681b      	ldr	r3, [r3, #0]
- 800145c:	625a      	str	r2, [r3, #36]	@ 0x24
+ 8001442:	681b      	ldr	r3, [r3, #0]
+ 8001444:	625a      	str	r2, [r3, #36]	@ 0x24
 }
- 800145e:	4770      	bx	lr
- 8001460:	200007a0 	.word	0x200007a0
+ 8001446:	4770      	bx	lr
+ 8001448:	200007a0 	.word	0x200007a0
 
-08001464 <main>:
+0800144c <main>:
 
 //VARIABLE DEFINITIONS
 volatile uint32_t statuses = 0; //set of all status bits (to reduce memory usage)
 
 int main(void)
 {
- 8001464:	b570      	push	{r4, r5, r6, lr}
+ 800144c:	b570      	push	{r4, r5, r6, lr}
 	//SYSTEM INIT
 	System_Init();
- 8001466:	f7ff fbfb 	bl	8000c60 <System_Init>
+ 800144e:	f7ff fc07 	bl	8000c60 <System_Init>
 
 	//STARTUP
 	Startup();
- 800146a:	f000 f97d 	bl	8001768 <Startup>
- 800146e:	4c07      	ldr	r4, [pc, #28]	@ (800148c <main+0x28>)
- 8001470:	4e07      	ldr	r6, [pc, #28]	@ (8001490 <main+0x2c>)
- 8001472:	4d08      	ldr	r5, [pc, #32]	@ (8001494 <main+0x30>)
+ 8001452:	f000 f989 	bl	8001768 <Startup>
+ 8001456:	4c0c      	ldr	r4, [pc, #48]	@ (8001488 <main+0x3c>)
+ 8001458:	4e0c      	ldr	r6, [pc, #48]	@ (800148c <main+0x40>)
+ 800145a:	4d0d      	ldr	r5, [pc, #52]	@ (8001490 <main+0x44>)
 
 			UART_DMA_TX_is_complete = NO;
 			HAL_UART_Transmit_DMA(&huart2, (const uint8_t*)&one_byte_data, sizeof(one_byte_data));
 		}*/
 
 		if(Get_Status_Bit(&statuses, Input_Capture_Processing_Can_Be_Started) == YES){
- 8001474:	2104      	movs	r1, #4
- 8001476:	0020      	movs	r0, r4
- 8001478:	f000 fe44 	bl	8002104 <Get_Status_Bit>
- 800147c:	2801      	cmp	r0, #1
- 800147e:	d1f9      	bne.n	8001474 <main+0x10>
+ 800145c:	2104      	movs	r1, #4
+ 800145e:	0020      	movs	r0, r4
+ 8001460:	f000 fe50 	bl	8002104 <Get_Status_Bit>
+ 8001464:	2801      	cmp	r0, #1
+ 8001466:	d1f9      	bne.n	800145c <main+0x10>
+
+			HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
+ 8001468:	2201      	movs	r2, #1
+ 800146a:	2140      	movs	r1, #64	@ 0x40
+ 800146c:	4809      	ldr	r0, [pc, #36]	@ (8001494 <main+0x48>)
+ 800146e:	f001 ff47 	bl	8003300 <HAL_GPIO_WritePin>
 
 			Input_Capture_Processing(interrupt_period, &params_to_be_loaded);
- 8001480:	8830      	ldrh	r0, [r6, #0]
- 8001482:	0029      	movs	r1, r5
- 8001484:	b280      	uxth	r0, r0
- 8001486:	f7ff ff73 	bl	8001370 <Input_Capture_Processing>
- 800148a:	e7f3      	b.n	8001474 <main+0x10>
- 800148c:	20000b80 	.word	0x20000b80
- 8001490:	20000b78 	.word	0x20000b78
- 8001494:	20000ba8 	.word	0x20000ba8
+ 8001472:	8830      	ldrh	r0, [r6, #0]
+ 8001474:	0029      	movs	r1, r5
+ 8001476:	b280      	uxth	r0, r0
+ 8001478:	f7ff ff6e 	bl	8001358 <Input_Capture_Processing>
+
+			HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
+ 800147c:	2200      	movs	r2, #0
+ 800147e:	2140      	movs	r1, #64	@ 0x40
+ 8001480:	4804      	ldr	r0, [pc, #16]	@ (8001494 <main+0x48>)
+ 8001482:	f001 ff3d 	bl	8003300 <HAL_GPIO_WritePin>
+ 8001486:	e7e9      	b.n	800145c <main+0x10>
+ 8001488:	20000b80 	.word	0x20000b80
+ 800148c:	20000b78 	.word	0x20000b78
+ 8001490:	20000ba8 	.word	0x20000ba8
+ 8001494:	50000400 	.word	0x50000400
 
 08001498 <Start_PWM_Gen_Timer_Main_and_Secondary_Oscillators>:
 								.duty_delay_line_finish_offset = FINAL_INDEX + 1, //initial value is 512th index, one larger than the index of the final sample
@@ -4280,7 +4282,7 @@ uint8_t Startup(void){
 
 	//START IP CAP
 	Start_Input_Capture_Timer();
- 8001830:	f7ff fddc 	bl	80013ec <Start_Input_Capture_Timer>
+ 8001830:	f7ff fdd0 	bl	80013d4 <Start_Input_Capture_Timer>
 
 
 	#if TAPCLK_ON_OR_OFF == ON
@@ -6256,7 +6258,7 @@ LoopFillZerobss:
  800214e:	f004 fb7b 	bl	8006848 <__libc_init_array>
 /* Call the application s entry point.*/
   bl main
- 8002152:	f7ff f987 	bl	8001464 <main>
+ 8002152:	f7ff f97b 	bl	800144c <main>
 
 08002156 <LoopForever>:
 
@@ -9635,7 +9637,7 @@ void HAL_GPIO_EXTI_IRQHandler(uint16_t GPIO_Pin)
     __HAL_GPIO_EXTI_CLEAR_RISING_IT(GPIO_Pin);
  8003322:	60d8      	str	r0, [r3, #12]
     HAL_GPIO_EXTI_Rising_Callback(GPIO_Pin);
- 8003324:	f7fd ff1c 	bl	8001160 <HAL_GPIO_EXTI_Rising_Callback>
+ 8003324:	f7fd ff10 	bl	8001148 <HAL_GPIO_EXTI_Rising_Callback>
   if (__HAL_GPIO_EXTI_GET_FALLING_IT(GPIO_Pin) != 0x00u)
  8003328:	4b04      	ldr	r3, [pc, #16]	@ (800333c <HAL_GPIO_EXTI_IRQHandler+0x30>)
  800332a:	691a      	ldr	r2, [r3, #16]
@@ -9646,7 +9648,7 @@ void HAL_GPIO_EXTI_IRQHandler(uint16_t GPIO_Pin)
     __HAL_GPIO_EXTI_CLEAR_FALLING_IT(GPIO_Pin);
  8003332:	611c      	str	r4, [r3, #16]
     HAL_GPIO_EXTI_Falling_Callback(GPIO_Pin);
- 8003334:	f7fd fef8 	bl	8001128 <HAL_GPIO_EXTI_Falling_Callback>
+ 8003334:	f7fd feec 	bl	8001110 <HAL_GPIO_EXTI_Falling_Callback>
 }
  8003338:	e7f2      	b.n	8003320 <HAL_GPIO_EXTI_IRQHandler+0x14>
  800333a:	46c0      	nop			@ (mov r8, r8)

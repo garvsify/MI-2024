@@ -12,6 +12,8 @@ Issues:
   - Further testing with the rigol and using the monitor pin shows that the uC never enters the reelapse isr (TIM3)
   so that's really weird???
 
+  - Further testing shows that input capture processing isn't even started
+
 */
 
 //INCLUDES
@@ -38,7 +40,11 @@ int main(void)
 
 		if(Get_Status_Bit(&statuses, Input_Capture_Processing_Can_Be_Started) == YES){
 
+			HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
+
 			Input_Capture_Processing(interrupt_period, &params_to_be_loaded);
+
+			HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
 		}
 	}
 	return 1;
