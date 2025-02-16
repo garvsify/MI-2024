@@ -118,12 +118,9 @@ uint8_t Calculate_Next_Main_Oscillator_Values(struct Params* params_ptr, enum Ne
 		}
 		else{
 
-			/*params_ptr->index = SQUARE_WAVE_TEMPO_APEX_INDEX;
+			params_ptr->index = SQUARE_WAVE_TEMPO_APEX_INDEX;
 			params_ptr->quadrant = CURRENT_QUADRANT_SQUARE_SYNCED;
-			params_ptr->halfcycle = CURRENT_HALFCYCLE_SQUARE_SYNCED;*/
-			params_ptr->index = 0;
-			params_ptr->quadrant = FIRST_QUADRANT;
-			params_ptr->halfcycle = FIRST_HALFCYCLE;
+			params_ptr->halfcycle = CURRENT_HALFCYCLE_SQUARE_SYNCED;
 		}
 	}
 	else if(mode == STARTUP_MODE){

@@ -70,6 +70,8 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 			IP_CAP_fsm.current_state = MEASUREMENT_REELAPSE;
 			IP_CAP_fsm.prev_state = MEASUREMENT_PENDING;
 
+			Copy_Params_Structs(&params, &params_to_be_loaded);
+
 			//BEGIN PROCESSING
 			Set_Status_Bit(&statuses, Input_Capture_Processing_Can_Be_Started);
 		}
