@@ -113,9 +113,9 @@ void TIM2_ch1_overflow_callback(TIM_HandleTypeDef *htim){
 				MIDI_CLK_tag = 0;
 			}
 
-			enum Speed_Exclusive_FSM_States current_state = speed_fsm.current_state.speed_exclusive_state;
+			union Speed_FSM_States current_state = speed_fsm.current_state;
 			speed_fsm.current_state = speed_fsm.prev_state;
-			speed_fsm.prev_state.speed_exclusive_state = current_state;
+			speed_fsm.prev_state = current_state;
 		}
 		else if(speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_MODE){
 
@@ -138,22 +138,7 @@ void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
 		IP_CAP_fsm.current_state = IDLE;
 		IP_CAP_fsm.prev_state = MEASUREMENT_REELAPSE;
 
-		//UPDATE SPEED FSM
-		union Speed_FSM_States current_state = speed_fsm.current_state;
-
-		if(speed_fsm.current_state.speed_exclusive_state == TAP_PENDING_MODE){
-
-			speed_fsm.current_state.speed_exclusive_state = TAP_MODE;
-		}
-		else if(speed_fsm.current_state.speed_exclusive_state == CLK_IN_PENDING_MODE){
-
-			speed_fsm.current_state.speed_exclusive_state = CLK_IN_MODE;
-		}
-		else if(speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_MODE){
-
-			speed_fsm.current_state.speed_exclusive_state = MIDI_CLK_MODE;
-		}
-		speed_fsm.prev_state = current_state;
+		Advance_Pending_States();
 	}
 	else if(IP_CAP_fsm.current_state == MEASUREMENT_REELAPSE_AND_MEASUREMENT_PENDING){
 
@@ -161,22 +146,7 @@ void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
 		IP_CAP_fsm.current_state = MEASUREMENT_PENDING;
 		IP_CAP_fsm.prev_state = MEASUREMENT_REELAPSE_AND_MEASUREMENT_PENDING;
 
-		//UPDATE SPEED FSM
-		union Speed_FSM_States current_state = speed_fsm.current_state;
-
-		if(speed_fsm.current_state.speed_exclusive_state == TAP_PENDING_MODE){
-
-			speed_fsm.current_state.speed_exclusive_state = TAP_MODE;
-		}
-		else if(speed_fsm.current_state.speed_exclusive_state == CLK_IN_PENDING_MODE){
-
-			speed_fsm.current_state.speed_exclusive_state = CLK_IN_MODE;
-		}
-		else if(speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_MODE){
-
-			speed_fsm.current_state.speed_exclusive_state = MIDI_CLK_MODE;
-		}
-		speed_fsm.prev_state = current_state;
+		Advance_Pending_States();
 	}
 
 	Copy_Params_Structs(&params_to_be_loaded, &params_working);

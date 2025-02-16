@@ -71,4 +71,7 @@ struct IP_CAP_FSM{
 	enum IP_CAP_FSM_States prev_state;
 };
 
+//FUNCTION DECLARATIONS
+uint8_t Advance_Pending_States(void);
+
 #endif /* INC_STATE_MACHINE_H_ */

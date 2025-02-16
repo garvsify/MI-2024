@@ -10,3 +10,27 @@ volatile struct Normal_FSM phase_fsm = {.current_state = MANUAL_MODE, .prev_stat
 volatile struct IP_CAP_FSM IP_CAP_fsm = {.current_state = MANUAL_MODE, .prev_state = NONE};
 volatile enum MIDI_CLK_FSM_State MIDI_CLK_FSM_state = NOT_COMPILING;
 
+//FUNCTION DEFINITIONS
+uint8_t Advance_Pending_States(void){
+
+	//UPDATE SPEED FSM
+	union Speed_FSM_States current_state = speed_fsm.current_state;
+
+	if(speed_fsm.current_state.speed_exclusive_state == TAP_PENDING_MODE){
+
+		speed_fsm.current_state.speed_exclusive_state = TAP_MODE;
+	}
+	else if(speed_fsm.current_state.speed_exclusive_state == CLK_IN_PENDING_MODE){
+
+		speed_fsm.current_state.speed_exclusive_state = CLK_IN_MODE;
+	}
+	else if(speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_MODE){
+
+		speed_fsm.current_state.speed_exclusive_state = MIDI_CLK_MODE;
+	}
+
+	speed_fsm.prev_state = current_state;
+
+	return 1;
+}
+
