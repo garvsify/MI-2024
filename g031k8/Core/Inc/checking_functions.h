@@ -7,7 +7,7 @@
 #define LPTIM2_COUNT_MAX 24
 
 #define SPEED_POT_CHECK_COUNTER_LENGTH 50
-#define SPEED_TOLERANCE 10
+#define SPEED_TOLERANCE 5
 
 //INCLUDES
 #include <stdint.h>
@@ -23,6 +23,7 @@
 //CUSTOM TYPES
 
 //VARIABLE DECLARATIONS
+volatile extern uint8_t speed_pot_adc_measurement_num;
 
 //FUNCTION DECLARATIONS
 uint8_t Speed_Pot_Check(struct Params* params_ptr);

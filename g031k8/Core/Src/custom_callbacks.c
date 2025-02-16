@@ -60,10 +60,6 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 
 	else if(IP_CAP_fsm.current_state == MEASUREMENT_PENDING){ //second edge
 
-		HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
-		HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
-		HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
-
 		if(interrupt_period >= HIGHEST_PRESCALER_TOP_SPEED_PERIOD){ //if the captured value/512 is >= than 129
 
 			//No need to check longest period as that is tested inherently by the TIM2 overflow
@@ -82,16 +78,11 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 
 			IP_CAP_fsm.current_state = IDLE;
 			IP_CAP_fsm.prev_state = MEASUREMENT_PENDING;
+			speed_pot_adc_measurement_num = 0; //whenever goes into idle, reset speed_adc_measurement
 		}
 	}
 
 	else if(IP_CAP_fsm.current_state == MEASUREMENT_REELAPSE){ //first edge
-
-		HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
-		HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
-		HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
-		HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
-		HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
 
 		Begin_Input_Capture_Measurement();
 
@@ -100,14 +91,6 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 	}
 
 	else if(IP_CAP_fsm.current_state == MEASUREMENT_REELAPSE_AND_MEASUREMENT_PENDING){ //second edge
-
-		HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
-		HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
-		HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
-		HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
-		HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
-		HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
-		HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
 
 		Start_Measurement_Reelapse_Timer();
 
@@ -120,7 +103,7 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 		Set_Status_Bit(&statuses, Input_Capture_Processing_Can_Be_Started);
 	}
 
-	HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
+	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
 }
 
 
@@ -130,6 +113,7 @@ void TIM2_ch1_overflow_callback(TIM_HandleTypeDef *htim){
 
 		IP_CAP_fsm.current_state = IDLE;
 		IP_CAP_fsm.prev_state = MEASUREMENT_PENDING;
+		speed_pot_adc_measurement_num = 0; //whenever goes into idle, reset speed_adc_measurement
 
 		if((speed_fsm.current_state.speed_exclusive_state == TAP_PENDING_MODE) || (speed_fsm.current_state.speed_exclusive_state == CLK_IN_PENDING_MODE) || (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_MODE)){
 

@@ -1,11 +1,10 @@
 #include "checking_functions.h"
 
 //VARIABLE DEFINITIONS
+volatile uint8_t speed_pot_adc_measurement_num = 0;
 
 //FUNCTION DEFINITIONS
 uint8_t Speed_Pot_Check(struct Params* params_ptr){
-
-	static volatile uint8_t speed_pot_adc_measurement_num;
 
 	static uint16_t first_speed_measurement;
 
