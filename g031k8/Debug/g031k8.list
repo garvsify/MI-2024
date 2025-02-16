@@ -39,15 +39,15 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  17 .debug_line   00028870  00000000  00000000  00053b5d  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    0009fc00  00000000  00000000  0007c3cd  2**0
+ 18 .debug_str    0009fc01  00000000  00000000  0007c3cd  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000043  00000000  00000000  0011bfcd  2**0
+ 19 .comment      00000043  00000000  00000000  0011bfce  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  000033f4  00000000  00000000  0011c010  2**2
+ 20 .debug_frame  000033f4  00000000  00000000  0011c014  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_loclists 0000f283  00000000  00000000  0011f404  2**0
+ 21 .debug_loclists 0000f283  00000000  00000000  0011f408  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 22 .debug_line_str 00000054  00000000  00000000  0012e687  2**0
+ 22 .debug_line_str 00000054  00000000  00000000  0012e68b  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -592,7 +592,7 @@ uint8_t Speed_Pot_Check(struct Params* params_ptr){
  8000496:	d906      	bls.n	80004a6 <Speed_Pot_Check+0x46>
 			if(first_speed_measurement - second_speed_measurement > SPEED_TOLERANCE){
  8000498:	1a9b      	subs	r3, r3, r2
- 800049a:	2b07      	cmp	r3, #7
+ 800049a:	2b0a      	cmp	r3, #10
  800049c:	ddec      	ble.n	8000478 <Speed_Pot_Check+0x18>
  800049e:	e007      	b.n	80004b0 <Speed_Pot_Check+0x50>
 		second_speed_measurement = params_ptr->speed;
@@ -604,7 +604,7 @@ uint8_t Speed_Pot_Check(struct Params* params_ptr){
  80004a8:	d2e6      	bcs.n	8000478 <Speed_Pot_Check+0x18>
 			if(second_speed_measurement - first_speed_measurement > SPEED_TOLERANCE){
  80004aa:	1ad2      	subs	r2, r2, r3
- 80004ac:	2a07      	cmp	r2, #7
+ 80004ac:	2a0a      	cmp	r2, #10
  80004ae:	dde3      	ble.n	8000478 <Speed_Pot_Check+0x18>
 				speed_fsm.prev_state = speed_fsm.current_state;
  80004b0:	4b07      	ldr	r3, [pc, #28]	@ (80004d0 <Speed_Pot_Check+0x70>)

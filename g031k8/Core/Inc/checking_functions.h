@@ -7,7 +7,7 @@
 #define LPTIM2_COUNT_MAX 24
 
 #define SPEED_POT_CHECK_COUNTER_LENGTH 50
-#define SPEED_TOLERANCE 7
+#define SPEED_TOLERANCE 10
 
 //INCLUDES
 #include <stdint.h>
