@@ -14,6 +14,8 @@ Issues:
 
   - Further testing shows that input capture processing isn't even started
 
+  - Issue seems to be because of second failing edge?
+
 */
 
 //INCLUDES
@@ -40,11 +42,11 @@ int main(void)
 
 		if(Get_Status_Bit(&statuses, Input_Capture_Processing_Can_Be_Started) == YES){
 
-			HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
+			//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
 
 			Input_Capture_Processing(interrupt_period, &params_to_be_loaded);
 
-			HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
+			//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
 		}
 	}
 	return 1;

@@ -51,7 +51,6 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 	//period = z/512 as the 'elapse period value' if we also set the elapse timer prescaler to 512x less than the
 	//input capture measurement timer
 
-
 	if(IP_CAP_fsm.current_state == IDLE){
 
 		Begin_Input_Capture_Measurement();
@@ -60,6 +59,10 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 	}
 
 	else if(IP_CAP_fsm.current_state == MEASUREMENT_PENDING){ //second edge
+
+		HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
+		HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
+		HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
 
 		if(interrupt_period >= HIGHEST_PRESCALER_TOP_SPEED_PERIOD){ //if the captured value/512 is >= than 129
 
@@ -84,6 +87,12 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 
 	else if(IP_CAP_fsm.current_state == MEASUREMENT_REELAPSE){ //first edge
 
+		HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
+		HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
+		HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
+		HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
+		HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
+
 		Begin_Input_Capture_Measurement();
 
 		IP_CAP_fsm.current_state = MEASUREMENT_REELAPSE_AND_MEASUREMENT_PENDING;
@@ -92,11 +101,26 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 
 	else if(IP_CAP_fsm.current_state == MEASUREMENT_REELAPSE_AND_MEASUREMENT_PENDING){ //second edge
 
+		HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
+		HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
+		HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
+		HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
+		HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
+		HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
+		HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
+
 		Start_Measurement_Reelapse_Timer();
 
-		IP_CAP_fsm.current_state = MEASUREMENT_PENDING;
+		IP_CAP_fsm.current_state = MEASUREMENT_REELAPSE;
 		IP_CAP_fsm.prev_state = MEASUREMENT_REELAPSE_AND_MEASUREMENT_PENDING;
+
+		Copy_Params_Structs(&params, &params_to_be_loaded);
+
+		//BEGIN PROCESSING
+		Set_Status_Bit(&statuses, Input_Capture_Processing_Can_Be_Started);
 	}
+
+	HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
 }
 
 
@@ -237,6 +261,8 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
 
 void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
 
+	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
+
 	if((GPIO_Pin == CLK_IN_Pin)){ //if specifically CLK IN pin with rising interrupt
 
 		if(speed_fsm.current_state.shared_state == MANUAL_MODE){
@@ -315,6 +341,8 @@ void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
 		}
 
 	}
+
+	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
 }
 
 void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
