@@ -5,14 +5,15 @@
 //#define LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK 4001 - 1 //4ms overflow with prescaler of 128
 #define LPTIM1_CCR_CHECK 251 - 1
 #define LPTIM2_COUNT_MAX 24
-#define TIM14_OVERFLOW_LENGTH 2050 // 4096/2 is min osc frequency period
+
+#define SPEED_POT_CHECK_COUNTER_LENGTH 50
+#define SPEED_TOLERANCE 7
 
 //INCLUDES
 #include <stdint.h>
 
 #include "utility.h"
 #include "oscillator_params_type.h"
-#include "speed_pot_check.h"
 #include "oscillator.h"
 #include "timers.h"
 #include "tap_tempo.h"
