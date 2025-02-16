@@ -395,15 +395,33 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 	}
 	else if((speed_fsm.current_state.speed_exclusive_state == CLK_IN_MODE) && (IP_CAP_fsm.current_state == IDLE)){
 
-		Speed_Pot_Check(&params);
+		Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
+
+		if(Get_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out) == YES){
+
+			Clear_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out);
+			Speed_Pot_Check(&params);
+		}
 	}
 	else if((speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_MODE) && (IP_CAP_fsm.current_state == IDLE)){
 
-		Speed_Pot_Check(&params);
+		Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
+
+		if(Get_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out) == YES){
+
+			Clear_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out);
+			Speed_Pot_Check(&params);
+		}
 	}
 	else if((speed_fsm.current_state.speed_exclusive_state == TAP_MODE) && (IP_CAP_fsm.current_state == IDLE)){
 
-		Speed_Pot_Check(&params);
+		Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
+
+		if(Get_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out) == YES){
+
+			Clear_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out);
+			Speed_Pot_Check(&params);
+		}
 	}
 
 	//SET TIMER TRIGGER

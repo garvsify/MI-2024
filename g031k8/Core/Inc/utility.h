@@ -26,7 +26,9 @@ enum Validate{
 enum Status_Bit{
 	Input_Capture_Processing_Can_Be_Started = INPUT_CAPTURE_PROCESSING_CAN_BE_STARTED,
 	First_Sync_Complete = FIRST_SYNC_COMPLETE,
-	Initial_ADC_Conversion_Complete = INITIAL_ADC_CONVERSION_COMPLETE
+	Initial_ADC_Conversion_Complete = INITIAL_ADC_CONVERSION_COMPLETE,
+	Software_IP_CAP_Idle_Timer_Has_Timed_Out = SOFTWARE_IP_CAP_IDLE_TIMER_HAS_TIMED_OUT,
+	Software_IP_CAP_Idle_Timer_Is_Running = SOFTWARE_IP_CAP_IDLE_TIMER_IS_RUNNING
 };
 
 //FUNCTION DECLARATIONS

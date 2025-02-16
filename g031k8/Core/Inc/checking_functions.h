@@ -9,6 +9,8 @@
 #define SPEED_POT_CHECK_COUNTER_LENGTH 50
 #define SPEED_TOLERANCE 5
 
+#define IDLE_COUNT 32000
+
 //INCLUDES
 #include <stdint.h>
 
