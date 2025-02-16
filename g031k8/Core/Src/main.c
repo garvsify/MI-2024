@@ -1,8 +1,7 @@
 /*NOTES ON THIS BUILD:
 
-Have found that the reason that we can't get out of tap tempo mode is because even when tap
-tempo is actioned, and it visually gets into the mode, the fsm doesn't update from tap pending mode
-which is of course why we can't get back into manual mode
+At some CLK IN speed settings, the the manual pot and clk in pot can sometimes control the speed
+even before timeout?
 
 */
 
