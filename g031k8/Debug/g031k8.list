@@ -672,7 +672,7 @@ uint8_t Check_Tap_Tempo_Switch_State(volatile struct Tap_Tempo_Switch_States *ta
 		tap_tempo_switch_states_ptr->tap_tempo_switch_state = DEPRESSED;
 	}
 	else if(tap_tempo_switch_state_counter == TAP_TEMPO_SWITCH_CONFIDENCE_COUNT){
- 80004fe:	2b0d      	cmp	r3, #13
+ 80004fe:	2b0e      	cmp	r3, #14
  8000500:	d110      	bne.n	8000524 <Check_Tap_Tempo_Switch_State+0x4c>
 
 		tap_tempo_switch_states_ptr->tap_tempo_switch_state = NOT_DEPRESSED;
@@ -682,7 +682,7 @@ uint8_t Check_Tap_Tempo_Switch_State(volatile struct Tap_Tempo_Switch_States *ta
 		if(tap_tempo_switch_state_counter != TAP_TEMPO_SWITCH_CONFIDENCE_COUNT){
  8000508:	490a      	ldr	r1, [pc, #40]	@ (8000534 <Check_Tap_Tempo_Switch_State+0x5c>)
  800050a:	780b      	ldrb	r3, [r1, #0]
- 800050c:	2b0d      	cmp	r3, #13
+ 800050c:	2b0e      	cmp	r3, #14
  800050e:	d0f8      	beq.n	8000502 <Check_Tap_Tempo_Switch_State+0x2a>
 			if(extend_rising_edge == COUNT_TO_DELAY_RISING_TAP_TEMPO_EDGE){
  8000510:	4809      	ldr	r0, [pc, #36]	@ (8000538 <Check_Tap_Tempo_Switch_State+0x60>)
