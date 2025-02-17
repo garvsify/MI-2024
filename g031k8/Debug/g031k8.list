@@ -37,17 +37,17 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  16 .debug_macro  00019dc6  00000000  00000000  00039dda  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   000288eb  00000000  00000000  00053ba0  2**0
+ 17 .debug_line   0002950a  00000000  00000000  00053ba0  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    0009fcd2  00000000  00000000  0007c48b  2**0
+ 18 .debug_str    0009fcd5  00000000  00000000  0007d0aa  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000043  00000000  00000000  0011c15d  2**0
+ 19 .comment      00000043  00000000  00000000  0011cd7f  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  00003400  00000000  00000000  0011c1a0  2**2
+ 20 .debug_frame  00003400  00000000  00000000  0011cdc4  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_loclists 0000f283  00000000  00000000  0011f5a0  2**0
+ 21 .debug_loclists 0000f283  00000000  00000000  001201c4  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 22 .debug_line_str 00000054  00000000  00000000  0012e823  2**0
+ 22 .debug_line_str 00000057  00000000  00000000  0012f447  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -2723,10 +2723,10 @@ void UART2_TX_transfer_complete_callback(UART_HandleTypeDef *huart){
 void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
  8001048:	b570      	push	{r4, r5, r6, lr}
 
-	if(*rx_buffer == SYSTEM_COMMON_MIDI_TIME_CODE_QUARTER_FRAME){
+	if(*rx_buffer == SYSTEM_REAL_TIME_MIDI_CLOCK){
  800104a:	4c2c      	ldr	r4, [pc, #176]	@ (80010fc <UART2_RX_transfer_complete_callback+0xb4>)
  800104c:	7823      	ldrb	r3, [r4, #0]
- 800104e:	2bf1      	cmp	r3, #241	@ 0xf1
+ 800104e:	2bf8      	cmp	r3, #248	@ 0xf8
  8001050:	d005      	beq.n	800105e <UART2_RX_transfer_complete_callback+0x16>
 
 		params.final_prescaler = 64;
