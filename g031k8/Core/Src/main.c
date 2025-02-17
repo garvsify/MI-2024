@@ -68,8 +68,8 @@ int main(void)
 			else{
 
 				Clear_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
-				idle_counter = 0;
 				Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out);
+				idle_counter = 0;
 			}
 		}
 	}

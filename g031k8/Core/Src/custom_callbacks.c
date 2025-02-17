@@ -180,7 +180,7 @@ void UART2_TX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
 void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
-	if(*rx_buffer == SYSTEM_COMMON_MIDI_TIME_CODE_QUARTER_FRAME){
+	if(*rx_buffer == SYSTEM_REAL_TIME_MIDI_CLOCK){
 
 		if(MIDI_CLK_FSM_state == NOT_COMPILING){
 
