@@ -131,7 +131,15 @@ void TIM2_ch1_overflow_callback(TIM_HandleTypeDef *htim){
 
 			MIDI_CLK_FSM_state = NOT_COMPILING;
 			MIDI_CLK_tag = 0;
+
+			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1);
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
 		}
+	}
+	else if((speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_MODE) && (IP_CAP_fsm.current_state == IDLE)){
+
+		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1);
+		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
 	}
 }
 
