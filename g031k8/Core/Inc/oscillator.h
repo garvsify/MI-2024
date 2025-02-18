@@ -42,6 +42,8 @@
 	#define SYMMETRY_ADC_NUM_BITS 8
 #endif
 
+#define START_REQUIRED_BEFORE_SYNC_MODE (0b1 << 7)
+
 
 //CONSTANTS
 extern const uint16_t sine_wavetable[512];

@@ -188,54 +188,118 @@ void UART2_TX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
 void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
-	if(*rx_buffer == SYSTEM_REAL_TIME_MIDI_CLOCK){
+	if(Get_Status_Bit(&statuses, Start_Required_Before_Sync_Mode == YES)){
 
-		if(MIDI_CLK_FSM_state == NOT_COMPILING){
+		if((MIDI_CLK_FSM_state == NOT_COMPILING) && (IP_CAP_fsm.current_state == IDLE) && (speed_fsm.current_state != TAP_PENDING_MODE) && (speed_fsm.current_state != CLK_IN_PENDING_MODE)){
 
-			speed_fsm.prev_state = speed_fsm.current_state;
-			speed_fsm.current_state.speed_exclusive_state = MIDI_CLK_PENDING_MODE;
+			if(*rx_buffer == SYSTEM_REAL_TIME_START){
 
-			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
-			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+				speed_fsm.prev_state = speed_fsm.current_state;
+				speed_fsm.current_state.speed_exclusive_state = MIDI_CLK_PENDING_A_MODE;
+			}
+			else if(*rx_buffer == SYSTEM_REAL_TIME_MIDI_CLOCK){
 
-			MIDI_CLK_FSM_state = COMPILING;
-			MIDI_CLK_tag++;
-		}
-		else{
-
-			MIDI_CLK_tag++;
-
-			if(MIDI_CLK_tag < 12){
+				speed_fsm.prev_state = speed_fsm.current_state;
+				speed_fsm.current_state.speed_exclusive_state = MIDI_CLK_PENDING_B0_MODE;
 
 				HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
 				HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+
+				MIDI_CLK_FSM_state = COMPILING;
+				MIDI_CLK_tag++;
 			}
-			else if(MIDI_CLK_tag < 25){
+		}
+		else if(speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_A_MODE){
+
+			if(*rx_buffer == SYSTEM_REAL_TIME_MIDI_CLOCK){
+
+				MIDI_CLK_tag++;
+
+				if(MIDI_CLK_tag < 12){
+
+					HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
+					HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+				}
+				else if(MIDI_CLK_tag < 25){
+
+					HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1);
+					HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+				}
+				else{
+
+					speed_fsm.prev_state.speed_exclusive_state = MIDI_CLK_PENDING_A_MODE;
+					speed_fsm.current_state.speed_exclusive_state = MIDI_CLK_MODE;
+					MIDI_CLK_tag = 1;
+				}
+			}
+		}
+		else if(speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_B0_MODE){
+
+			if(*rx_buffer == SYSTEM_REAL_TIME_MIDI_CLOCK){
+
+				MIDI_CLK_tag++;
+
+				if(MIDI_CLK_tag < 12){
+
+					HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
+					HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+				}
+				else if(MIDI_CLK_tag < 25){
+
+					HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1);
+					HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+				}
+				else{
+
+					MIDI_CLK_tag = 1;
+					speed_fsm.prev_state.speed_exclusive_state = MIDI_CLK_PENDING_B0_MODE;
+					speed_fsm.current_state.speed_exclusive_state = MIDI_CLK_PENDING_B1_MODE;
+				}
+			}
+		}
+		else if(speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_B1_MODE){
+
+			if(*rx_buffer == SYSTEM_REAL_TIME_MIDI_CLOCK){
+
+				MIDI_CLK_tag++;
+
+				if(MIDI_CLK_tag < 12){
+
+					HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
+					HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+				}
+				else if(MIDI_CLK_tag < 25){
+
+					HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1);
+					HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+				}
+				else{
+
+					MIDI_CLK_tag = 1;
+				}
+			}
+			else if(*rx_buffer == SYSTEM_REAL_TIME_START){
+
+				speed_fsm.prev_state.speed_exclusive_state = MIDI_CLK_PENDING_B1_MODE;
+				speed_fsm.current_state.speed_exclusive_state = MIDI_CLK_PENDING_B2_MODE;
+			}
+		}
+		else if(speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_B2_MODE){
+
+			if(*rx_buffer == SYSTEM_REAL_TIME_MIDI_CLOCK){
 
 				HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1);
 				HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
-			}
-			else{
 
-				if(speed_fsm.current_state.speed_exclusive_state != MIDI_CLK_MODE){
-
-					speed_fsm.prev_state = speed_fsm.current_state;
-				}
-
+				speed_fsm.prev_state.speed_exclusive_state = MIDI_CLK_PENDING_B2_MODE;
 				speed_fsm.current_state.speed_exclusive_state = MIDI_CLK_MODE;
 
 				MIDI_CLK_tag = 1;
 			}
 		}
-		*rx_buffer = 0;
 	}
+	*rx_buffer = 0;
 
-	/*if(rx_buffer[0] == 'y'){
-
-		params.final_prescaler = 64;
-		params.final_start_value = 127;
-		rx_buffer[0] = 0;
-	}*/
 	HAL_UART_Receive_DMA(&huart2, (uint8_t*)rx_buffer, sizeof(rx_buffer));
 }
 

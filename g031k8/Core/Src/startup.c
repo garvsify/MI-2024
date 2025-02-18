@@ -4,6 +4,8 @@
 
 uint8_t Startup(void){
 
+	Set_Status_Bit(&statuses, Start_Before_Sync_Mode) = YES; //set default mode to requiring START MIDI message before beginning a sync
+
 	HAL_NVIC_DisableIRQ(EXTI4_15_IRQn);
 
 	__HAL_TIM_ENABLE_IT(&htim2, TIM_IT_UPDATE); //make sure the overflow (update) interrupt is enabled for TIM2
