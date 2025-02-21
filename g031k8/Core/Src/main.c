@@ -3,18 +3,7 @@
 
 Issues:
 
-  - At some CLK IN speed settings, the the manual pot and clk in pot can sometimes control the speed
-	even before timeout?
-
-  - Sometimes CLK IN gets bricked by turning on CLK IN - had a look on the rigol scope, apart from a bit of
-  bouncing on the pin it seems like its about to sync correctly but then dies?
-
-  - Further testing with the rigol and using the monitor pin shows that the uC never enters the reelapse isr (TIM3)
-  so that's really weird???
-
-  - Further testing shows that input capture processing isn't even started
-
-  - Issue seems to be because of second failing edge?
+- hehe - MIDI CLK still causes syncing to start even if START isn't received
 
 */
 
