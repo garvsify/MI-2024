@@ -208,6 +208,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
 		if((MIDI_CLK_fsm == NOT_COMPILING) && (IP_CAP_fsm.current_state == IDLE)
 				&& ((speed_fsm.current_state.speed_exclusive_state == TAP_MODE)
+				|| (speed_fsm.current_state.shared_state == MANUAL_MODE)
 				|| (speed_fsm.current_state.speed_exclusive_state == CLK_IN_MODE)
 				|| (speed_fsm.current_state.shared_state == PC_MODE)
 				|| (speed_fsm.current_state.shared_state == CC_MODE))){
