@@ -12,6 +12,7 @@
 #include "oscillator_macros.h"
 
 //MACROS
+#define START_REQUIRED_BEFORE_SYNC_MODE (0b1 << 7)
 
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
@@ -41,8 +42,6 @@
 	#define SYMMETRY_ADC_HALF_SCALE 128
 	#define SYMMETRY_ADC_NUM_BITS 8
 #endif
-
-#define START_REQUIRED_BEFORE_SYNC_MODE (0b1 << 7)
 
 
 //CONSTANTS

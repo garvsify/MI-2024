@@ -1,7 +1,10 @@
 Core/Src/custom_callbacks.o: ../Core/Src/custom_callbacks.c \
  ../Core/Inc/custom_callbacks.h ../Core/Inc/checking_functions.h \
- ../Core/Inc/utility.h ../Core/Inc/input_capture.h ../Core/Inc/main.h \
- ../Core/Inc/config.h ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal.h \
+ ../Core/Inc/utility.h ../Core/Inc/oscillator.h \
+ ../Core/Inc/symmetry_adjustment.h ../Core/Inc/oscillator_params_type.h \
+ ../Core/Inc/symmetry_adjustment_types.h \
+ ../Core/Inc/oscillator_params_type.h ../Core/Inc/config.h \
+ ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal.h \
  ../Core/Inc/stm32g0xx_hal_conf.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_rcc.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_def.h \
@@ -38,19 +41,19 @@ Core/Src/custom_callbacks.o: ../Core/Src/custom_callbacks.c \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_tim_ex.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart_ex.h \
- ../Core/Inc/oscillator.h ../Core/Inc/symmetry_adjustment.h \
- ../Core/Inc/oscillator_params_type.h \
- ../Core/Inc/symmetry_adjustment_types.h \
- ../Core/Inc/oscillator_params_type.h ../Core/Inc/timers.h \
- ../Core/Inc/oscillator_macros.h ../Core/Inc/startup.h \
+ ../Core/Inc/timers.h ../Core/Inc/oscillator_macros.h \
+ ../Core/Inc/input_capture.h ../Core/Inc/main.h ../Core/Inc/startup.h \
  ../Core/Inc/checking_functions.h ../Core/Inc/UART.h \
  ../Core/Inc/tap_tempo.h ../Core/Inc/CLK_IN.h ../Core/Inc/state_machine.h \
  ../Core/Inc/oscillator.h ../Core/Inc/MIDI_defines.h ../Core/Inc/debug.h
 ../Core/Inc/custom_callbacks.h:
 ../Core/Inc/checking_functions.h:
 ../Core/Inc/utility.h:
-../Core/Inc/input_capture.h:
-../Core/Inc/main.h:
+../Core/Inc/oscillator.h:
+../Core/Inc/symmetry_adjustment.h:
+../Core/Inc/oscillator_params_type.h:
+../Core/Inc/symmetry_adjustment_types.h:
+../Core/Inc/oscillator_params_type.h:
 ../Core/Inc/config.h:
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal.h:
 ../Core/Inc/stm32g0xx_hal_conf.h:
@@ -89,13 +92,10 @@ Core/Src/custom_callbacks.o: ../Core/Src/custom_callbacks.c \
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_tim_ex.h:
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart.h:
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart_ex.h:
-../Core/Inc/oscillator.h:
-../Core/Inc/symmetry_adjustment.h:
-../Core/Inc/oscillator_params_type.h:
-../Core/Inc/symmetry_adjustment_types.h:
-../Core/Inc/oscillator_params_type.h:
 ../Core/Inc/timers.h:
 ../Core/Inc/oscillator_macros.h:
+../Core/Inc/input_capture.h:
+../Core/Inc/main.h:
 ../Core/Inc/startup.h:
 ../Core/Inc/checking_functions.h:
 ../Core/Inc/UART.h:

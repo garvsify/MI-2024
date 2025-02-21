@@ -115,9 +115,9 @@ void TIM2_ch1_overflow_callback(TIM_HandleTypeDef *htim){
 		IP_CAP_fsm.prev_state = MEASUREMENT_PENDING;
 		speed_pot_adc_measurement_num = 0; //whenever goes into idle, reset speed_adc_measurement
 
-		if((speed_fsm.current_state.speed_exclusive_state == TAP_PENDING_MODE) || (speed_fsm.current_state.speed_exclusive_state == CLK_IN_PENDING_MODE) || (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_MODE)){
+		if((speed_fsm.current_state.speed_exclusive_state == TAP_PENDING_MODE) || (speed_fsm.current_state.speed_exclusive_state == CLK_IN_PENDING_MODE) || (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_A0_MODE) || (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_A1_MODE) || (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_B0_MODE) || (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_B1_MODE) || (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_B2_MODE)){
 
-			if(speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_MODE){
+			if((speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_A0_MODE) || (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_A1_MODE) || (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_B0_MODE) || (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_B1_MODE) || (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_B2_MODE)){
 
 				MIDI_CLK_FSM_state = NOT_COMPILING;
 				MIDI_CLK_tag = 0;
@@ -188,19 +188,23 @@ void UART2_TX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
 void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
-	if(Get_Status_Bit(&statuses, Start_Required_Before_Sync_Mode == YES)){
+	if(Get_Status_Bit(&statuses, Start_Required_Before_Sync_Mode) == YES){
 
-		if((MIDI_CLK_FSM_state == NOT_COMPILING) && (IP_CAP_fsm.current_state == IDLE) && (speed_fsm.current_state != TAP_PENDING_MODE) && (speed_fsm.current_state != CLK_IN_PENDING_MODE)){
+		if((MIDI_CLK_FSM_state == NOT_COMPILING) && (IP_CAP_fsm.current_state == IDLE) && (speed_fsm.current_state.speed_exclusive_state != TAP_PENDING_MODE) && (speed_fsm.current_state.speed_exclusive_state != CLK_IN_PENDING_MODE) && (speed_fsm.current_state.speed_exclusive_state != MIDI_CLK_MODE) && (speed_fsm.current_state.speed_exclusive_state != MIDI_CLK_PENDING_A0_MODE) && (speed_fsm.current_state.speed_exclusive_state != MIDI_CLK_PENDING_A1_MODE) && (speed_fsm.current_state.speed_exclusive_state != MIDI_CLK_PENDING_B0_MODE) && (speed_fsm.current_state.speed_exclusive_state != MIDI_CLK_PENDING_B1_MODE) && (speed_fsm.current_state.speed_exclusive_state != MIDI_CLK_PENDING_B2_MODE)){
 
 			if(*rx_buffer == SYSTEM_REAL_TIME_START){
 
 				speed_fsm.prev_state = speed_fsm.current_state;
-				speed_fsm.current_state.speed_exclusive_state = MIDI_CLK_PENDING_A_MODE;
+				speed_fsm.current_state.speed_exclusive_state = MIDI_CLK_PENDING_A0_MODE;
+
+				MIDI_CLK_tag = 0; //just in case
 			}
 			else if(*rx_buffer == SYSTEM_REAL_TIME_MIDI_CLOCK){
 
 				speed_fsm.prev_state = speed_fsm.current_state;
 				speed_fsm.current_state.speed_exclusive_state = MIDI_CLK_PENDING_B0_MODE;
+
+				MIDI_CLK_tag = 0; //just in case
 
 				HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
 				HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
@@ -209,7 +213,21 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 				MIDI_CLK_tag++;
 			}
 		}
-		else if(speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_A_MODE){
+		else if(speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_A0_MODE){
+
+			if(*rx_buffer == SYSTEM_REAL_TIME_MIDI_CLOCK){
+
+				HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
+				HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+
+				MIDI_CLK_FSM_state = COMPILING;
+				MIDI_CLK_tag++;
+
+				speed_fsm.current_state.speed_exclusive_state = MIDI_CLK_PENDING_A1_MODE;
+				//DO NOT UPDATE PREV STATE - we need to keep track of what the state was prior to any pending state
+			}
+		}
+		else if(speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_A1_MODE){
 
 			if(*rx_buffer == SYSTEM_REAL_TIME_MIDI_CLOCK){
 
@@ -227,7 +245,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 				}
 				else{
 
-					speed_fsm.prev_state.speed_exclusive_state = MIDI_CLK_PENDING_A_MODE;
+					speed_fsm.prev_state.speed_exclusive_state = MIDI_CLK_PENDING_A1_MODE;
 					speed_fsm.current_state.speed_exclusive_state = MIDI_CLK_MODE;
 					MIDI_CLK_tag = 1;
 				}
@@ -252,7 +270,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 				else{
 
 					MIDI_CLK_tag = 1;
-					speed_fsm.prev_state.speed_exclusive_state = MIDI_CLK_PENDING_B0_MODE;
+					//DO NOT UPDATE PREV STATE - we need to keep track of what the state was prior to any pending state
 					speed_fsm.current_state.speed_exclusive_state = MIDI_CLK_PENDING_B1_MODE;
 				}
 			}
@@ -280,7 +298,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 			}
 			else if(*rx_buffer == SYSTEM_REAL_TIME_START){
 
-				speed_fsm.prev_state.speed_exclusive_state = MIDI_CLK_PENDING_B1_MODE;
+				//DO NOT UPDATE PREV STATE - we need to keep track of what the state was prior to any pending state
 				speed_fsm.current_state.speed_exclusive_state = MIDI_CLK_PENDING_B2_MODE;
 			}
 		}

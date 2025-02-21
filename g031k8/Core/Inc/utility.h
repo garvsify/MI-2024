@@ -7,9 +7,9 @@
 
 //INCLUDES
 #include <stdint.h>
+#include "oscillator.h"
 #include "input_capture.h"
 #include "config.h"
-#include "oscillator.h"
 #include "oscillator_macros.h"
 
 //CUSTOM TYPES
