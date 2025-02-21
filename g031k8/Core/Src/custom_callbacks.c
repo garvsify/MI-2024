@@ -206,7 +206,11 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
 	if(Get_Status_Bit(&statuses, Start_Required_Before_Sync_Mode) == YES){
 
-		if((MIDI_CLK_fsm == NOT_COMPILING) && (IP_CAP_fsm.current_state == IDLE) && (speed_fsm.current_state.speed_exclusive_state != TAP_PENDING_MODE) && (speed_fsm.current_state.speed_exclusive_state != CLK_IN_PENDING_MODE) && (speed_fsm.current_state.speed_exclusive_state != MIDI_CLK_MODE) && (speed_fsm.current_state.speed_exclusive_state != MIDI_CLK_PENDING_A0_MODE) && (speed_fsm.current_state.speed_exclusive_state != MIDI_CLK_PENDING_A1_MODE) && (speed_fsm.current_state.speed_exclusive_state != MIDI_CLK_PENDING_B0_MODE) && (speed_fsm.current_state.speed_exclusive_state != MIDI_CLK_PENDING_B1_MODE) && (speed_fsm.current_state.speed_exclusive_state != MIDI_CLK_PENDING_B2_MODE)){
+		if((MIDI_CLK_fsm == NOT_COMPILING) && (IP_CAP_fsm.current_state == IDLE)
+				&& ((speed_fsm.current_state.speed_exclusive_state == TAP_MODE)
+				|| (speed_fsm.current_state.speed_exclusive_state == CLK_IN_MODE)
+				|| (speed_fsm.current_state.shared_state == PC_MODE)
+				|| (speed_fsm.current_state.shared_state == CC_MODE))){
 
 			if(*rx_buffer == SYSTEM_REAL_TIME_START){
 
@@ -322,8 +326,8 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
 			if(*rx_buffer == SYSTEM_REAL_TIME_MIDI_CLOCK){
 
-				HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1);
-				HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+				HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
+				HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
 
 				//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
 
@@ -349,7 +353,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 				//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
 			}
 		}
-		else if(speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_MODE){
+		else if((speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_MODE) && (Get_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out) == NO)){
 
 			if(*rx_buffer == SYSTEM_REAL_TIME_MIDI_CLOCK){
 
@@ -369,6 +373,150 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
 					MIDI_CLK_tag = 1;
 				}
+			}
+		}
+		else if((speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_MODE) && (IP_CAP_fsm.current_state == IDLE) && (Get_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out) == YES)){
+
+			if(*rx_buffer == SYSTEM_REAL_TIME_MIDI_CLOCK){
+
+				MIDI_CLK_tag = 0; //just in case
+				MIDI_CLK_tag++;
+				MIDI_CLK_fsm = COMPILING;
+
+				speed_fsm.current_state.speed_exclusive_state = MIDI_CLK_RESYNC_B0_MODE;
+				speed_fsm.prev_state.speed_exclusive_state = MIDI_CLK_MODE;
+
+				Clear_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out);
+			}
+			else if(*rx_buffer == SYSTEM_REAL_TIME_START){
+
+				MIDI_CLK_tag = 0; //just in case
+
+				speed_fsm.current_state.speed_exclusive_state = MIDI_CLK_RESYNC_A0_MODE;
+				speed_fsm.prev_state.speed_exclusive_state = MIDI_CLK_MODE;
+
+				Clear_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out);
+			}
+		}
+		else if(speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_RESYNC_A0_MODE){
+
+			if(*rx_buffer == SYSTEM_REAL_TIME_MIDI_CLOCK){
+
+				HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
+				HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+
+				MIDI_CLK_fsm = COMPILING;
+				MIDI_CLK_tag++;
+
+				speed_fsm.current_state.speed_exclusive_state = MIDI_CLK_RESYNC_A1_MODE;
+				//DO NOT UPDATE PREV STATE - we need to keep track of what the state was prior to any pending state
+			}
+		}
+		else if(speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_RESYNC_A1_MODE){
+
+			if(*rx_buffer == SYSTEM_REAL_TIME_MIDI_CLOCK){
+
+				MIDI_CLK_tag++;
+
+				if(MIDI_CLK_tag < 12){
+
+					HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
+					HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+				}
+				else if(MIDI_CLK_tag < 25){
+
+					HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1);
+					HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+				}
+				else{
+
+					speed_fsm.prev_state.speed_exclusive_state = MIDI_CLK_RESYNC_A1_MODE;
+					speed_fsm.current_state.speed_exclusive_state = MIDI_CLK_MODE;
+					MIDI_CLK_tag = 1;
+				}
+			}
+		}
+		else if(speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_RESYNC_B0_MODE){
+
+			if(*rx_buffer == SYSTEM_REAL_TIME_MIDI_CLOCK){
+
+				//when sftwre timer times out the midi clk tag is reset to 0
+				MIDI_CLK_tag++;
+
+				if(MIDI_CLK_tag < 12){
+
+					HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
+					HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+				}
+				else if(MIDI_CLK_tag < 25){
+
+					HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1);
+					HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+				}
+				else{
+
+					speed_fsm.current_state.speed_exclusive_state = MIDI_CLK_RESYNC_B1_MODE;
+					//DO NOT UPDATE PREV STATE - we need to keep track of what the state was prior to any pending state
+					MIDI_CLK_tag = 1;
+				}
+			}
+		}
+		else if(speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_RESYNC_B1_MODE){
+
+			if(*rx_buffer == SYSTEM_REAL_TIME_MIDI_CLOCK){
+
+				MIDI_CLK_tag++;
+
+				if(MIDI_CLK_tag < 12){
+
+					HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
+					HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+				}
+				else if(MIDI_CLK_tag < 25){
+
+					HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1);
+					HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+				}
+				else{
+
+					MIDI_CLK_tag = 1;
+				}
+			}
+			else if(*rx_buffer == SYSTEM_REAL_TIME_START){
+
+				//DO NOT UPDATE PREV STATE - we need to keep track of what the state was prior to any pending state
+				speed_fsm.current_state.speed_exclusive_state = MIDI_CLK_RESYNC_B2_MODE;
+			}
+		}
+		else if(speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_RESYNC_B2_MODE){
+
+			if(*rx_buffer == SYSTEM_REAL_TIME_MIDI_CLOCK){
+
+				HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
+				HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+
+				//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
+
+				// @TODO //WRITE CODE TO LOAD CORRECT DUTY DELAYED VALUE TO SECONDARY OSCILLATOR
+				Set_Oscillator_Values(&params_to_be_loaded);
+
+				speed_fsm.prev_state.speed_exclusive_state = MIDI_CLK_RESYNC_B2_MODE;
+				speed_fsm.current_state.speed_exclusive_state = MIDI_CLK_MODE;
+
+				MIDI_CLK_tag = 1;
+
+				Stop_OC_TIM(&htim3, TIM_CHANNEL_1); //do we need?
+
+				Copy_Params_Structs(&params_to_be_loaded, &params_working);
+				Copy_Params_Structs(&params_to_be_loaded, &params);
+
+				Set_Status_Bit(&statuses, First_Sync_Complete);
+
+				Calculate_Next_Main_Oscillator_Values(&params, (enum Next_Values_Processing_Mode)REGULAR_MODE);
+				Write_Next_Main_Oscillator_Values_to_Delay_Line(&params, &delay_line);
+				HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions); //this function takes ages to execute!
+
+				//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
 			}
 		}
 	}
@@ -545,7 +693,6 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 		if(Get_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out) == YES){
 
-			Clear_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out);
 			Speed_Pot_Check(&params);
 		}
 	}
@@ -555,7 +702,6 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 		if(Get_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out) == YES){
 
-			Clear_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out);
 			Speed_Pot_Check(&params);
 		}
 	}
@@ -565,7 +711,6 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 		if(Get_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out) == YES){
 
-			Clear_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out);
 			Speed_Pot_Check(&params);
 		}
 	}
