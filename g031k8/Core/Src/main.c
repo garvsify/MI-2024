@@ -3,7 +3,8 @@
 
 Issues:
 
-- hehe - MIDI CLK still causes syncing to start even if START isn't received
+- Found a bug! If MIDI CLKs are received, oscillator syncs internally as it should, then when 'start' is received, the oscillator actually syncs
+as it should. However if MIDI CLKs are then received and a start IS NOT sent, the oscillator actually syncs, when it should just internally sync again!
 
 */
 
