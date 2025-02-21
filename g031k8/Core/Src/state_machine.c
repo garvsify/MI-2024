@@ -24,10 +24,8 @@ uint8_t Advance_Pending_States(void){
 
 		speed_fsm.current_state.speed_exclusive_state = CLK_IN_MODE;
 	}
-	else if(speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_MODE){
 
-		speed_fsm.current_state.speed_exclusive_state = MIDI_CLK_MODE;
-	}
+	//DON'T ADD MIDI CLK CODE
 
 	speed_fsm.prev_state = current_state;
 

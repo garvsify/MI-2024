@@ -64,12 +64,17 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 
 			//No need to check longest period as that is tested inherently by the TIM2 overflow
 
-			Start_Measurement_Reelapse_Timer();
+			if(speed_fsm.current_state.speed_exclusive_state != MIDI_CLK_PENDING_B0_MODE){
+
+				Start_Measurement_Reelapse_Timer();
+			}
 
 			IP_CAP_fsm.current_state = MEASUREMENT_REELAPSE;
 			IP_CAP_fsm.prev_state = MEASUREMENT_PENDING;
 
 			Copy_Params_Structs(&params, &params_to_be_loaded);
+
+			Advance_Pending_States();
 
 			//BEGIN PROCESSING
 			Set_Status_Bit(&statuses, Input_Capture_Processing_Can_Be_Started);
@@ -92,12 +97,17 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 
 	else if(IP_CAP_fsm.current_state == MEASUREMENT_REELAPSE_AND_MEASUREMENT_PENDING){ //second edge
 
-		Start_Measurement_Reelapse_Timer();
+		if(speed_fsm.current_state.speed_exclusive_state != MIDI_CLK_PENDING_B0_MODE){
+
+			Start_Measurement_Reelapse_Timer();
+		}
 
 		IP_CAP_fsm.current_state = MEASUREMENT_REELAPSE;
 		IP_CAP_fsm.prev_state = MEASUREMENT_REELAPSE_AND_MEASUREMENT_PENDING;
 
 		Copy_Params_Structs(&params, &params_to_be_loaded);
+
+		Advance_Pending_States();
 
 		//BEGIN PROCESSING
 		Set_Status_Bit(&statuses, Input_Capture_Processing_Can_Be_Started);
@@ -115,11 +125,21 @@ void TIM2_ch1_overflow_callback(TIM_HandleTypeDef *htim){
 		IP_CAP_fsm.prev_state = MEASUREMENT_PENDING;
 		speed_pot_adc_measurement_num = 0; //whenever goes into idle, reset speed_adc_measurement
 
-		if((speed_fsm.current_state.speed_exclusive_state == TAP_PENDING_MODE) || (speed_fsm.current_state.speed_exclusive_state == CLK_IN_PENDING_MODE) || (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_A0_MODE) || (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_A1_MODE) || (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_B0_MODE) || (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_B1_MODE) || (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_B2_MODE)){
+		if((speed_fsm.current_state.speed_exclusive_state == TAP_PENDING_MODE)
+				|| (speed_fsm.current_state.speed_exclusive_state == CLK_IN_PENDING_MODE)
+				|| (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_A0_MODE)
+				|| (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_A1_MODE)
+				|| (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_B0_MODE)
+				|| (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_B1_MODE)
+				|| (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_B2_MODE)){
 
-			if((speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_A0_MODE) || (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_A1_MODE) || (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_B0_MODE) || (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_B1_MODE) || (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_B2_MODE)){
+			if((speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_A0_MODE)
+					|| (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_A1_MODE)
+					|| (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_B0_MODE)
+					|| (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_B1_MODE)
+					|| (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_B2_MODE)){
 
-				MIDI_CLK_FSM_state = NOT_COMPILING;
+				MIDI_CLK_fsm = NOT_COMPILING;
 				MIDI_CLK_tag = 0;
 			}
 
@@ -129,7 +149,7 @@ void TIM2_ch1_overflow_callback(TIM_HandleTypeDef *htim){
 		}
 		else if(speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_MODE){
 
-			MIDI_CLK_FSM_state = NOT_COMPILING;
+			MIDI_CLK_fsm = NOT_COMPILING;
 			MIDI_CLK_tag = 0;
 
 			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1);
@@ -157,16 +177,12 @@ void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
 		//UPDATE IP CAP FSM
 		IP_CAP_fsm.current_state = IDLE;
 		IP_CAP_fsm.prev_state = MEASUREMENT_REELAPSE;
-
-		Advance_Pending_States();
 	}
 	else if(IP_CAP_fsm.current_state == MEASUREMENT_REELAPSE_AND_MEASUREMENT_PENDING){
 
 		//UPDATE IP CAP FSM
 		IP_CAP_fsm.current_state = MEASUREMENT_PENDING;
 		IP_CAP_fsm.prev_state = MEASUREMENT_REELAPSE_AND_MEASUREMENT_PENDING;
-
-		Advance_Pending_States();
 	}
 
 	Copy_Params_Structs(&params_to_be_loaded, &params_working);
@@ -190,7 +206,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
 	if(Get_Status_Bit(&statuses, Start_Required_Before_Sync_Mode) == YES){
 
-		if((MIDI_CLK_FSM_state == NOT_COMPILING) && (IP_CAP_fsm.current_state == IDLE) && (speed_fsm.current_state.speed_exclusive_state != TAP_PENDING_MODE) && (speed_fsm.current_state.speed_exclusive_state != CLK_IN_PENDING_MODE) && (speed_fsm.current_state.speed_exclusive_state != MIDI_CLK_MODE) && (speed_fsm.current_state.speed_exclusive_state != MIDI_CLK_PENDING_A0_MODE) && (speed_fsm.current_state.speed_exclusive_state != MIDI_CLK_PENDING_A1_MODE) && (speed_fsm.current_state.speed_exclusive_state != MIDI_CLK_PENDING_B0_MODE) && (speed_fsm.current_state.speed_exclusive_state != MIDI_CLK_PENDING_B1_MODE) && (speed_fsm.current_state.speed_exclusive_state != MIDI_CLK_PENDING_B2_MODE)){
+		if((MIDI_CLK_fsm == NOT_COMPILING) && (IP_CAP_fsm.current_state == IDLE) && (speed_fsm.current_state.speed_exclusive_state != TAP_PENDING_MODE) && (speed_fsm.current_state.speed_exclusive_state != CLK_IN_PENDING_MODE) && (speed_fsm.current_state.speed_exclusive_state != MIDI_CLK_MODE) && (speed_fsm.current_state.speed_exclusive_state != MIDI_CLK_PENDING_A0_MODE) && (speed_fsm.current_state.speed_exclusive_state != MIDI_CLK_PENDING_A1_MODE) && (speed_fsm.current_state.speed_exclusive_state != MIDI_CLK_PENDING_B0_MODE) && (speed_fsm.current_state.speed_exclusive_state != MIDI_CLK_PENDING_B1_MODE) && (speed_fsm.current_state.speed_exclusive_state != MIDI_CLK_PENDING_B2_MODE)){
 
 			if(*rx_buffer == SYSTEM_REAL_TIME_START){
 
@@ -209,7 +225,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 				HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
 				HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
 
-				MIDI_CLK_FSM_state = COMPILING;
+				MIDI_CLK_fsm = COMPILING;
 				MIDI_CLK_tag++;
 			}
 		}
@@ -220,7 +236,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 				HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
 				HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
 
-				MIDI_CLK_FSM_state = COMPILING;
+				MIDI_CLK_fsm = COMPILING;
 				MIDI_CLK_tag++;
 
 				speed_fsm.current_state.speed_exclusive_state = MIDI_CLK_PENDING_A1_MODE;
@@ -309,10 +325,28 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 				HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1);
 				HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
 
+				//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
+
+				// @TODO //WRITE CODE TO LOAD CORRECT DUTY DELAYED VALUE TO SECONDARY OSCILLATOR
+				Set_Oscillator_Values(&params_to_be_loaded);
+
 				speed_fsm.prev_state.speed_exclusive_state = MIDI_CLK_PENDING_B2_MODE;
 				speed_fsm.current_state.speed_exclusive_state = MIDI_CLK_MODE;
 
 				MIDI_CLK_tag = 1;
+
+				Stop_OC_TIM(&htim3, TIM_CHANNEL_1); //do we need?
+
+				Copy_Params_Structs(&params_to_be_loaded, &params_working);
+				Copy_Params_Structs(&params_to_be_loaded, &params);
+
+				Set_Status_Bit(&statuses, First_Sync_Complete);
+
+				Calculate_Next_Main_Oscillator_Values(&params, (enum Next_Values_Processing_Mode)REGULAR_MODE);
+				Write_Next_Main_Oscillator_Values_to_Delay_Line(&params, &delay_line);
+				HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions); //this function takes ages to execute!
+
+				//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
 			}
 		}
 	}
