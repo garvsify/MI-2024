@@ -2476,10 +2476,10 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
  8000edc:	8813      	ldrh	r3, [r2, #0]
  8000ede:	2b80      	cmp	r3, #128	@ 0x80
  8000ee0:	d91a      	bls.n	8000f18 <TIM2_ch1_IP_capture_callback+0x74>
-			if(speed_fsm.current_state.speed_exclusive_state != MIDI_CLK_PENDING_B0_MODE){
+			if(speed_fsm.current_state.speed_exclusive_state != MIDI_CLK_PENDING_B1_MODE){
  8000ee2:	4b1b      	ldr	r3, [pc, #108]	@ (8000f50 <TIM2_ch1_IP_capture_callback+0xac>)
  8000ee4:	781b      	ldrb	r3, [r3, #0]
- 8000ee6:	2b0b      	cmp	r3, #11
+ 8000ee6:	2b0c      	cmp	r3, #12
  8000ee8:	d001      	beq.n	8000eee <TIM2_ch1_IP_capture_callback+0x4a>
 				Start_Measurement_Reelapse_Timer();
  8000eea:	f000 fbd3 	bl	8001694 <Start_Measurement_Reelapse_Timer>
@@ -2522,10 +2522,10 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 			speed_pot_adc_measurement_num = 0; //whenever goes into idle, reset speed_adc_measurement
  8000f20:	7013      	strb	r3, [r2, #0]
  8000f22:	e7da      	b.n	8000eda <TIM2_ch1_IP_capture_callback+0x36>
-		if(speed_fsm.current_state.speed_exclusive_state != MIDI_CLK_PENDING_B0_MODE){
+		if(speed_fsm.current_state.speed_exclusive_state != MIDI_CLK_PENDING_B1_MODE){
  8000f24:	4b0a      	ldr	r3, [pc, #40]	@ (8000f50 <TIM2_ch1_IP_capture_callback+0xac>)
  8000f26:	781b      	ldrb	r3, [r3, #0]
- 8000f28:	2b0b      	cmp	r3, #11
+ 8000f28:	2b0c      	cmp	r3, #12
  8000f2a:	d001      	beq.n	8000f30 <TIM2_ch1_IP_capture_callback+0x8c>
 			Start_Measurement_Reelapse_Timer();
  8000f2c:	f000 fbb2 	bl	8001694 <Start_Measurement_Reelapse_Timer>

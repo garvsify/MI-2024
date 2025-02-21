@@ -64,7 +64,7 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 
 			//No need to check longest period as that is tested inherently by the TIM2 overflow
 
-			if(speed_fsm.current_state.speed_exclusive_state != MIDI_CLK_PENDING_B0_MODE){
+			if(speed_fsm.current_state.speed_exclusive_state != MIDI_CLK_PENDING_B1_MODE){
 
 				Start_Measurement_Reelapse_Timer();
 			}
@@ -97,7 +97,7 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 
 	else if(IP_CAP_fsm.current_state == MEASUREMENT_REELAPSE_AND_MEASUREMENT_PENDING){ //second edge
 
-		if(speed_fsm.current_state.speed_exclusive_state != MIDI_CLK_PENDING_B0_MODE){
+		if(speed_fsm.current_state.speed_exclusive_state != MIDI_CLK_PENDING_B1_MODE){
 
 			Start_Measurement_Reelapse_Timer();
 		}
