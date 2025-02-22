@@ -599,8 +599,9 @@ void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
 			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
 			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
 
-			speed_fsm.prev_state.speed_exclusive_state = CLK_IN_PENDING_MODE;
-			speed_fsm.current_state.speed_exclusive_state = CLK_IN_MODE;
+			//ALREADY DONE IN IP CAP CALLBACK
+			/*speed_fsm.prev_state.speed_exclusive_state = CLK_IN_PENDING_MODE;
+			speed_fsm.current_state.speed_exclusive_state = CLK_IN_MODE;*/
 		}
 
 		//IF ALREADY IN CLK MODE
