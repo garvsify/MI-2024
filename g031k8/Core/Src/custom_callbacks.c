@@ -126,6 +126,10 @@ void TIM2_ch1_overflow_callback(TIM_HandleTypeDef *htim){
 		IP_CAP_fsm.current_state = IDLE;
 		IP_CAP_fsm.prev_state = MEASUREMENT_PENDING;
 
+		union Speed_FSM_States prev_state = speed_fsm.prev_state;
+		speed_fsm.prev_state = speed_fsm.current_state;
+		speed_fsm.current_state = prev_state;
+
 		MIDI_CLK_fsm = NOT_COMPILING;
 		MIDI_CLK_tag = 0;
 
@@ -136,6 +140,10 @@ void TIM2_ch1_overflow_callback(TIM_HandleTypeDef *htim){
 
 		IP_CAP_fsm.current_state = MEASUREMENT_REELAPSE;
 		IP_CAP_fsm.prev_state = MEASUREMENT_REELAPSE_AND_MEASUREMENT_PENDING;
+
+		union Speed_FSM_States prev_state = speed_fsm.prev_state;
+		speed_fsm.prev_state = speed_fsm.current_state;
+		speed_fsm.current_state = prev_state;
 
 		MIDI_CLK_fsm = NOT_COMPILING;
 		MIDI_CLK_tag = 0;
