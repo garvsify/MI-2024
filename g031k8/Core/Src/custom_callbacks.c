@@ -121,35 +121,43 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 
 void TIM2_ch1_overflow_callback(TIM_HandleTypeDef *htim){
 
+	union Speed_FSM_States previous = speed_fsm.prev_state;
+
 	if(IP_CAP_fsm.current_state == MEASUREMENT_PENDING){
 
 		IP_CAP_fsm.current_state = IDLE;
 		IP_CAP_fsm.prev_state = MEASUREMENT_PENDING;
-
-		union Speed_FSM_States prev_state = speed_fsm.prev_state;
-		speed_fsm.prev_state = speed_fsm.current_state;
-		speed_fsm.current_state = prev_state;
 
 		MIDI_CLK_fsm = NOT_COMPILING;
 		MIDI_CLK_tag = 0;
 
 		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1);
 		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+
+		if(!((speed_fsm.current_state.speed_exclusive_state == TAP_MODE)
+			|| (speed_fsm.current_state.speed_exclusive_state == CLK_IN_MODE))){
+
+			speed_fsm.prev_state = speed_fsm.current_state;
+			speed_fsm.current_state = previous;
+		}
 	}
 	else if(IP_CAP_fsm.current_state == MEASUREMENT_REELAPSE_AND_MEASUREMENT_PENDING){
 
 		IP_CAP_fsm.current_state = MEASUREMENT_REELAPSE;
 		IP_CAP_fsm.prev_state = MEASUREMENT_REELAPSE_AND_MEASUREMENT_PENDING;
 
-		union Speed_FSM_States prev_state = speed_fsm.prev_state;
-		speed_fsm.prev_state = speed_fsm.current_state;
-		speed_fsm.current_state = prev_state;
-
 		MIDI_CLK_fsm = NOT_COMPILING;
 		MIDI_CLK_tag = 0;
 
 		HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1);
 		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+
+		if(!((speed_fsm.current_state.speed_exclusive_state == TAP_MODE)
+			|| (speed_fsm.current_state.speed_exclusive_state == CLK_IN_MODE))){
+
+			speed_fsm.prev_state = speed_fsm.current_state;
+			speed_fsm.current_state = previous;
+		}
 	}
 }
 

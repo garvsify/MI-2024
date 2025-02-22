@@ -46,14 +46,16 @@ uint8_t Startup(void){
 	Start_PWM_Gen_Timer_Main_and_Secondary_Oscillators(&htim1, TIM_CHANNEL_2, TIM_CHANNEL_4);
 	Start_Freq_Gen_Timer();
 
-	//ENABLE INTERRUPTS
-	Global_Interrupt_Enable();
-
 	//START UART RECEIVE
 	Start_UART_Receive();
 
 	//START IP CAP
+	IP_CAP_fsm.current_state = IDLE;
+	IP_CAP_fsm.prev_state = IP_CAP_NONE;
 	Start_Input_Capture_Timer();
+
+	//ENABLE INTERRUPTS
+	Global_Interrupt_Enable();
 
 
 	#if TAPCLK_ON_OR_OFF == ON
