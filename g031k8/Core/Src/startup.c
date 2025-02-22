@@ -50,8 +50,6 @@ uint8_t Startup(void){
 	Start_UART_Receive();
 
 	//START IP CAP
-	IP_CAP_fsm.current_state = IDLE;
-	IP_CAP_fsm.prev_state = IP_CAP_NONE;
 	Start_Input_Capture_Timer();
 
 	//ENABLE INTERRUPTS
