@@ -654,10 +654,20 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 		speed_fsm.current_state.speed_exclusive_state = TAP_PENDING_MODE;
 		speed_fsm.prev_state.speed_exclusive_state = MIDI_CLK_MODE;
 	}
-	else if((speed_fsm.current_state.speed_exclusive_state == TAP_MODE) && (pin_state == 0) && IP_CAP_fsm.current_state == IDLE){
+	else if((speed_fsm.current_state.speed_exclusive_state == TAP_MODE) && (pin_state == 0) && (IP_CAP_fsm.current_state == IDLE)){
 
 		speed_fsm.current_state.speed_exclusive_state = TAP_RESYNC_MODE;
 		speed_fsm.prev_state.speed_exclusive_state = TAP_MODE;
+	}
+	else if((speed_fsm.current_state.speed_exclusive_state == TAP_MODE) && (pin_state == 0) && (IP_CAP_fsm.current_state == MEASUREMENT_REELAPSE)){
+
+		speed_fsm.current_state.speed_exclusive_state = TAP_RESYNC_MODE;
+		speed_fsm.prev_state.speed_exclusive_state = TAP_MODE;
+	}
+	else if((speed_fsm.current_state.speed_exclusive_state == TAP_RESYNC_MODE) && (pin_state == 0)){
+
+		speed_fsm.current_state.speed_exclusive_state = TAP_MODE;
+		speed_fsm.prev_state.speed_exclusive_state = TAP_RESYNC_MODE;
 	}
 
 	//CHECK TAP TEMPO STATE
