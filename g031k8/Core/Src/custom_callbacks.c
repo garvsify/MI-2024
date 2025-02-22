@@ -625,49 +625,71 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 	static volatile struct Tap_Tempo_Switch_States tap_tempo_switch_states = {0};
 
-	//CHECK IF NEED TO TAP_PENDING TRANSITION
+	//CHECK IF NEED TO TRANSITION
 
 	uint8_t pin_state = (uint8_t)HAL_GPIO_ReadPin(SW_IN_GPIO_Port, SW_IN_Pin);
 
-	if((speed_fsm.current_state.shared_state == MANUAL_MODE) && (pin_state == 0)){
 
-		speed_fsm.current_state.speed_exclusive_state = TAP_PENDING_MODE;
-		speed_fsm.prev_state.shared_state = MANUAL_MODE;
-	}
-	else if((speed_fsm.current_state.shared_state == CC_MODE) && (pin_state == 0)){
+	if(Get_Status_Bit(&statuses, Tap_Tempo_Checking_Disabled) == NO){
 
-		speed_fsm.current_state.speed_exclusive_state = TAP_PENDING_MODE;
-		speed_fsm.prev_state.shared_state = CC_MODE;
-	}
-	else if((speed_fsm.current_state.shared_state == PC_MODE) && (pin_state == 0)){
+		if((speed_fsm.current_state.shared_state == MANUAL_MODE) && (pin_state == 0)){
 
-		speed_fsm.current_state.speed_exclusive_state = TAP_PENDING_MODE;
-		speed_fsm.prev_state.shared_state = PC_MODE;
-	}
-	else if((speed_fsm.current_state.speed_exclusive_state == CLK_IN_MODE) && (pin_state == 0) && IP_CAP_fsm.current_state == IDLE){
+			speed_fsm.current_state.speed_exclusive_state = TAP_PENDING_MODE;
+			speed_fsm.prev_state.shared_state = MANUAL_MODE;
 
-		speed_fsm.current_state.speed_exclusive_state = TAP_PENDING_MODE;
-		speed_fsm.prev_state.speed_exclusive_state = CLK_IN_MODE;
-	}
-	else if((speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_MODE) && (pin_state == 0) && IP_CAP_fsm.current_state == IDLE){
+			Reset_Tap_Tempo_Timer();
+		}
+		else if((speed_fsm.current_state.shared_state == CC_MODE) && (pin_state == 0)){
 
-		speed_fsm.current_state.speed_exclusive_state = TAP_PENDING_MODE;
-		speed_fsm.prev_state.speed_exclusive_state = MIDI_CLK_MODE;
-	}
-	else if((speed_fsm.current_state.speed_exclusive_state == TAP_MODE) && (pin_state == 0) && (IP_CAP_fsm.current_state == IDLE)){
+			speed_fsm.current_state.speed_exclusive_state = TAP_PENDING_MODE;
+			speed_fsm.prev_state.shared_state = CC_MODE;
 
-		speed_fsm.current_state.speed_exclusive_state = TAP_RESYNC_MODE;
-		speed_fsm.prev_state.speed_exclusive_state = TAP_MODE;
-	}
-	else if((speed_fsm.current_state.speed_exclusive_state == TAP_MODE) && (pin_state == 0) && (IP_CAP_fsm.current_state == MEASUREMENT_REELAPSE)){
+			Reset_Tap_Tempo_Timer();
+		}
+		else if((speed_fsm.current_state.shared_state == PC_MODE) && (pin_state == 0)){
 
-		speed_fsm.current_state.speed_exclusive_state = TAP_RESYNC_MODE;
-		speed_fsm.prev_state.speed_exclusive_state = TAP_MODE;
-	}
-	else if((speed_fsm.current_state.speed_exclusive_state == TAP_RESYNC_MODE) && (pin_state == 0)){
+			speed_fsm.current_state.speed_exclusive_state = TAP_PENDING_MODE;
+			speed_fsm.prev_state.shared_state = PC_MODE;
 
-		speed_fsm.current_state.speed_exclusive_state = TAP_MODE;
-		speed_fsm.prev_state.speed_exclusive_state = TAP_RESYNC_MODE;
+			Reset_Tap_Tempo_Timer();
+		}
+		else if((speed_fsm.current_state.speed_exclusive_state == CLK_IN_MODE) && (pin_state == 0) && IP_CAP_fsm.current_state == IDLE){
+
+			speed_fsm.current_state.speed_exclusive_state = TAP_PENDING_MODE;
+			speed_fsm.prev_state.speed_exclusive_state = CLK_IN_MODE;
+
+			Reset_Tap_Tempo_Timer();
+		}
+		else if((speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_MODE) && (pin_state == 0) && IP_CAP_fsm.current_state == IDLE){
+
+			speed_fsm.current_state.speed_exclusive_state = TAP_PENDING_MODE;
+			speed_fsm.prev_state.speed_exclusive_state = MIDI_CLK_MODE;
+
+			Reset_Tap_Tempo_Timer();
+		}
+		else if((speed_fsm.current_state.speed_exclusive_state == TAP_MODE) && (pin_state == 0) && (IP_CAP_fsm.current_state == IDLE)){
+
+			speed_fsm.current_state.speed_exclusive_state = TAP_RESYNC_MODE;
+			speed_fsm.prev_state.speed_exclusive_state = TAP_MODE;
+
+			Reset_Tap_Tempo_Timer();
+		}
+		else if((speed_fsm.current_state.speed_exclusive_state == TAP_MODE) && (pin_state == 0) && (IP_CAP_fsm.current_state == MEASUREMENT_REELAPSE)){
+
+			speed_fsm.current_state.speed_exclusive_state = TAP_RESYNC_MODE;
+			speed_fsm.prev_state.speed_exclusive_state = TAP_MODE;
+
+			Reset_Tap_Tempo_Timer();
+		}
+		/*
+		//temporarily removing for simplicity to debug tap tempo timer
+		else if((speed_fsm.current_state.speed_exclusive_state == TAP_RESYNC_MODE) && (pin_state == 0) && (IP_CAP_fsm.current_state == MEASUREMENT_REELAPSE_AND_MEASUREMENT_PENDING)){
+
+			speed_fsm.current_state.speed_exclusive_state = TAP_MODE;
+			speed_fsm.prev_state.speed_exclusive_state = TAP_RESYNC_MODE;
+
+			Reset_Tap_Tempo_Timer();
+		}*/
 	}
 
 	//CHECK TAP TEMPO STATE

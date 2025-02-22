@@ -18,6 +18,7 @@ Potential Issues:
 //VARIABLE DEFINITIONS
 volatile uint32_t statuses = 0; //set of all status bits (to reduce memory usage)
 uint32_t idle_counter = 0;
+uint32_t tap_tempo_checking_counter = 0;
 
 int main(void)
 {
@@ -64,6 +65,21 @@ int main(void)
 				Clear_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
 				Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out);
 				idle_counter = 0;
+			}
+		}
+
+		if(Get_Status_Bit(&statuses, Software_Tap_Tempo_Checking_Timer_Is_Running) == YES){
+
+			if(tap_tempo_checking_counter < TAP_TEMPO_CHECKING_COUNT){
+
+				tap_tempo_checking_counter++;
+			}
+			else{
+
+				Clear_Status_Bit(&statuses, Software_Tap_Tempo_Checking_Timer_Is_Running);
+				Set_Status_Bit(&statuses, Software_Tap_Tempo_Checking_Timer_Has_Timed_Out);
+				Clear_Status_Bit(&statuses, Tap_Tempo_Checking_Disabled);
+				tap_tempo_checking_counter = 0;
 			}
 		}
 	}

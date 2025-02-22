@@ -12,6 +12,7 @@
 #include "input_capture.h"
 #include "config.h"
 #include "oscillator_macros.h"
+#include "tap_tempo.h"
 
 //CUSTOM TYPES
 enum Polarity{
@@ -30,7 +31,10 @@ enum Status_Bit{
 	Initial_ADC_Conversion_Complete = INITIAL_ADC_CONVERSION_COMPLETE,
 	Software_IP_CAP_Idle_Timer_Has_Timed_Out = SOFTWARE_IP_CAP_IDLE_TIMER_HAS_TIMED_OUT,
 	Software_IP_CAP_Idle_Timer_Is_Running = SOFTWARE_IP_CAP_IDLE_TIMER_IS_RUNNING,
-	Start_Required_Before_Sync_Mode = START_REQUIRED_BEFORE_SYNC_MODE
+	Start_Required_Before_Sync_Mode = START_REQUIRED_BEFORE_SYNC_MODE,
+	Software_Tap_Tempo_Checking_Timer_Has_Timed_Out = SOFTWARE_TAP_TEMPO_CHECKING_TIMER_HAS_TIMED_OUT,
+	Software_Tap_Tempo_Checking_Timer_Is_Running = SOFTWARE_TAP_TEMPO_CHECKING_TIMER_IS_RUNNING,
+	Tap_Tempo_Checking_Disabled = TAP_TEMPO_CHECKING_DISABLED
 };
 
 //FUNCTION DECLARATIONS

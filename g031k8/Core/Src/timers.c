@@ -26,3 +26,12 @@ uint8_t Stop_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t OC_TIM_channel){
 
 	return ok;
 }
+
+uint8_t Reset_Tap_Tempo_Timer(void){
+
+	Set_Status_Bit(&statuses, Tap_Tempo_Checking_Disabled);
+	Clear_Status_Bit(&statuses, Software_Tap_Tempo_Checking_Timer_Has_Timed_Out);
+	Set_Status_Bit(&statuses, Software_Tap_Tempo_Checking_Timer_Is_Running);
+
+	return 1;
+}
