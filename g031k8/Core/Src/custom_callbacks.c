@@ -84,7 +84,6 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 
 			IP_CAP_fsm.current_state = IDLE;
 			IP_CAP_fsm.prev_state = MEASUREMENT_PENDING;
-			speed_pot_adc_measurement_num = 0; //whenever goes into idle, reset speed_adc_measurement
 		}
 	}
 
@@ -572,16 +571,6 @@ void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
 			speed_fsm.prev_state.speed_exclusive_state = TAP_MODE;
 			speed_fsm.current_state.speed_exclusive_state = CLK_IN_PENDING_MODE;
 		}
-		//DON'T COMMENT BACK IN - IN THIS CONDITION WE DON'T WANT TO CHANGE STATE
-		/*else if(speed_fsm.current_state == SPEED_CLK_IN){
-
-			//Set SW OUT
-			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
-			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
-
-			speed_fsm.prev_state = SPEED_CLK_IN;
-			speed_fsm.current_state == SPEED_CLK_IN_PENDING;
-		}*/
 		else if((speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_MODE) && (IP_CAP_fsm.current_state == IDLE)){
 
 			//Set SW OUT
@@ -622,8 +611,9 @@ void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
 			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
 			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
 
-			speed_fsm.prev_state.speed_exclusive_state = CLK_IN_RESYNC_MODE;
-			speed_fsm.current_state.speed_exclusive_state = CLK_IN_MODE;
+			//ALREADY DONE IN IP CAP CALLBACK
+			/*speed_fsm.prev_state.speed_exclusive_state = CLK_IN_RESYNC_MODE;
+			speed_fsm.current_state.speed_exclusive_state = CLK_IN_MODE;*/
 		}
 	}
 
