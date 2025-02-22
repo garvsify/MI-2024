@@ -602,6 +602,10 @@ void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
 
 			speed_fsm.prev_state.speed_exclusive_state = CLK_IN_MODE;
 			speed_fsm.current_state.speed_exclusive_state = CLK_IN_RESYNC_MODE;
+
+			//DEBUG
+			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
 		}
 
 		//IF ALREADY IN RESYNC MODE, CHECK FOR SECOND EDGE
@@ -691,7 +695,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 		Speed_Pot_Check(&params);
 	}
-	else if((speed_fsm.current_state.speed_exclusive_state == CLK_IN_MODE) && (IP_CAP_fsm.current_state == IDLE)){
+	else if(((speed_fsm.current_state.speed_exclusive_state == CLK_IN_MODE)) && (IP_CAP_fsm.current_state == IDLE)){
 
 		Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
 

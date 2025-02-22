@@ -6280,37 +6280,37 @@ LOAD C:/ST/STM32CubeIDE_1.16.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.ext
  .debug_macro   0x0001995a      0x246 ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_uart.o
  .debug_macro   0x00019ba0      0x227 ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_uart_ex.o
 
-.debug_line     0x00000000    0x29939
+.debug_line     0x00000000    0x29934
  .debug_line    0x00000000      0x911 ./Core/Src/UART.o
  .debug_line    0x00000911      0xa61 ./Core/Src/checking_functions.o
  .debug_line    0x00001372     0x1cb3 ./Core/Src/config.o
- .debug_line    0x00003025     0x13e6 ./Core/Src/custom_callbacks.o
- .debug_line    0x0000440b      0xad4 ./Core/Src/input_capture.o
- .debug_line    0x00004edf      0x997 ./Core/Src/main.o
- .debug_line    0x00005876      0xdbc ./Core/Src/oscillator.o
- .debug_line    0x00006632      0x9d1 ./Core/Src/startup.o
- .debug_line    0x00007003      0x48f ./Core/Src/state_machine.o
- .debug_line    0x00007492      0xe60 ./Core/Src/stm32g0xx_hal_msp.o
- .debug_line    0x000082f2      0xadd ./Core/Src/stm32g0xx_it.o
- .debug_line    0x00008dcf      0xda2 ./Core/Src/symmetry_adjustment.o
- .debug_line    0x00009b71      0x8dc ./Core/Src/system_stm32g0xx.o
- .debug_line    0x0000a44d      0x84e ./Core/Src/timers.o
- .debug_line    0x0000ac9b      0xa3c ./Core/Src/utility.o
- .debug_line    0x0000b6d7       0x7b ./Core/Startup/startup_stm32g031k8tx.o
- .debug_line    0x0000b752      0xd4c ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal.o
- .debug_line    0x0000c49e     0x24ac ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_adc.o
- .debug_line    0x0000e94a      0xd15 ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_adc_ex.o
- .debug_line    0x0000f65f      0xd13 ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_cortex.o
- .debug_line    0x00010372     0x1359 ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_dma.o
- .debug_line    0x000116cb      0xdc3 ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_gpio.o
- .debug_line    0x0001248e     0x2194 ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_lptim.o
- .debug_line    0x00014622      0xd0c ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_pwr_ex.o
- .debug_line    0x0001532e     0x15b1 ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_rcc.o
- .debug_line    0x000168df      0xf40 ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_rcc_ex.o
- .debug_line    0x0001781f     0x76a3 ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_tim.o
- .debug_line    0x0001eec2     0x23a9 ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_tim_ex.o
- .debug_line    0x0002126b     0x70f7 ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_uart.o
- .debug_line    0x00028362     0x15d7 ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_uart_ex.o
+ .debug_line    0x00003025     0x13e1 ./Core/Src/custom_callbacks.o
+ .debug_line    0x00004406      0xad4 ./Core/Src/input_capture.o
+ .debug_line    0x00004eda      0x997 ./Core/Src/main.o
+ .debug_line    0x00005871      0xdbc ./Core/Src/oscillator.o
+ .debug_line    0x0000662d      0x9d1 ./Core/Src/startup.o
+ .debug_line    0x00006ffe      0x48f ./Core/Src/state_machine.o
+ .debug_line    0x0000748d      0xe60 ./Core/Src/stm32g0xx_hal_msp.o
+ .debug_line    0x000082ed      0xadd ./Core/Src/stm32g0xx_it.o
+ .debug_line    0x00008dca      0xda2 ./Core/Src/symmetry_adjustment.o
+ .debug_line    0x00009b6c      0x8dc ./Core/Src/system_stm32g0xx.o
+ .debug_line    0x0000a448      0x84e ./Core/Src/timers.o
+ .debug_line    0x0000ac96      0xa3c ./Core/Src/utility.o
+ .debug_line    0x0000b6d2       0x7b ./Core/Startup/startup_stm32g031k8tx.o
+ .debug_line    0x0000b74d      0xd4c ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal.o
+ .debug_line    0x0000c499     0x24ac ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_adc.o
+ .debug_line    0x0000e945      0xd15 ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_adc_ex.o
+ .debug_line    0x0000f65a      0xd13 ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_cortex.o
+ .debug_line    0x0001036d     0x1359 ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_dma.o
+ .debug_line    0x000116c6      0xdc3 ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_gpio.o
+ .debug_line    0x00012489     0x2194 ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_lptim.o
+ .debug_line    0x0001461d      0xd0c ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_pwr_ex.o
+ .debug_line    0x00015329     0x15b1 ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_rcc.o
+ .debug_line    0x000168da      0xf40 ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_rcc_ex.o
+ .debug_line    0x0001781a     0x76a3 ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_tim.o
+ .debug_line    0x0001eebd     0x23a9 ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_tim_ex.o
+ .debug_line    0x00021266     0x70f7 ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_uart.o
+ .debug_line    0x0002835d     0x15d7 ./Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_uart_ex.o
 
 .debug_str      0x00000000    0x9fdf8
  .debug_str     0x00000000    0x97d54 ./Core/Src/UART.o
