@@ -3,8 +3,7 @@
 
 Issues:
 
-- Found a bug! If MIDI CLKs are received, oscillator syncs internally as it should, then when 'start' is received, the oscillator actually syncs
-as it should. However if MIDI CLKs are then received and a start IS NOT sent, the oscillator actually syncs, when it should just internally sync again!
+- MIDI CLK resync seems not to be syncing properly when 'Start' is triggered
 
 Potential Issues:
 
@@ -14,10 +13,7 @@ Potential Issues:
 
 //INCLUDES
 #include "main.h"
-
-//VARIABLE DEFINITIONS
-volatile uint32_t statuses = 0; //set of all status bits (to reduce memory usage)
-uint32_t idle_counter = 0;
+#include "main_vars.h"
 
 int main(void)
 {
@@ -29,12 +25,6 @@ int main(void)
 
 	while (1)
 	{
-		/*if(UART_DMA_TX_is_complete == YES){
-
-			UART_DMA_TX_is_complete = NO;
-			HAL_UART_Transmit_DMA(&huart2, (const uint8_t*)&one_byte_data, sizeof(one_byte_data));
-		}*/
-
 		if(Get_Status_Bit(&statuses, Input_Capture_Processing_Can_Be_Started) == YES){
 
 			//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);

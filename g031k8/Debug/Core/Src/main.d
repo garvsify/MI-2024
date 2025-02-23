@@ -43,7 +43,8 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Core/Inc/symmetry_adjustment.h ../Core/Inc/oscillator_params_type.h \
  ../Core/Inc/timers.h ../Core/Inc/startup.h \
  ../Core/Inc/checking_functions.h ../Core/Inc/tap_tempo.h \
- ../Core/Inc/CLK_IN.h ../Core/Inc/state_machine.h ../Core/Inc/UART.h
+ ../Core/Inc/CLK_IN.h ../Core/Inc/state_machine.h ../Core/Inc/UART.h \
+ ../Core/Inc/main_vars.h
 ../Core/Inc/main.h:
 ../Core/Inc/config.h:
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal.h:
@@ -99,3 +100,4 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Core/Inc/CLK_IN.h:
 ../Core/Inc/state_machine.h:
 ../Core/Inc/UART.h:
+../Core/Inc/main_vars.h:

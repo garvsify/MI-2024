@@ -64,11 +64,11 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 
 			//No need to check longest period as that is tested inherently by the TIM2 overflow
 
-			if(!((speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_B1_MODE)
-					|| (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_RESYNC_B1_MODE))){
+			/*if(!((speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_B1_MODE)
+					|| (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_RESYNC_B1_MODE))){*/
 
 				Start_Measurement_Reelapse_Timer();
-			}
+			//}
 
 			IP_CAP_fsm.current_state = MEASUREMENT_REELAPSE;
 			IP_CAP_fsm.prev_state = MEASUREMENT_PENDING;
@@ -101,11 +101,11 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 
 	else if(IP_CAP_fsm.current_state == MEASUREMENT_REELAPSE_AND_MEASUREMENT_PENDING){ //second edge
 
-		if(!((speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_B1_MODE)
-			|| (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_RESYNC_B1_MODE))){
+		/*if(!((speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_B1_MODE)
+			|| (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_RESYNC_B1_MODE))){*/
 
 			Start_Measurement_Reelapse_Timer();
-		}
+		//}
 
 		IP_CAP_fsm.current_state = MEASUREMENT_REELAPSE;
 		IP_CAP_fsm.prev_state = MEASUREMENT_REELAPSE_AND_MEASUREMENT_PENDING;
@@ -171,8 +171,16 @@ void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
 
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
 
-	// @TODO //WRITE CODE TO LOAD CORRECT DUTY DELAYED VALUE TO SECONDARY OSCILLATOR
-	Set_Oscillator_Values(&params_to_be_loaded);
+	if(!((speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_B0_MODE)
+		|| (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_B1_MODE)
+		|| (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_B2_MODE)
+		|| (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_RESYNC_B0_MODE)
+		|| (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_RESYNC_B1_MODE)
+		|| (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_RESYNC_B2_MODE))){
+
+		// @TODO //WRITE CODE TO LOAD CORRECT DUTY DELAYED VALUE TO SECONDARY OSCILLATOR
+		Set_Oscillator_Values(&params_to_be_loaded);
+	}
 
 	Stop_OC_TIM(&htim3, TIM_CHANNEL_1);
 
@@ -189,14 +197,23 @@ void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
 		IP_CAP_fsm.prev_state = MEASUREMENT_REELAPSE_AND_MEASUREMENT_PENDING;
 	}
 
-	Copy_Params_Structs(&params_to_be_loaded, &params_working);
-	Copy_Params_Structs(&params_to_be_loaded, &params);
+	if(!((speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_B0_MODE)
+		|| (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_B1_MODE)
+		|| (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_B2_MODE)
+		|| (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_RESYNC_B0_MODE)
+		|| (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_RESYNC_B1_MODE)
+		|| (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_RESYNC_B2_MODE))){
 
-	Set_Status_Bit(&statuses, First_Sync_Complete);
+		Copy_Params_Structs(&params_to_be_loaded, &params_working);
+		Copy_Params_Structs(&params_to_be_loaded, &params);
 
-	Calculate_Next_Main_Oscillator_Values(&params, (enum Next_Values_Processing_Mode)REGULAR_MODE);
-	Write_Next_Main_Oscillator_Values_to_Delay_Line(&params, &delay_line);
-	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions); //this function takes ages to execute!
+		Set_Status_Bit(&statuses, First_Sync_Complete);
+
+		Calculate_Next_Main_Oscillator_Values(&params, (enum Next_Values_Processing_Mode)REGULAR_MODE);
+		Write_Next_Main_Oscillator_Values_to_Delay_Line(&params, &delay_line);
+		HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions); //this function takes ages to execute!
+
+	}
 
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
 }
@@ -256,6 +273,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
 			if(*rx_buffer == SYSTEM_REAL_TIME_MIDI_CLOCK){
 
+				MIDI_CLK_fsm = COMPILING; //just in case
 				MIDI_CLK_tag++;
 
 				if(MIDI_CLK_tag < 12){
@@ -280,6 +298,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
 			if(*rx_buffer == SYSTEM_REAL_TIME_MIDI_CLOCK){
 
+				MIDI_CLK_fsm = COMPILING; //just in case
 				MIDI_CLK_tag++;
 
 				if(MIDI_CLK_tag < 12){
@@ -304,6 +323,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
 			if(*rx_buffer == SYSTEM_REAL_TIME_MIDI_CLOCK){
 
+				MIDI_CLK_fsm = COMPILING; //just in case
 				MIDI_CLK_tag++;
 
 				if(MIDI_CLK_tag < 12){
@@ -331,20 +351,24 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
 			if(*rx_buffer == SYSTEM_REAL_TIME_MIDI_CLOCK){
 
+				// @TODO //WRITE CODE TO LOAD CORRECT DUTY DELAYED VALUE TO SECONDARY OSCILLATOR
+				Set_Oscillator_Values(&params_to_be_loaded);
+
+				//Give it another IP CAP edge upon sync
+				HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1);
+				HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+
 				HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
 				HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
 
-				//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
-
-				// @TODO //WRITE CODE TO LOAD CORRECT DUTY DELAYED VALUE TO SECONDARY OSCILLATOR
-				Set_Oscillator_Values(&params_to_be_loaded);
+				MIDI_CLK_fsm = COMPILING; //just in case
+				MIDI_CLK_tag = 1;
 
 				speed_fsm.prev_state.speed_exclusive_state = MIDI_CLK_PENDING_B2_MODE;
 				speed_fsm.current_state.speed_exclusive_state = MIDI_CLK_MODE;
 
-				MIDI_CLK_tag = 1;
-
 				Stop_OC_TIM(&htim3, TIM_CHANNEL_1); //do we need?
+				IP_CAP_fsm.current_state = IDLE; //force idle so next edge is forced to be computed as first edge
 
 				Copy_Params_Structs(&params_to_be_loaded, &params_working);
 				Copy_Params_Structs(&params_to_be_loaded, &params);
@@ -354,14 +378,13 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 				Calculate_Next_Main_Oscillator_Values(&params, (enum Next_Values_Processing_Mode)REGULAR_MODE);
 				Write_Next_Main_Oscillator_Values_to_Delay_Line(&params, &delay_line);
 				HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions); //this function takes ages to execute!
-
-				//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
 			}
 		}
 		else if((speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_MODE) && (Get_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out) == NO)){
 
 			if(*rx_buffer == SYSTEM_REAL_TIME_MIDI_CLOCK){
 
+				MIDI_CLK_fsm = COMPILING; //just in case
 				MIDI_CLK_tag++;
 
 				if(MIDI_CLK_tag < 12){
@@ -392,6 +415,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 				speed_fsm.prev_state.speed_exclusive_state = MIDI_CLK_MODE;
 
 				Clear_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out);
+				Clear_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
 			}
 			else if(*rx_buffer == SYSTEM_REAL_TIME_START){
 
@@ -401,6 +425,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 				speed_fsm.prev_state.speed_exclusive_state = MIDI_CLK_MODE;
 
 				Clear_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out);
+				Clear_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
 			}
 		}
 		else if(speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_RESYNC_A0_MODE){
@@ -497,13 +522,15 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
 			if(*rx_buffer == SYSTEM_REAL_TIME_MIDI_CLOCK){
 
-				HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
-				HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
-
-				//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
-
 				// @TODO //WRITE CODE TO LOAD CORRECT DUTY DELAYED VALUE TO SECONDARY OSCILLATOR
 				Set_Oscillator_Values(&params_to_be_loaded);
+
+				//Give it another IP CAP edge upon sync
+				HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1);
+				HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+
+				HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
+				HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
 
 				speed_fsm.prev_state.speed_exclusive_state = MIDI_CLK_RESYNC_B2_MODE;
 				speed_fsm.current_state.speed_exclusive_state = MIDI_CLK_MODE;
@@ -511,6 +538,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 				MIDI_CLK_tag = 1;
 
 				Stop_OC_TIM(&htim3, TIM_CHANNEL_1); //do we need?
+				IP_CAP_fsm.current_state = IDLE; //force idle so next edge is forced to be computed as first edge
 
 				Copy_Params_Structs(&params_to_be_loaded, &params_working);
 				Copy_Params_Structs(&params_to_be_loaded, &params);
@@ -520,8 +548,6 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 				Calculate_Next_Main_Oscillator_Values(&params, (enum Next_Values_Processing_Mode)REGULAR_MODE);
 				Write_Next_Main_Oscillator_Values_to_Delay_Line(&params, &delay_line);
 				HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions); //this function takes ages to execute!
-
-				//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
 			}
 		}
 	}
@@ -575,7 +601,7 @@ void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
 			speed_fsm.prev_state.shared_state = CC_MODE;
 			speed_fsm.current_state.speed_exclusive_state = CLK_IN_PENDING_MODE;
 		}
-		else if((speed_fsm.current_state.speed_exclusive_state == TAP_MODE) && (IP_CAP_fsm.current_state == IDLE)){
+		else if((speed_fsm.current_state.speed_exclusive_state == TAP_MODE) && (IP_CAP_fsm.current_state == IDLE) && (Get_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out) == YES)){
 
 			//Set SW OUT
 			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
@@ -583,8 +609,11 @@ void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
 
 			speed_fsm.prev_state.speed_exclusive_state = TAP_MODE;
 			speed_fsm.current_state.speed_exclusive_state = CLK_IN_PENDING_MODE;
+
+			Clear_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out);
+			Clear_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
 		}
-		else if((speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_MODE) && (IP_CAP_fsm.current_state == IDLE)){
+		else if((speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_MODE) && (IP_CAP_fsm.current_state == IDLE) && (Get_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out) == YES)){
 
 			//Set SW OUT
 			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
@@ -592,6 +621,9 @@ void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
 
 			speed_fsm.prev_state.speed_exclusive_state = MIDI_CLK_MODE;
 			speed_fsm.current_state.speed_exclusive_state = CLK_IN_PENDING_MODE;
+
+			Clear_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out);
+			Clear_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
 		}
 
 		//IF ALREADY IN PENDING MODE, CHECK FOR SECOND EDGE
@@ -641,15 +673,21 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 		speed_fsm.current_state.speed_exclusive_state = TAP_PENDING_MODE;
 		speed_fsm.prev_state.shared_state = PC_MODE;
 	}
-	else if((speed_fsm.current_state.speed_exclusive_state == CLK_IN_MODE) && (pin_state == 0) && IP_CAP_fsm.current_state == IDLE){
+	else if((speed_fsm.current_state.speed_exclusive_state == CLK_IN_MODE) && (pin_state == 0) && (IP_CAP_fsm.current_state == IDLE) && (Get_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out) == YES)){
 
 		speed_fsm.current_state.speed_exclusive_state = TAP_PENDING_MODE;
 		speed_fsm.prev_state.speed_exclusive_state = CLK_IN_MODE;
+
+		Clear_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out);
+		Clear_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
 	}
-	else if((speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_MODE) && (pin_state == 0) && IP_CAP_fsm.current_state == IDLE){
+	else if((speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_MODE) && (pin_state == 0) && (IP_CAP_fsm.current_state == IDLE) && (Get_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out) == YES)){
 
 		speed_fsm.current_state.speed_exclusive_state = TAP_PENDING_MODE;
 		speed_fsm.prev_state.speed_exclusive_state = MIDI_CLK_MODE;
+
+		Clear_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out);
+		Clear_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
 	}
 
 	//CHECK TAP TEMPO STATE
@@ -699,6 +737,9 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1); //reset
 			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+
+			MIDI_CLK_fsm = NOT_COMPILING;
+			MIDI_CLK_tag = 0;
 
 			Speed_Pot_Check(&params);
 		}

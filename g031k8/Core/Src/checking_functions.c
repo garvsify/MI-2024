@@ -33,6 +33,7 @@ uint8_t Speed_Pot_Check(struct Params* params_ptr){
 				speed_fsm.prev_state = speed_fsm.current_state;
 				speed_fsm.current_state.shared_state = MANUAL_MODE;
 				Clear_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out);
+				Clear_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
 				Clear_Status_Bit(&statuses, First_Sync_Complete);
 			}
 		}
@@ -43,6 +44,7 @@ uint8_t Speed_Pot_Check(struct Params* params_ptr){
 				speed_fsm.prev_state = speed_fsm.current_state;
 				speed_fsm.current_state.shared_state = MANUAL_MODE;
 				Clear_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out);
+				Clear_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
 				Clear_Status_Bit(&statuses, First_Sync_Complete);
 			}
 		}
