@@ -80,12 +80,12 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 			//BEGIN PROCESSING
 			Set_Status_Bit(&statuses, Input_Capture_Processing_Can_Be_Started);
 		}
+		/*//DO NOT ADD BACK IN - causes issues at highest speeds
 		else{
 
 			IP_CAP_fsm.current_state = IDLE;
 			IP_CAP_fsm.prev_state = MEASUREMENT_PENDING;
-			speed_pot_adc_measurement_num = 0; //whenever goes into idle, reset speed_adc_measurement
-		}
+		}*/
 	}
 
 	else if(IP_CAP_fsm.current_state == MEASUREMENT_REELAPSE){ //first edge
