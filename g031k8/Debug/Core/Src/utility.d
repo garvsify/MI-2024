@@ -41,8 +41,8 @@ Core/Src/utility.o: ../Core/Src/utility.c ../Core/Inc/utility.h \
  ../Core/Inc/symmetry_adjustment.h ../Core/Inc/oscillator_params_type.h \
  ../Core/Inc/symmetry_adjustment_types.h \
  ../Core/Inc/oscillator_params_type.h ../Core/Inc/timers.h \
- ../Core/Inc/oscillator_macros.h ../Core/Inc/startup.h \
- ../Core/Inc/checking_functions.h ../Core/Inc/tap_tempo.h \
+ ../Core/Inc/tap_tempo.h ../Core/Inc/oscillator_macros.h \
+ ../Core/Inc/startup.h ../Core/Inc/checking_functions.h \
  ../Core/Inc/CLK_IN.h ../Core/Inc/state_machine.h ../Core/Inc/UART.h
 ../Core/Inc/utility.h:
 ../Core/Inc/input_capture.h:
@@ -92,10 +92,10 @@ Core/Src/utility.o: ../Core/Src/utility.c ../Core/Inc/utility.h \
 ../Core/Inc/symmetry_adjustment_types.h:
 ../Core/Inc/oscillator_params_type.h:
 ../Core/Inc/timers.h:
+../Core/Inc/tap_tempo.h:
 ../Core/Inc/oscillator_macros.h:
 ../Core/Inc/startup.h:
 ../Core/Inc/checking_functions.h:
-../Core/Inc/tap_tempo.h:
 ../Core/Inc/CLK_IN.h:
 ../Core/Inc/state_machine.h:
 ../Core/Inc/UART.h:

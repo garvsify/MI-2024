@@ -24,6 +24,14 @@ uint8_t Advance_Pending_States(void){
 
 		speed_fsm.current_state.speed_exclusive_state = CLK_IN_MODE;
 	}
+	else if(speed_fsm.current_state.speed_exclusive_state == TAP_RESYNC_MODE){
+
+		speed_fsm.current_state.speed_exclusive_state = TAP_MODE;
+	}
+	else if(speed_fsm.current_state.speed_exclusive_state == CLK_IN_RESYNC_MODE){
+
+		speed_fsm.current_state.speed_exclusive_state = CLK_IN_MODE;
+	}
 
 	//DON'T ADD MIDI CLK CODE
 

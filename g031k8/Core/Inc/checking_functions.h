@@ -10,6 +10,7 @@
 #define SPEED_TOLERANCE 5
 
 #define IDLE_COUNT 32000
+#define TAP_TEMPO_CHECKING_COUNT 200000
 
 //INCLUDES
 #include <stdint.h>
