@@ -75,7 +75,10 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 
 			Copy_Params_Structs(&params, &params_to_be_loaded);
 
-			Advance_Pending_States();
+			if((speed_fsm.current_state.speed_exclusive_state == TAP_PENDING_MODE) || (speed_fsm.current_state.speed_exclusive_state == CLK_IN_PENDING_MODE)){
+
+				Advance_Pending_States();
+			}
 
 			//BEGIN PROCESSING
 			Set_Status_Bit(&statuses, Input_Capture_Processing_Can_Be_Started);
@@ -109,7 +112,10 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 
 		Copy_Params_Structs(&params, &params_to_be_loaded);
 
-		Advance_Pending_States();
+		if((speed_fsm.current_state.speed_exclusive_state == TAP_PENDING_MODE) || (speed_fsm.current_state.speed_exclusive_state == CLK_IN_PENDING_MODE)){
+
+			Advance_Pending_States();
+		}
 
 		//BEGIN PROCESSING
 		Set_Status_Bit(&statuses, Input_Capture_Processing_Can_Be_Started);
@@ -135,7 +141,7 @@ void TIM2_ch1_overflow_callback(TIM_HandleTypeDef *htim){
 		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
 
 		if(!((speed_fsm.current_state.speed_exclusive_state == TAP_MODE)
-			|| (speed_fsm.current_state.speed_exclusive_state == CLK_IN_MODE))){
+			|| (speed_fsm.current_state.speed_exclusive_state == CLK_IN_MODE) || (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_MODE))){
 
 			speed_fsm.prev_state = speed_fsm.current_state;
 			speed_fsm.current_state = previous;
@@ -153,7 +159,7 @@ void TIM2_ch1_overflow_callback(TIM_HandleTypeDef *htim){
 		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
 
 		if(!((speed_fsm.current_state.speed_exclusive_state == TAP_MODE)
-			|| (speed_fsm.current_state.speed_exclusive_state == CLK_IN_MODE))){
+			|| (speed_fsm.current_state.speed_exclusive_state == CLK_IN_MODE) || (speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_MODE))){
 
 			speed_fsm.prev_state = speed_fsm.current_state;
 			speed_fsm.current_state = previous;
@@ -690,6 +696,9 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 		Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
 
 		if(Get_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out) == YES){
+
+			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1); //reset
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
 
 			Speed_Pot_Check(&params);
 		}
