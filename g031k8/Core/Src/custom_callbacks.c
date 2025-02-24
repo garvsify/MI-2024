@@ -19,6 +19,8 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 	HAL_ADC_Stop_DMA(hadc); //disable ADC DMA
 	Process_ADC_Conversion_Values(&params, &delay_line, ADCResultsDMA);
 
+	Update_Params_If_PC_Mode_Selected();
+
 	enum Validate first_sync_complete = Get_Status_Bit(&statuses, First_Sync_Complete);
 
 	if(first_sync_complete == YES){

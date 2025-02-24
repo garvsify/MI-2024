@@ -14,6 +14,7 @@ volatile uint16_t ADCResultsDMA[5] = {0};
 struct Params params = {0};
 struct Params params_to_be_loaded = {0};
 struct Params params_working = {0};
+struct Params params_PC = {0};
 struct Delay_Line delay_line = {.duty_delay_line_storage_array = 0, //one index larger than the number of indexes (wave samples) to allow us to 'wrap' the array into a kind of circular buffer - this is reinitialised to mid-scale on runtime
 								.duty_delay_line_start_offset = 1,  //initial value is 1st index - to give us space to fill index 0
 								.duty_delay_line_finish_offset = FINAL_INDEX + 1, //initial value is 512th index, one larger than the index of the final sample

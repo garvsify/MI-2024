@@ -56,6 +56,7 @@ const extern uint8_t num_ADC_conversions;
 extern struct Params params; //running variables of the oscillator/s
 extern struct Params params_to_be_loaded; //'to be loaded' params for the oscillators for when I/P capture states are active
 extern struct Params params_working; //upon overflow of re-elapse timer (TIM3), 'to_be_loaded' values are copied into this struct
+extern struct Params params_PC;
 extern struct Delay_Line delay_line;
 
 //CUSTOM TYPES
