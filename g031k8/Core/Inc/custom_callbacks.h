@@ -4,13 +4,13 @@
 #include <stdint.h>
 
 #include <checking_functions.h>
+#include <CC_and_PC.h>
 #include <oscillator.h>
 #include <state_machine.h>
 #include "input_capture.h"
 #include "MIDI_defines.h"
 #include "UART.h"
 #include "debug.h"
-#include "presets.h"
 
 void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc);
 void TIM16_callback(TIM_HandleTypeDef *htim);

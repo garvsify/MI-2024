@@ -1,5 +1,5 @@
-#ifndef INC_PRESETS_H_
-#define INC_PRESETS_H_
+#ifndef INC_CC_AND_PC_H_
+#define INC_CC_AND_PC_H_
 
 //MACROS
 #define NUM_PRESETS 4
@@ -37,6 +37,7 @@ struct Preset_Converted{
 };
 
 //VARIABLE DECLARATIONS
+extern struct Preset factory_presets_array[4];
 extern struct Preset presets_array[4];
 extern enum Preset_Selected preset_selected;
 
@@ -55,4 +56,4 @@ uint8_t Convert_Depth_Preset_Value(struct Preset* preset_ptr, struct Preset_Conv
 uint8_t Convert_Symmetry_Preset_Value(struct Preset* preset_ptr, struct Preset_Converted* preset_converted_ptr);
 uint8_t Convert_Phase_Preset_Value(struct Preset* preset_ptr, struct Preset_Converted* preset_converted_ptr);
 
-#endif /* INC_PRESETS_H_ */
+#endif /* INC_CC_AND_PC_H_ */

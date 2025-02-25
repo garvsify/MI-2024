@@ -1,4 +1,4 @@
-Core/Src/presets.o: ../Core/Src/presets.c ../Core/Inc/presets.h \
+Core/Src/CC_and_PC.o: ../Core/Src/CC_and_PC.c ../Core/Inc/CC_and_PC.h \
  ../Core/Inc/midi_defines.h ../Core/Inc/oscillator.h \
  ../Core/Inc/utility.h ../Core/Inc/input_capture.h ../Core/Inc/main.h \
  ../Core/Inc/config.h ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal.h \
@@ -44,7 +44,7 @@ Core/Src/presets.o: ../Core/Src/presets.c ../Core/Inc/presets.h \
  ../Core/Inc/tap_tempo.h ../Core/Inc/CLK_IN.h ../Core/Inc/state_machine.h \
  ../Core/Inc/UART.h ../Core/Inc/oscillator_macros.h \
  ../Core/Inc/symmetry_adjustment.h ../Core/Inc/oscillator_params_type.h
-../Core/Inc/presets.h:
+../Core/Inc/CC_and_PC.h:
 ../Core/Inc/midi_defines.h:
 ../Core/Inc/oscillator.h:
 ../Core/Inc/utility.h:

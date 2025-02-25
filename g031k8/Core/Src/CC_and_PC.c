@@ -1,7 +1,8 @@
 //INCLUDES
-#include "presets.h"
+#include <CC_and_PC.h>
 
 //VARIABLE DEFINITIONS
+struct Preset factory_presets_array[NUM_PRESETS] = {0};
 struct Preset presets_array[NUM_PRESETS] = {0};
 struct Preset_Converted preset_converted_array[NUM_PRESETS] = {0};
 enum Preset_Selected preset_selected = NO_PRESET_SELECTED;
