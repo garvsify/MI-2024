@@ -1,15 +1,30 @@
 //INCLUDES
 #include <CC_and_PC.h>
 
+//CONSTS DEFINITIONS
+const struct Preset factory_preset_0 = {.waveshape = FACTORY_PRESET_0_WAVESHAPE, .speed = FACTORY_PRESET_0_SPEED, .depth = FACTORY_PRESET_0_DEPTH, .symmetry = FACTORY_PRESET_0_SYMMETRY, .phase = FACTORY_PRESET_0_PHASE};
+const struct Preset factory_preset_1 = {.waveshape = FACTORY_PRESET_1_WAVESHAPE, .speed = FACTORY_PRESET_1_SPEED, .depth = FACTORY_PRESET_1_DEPTH, .symmetry = FACTORY_PRESET_1_SYMMETRY, .phase = FACTORY_PRESET_1_PHASE};
+const struct Preset factory_preset_2 = {.waveshape = FACTORY_PRESET_2_WAVESHAPE, .speed = FACTORY_PRESET_2_SPEED, .depth = FACTORY_PRESET_2_DEPTH, .symmetry = FACTORY_PRESET_2_SYMMETRY, .phase = FACTORY_PRESET_2_PHASE};
+const struct Preset factory_preset_3 = {.waveshape = FACTORY_PRESET_3_WAVESHAPE, .speed = FACTORY_PRESET_3_SPEED, .depth = FACTORY_PRESET_3_DEPTH, .symmetry = FACTORY_PRESET_3_SYMMETRY, .phase = FACTORY_PRESET_3_PHASE};
+
 //VARIABLE DEFINITIONS
-struct Preset factory_presets_array[NUM_PRESETS] = {0};
-struct Preset presets_array[NUM_PRESETS] = {0};
+struct Preset *factory_presets_array[NUM_PRESETS] = {0};
+struct Preset *presets_array[NUM_PRESETS] = {0};
 struct Preset_Converted preset_converted_array[NUM_PRESETS] = {0};
 enum Preset_Selected preset_selected = NO_PRESET_SELECTED;
 
+//default values that may be selectively over-written by the user - and which are overwritten by flash-reads upon startup
+struct Preset user_preset_0 = factory_preset_0;
+struct Preset user_preset_1 = factory_preset_1;
+struct Preset user_preset_2 = factory_preset_2;
+struct Preset user_preset_3 = factory_preset_3;
+
+enum Validate user_preset_0_used = NO;
+enum Validate user_preset_1_used = NO;
+enum Validate user_preset_2_used = NO;
+enum Validate user_preset_3_used = NO;
 
 //FUNCTION DEFINITIONS
-
 uint8_t Update_Params_If_PC_Mode_Selected(void){
 
 	if(waveshape_fsm.current_state == PC_MODE){
@@ -143,6 +158,16 @@ uint8_t Convert_Symmetry_Preset_Value(struct Preset* preset_ptr, struct Preset_C
 uint8_t Convert_Phase_Preset_Value(struct Preset* preset_ptr, struct Preset_Converted* preset_converted_ptr){
 
 	preset_converted_ptr->phase = (preset_ptr->phase) << 2; //convert to 9-bit
+
+	return 1;
+}
+
+uint8_t Pack_Preset_Into_Doubleword(struct Preset* preset_ptr, uint64_t *Doubleword_ptr){
+
+	return 1;
+}
+
+uint8_t UnPack_Preset_From_Doubleword(uint64_t *Doubleword_ptr, struct Preset* preset_ptr){
 
 	return 1;
 }

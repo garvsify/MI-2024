@@ -55,21 +55,11 @@ uint8_t Startup(void){
 	//ENABLE INTERRUPTS
 	Global_Interrupt_Enable();
 
-
-	#if TAPCLK_ON_OR_OFF == ON
-
-		//ENABLE TAP-TEMPO SWITCH CHECKING
-		HAL_LPTIM_SetOnce_Start_IT(&hlptim1, LPTIM1_CCR_CHECK, LPTIM1_CCR_CHECK);
-
-
-	#endif
+	//ENABLE TAP-TEMPO SWITCH CHECKING
+	HAL_LPTIM_SetOnce_Start_IT(&hlptim1, LPTIM1_CCR_CHECK, LPTIM1_CCR_CHECK);
 
 	//ENABLE EXTI
 	HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);
-
-	//DEBUG
-	/*__HAL_TIM_SET_COUNTER(&htim14, 0);
-	Start_OC_TIM(&htim14, TIM_CHANNEL_1);*/
 
 	return 1;
 }
