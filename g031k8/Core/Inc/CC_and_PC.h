@@ -22,18 +22,18 @@
 #define FACTORY_PRESET_1_PHASE 64
 
 //FACTORY PRESET 2 - triangle, medium speed, full CCW symmetry, slightly out-of-phase
-#define FACTORY_PRESET_1_WAVESHAPE 0
-#define FACTORY_PRESET_1_SPEED 64
-#define FACTORY_PRESET_1_DEPTH 127
-#define FACTORY_PRESET_1_SYMMETRY 0
-#define FACTORY_PRESET_1_PHASE 32
+#define FACTORY_PRESET_2_WAVESHAPE 0
+#define FACTORY_PRESET_2_SPEED 64
+#define FACTORY_PRESET_2_DEPTH 127
+#define FACTORY_PRESET_2_SYMMETRY 0
+#define FACTORY_PRESET_2_PHASE 32
 
 //FACTORY PRESET 3 - sine, medium speed, full CW symmetry, almost back-in-phase
-#define FACTORY_PRESET_1_WAVESHAPE 64
-#define FACTORY_PRESET_1_SPEED 64
-#define FACTORY_PRESET_1_DEPTH 127
-#define FACTORY_PRESET_1_SYMMETRY 127
-#define FACTORY_PRESET_1_PHASE 100
+#define FACTORY_PRESET_3_WAVESHAPE 64
+#define FACTORY_PRESET_3_SPEED 64
+#define FACTORY_PRESET_3_DEPTH 127
+#define FACTORY_PRESET_3_SYMMETRY 127
+#define FACTORY_PRESET_3_PHASE 100
 
 
 //USER PRESET FLASH MEMORY ADDRESSES
@@ -89,7 +89,7 @@ const extern struct Preset factory_preset_3;
 //VARIABLE DECLARATIONS
 extern struct Preset *factory_presets_array[NUM_PRESETS];
 extern struct Preset *presets_array[NUM_PRESETS];
-extern struct Preset_Converted preset_converted_array[NUM_PRESETS] = {0};
+extern struct Preset_Converted preset_converted_array[NUM_PRESETS];
 extern enum Preset_Selected preset_selected;
 
 extern struct Preset user_preset_0;
@@ -118,6 +118,7 @@ uint8_t Convert_Depth_Preset_Value(struct Preset* preset_ptr, struct Preset_Conv
 uint8_t Convert_Symmetry_Preset_Value(struct Preset* preset_ptr, struct Preset_Converted* preset_converted_ptr);
 uint8_t Convert_Phase_Preset_Value(struct Preset* preset_ptr, struct Preset_Converted* preset_converted_ptr);
 uint8_t Pack_Preset_Into_Doubleword(struct Preset* preset_ptr, uint64_t *Doubleword_ptr);
-uint8_t UnPack_Preset_From_Doubleword(uint64_t *Doubleword_ptr, struct Preset* preset_ptr);
+//uint8_t UnPack_Preset_From_Doubleword(uint64_t *Doubleword_ptr, struct Preset* preset_ptr);
+uint8_t Read_Preset_From_Flash(uint32_t address, struct Preset* preset_ptr);
 
 #endif /* INC_CC_AND_PC_H_ */

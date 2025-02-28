@@ -27,27 +27,27 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  11 .ARM.attributes 00000028  00000000  00000000  00009430  2**0
                   CONTENTS, READONLY
- 12 .debug_info   00029aa4  00000000  00000000  00009458  2**0
+ 12 .debug_info   00029cc8  00000000  00000000  00009458  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 13 .debug_abbrev 0000519a  00000000  00000000  00032efc  2**0
+ 13 .debug_abbrev 00005191  00000000  00000000  00033120  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_loclists 0000f667  00000000  00000000  00038096  2**0
+ 14 .debug_loclists 0000f6e7  00000000  00000000  000382b1  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_aranges 00001408  00000000  00000000  00047700  2**3
+ 15 .debug_aranges 00001418  00000000  00000000  00047998  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_rnglists 00001c46  00000000  00000000  00048b08  2**0
+ 16 .debug_rnglists 00001c52  00000000  00000000  00048db0  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_macro  0001a0e4  00000000  00000000  0004a74e  2**0
+ 17 .debug_macro  0001a174  00000000  00000000  0004aa02  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_line   00029b24  00000000  00000000  00064832  2**0
+ 18 .debug_line   00029bd0  00000000  00000000  00064b76  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .debug_str    000a00b3  00000000  00000000  0008e356  2**0
+ 19 .debug_str    000a04c8  00000000  00000000  0008e746  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 20 .comment      00000043  00000000  00000000  0012e409  2**0
+ 20 .comment      00000043  00000000  00000000  0012ec0e  2**0
                   CONTENTS, READONLY
- 21 .debug_frame  000034fc  00000000  00000000  0012e44c  2**2
+ 21 .debug_frame  00003524  00000000  00000000  0012ec54  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 22 .debug_line_str 00000054  00000000  00000000  00131948  2**0
+ 22 .debug_line_str 00000054  00000000  00000000  00132178  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -507,9 +507,9 @@ Disassembly of section .text:
 	...
 
 08000448 <Update_Params_If_PC_Mode_Selected>:
+enum Validate user_preset_3_used = NO;
 
 //FUNCTION DEFINITIONS
-
 uint8_t Update_Params_If_PC_Mode_Selected(void){
 
 	if(waveshape_fsm.current_state == PC_MODE){
@@ -5388,26 +5388,17 @@ uint8_t Startup(void){
 	Global_Interrupt_Enable();
  8001f0c:	f000 fc68 	bl	80027e0 <Global_Interrupt_Enable>
 
-
-	#if TAPCLK_ON_OR_OFF == ON
-
-		//ENABLE TAP-TEMPO SWITCH CHECKING
-		HAL_LPTIM_SetOnce_Start_IT(&hlptim1, LPTIM1_CCR_CHECK, LPTIM1_CCR_CHECK);
+	//ENABLE TAP-TEMPO SWITCH CHECKING
+	HAL_LPTIM_SetOnce_Start_IT(&hlptim1, LPTIM1_CCR_CHECK, LPTIM1_CCR_CHECK);
  8001f10:	22fa      	movs	r2, #250	@ 0xfa
  8001f12:	21fa      	movs	r1, #250	@ 0xfa
  8001f14:	480e      	ldr	r0, [pc, #56]	@ (8001f50 <Startup+0x114>)
  8001f16:	f001 ff8f 	bl	8003e38 <HAL_LPTIM_SetOnce_Start_IT>
 
-
-	#endif
-
 	//ENABLE EXTI
 	HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);
  8001f1a:	2007      	movs	r0, #7
  8001f1c:	f001 fa82 	bl	8003424 <HAL_NVIC_EnableIRQ>
-	//DEBUG
-	/*__HAL_TIM_SET_COUNTER(&htim14, 0);
-	Start_OC_TIM(&htim14, TIM_CHANNEL_1);*/
 
 	return 1;
 }

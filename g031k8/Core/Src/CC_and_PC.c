@@ -164,12 +164,42 @@ uint8_t Convert_Phase_Preset_Value(struct Preset* preset_ptr, struct Preset_Conv
 
 uint8_t Pack_Preset_Into_Doubleword(struct Preset* preset_ptr, uint64_t *Doubleword_ptr){
 
+	uint64_t packed = 0;
+
+	packed |= ((uint64_t)preset_ptr->waveshape << 0);
+	packed |= ((uint64_t)preset_ptr->speed << 8);
+	packed |= ((uint64_t)preset_ptr->depth << 16);
+	packed |= ((uint64_t)preset_ptr->symmetry << 24);
+	packed |= ((uint64_t)preset_ptr->phase << 32);
+
+	*Doubleword_ptr = packed;
+
 	return 1;
 }
 
-uint8_t UnPack_Preset_From_Doubleword(uint64_t *Doubleword_ptr, struct Preset* preset_ptr){
+/*uint8_t UnPack_Preset_From_Doubleword(uint64_t *Doubleword_ptr, struct Preset* preset_ptr){
+
+	preset_ptr->waveshape = (uint8_t)(*Doubleword_ptr & 0xFF);
+	preset_ptr->speed = (uint8_t)((*Doubleword_ptr >> 8) & 0xFF);
+	preset_ptr->depth = (uint8_t)((*Doubleword_ptr >> 16) & 0xFF);
+	preset_ptr->symmetry = (uint8_t)((*Doubleword_ptr >> 24) & 0xFF);
+	preset_ptr->phase = (uint8_t)((*Doubleword_ptr >> 32) & 0xFF);
+
+	return 1;
+}*/
+
+uint8_t Read_Preset_From_Flash(uint32_t address_val, struct Preset* preset_ptr){
+
+	uint8_t *address = (uint8_t *)address_val;
+
+	preset_ptr->waveshape = *address;
+	preset_ptr->speed = *(address + 1);
+	preset_ptr->depth = *(address + 2);
+	preset_ptr->symmetry = *(address + 3);
+	preset_ptr->phase = *(address + 4);
 
 	return 1;
 }
+
 
 
