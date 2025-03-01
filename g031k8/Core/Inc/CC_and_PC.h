@@ -123,9 +123,9 @@ uint8_t Convert_Depth_Preset_Value(struct Preset* preset_ptr, struct Preset_Conv
 uint8_t Convert_Symmetry_Preset_Value(struct Preset* preset_ptr, struct Preset_Converted* preset_converted_ptr);
 uint8_t Convert_Phase_Preset_Value(struct Preset* preset_ptr, struct Preset_Converted* preset_converted_ptr);
 uint8_t Pack_Preset_Into_Doubleword(struct Preset* preset_ptr, uint64_t *Doubleword_ptr);
-uint8_t Read_Preset_From_Flash(uint32_t address, struct Preset* preset_ptr);
+uint8_t Read_and_Interpret_Preset_From_Flash(uint32_t address, struct Preset* preset_ptr);
 uint8_t Pack_User_Preset_Used_Bytes_and_Start_Required_Before_MIDI_CLK_Into_Doubleword(struct User_Preset_X_Used *user_preset_used_struct_ptr, enum Status_Bit *start_required_before_midi_clk_status_bit_ptr, uint64_t *Doubleword_ptr);
-uint8_t Read_User_Preset_Used_Bytes_and_Start_Required_Before_MIDI_CLK_Byte_From_Flash(uint32_t address_val, struct User_Preset_X_Used *user_preset_used_struct_ptr, enum Status_Bit *start_required_before_midi_clk_status_bit_ptr);
+uint8_t Read_and_Interpret_User_Preset_Used_Bytes_and_Start_Required_Before_MIDI_CLK_Byte_From_Flash(uint32_t address_val, struct User_Preset_X_Used *user_preset_used_struct_ptr, enum Status_Bit *start_required_before_midi_clk_status_bit_ptr);
 
 
 #endif /* INC_CC_AND_PC_H_ */

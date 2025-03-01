@@ -175,15 +175,59 @@ uint8_t Pack_Preset_Into_Doubleword(struct Preset* preset_ptr, uint64_t *Doublew
 	return 1;
 }
 
-uint8_t Read_Preset_From_Flash(uint32_t address_val, struct Preset* preset_ptr){
+uint8_t Read_and_Interpret_Preset_From_Flash(uint32_t address_val, struct Preset* preset_ptr){
 
 	uint8_t *address = (uint8_t *)address_val;
+
+	uint8_t interpretted_value = 0;
 
 	preset_ptr->waveshape = *address;
 	preset_ptr->speed = *(address + 1);
 	preset_ptr->depth = *(address + 2);
 	preset_ptr->symmetry = *(address + 3);
 	preset_ptr->phase = *(address + 4);
+
+	for(uint8_t i = 0; i < 5; i++){
+
+		interpretted_value = *(address + i);
+
+		if((interpretted_value == 0xFF) || (interpretted_value == (enum Validate)NO)){
+
+			if(i == 0){
+				preset_ptr->waveshape = (enum Validate)NO;
+			}
+			else if(i == 1){
+				preset_ptr->speed = (enum Validate)NO;
+			}
+			else if(i == 2){
+				preset_ptr->depth = (enum Validate)NO;
+			}
+			else if(i == 3){
+				preset_ptr->symmetry = (enum Validate)NO;
+			}
+			else if(i == 4){
+				preset_ptr->phase = (enum Validate)NO;
+			}
+		}
+		else if(interpretted_value == (enum Validate)YES){
+
+			if(i == 0){
+				preset_ptr->waveshape = (enum Validate)YES;
+			}
+			else if(i == 1){
+				preset_ptr->speed = (enum Validate)YES;
+			}
+			else if(i == 2){
+				preset_ptr->depth = (enum Validate)YES;
+			}
+			else if(i == 3){
+				preset_ptr->symmetry = (enum Validate)YES;
+			}
+			else if(i == 4){
+				preset_ptr->phase = (enum Validate)YES;
+			}
+		}
+	}
 
 	return 1;
 }
@@ -203,19 +247,54 @@ uint8_t Pack_User_Preset_Used_Bytes_and_Start_Required_Before_MIDI_CLK_Into_Doub
 	return 1;
 }
 
-uint8_t Read_User_Preset_Used_Bytes_and_Start_Required_Before_MIDI_CLK_Byte_From_Flash(uint32_t address_val, struct User_Preset_X_Used *user_preset_used_struct_ptr, enum Status_Bit *start_required_before_midi_clk_status_bit_ptr){
+uint8_t Read_and_Interpret_User_Preset_Used_Bytes_and_Start_Required_Before_MIDI_CLK_Byte_From_Flash(uint32_t address_val, struct User_Preset_X_Used *user_preset_used_struct_ptr, enum Status_Bit *start_required_before_midi_clk_status_bit_ptr){
 
 	uint8_t *address = (uint8_t *)address_val;
 
-	user_preset_used_struct_ptr->user_preset_0_used = *address;
-	user_preset_used_struct_ptr->user_preset_1_used = *(address + 1);
-	user_preset_used_struct_ptr->user_preset_2_used = *(address + 2);
-	user_preset_used_struct_ptr->user_preset_3_used = *(address + 3);
+	uint8_t interpretted_value = 0;
 
-	*start_required_before_midi_clk_status_bit_ptr = *(address + 4);
+	for(uint8_t i = 0; i < 5; i++){
+
+		interpretted_value = *(address + i);
+
+		if((interpretted_value == 0xFF) || (interpretted_value == (enum Validate)NO)){
+
+			if(i == 0){
+				user_preset_used_struct_ptr->user_preset_0_used = (enum Validate)NO;
+			}
+			else if(i == 1){
+				user_preset_used_struct_ptr->user_preset_1_used = (enum Validate)NO;
+			}
+			else if(i == 2){
+				user_preset_used_struct_ptr->user_preset_2_used = (enum Validate)NO;
+			}
+			else if(i == 3){
+				user_preset_used_struct_ptr->user_preset_3_used = (enum Validate)NO;
+			}
+			else if(i == 4){
+				*start_required_before_midi_clk_status_bit_ptr = (enum Validate)NO;
+			}
+		}
+		else if(interpretted_value == (enum Validate)YES){
+
+			if(i == 0){
+				user_preset_used_struct_ptr->user_preset_0_used = (enum Validate)YES;
+			}
+			else if(i == 1){
+				user_preset_used_struct_ptr->user_preset_1_used = (enum Validate)YES;
+			}
+			else if(i == 2){
+				user_preset_used_struct_ptr->user_preset_2_used = (enum Validate)YES;
+			}
+			else if(i == 3){
+				user_preset_used_struct_ptr->user_preset_3_used = (enum Validate)YES;
+			}
+			else if(i == 4){
+				*start_required_before_midi_clk_status_bit_ptr = (enum Validate)YES;
+			}
+		}
+	}
 
 	return 1;
 }
-
-
 
