@@ -27,27 +27,27 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  11 .ARM.attributes 00000028  00000000  00000000  00009430  2**0
                   CONTENTS, READONLY
- 12 .debug_info   00029e17  00000000  00000000  00009458  2**0
+ 12 .debug_info   00029f6b  00000000  00000000  00009458  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 13 .debug_abbrev 000051b9  00000000  00000000  0003326f  2**0
+ 13 .debug_abbrev 0000523e  00000000  00000000  000333c3  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_loclists 0000fa02  00000000  00000000  00038428  2**0
+ 14 .debug_loclists 0000f9d4  00000000  00000000  00038601  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_aranges 00001428  00000000  00000000  00047e30  2**3
+ 15 .debug_aranges 00001438  00000000  00000000  00047fd8  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_rnglists 00001c7a  00000000  00000000  00049258  2**0
+ 16 .debug_rnglists 00001ccb  00000000  00000000  00049410  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_macro  0001a174  00000000  00000000  0004aed2  2**0
+ 17 .debug_macro  0001a174  00000000  00000000  0004b0db  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_line   00029f0f  00000000  00000000  00065046  2**0
+ 18 .debug_line   0002a015  00000000  00000000  0006524f  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .debug_str    000a060c  00000000  00000000  0008ef55  2**0
+ 19 .debug_str    000a067c  00000000  00000000  0008f264  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 20 .comment      00000043  00000000  00000000  0012f561  2**0
+ 20 .comment      00000043  00000000  00000000  0012f8e0  2**0
                   CONTENTS, READONLY
- 21 .debug_frame  00003554  00000000  00000000  0012f5a4  2**2
+ 21 .debug_frame  000035a0  00000000  00000000  0012f924  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 22 .debug_line_str 00000054  00000000  00000000  00132af8  2**0
+ 22 .debug_line_str 00000054  00000000  00000000  00132ec4  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -507,9 +507,9 @@ Disassembly of section .text:
 	...
 
 08000448 <Update_Params_If_PC_Mode_Selected>:
-struct User_Preset_X_Used user_preset_x_used_struct = {(enum Validate) NO};
+	return 1;
+}
 
-//FUNCTION DEFINITIONS
 uint8_t Update_Params_If_PC_Mode_Selected(void){
 
 	if(waveshape_fsm.current_state == PC_MODE){
