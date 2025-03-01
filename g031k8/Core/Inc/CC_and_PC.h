@@ -45,7 +45,7 @@
 //plus 8 bytes (64-bit)...
 #define USER_PRESET_3_FLASH_MEMORY_ADDRESS 0x0800F818
 //plus 8 bytes (64-bit)...
-//64-bits used for whether user preset or factory preset for a given preset are used, start required before midi clk bit, midi manufacturers ident, other midi system exclusive data, etc.
+//64-bits used for whether user preset or factory preset for a given preset is used, start required before midi clk bool
 #define MISC_FLASH_MEMORY_ADDRESS 0x0800F820
 
 //INCLUDES
@@ -60,6 +60,14 @@ struct Preset{
 	volatile uint8_t depth;
 	volatile uint8_t symmetry;
 	volatile uint8_t phase;
+};
+
+struct User_Preset_X_Used{
+
+	enum Validate user_preset_0_used;
+	enum Validate user_preset_1_used;
+	enum Validate user_preset_2_used;
+	enum Validate user_preset_3_used;
 };
 
 enum Preset_Selected{
@@ -97,10 +105,7 @@ extern struct Preset user_preset_1;
 extern struct Preset user_preset_2;
 extern struct Preset user_preset_3;
 
-extern enum Validate user_preset_0_used;
-extern enum Validate user_preset_1_used;
-extern enum Validate user_preset_2_used;
-extern enum Validate user_preset_3_used;
+extern struct User_Preset_X_Used user_preset_x_used_struct;
 
 
 //FUNCTION DECLARATIONS
@@ -118,7 +123,9 @@ uint8_t Convert_Depth_Preset_Value(struct Preset* preset_ptr, struct Preset_Conv
 uint8_t Convert_Symmetry_Preset_Value(struct Preset* preset_ptr, struct Preset_Converted* preset_converted_ptr);
 uint8_t Convert_Phase_Preset_Value(struct Preset* preset_ptr, struct Preset_Converted* preset_converted_ptr);
 uint8_t Pack_Preset_Into_Doubleword(struct Preset* preset_ptr, uint64_t *Doubleword_ptr);
-//uint8_t UnPack_Preset_From_Doubleword(uint64_t *Doubleword_ptr, struct Preset* preset_ptr);
 uint8_t Read_Preset_From_Flash(uint32_t address, struct Preset* preset_ptr);
+uint8_t Pack_User_Preset_Used_Bytes_and_Start_Required_Before_MIDI_CLK_Into_Doubleword(struct User_Preset_X_Used *user_preset_used_struct_ptr, enum Status_Bit *start_required_before_midi_clk_status_bit_ptr, uint64_t *Doubleword_ptr);
+uint8_t Read_User_Preset_Used_Bytes_and_Start_Required_Before_MIDI_CLK_Byte_From_Flash(uint32_t address_val, struct User_Preset_X_Used *user_preset_used_struct_ptr, enum Status_Bit *start_required_before_midi_clk_status_bit_ptr);
+
 
 #endif /* INC_CC_AND_PC_H_ */

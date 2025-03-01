@@ -19,10 +19,7 @@ struct Preset user_preset_1 = factory_preset_1;
 struct Preset user_preset_2 = factory_preset_2;
 struct Preset user_preset_3 = factory_preset_3;
 
-enum Validate user_preset_0_used = NO;
-enum Validate user_preset_1_used = NO;
-enum Validate user_preset_2_used = NO;
-enum Validate user_preset_3_used = NO;
+struct User_Preset_X_Used user_preset_x_used_struct = {(enum Validate) NO};
 
 //FUNCTION DEFINITIONS
 uint8_t Update_Params_If_PC_Mode_Selected(void){
@@ -101,6 +98,7 @@ uint8_t Update_Waveshape_with_Converted_Preset_Value(struct Preset_Converted* pr
 }
 
 uint8_t Update_Speed_with_Converted_Preset_Value(struct Preset_Converted* preset_converted_ptr, struct Params* params_ptr){
+
 	params_ptr->speed = preset_converted_ptr->speed;
 
 	return 1;
@@ -177,17 +175,6 @@ uint8_t Pack_Preset_Into_Doubleword(struct Preset* preset_ptr, uint64_t *Doublew
 	return 1;
 }
 
-/*uint8_t UnPack_Preset_From_Doubleword(uint64_t *Doubleword_ptr, struct Preset* preset_ptr){
-
-	preset_ptr->waveshape = (uint8_t)(*Doubleword_ptr & 0xFF);
-	preset_ptr->speed = (uint8_t)((*Doubleword_ptr >> 8) & 0xFF);
-	preset_ptr->depth = (uint8_t)((*Doubleword_ptr >> 16) & 0xFF);
-	preset_ptr->symmetry = (uint8_t)((*Doubleword_ptr >> 24) & 0xFF);
-	preset_ptr->phase = (uint8_t)((*Doubleword_ptr >> 32) & 0xFF);
-
-	return 1;
-}*/
-
 uint8_t Read_Preset_From_Flash(uint32_t address_val, struct Preset* preset_ptr){
 
 	uint8_t *address = (uint8_t *)address_val;
@@ -197,6 +184,35 @@ uint8_t Read_Preset_From_Flash(uint32_t address_val, struct Preset* preset_ptr){
 	preset_ptr->depth = *(address + 2);
 	preset_ptr->symmetry = *(address + 3);
 	preset_ptr->phase = *(address + 4);
+
+	return 1;
+}
+
+uint8_t Pack_User_Preset_Used_Bytes_and_Start_Required_Before_MIDI_CLK_Into_Doubleword(struct User_Preset_X_Used *user_preset_used_struct_ptr, enum Status_Bit *start_required_before_midi_clk_status_bit_ptr, uint64_t *Doubleword_ptr){
+
+	uint64_t packed = 0;
+
+	packed |= ((uint64_t)user_preset_used_struct_ptr->user_preset_0_used << 0);
+	packed |= ((uint64_t)user_preset_used_struct_ptr->user_preset_1_used << 8);
+	packed |= ((uint64_t)user_preset_used_struct_ptr->user_preset_2_used << 16);
+	packed |= ((uint64_t)user_preset_used_struct_ptr->user_preset_3_used << 24);
+	packed |= ((uint64_t)*start_required_before_midi_clk_status_bit_ptr << 32);
+
+	*Doubleword_ptr = packed;
+
+	return 1;
+}
+
+uint8_t Read_User_Preset_Used_Bytes_and_Start_Required_Before_MIDI_CLK_Byte_From_Flash(uint32_t address_val, struct User_Preset_X_Used *user_preset_used_struct_ptr, enum Status_Bit *start_required_before_midi_clk_status_bit_ptr){
+
+	uint8_t *address = (uint8_t *)address_val;
+
+	user_preset_used_struct_ptr->user_preset_0_used = *address;
+	user_preset_used_struct_ptr->user_preset_1_used = *(address + 1);
+	user_preset_used_struct_ptr->user_preset_2_used = *(address + 2);
+	user_preset_used_struct_ptr->user_preset_3_used = *(address + 3);
+
+	*start_required_before_midi_clk_status_bit_ptr = *(address + 4);
 
 	return 1;
 }
