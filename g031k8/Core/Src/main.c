@@ -56,6 +56,19 @@ int main(void)
 				idle_counter = 0;
 			}
 		}
+		if(Get_Status_Bit(&statuses, Software_MIDI_Timer_Is_Running) == YES){
+
+			if(midi_counter < MIDI_COUNT){
+
+				midi_counter++;
+			}
+			else{
+
+				Clear_Status_Bit(&statuses, Software_MIDI_Timer_Is_Running);
+				Set_Status_Bit(&statuses, Software_MIDI_Timer_Has_Timed_Out);
+				midi_counter = 0;
+			}
+		}
 	}
 	return 1;
 }

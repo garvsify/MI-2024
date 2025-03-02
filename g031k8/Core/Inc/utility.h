@@ -30,7 +30,9 @@ enum Status_Bit{
 	Initial_ADC_Conversion_Complete = INITIAL_ADC_CONVERSION_COMPLETE,
 	Software_IP_CAP_Idle_Timer_Has_Timed_Out = SOFTWARE_IP_CAP_IDLE_TIMER_HAS_TIMED_OUT,
 	Software_IP_CAP_Idle_Timer_Is_Running = SOFTWARE_IP_CAP_IDLE_TIMER_IS_RUNNING,
-	Start_Required_Before_Sync_Mode = START_REQUIRED_BEFORE_SYNC_MODE
+	Start_Required_Before_Sync_Mode = START_REQUIRED_BEFORE_SYNC_MODE,
+	Software_MIDI_Timer_Is_Running = SOFTWARE_MIDI_TIMER_IS_RUNNING,
+	Software_MIDI_Timer_Has_Timed_Out = SOFTWARE_MIDI_TIMER_HAS_TIMED_OUT,
 };
 
 //FUNCTION DECLARATIONS

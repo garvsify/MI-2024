@@ -552,6 +552,40 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 				HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions); //this function takes ages to execute!
 			}
 		}
+
+		if(MIDI_fsm.current_state == MIDI_IDLE){
+
+			if(*rx_buffer == CHANNEL_VOICE_PROGRAM_CHANGE){
+
+				MIDI_fsm.current_state = RECEIVED_PC_STATUS_BYTE;
+				MIDI_fsm.prev_state = MIDI_IDLE;
+				midi_running_status.midi_status_byte = CHANNEL_VOICE_PROGRAM_CHANGE;
+				midi_running_status.status_byte_received = YES;
+
+				//Start Timer to timeout if data byte doesn't follow PC status byte
+				Set_Status_Bit(&statuses, Software_MIDI_Timer_Is_Running);
+			}
+			else if(*rx_buffer == CHANNEL_VOICE_CONTROL_CHANGE){
+
+				MIDI_fsm.current_state = RECEIVED_CC_STATUS_BYTE;
+				MIDI_fsm.prev_state = MIDI_IDLE;
+				midi_running_status.midi_status_byte = CHANNEL_VOICE_CONTROL_CHANGE;
+				midi_running_status.status_byte_received = YES;
+
+				//Start Timer to timeout if data byte doesn't follow PC status byte
+				Set_Status_Bit(&statuses, Software_MIDI_Timer_Is_Running);
+			}
+		}
+		else if(MIDI_fsm.current_state == RECEIVED_PC_STATUS_BYTE){
+
+			//Check byte received is not a status byte, if it is, reset to idle
+			if(Is_Status_Byte(rx_buffer) == NO){
+
+			}
+			else{
+
+			}
+		}
 	}
 	*rx_buffer = 0;
 

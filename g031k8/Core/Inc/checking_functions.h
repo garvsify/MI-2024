@@ -10,6 +10,7 @@
 #define SPEED_TOLERANCE 5
 
 #define IDLE_COUNT 32000
+#define MIDI_COUNT 32000 //@TODO
 
 //INCLUDES
 #include <stdint.h>

@@ -3,6 +3,9 @@
 
 #include <stdint.h>
 
+#define SOFTWARE_MIDI_TIMER_IS_RUNNING (0b1 << 8)
+#define SOFTWARE_MIDI_TIMER_HAS_TIMED_OUT (0b1 << 9)
+
 #define MIDI_MS_NIBBLE_SHIFT 4
 
 volatile extern uint8_t MIDI_CLK_tag;
