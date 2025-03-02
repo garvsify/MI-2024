@@ -1,6 +1,11 @@
 #ifndef INC_CC_AND_PC_H_
 #define INC_CC_AND_PC_H_
 
+//INCLUDES
+#include "utility.h"
+#include "midi_defines.h"
+#include "oscillator.h"
+
 //MACROS
 #define NUM_PRESETS 4
 
@@ -47,10 +52,6 @@
 //plus 8 bytes (64-bit)...
 //64-bits used for whether user preset or factory preset for a given preset is used, start required before midi clk bool
 #define MISC_FLASH_MEMORY_ADDRESS 0x0800F820
-
-//INCLUDES
-#include "midi_defines.h"
-#include "oscillator.h"
 
 //CUSTOM TYPES
 struct Preset{
@@ -99,7 +100,6 @@ extern struct Preset user_preset_3;
 
 extern enum Validate user_preset_used_array[NUM_PRESETS];
 
-
 //FUNCTION DECLARATIONS
 uint8_t Initialise_Preset_Arrays(void);
 uint8_t Update_Params_If_PC_Mode_Selected(void);
@@ -124,5 +124,6 @@ uint8_t Update_Converted_Preset_Array_with_User_or_Factory_Preset(struct Preset_
 																	struct Preset *factory_preset_array_ptr,
 																	struct Preset *user_preset_array_ptr,
 																	uint8_t size_of_factory_and_user_arrays);
+
 
 #endif /* INC_CC_AND_PC_H_ */

@@ -1,10 +1,5 @@
 /*NOTES ON THIS BUILD:
 
-
-Issues:
-
-- MIDI CLK resync seems not to be syncing properly when 'Start' is triggered
-
 Potential Issues:
 
 - What happens if 'Start' is received and no MIDI CLKs follow it???? Unlikely I know, but we'll have to deal with this rare case!

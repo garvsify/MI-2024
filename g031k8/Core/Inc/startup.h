@@ -9,6 +9,7 @@
 #include "checking_functions.h"
 #include "UART.h"
 #include "input_capture.h"
+#include "CC_and_PC.h"
 
 //FUNCTION DECLARATIONS
 uint8_t Startup(void);

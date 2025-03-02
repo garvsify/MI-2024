@@ -16,6 +16,12 @@ uint8_t Startup(void){
 	HAL_GPIO_WritePin(HACK_POT_HIGH_GPIO_Port, HACK_POT_HIGH_Pin, 1);
 	HAL_GPIO_WritePin(HACK_POT_LOW_GPIO_Port, HACK_POT_LOW_Pin, 0);
 
+	Initialise_Preset_Arrays();
+
+	Read_Preset_From_Flash(USER_PRESET_0_FLASH_MEMORY_ADDRESS, &user_preset_0);
+	Read_Preset_From_Flash(USER_PRESET_1_FLASH_MEMORY_ADDRESS, &user_preset_1);
+	Read_Preset_From_Flash(USER_PRESET_2_FLASH_MEMORY_ADDRESS, &user_preset_2);
+	Read_Preset_From_Flash(USER_PRESET_3_FLASH_MEMORY_ADDRESS, &user_preset_3);
 
 	//GET ADC VALUES
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions);
