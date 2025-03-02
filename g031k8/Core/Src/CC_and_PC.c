@@ -276,7 +276,7 @@ uint8_t Update_Converted_Preset_Array_with_User_or_Factory_Preset(struct Preset_
 			Convert_All_Preset_Values(*(user_presets_array_ptr + i), (presets_converted_array_ptr + i));
 		}
 		else if(*(user_presets_used_array_ptr + i) == (enum Validate)NO){
-			Convert_All_Preset_Values(*(factory_presets_array_ptr + i), (presets_converted_array_ptr + i));
+			Convert_All_Preset_Values((struct Preset *) *(factory_presets_array_ptr + i), (presets_converted_array_ptr + i));
 		}
 	}
 
