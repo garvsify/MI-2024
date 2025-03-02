@@ -10,7 +10,7 @@ const struct Preset factory_preset_3 = {.waveshape = FACTORY_PRESET_3_WAVESHAPE,
 //VARIABLE DEFINITIONS
 const struct Preset *factory_presets_array[NUM_PRESETS] = {0};
 struct Preset *user_presets_array[NUM_PRESETS] = {0};
-struct Preset_Converted preset_converted_array[NUM_PRESETS] = {0};
+struct Preset_Converted presets_converted_array[NUM_PRESETS] = {0};
 enum Preset_Selected preset_selected = NO_PRESET_SELECTED;
 
 //default values that may be selectively over-written by the user - and which are overwritten by flash-reads upon startup
@@ -19,7 +19,7 @@ struct Preset user_preset_1 = factory_preset_1;
 struct Preset user_preset_2 = factory_preset_2;
 struct Preset user_preset_3 = factory_preset_3;
 
-enum Validate user_preset_used_array[NUM_PRESETS] = {(enum Validate)NO};
+enum Validate user_presets_used_array[NUM_PRESETS] = {(enum Validate)NO};
 
 //FUNCTION DEFINITIONS
 uint8_t Initialise_Preset_Arrays(void){
@@ -50,19 +50,19 @@ uint8_t Initialise_Preset_Arrays(void){
 uint8_t Update_Params_If_PC_Mode_Selected(void){
 
 	if(waveshape_fsm.current_state == PC_MODE){
-		Update_Waveshape_with_Converted_Preset_Value(&preset_converted_array[(uint8_t)preset_selected - 1], &params);
+		Update_Waveshape_with_Converted_Preset_Value(&presets_converted_array[(uint8_t)preset_selected - 1], &params);
 	}
 	if(speed_fsm.current_state.shared_state == PC_MODE){
-		Update_Speed_with_Converted_Preset_Value(&preset_converted_array[(uint8_t)preset_selected - 1], &params);
+		Update_Speed_with_Converted_Preset_Value(&presets_converted_array[(uint8_t)preset_selected - 1], &params);
 	}
 	if(depth_fsm.current_state == PC_MODE){
-		Update_Depth_with_Converted_Preset_Value(&preset_converted_array[(uint8_t)preset_selected - 1], &params);
+		Update_Depth_with_Converted_Preset_Value(&presets_converted_array[(uint8_t)preset_selected - 1], &params);
 	}
 	if(symmetry_fsm.current_state == PC_MODE){
-		Update_Symmetry_with_Converted_Preset_Value(&preset_converted_array[(uint8_t)preset_selected - 1], &params);
+		Update_Symmetry_with_Converted_Preset_Value(&presets_converted_array[(uint8_t)preset_selected - 1], &params);
 	}
 	if(phase_fsm.current_state == PC_MODE){
-		Update_Phase_with_Converted_Preset_Value(&preset_converted_array[(uint8_t)preset_selected - 1], &delay_line);
+		Update_Phase_with_Converted_Preset_Value(&presets_converted_array[(uint8_t)preset_selected - 1], &delay_line);
 	}
 
 	return 1;
@@ -213,23 +213,25 @@ uint8_t Read_Preset_From_Flash(uint32_t address_val, struct Preset* preset_ptr){
 	return 1;
 }
 
-uint8_t Pack_User_Preset_Used_Bytes_and_Start_Required_Before_MIDI_CLK_Into_Doubleword(enum Validate *user_preset_used_array_ptr, enum Status_Bit *start_required_before_midi_clk_status_bit_ptr, uint64_t *Doubleword_ptr, uint8_t size_of_preset){
+uint8_t Pack_User_Preset_Used_Bytes_and_Start_Required_Before_MIDI_CLK_Into_Doubleword(enum Validate *user_presets_used_array_ptr, volatile uint32_t *statuses_ptr, uint64_t *Doubleword_ptr, uint8_t size_of_preset){
 
 	uint64_t packed = 0;
 
 	for(uint8_t i = 0; i < size_of_preset; i++){
 
-		packed |= ((uint64_t)user_preset_used_array_ptr[i] << (i << 3)); //<< (i*8)
+		packed |= ((uint64_t)user_presets_used_array_ptr[i] << (i << 3)); //<< (i*8)
 	}
 
-	packed |= *start_required_before_midi_clk_status_bit_ptr << (size_of_preset << 3); //<< (4 * 8)
+	enum Validate start_required_before_midi_clk_status_bit = Get_Status_Bit(statuses_ptr, Start_Required_Before_Sync_Mode);
+
+	packed |= (uint64_t)start_required_before_midi_clk_status_bit << (size_of_preset << 3); //<< (4 * 8)
 
 	*Doubleword_ptr = packed;
 
 	return 1;
 }
 
-uint8_t Read_and_Interpret_User_Preset_Used_Bytes_and_Start_Required_Before_MIDI_CLK_Byte_From_Flash(uint32_t address_val, enum Validate *user_preset_used_array_ptr, enum Status_Bit *start_required_before_midi_clk_status_bit_ptr, uint8_t size_of_factory_or_user_array){
+uint8_t Read_and_Interpret_User_Preset_Used_Bytes_and_Start_Required_Before_MIDI_CLK_Byte_From_Flash(uint32_t address_val, enum Validate *user_presets_used_array_ptr, volatile uint32_t *statuses_ptr, uint8_t size_of_factory_or_user_array){
 
 	uint8_t *address = (uint8_t *)address_val;
 
@@ -239,22 +241,22 @@ uint8_t Read_and_Interpret_User_Preset_Used_Bytes_and_Start_Required_Before_MIDI
 
 		interpretted_value = *(address + i);
 
-		if((interpretted_value == 0xFF) || (interpretted_value == (enum Validate)NO)){
+		if(interpretted_value == (enum Validate)NO){
 
 			if(i < size_of_factory_or_user_array){
-				*(user_preset_used_array_ptr + i) = (enum Validate)NO;
+				*(user_presets_used_array_ptr + i) = (enum Validate)NO;
 			}
 			else if(i == size_of_factory_or_user_array){
-				*start_required_before_midi_clk_status_bit_ptr = (enum Validate)NO;
+				Clear_Status_Bit(statuses_ptr, Start_Required_Before_Sync_Mode);
 			}
 		}
-		else if(interpretted_value == (enum Validate)YES){
+		else if((interpretted_value == 0xFF) || (interpretted_value == (enum Validate)YES)){
 
 			if(i < size_of_factory_or_user_array){
-				*(user_preset_used_array_ptr + i) = (enum Validate)YES;
+				*(user_presets_used_array_ptr + i) = (enum Validate)YES;
 			}
 			else if(i == size_of_factory_or_user_array){
-				*start_required_before_midi_clk_status_bit_ptr = (enum Validate)YES;
+				Set_Status_Bit(statuses_ptr, Start_Required_Before_Sync_Mode);
 			}
 		}
 	}
@@ -262,21 +264,31 @@ uint8_t Read_and_Interpret_User_Preset_Used_Bytes_and_Start_Required_Before_MIDI
 	return 1;
 }
 
-uint8_t Update_Converted_Preset_Array_with_User_or_Factory_Preset(struct Preset_Converted* preset_converted_ptr,
-																	enum Validate *user_preset_used_array_ptr,
-																	struct Preset *factory_preset_array_ptr,
-																	struct Preset *user_preset_array_ptr,
+uint8_t Update_Converted_Preset_Array_with_User_or_Factory_Preset(struct Preset_Converted* presets_converted_array_ptr,
+																	enum Validate *user_presets_used_array_ptr,
+																	const struct Preset **factory_presets_array_ptr,
+																	struct Preset **user_presets_array_ptr,
 																	uint8_t size_of_factory_and_user_arrays){
 
 	for(uint8_t i = 0; i < size_of_factory_and_user_arrays; i++){
 
-		if(*(user_preset_used_array_ptr + i) == (enum Validate)YES){
-			Convert_All_Preset_Values((user_preset_array_ptr + i), (preset_converted_ptr + i));
+		if(*(user_presets_used_array_ptr + i) == (enum Validate)YES){
+			Convert_All_Preset_Values(*(user_presets_array_ptr + i), (presets_converted_array_ptr + i));
 		}
-		else if(*(user_preset_used_array_ptr + i) == (enum Validate)NO){
-			Convert_All_Preset_Values((factory_preset_array_ptr + i), (preset_converted_ptr + i));
+		else if(*(user_presets_used_array_ptr + i) == (enum Validate)NO){
+			Convert_All_Preset_Values(*(factory_presets_array_ptr + i), (presets_converted_array_ptr + i));
 		}
 	}
+
+	return 1;
+}
+
+uint8_t Read_User_Presets_From_Flash(void){
+
+	Read_Preset_From_Flash(USER_PRESET_0_FLASH_MEMORY_ADDRESS, &user_preset_0);
+	Read_Preset_From_Flash(USER_PRESET_1_FLASH_MEMORY_ADDRESS, &user_preset_1);
+	Read_Preset_From_Flash(USER_PRESET_2_FLASH_MEMORY_ADDRESS, &user_preset_2);
+	Read_Preset_From_Flash(USER_PRESET_3_FLASH_MEMORY_ADDRESS, &user_preset_3);
 
 	return 1;
 }

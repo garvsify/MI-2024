@@ -89,7 +89,7 @@ const extern struct Preset factory_preset_3;
 //VARIABLE DECLARATIONS
 extern const struct Preset *factory_presets_array[NUM_PRESETS];
 extern struct Preset *user_presets_array[NUM_PRESETS];
-extern struct Preset_Converted preset_converted_array[NUM_PRESETS];
+extern struct Preset_Converted presets_converted_array[NUM_PRESETS];
 extern enum Preset_Selected preset_selected;
 
 extern struct Preset user_preset_0;
@@ -97,7 +97,7 @@ extern struct Preset user_preset_1;
 extern struct Preset user_preset_2;
 extern struct Preset user_preset_3;
 
-extern enum Validate user_preset_used_array[NUM_PRESETS];
+extern enum Validate user_presets_used_array[NUM_PRESETS];
 
 
 //FUNCTION DECLARATIONS
@@ -117,12 +117,13 @@ uint8_t Convert_Symmetry_Preset_Value(struct Preset* preset_ptr, struct Preset_C
 uint8_t Convert_Phase_Preset_Value(struct Preset* preset_ptr, struct Preset_Converted* preset_converted_ptr);
 uint8_t Pack_Preset_Into_Doubleword(struct Preset* preset_ptr, uint64_t *Doubleword_ptr);
 uint8_t Read_Preset_From_Flash(uint32_t address_val, struct Preset* preset_ptr);
-uint8_t Pack_User_Preset_Used_Bytes_and_Start_Required_Before_MIDI_CLK_Into_Doubleword(enum Validate *user_preset_used_array_ptr, enum Status_Bit *start_required_before_midi_clk_status_bit_ptr, uint64_t *Doubleword_ptr, uint8_t size_of_preset);
-uint8_t Read_and_Interpret_User_Preset_Used_Bytes_and_Start_Required_Before_MIDI_CLK_Byte_From_Flash(uint32_t address_val, enum Validate *user_preset_used_array_ptr, enum Status_Bit *start_required_before_midi_clk_status_bit_ptr, uint8_t size_of_factory_or_user_array);
-uint8_t Update_Converted_Preset_Array_with_User_or_Factory_Preset(struct Preset_Converted* preset_converted_ptr,
+uint8_t Pack_User_Preset_Used_Bytes_and_Start_Required_Before_MIDI_CLK_Into_Doubleword(enum Validate *user_preset_used_array_ptr, volatile uint32_t *statuses_ptr, uint64_t *Doubleword_ptr, uint8_t size_of_preset);
+uint8_t Read_and_Interpret_User_Preset_Used_Bytes_and_Start_Required_Before_MIDI_CLK_Byte_From_Flash(uint32_t address_val, enum Validate *user_preset_used_array_ptr, volatile uint32_t *statuses_ptr, uint8_t size_of_factory_or_user_array);
+uint8_t Update_Converted_Preset_Array_with_User_or_Factory_Preset(struct Preset_Converted* preset_converted_array_ptr,
 																	enum Validate *user_preset_used_array_ptr,
-																	struct Preset *factory_preset_array_ptr,
-																	struct Preset *user_preset_array_ptr,
+																	const struct Preset **factory_preset_array_ptr,
+																	struct Preset **user_preset_array_ptr,
 																	uint8_t size_of_factory_and_user_arrays);
+uint8_t Read_User_Presets_From_Flash(void);
 
 #endif /* INC_CC_AND_PC_H_ */

@@ -2,9 +2,11 @@
 
 #include "stm32g0xx_ll_lptim.h"
 
+#include "CC_and_PC.h" //for some reason compiler shits itself if this is included in startup.h
+
 uint8_t Startup(void){
 
-	Set_Status_Bit(&statuses, Start_Required_Before_Sync_Mode); //set default mode to requiring START MIDI message before beginning a sync
+	//Shouldn't be required now we have a default state set below, even in case flash not programmed //Set_Status_Bit(&statuses, Start_Required_Before_Sync_Mode); //set default mode to requiring START MIDI message before beginning a sync
 
 	HAL_NVIC_DisableIRQ(EXTI4_15_IRQn);
 
@@ -16,6 +18,21 @@ uint8_t Startup(void){
 	HAL_GPIO_WritePin(HACK_POT_HIGH_GPIO_Port, HACK_POT_HIGH_Pin, 1);
 	HAL_GPIO_WritePin(HACK_POT_LOW_GPIO_Port, HACK_POT_LOW_Pin, 0);
 
+	//Point Arrays to Presets
+	Initialise_Preset_Arrays();
+
+	//Read User Presets From Flash, regardless of whether they have been written to before
+	Read_User_Presets_From_Flash();
+
+	//Read 'User Preset Used' Bytes and 'Start Required Before MIDI CLK' Byte
+	Read_and_Interpret_User_Preset_Used_Bytes_and_Start_Required_Before_MIDI_CLK_Byte_From_Flash(MISC_FLASH_MEMORY_ADDRESS, user_presets_used_array, &statuses, NUM_PRESETS);
+
+	//Set the Converted Preset Array to the Relevant Factory/User Preset depending upon the 'User Preset Used' Byte read from Flash
+	Update_Converted_Preset_Array_with_User_or_Factory_Preset(presets_converted_array,
+															  user_presets_used_array,
+															  factory_presets_array,
+															  user_presets_array,
+															  NUM_PRESETS);
 
 	//GET ADC VALUES
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions);
