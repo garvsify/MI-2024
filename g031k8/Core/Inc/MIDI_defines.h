@@ -34,9 +34,18 @@ enum MIDI_Status_Byte{
 	//SYSTEM REAL TIME
 	SYSTEM_REAL_TIME_MIDI_CLOCK = 0xF8,
 	SYSTEM_REAL_TIME_START = 0xFA,
-	//SYSTEM_REAL_TIME_CONTINUE = 0xFB,
-	//SYSTEM_REAL_TIME_STOP = 0xFC,
-	//SYSTEM_REAL_TIME_ACTIVE_SENSING = 0xFE, //not sure if needed?
+
+
+
+	//needed for checking only
+	SYSTEM_REAL_TIME_CONTINUE = 0xFB,
+	//needed for checking only
+	SYSTEM_REAL_TIME_STOP = 0xFC,
+	//needed for checking only
+	SYSTEM_REAL_TIME_ACTIVE_SENSING = 0xFE,
+
+
+
 	SYSTEM_REAL_TIME_RESET = 0xFF
 };
 

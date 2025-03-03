@@ -43,7 +43,8 @@ Core/Src/CC_and_PC.o: ../Core/Src/CC_and_PC.c ../Core/Inc/CC_and_PC.h \
  ../Core/Inc/symmetry_adjustment_types.h ../Core/Inc/timers.h \
  ../Core/Inc/tap_tempo.h ../Core/Inc/CLK_IN.h ../Core/Inc/state_machine.h \
  ../Core/Inc/UART.h ../Core/Inc/oscillator_macros.h \
- ../Core/Inc/symmetry_adjustment.h ../Core/Inc/oscillator_params_type.h
+ ../Core/Inc/MIDI_defines.h ../Core/Inc/symmetry_adjustment.h \
+ ../Core/Inc/oscillator_params_type.h
 ../Core/Inc/CC_and_PC.h:
 ../Core/Inc/midi_defines.h:
 ../Core/Inc/oscillator.h:
@@ -98,5 +99,6 @@ Core/Src/CC_and_PC.o: ../Core/Src/CC_and_PC.c ../Core/Inc/CC_and_PC.h \
 ../Core/Inc/state_machine.h:
 ../Core/Inc/UART.h:
 ../Core/Inc/oscillator_macros.h:
+../Core/Inc/MIDI_defines.h:
 ../Core/Inc/symmetry_adjustment.h:
 ../Core/Inc/oscillator_params_type.h:

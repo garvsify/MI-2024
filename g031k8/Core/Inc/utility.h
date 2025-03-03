@@ -12,6 +12,7 @@
 #include "input_capture.h"
 #include "config.h"
 #include "oscillator_macros.h"
+#include "MIDI_defines.h"
 
 //CUSTOM TYPES
 enum Polarity{

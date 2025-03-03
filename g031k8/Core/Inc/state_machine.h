@@ -14,7 +14,6 @@ volatile extern struct Normal_FSM phase_fsm;
 volatile extern struct IP_CAP_FSM IP_CAP_fsm;
 volatile extern enum MIDI_CLK_FSM_State MIDI_CLK_fsm;
 volatile extern struct MIDI_FSM MIDI_fsm;
-volatile extern struct MIDI_Running_Status midi_running_status;
 
 enum MIDI_CLK_FSM_State{
 
@@ -84,9 +83,9 @@ struct IP_CAP_FSM{
 
 enum MIDI_FSM_States{
 
-	MIDI_NONE, //startup previous only
+	MIDI_NONE, //startup prev state only
 
-	MIDI_IDLE, //(dispatch status)
+	MIDI_IDLE, //no status byte received
 
 	RECEIVED_CC_STATUS_BYTE,
 	RECEIVED_CH_MODE_DATA_BYTE_AFTER_CC_STATUS_BYTE,
@@ -102,12 +101,6 @@ struct MIDI_FSM{
 
 	enum MIDI_FSM_States current_state;
 	enum MIDI_FSM_States prev_state;
-};
-
-struct MIDI_Running_Status{
-
-	enum Midi_Status_Byte midi_status_byte;
-	enum Validate status_byte_received;
 };
 
 //FUNCTION DECLARATIONS
