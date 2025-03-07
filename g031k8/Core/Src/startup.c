@@ -22,13 +22,13 @@ uint8_t Startup(void){
 	Initialise_Preset_Arrays();
 
 	//Read User Presets From Flash, regardless of whether they have been written to before
-	Read_User_Presets_From_Flash();
+	Read_and_Interpret_User_Presets_From_Flash();
 
 	//Read 'User Preset Used' Bytes and 'Start Required Before MIDI CLK' Byte
-	Read_and_Interpret_User_Preset_Used_Bytes_and_Start_Required_Before_MIDI_CLK_Byte_From_Flash(MISC_FLASH_MEMORY_ADDRESS, user_presets_used_array, &statuses, NUM_PRESETS);
+	Read_and_Interpret_Misc_From_Flash(MISC_FLASH_MEMORY_ADDRESS, user_presets_used_array, &statuses, &MIDI_basic_channel, NUM_PRESETS);
 
 	//Set the Converted Preset Array to the Relevant Factory/User Preset depending upon the 'User Preset Used' Byte read from Flash
-	Update_Converted_Preset_Array_with_User_or_Factory_Preset(presets_converted_array,
+	Update_Converted_Preset_Array_with_User_or_Factory_Presets(presets_converted_array,
 															  user_presets_used_array,
 															  factory_presets_array,
 															  user_presets_array,

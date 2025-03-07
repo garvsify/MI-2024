@@ -41,7 +41,7 @@ Core/Src/oscillator.o: ../Core/Src/oscillator.c ../Core/Inc/oscillator.h \
  ../Core/Inc/checking_functions.h ../Core/Inc/oscillator_params_type.h \
  ../Core/Inc/symmetry_adjustment_types.h ../Core/Inc/timers.h \
  ../Core/Inc/tap_tempo.h ../Core/Inc/CLK_IN.h ../Core/Inc/state_machine.h \
- ../Core/Inc/UART.h ../Core/Inc/oscillator_macros.h \
+ ../Core/Inc/UART.h ../Core/Inc/MIDI.h ../Core/Inc/oscillator_macros.h \
  ../Core/Inc/MIDI_defines.h ../Core/Inc/symmetry_adjustment.h \
  ../Core/Inc/oscillator_params_type.h
 ../Core/Inc/oscillator.h:
@@ -96,6 +96,7 @@ Core/Src/oscillator.o: ../Core/Src/oscillator.c ../Core/Inc/oscillator.h \
 ../Core/Inc/CLK_IN.h:
 ../Core/Inc/state_machine.h:
 ../Core/Inc/UART.h:
+../Core/Inc/MIDI.h:
 ../Core/Inc/oscillator_macros.h:
 ../Core/Inc/MIDI_defines.h:
 ../Core/Inc/symmetry_adjustment.h:

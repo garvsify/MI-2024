@@ -45,12 +45,13 @@
 //plus 8 bytes (64-bit)...
 #define USER_PRESET_3_FLASH_MEMORY_ADDRESS 0x0800F818
 //plus 8 bytes (64-bit)...
-//64-bits used for whether user preset or factory preset for a given preset is used, start required before midi clk bool
+//64-bits used for whether user preset or factory preset for a given preset is used, start required before MIDI CLK status, MIDI basic channel N, and OMNI On/Off status
 #define MISC_FLASH_MEMORY_ADDRESS 0x0800F820
 
 //INCLUDES
 #include "midi_defines.h"
 #include "oscillator.h"
+#include "MIDI.h"
 
 //CUSTOM TYPES
 struct Preset{
@@ -103,27 +104,33 @@ extern enum Validate user_presets_used_array[NUM_PRESETS];
 //FUNCTION DECLARATIONS
 uint8_t Initialise_Preset_Arrays(void);
 uint8_t Update_Params_If_PC_Mode_Selected(void);
+
 uint8_t Convert_All_Preset_Values(struct Preset* preset_ptr, struct Preset_Converted* preset_converted_ptr);
 uint8_t Update_All_with_Converted_Preset_Values(struct Preset_Converted* preset_converted_ptr, struct Params* params_ptr, struct Delay_Line* delay_line_ptr);
+
 uint8_t Update_Waveshape_with_Converted_Preset_Value(struct Preset_Converted* preset_converted_ptr, struct Params* params_ptr);
 uint8_t Update_Speed_with_Converted_Preset_Value(struct Preset_Converted* preset_converted_ptr, struct Params* params_ptr);
 uint8_t Update_Depth_with_Converted_Preset_Value(struct Preset_Converted* preset_converted_ptr, struct Params* params_ptr);
 uint8_t Update_Symmetry_with_Converted_Preset_Value(struct Preset_Converted* preset_converted_ptr, struct Params* params_ptr);
 uint8_t Update_Phase_with_Converted_Preset_Value(struct Preset_Converted* preset_converted_ptr, struct Delay_Line* delay_line_ptr);
+
 uint8_t Convert_Waveshape_Preset_Value(struct Preset* preset_ptr, struct Preset_Converted* preset_converted_ptr);
 uint8_t Convert_Speed_Preset_Value(struct Preset* preset_ptr, struct Preset_Converted* preset_converted_ptr);
 uint8_t Convert_Depth_Preset_Value(struct Preset* preset_ptr, struct Preset_Converted* preset_converted_ptr);
 uint8_t Convert_Symmetry_Preset_Value(struct Preset* preset_ptr, struct Preset_Converted* preset_converted_ptr);
 uint8_t Convert_Phase_Preset_Value(struct Preset* preset_ptr, struct Preset_Converted* preset_converted_ptr);
+
 uint8_t Pack_Preset_Into_Doubleword(struct Preset* preset_ptr, uint64_t *Doubleword_ptr);
-uint8_t Read_Preset_From_Flash(uint32_t address_val, struct Preset* preset_ptr);
-uint8_t Pack_User_Preset_Used_Bytes_and_Start_Required_Before_MIDI_CLK_Into_Doubleword(enum Validate *user_preset_used_array_ptr, volatile uint32_t *statuses_ptr, uint64_t *Doubleword_ptr, uint8_t size_of_preset);
-uint8_t Read_and_Interpret_User_Preset_Used_Bytes_and_Start_Required_Before_MIDI_CLK_Byte_From_Flash(uint32_t address_val, enum Validate *user_preset_used_array_ptr, volatile uint32_t *statuses_ptr, uint8_t size_of_factory_or_user_array);
-uint8_t Update_Converted_Preset_Array_with_User_or_Factory_Preset(struct Preset_Converted* preset_converted_array_ptr,
+uint8_t Read_and_Interpret_Preset_From_Flash(uint32_t address_val, struct Preset* preset_ptr);
+uint8_t Read_and_Interpret_User_Presets_From_Flash(void);
+
+uint8_t Pack_Misc_Into_Doubleword(enum Validate *user_presets_used_array_ptr, volatile uint32_t *statuses_ptr, volatile enum MIDI_Channel *MIDI_basic_channel_ptr, uint64_t *Doubleword_ptr, uint8_t num_presets);
+uint8_t Read_and_Interpret_Misc_From_Flash(uint32_t address_val, enum Validate *user_presets_used_array_ptr, volatile uint32_t *statuses_ptr, volatile enum MIDI_Channel *MIDI_basic_channel_ptr, uint8_t num_presets);
+
+uint8_t Update_Converted_Preset_Array_with_User_or_Factory_Presets(struct Preset_Converted* preset_converted_array_ptr,
 																	enum Validate *user_preset_used_array_ptr,
 																	const struct Preset **factory_preset_array_ptr,
 																	struct Preset **user_preset_array_ptr,
 																	uint8_t size_of_factory_and_user_arrays);
-uint8_t Read_User_Presets_From_Flash(void);
 
 #endif /* INC_CC_AND_PC_H_ */

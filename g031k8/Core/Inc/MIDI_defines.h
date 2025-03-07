@@ -5,6 +5,7 @@
 
 #define SOFTWARE_MIDI_TIMER_IS_RUNNING (0b1 << 8)
 #define SOFTWARE_MIDI_TIMER_HAS_TIMED_OUT (0b1 << 9)
+#define MIDI_CHANNEL_VOICE_MODE (0b1 << 10)
 
 #define MIDI_MS_NIBBLE_SHIFT 4
 
@@ -36,7 +37,6 @@ enum MIDI_Status_Byte{
 	SYSTEM_REAL_TIME_START = 0xFA,
 
 
-
 	//needed for checking only
 	SYSTEM_REAL_TIME_CONTINUE = 0xFB,
 	//needed for checking only
@@ -50,12 +50,19 @@ enum MIDI_Status_Byte{
 };
 
 enum MIDI_Channel_Mode_Data_Byte_0{
+
 	LOCAL_CONTROL = 122,
-	//ALL_NOTES_OFF = 123,
+
+	//needed for checking only
+	ALL_NOTES_OFF = 123,
+
 	OMNI_OFF = 124,
 	OMNI_ON = 125,
-	//MONO_ON = 126,
-	//POLY_ON = 127
+
+	//needed for checking only
+	MONO_ON = 126,
+	//needed for checking only
+	POLY_ON = 127
 };
 
 #endif

@@ -45,7 +45,7 @@ Core/Src/input_capture.o: ../Core/Src/input_capture.c \
  ../Core/Inc/oscillator_params_type.h ../Core/Inc/timers.h \
  ../Core/Inc/startup.h ../Core/Inc/checking_functions.h \
  ../Core/Inc/tap_tempo.h ../Core/Inc/CLK_IN.h ../Core/Inc/state_machine.h \
- ../Core/Inc/UART.h
+ ../Core/Inc/UART.h ../Core/Inc/MIDI.h
 ../Core/Inc/input_capture.h:
 ../Core/Inc/main.h:
 ../Core/Inc/config.h:
@@ -102,3 +102,4 @@ Core/Src/input_capture.o: ../Core/Src/input_capture.c \
 ../Core/Inc/CLK_IN.h:
 ../Core/Inc/state_machine.h:
 ../Core/Inc/UART.h:
+../Core/Inc/MIDI.h:

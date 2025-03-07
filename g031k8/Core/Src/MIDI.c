@@ -1,6 +1,9 @@
 //INCLUDES
 #include "MIDI.h"
 
+//VARIABLE DEFINITIONS
+volatile enum MIDI_Channel MIDI_basic_channel = MIDI_CH_ONE;
+
 //FUNCTION DEFINITIONS
 enum Validate Is_Status_Byte(volatile char *data){
 

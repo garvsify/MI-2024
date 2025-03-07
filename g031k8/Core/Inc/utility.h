@@ -34,6 +34,7 @@ enum Status_Bit{
 	Start_Required_Before_Sync_Mode = START_REQUIRED_BEFORE_SYNC_MODE,
 	Software_MIDI_Timer_Is_Running = SOFTWARE_MIDI_TIMER_IS_RUNNING,
 	Software_MIDI_Timer_Has_Timed_Out = SOFTWARE_MIDI_TIMER_HAS_TIMED_OUT,
+	MIDI_Channel_Voice_Mode = MIDI_CHANNEL_VOICE_MODE,
 };
 
 //FUNCTION DECLARATIONS

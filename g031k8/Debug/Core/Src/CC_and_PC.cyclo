@@ -13,8 +13,8 @@
 ../Core/Src/CC_and_PC.c:174:9:Convert_Symmetry_Preset_Value	1
 ../Core/Src/CC_and_PC.c:181:9:Convert_Phase_Preset_Value	1
 ../Core/Src/CC_and_PC.c:188:9:Pack_Preset_Into_Doubleword	1
-../Core/Src/CC_and_PC.c:202:9:Read_Preset_From_Flash	3
-../Core/Src/CC_and_PC.c:216:9:Pack_User_Preset_Used_Bytes_and_Start_Required_Before_MIDI_CLK_Into_Doubleword	5
-../Core/Src/CC_and_PC.c:234:9:Read_and_Interpret_User_Preset_Used_Bytes_and_Start_Required_Before_MIDI_CLK_Byte_From_Flash	7
-../Core/Src/CC_and_PC.c:267:9:Update_Converted_Preset_Array_with_User_or_Factory_Preset	5
-../Core/Src/CC_and_PC.c:286:9:Read_User_Presets_From_Flash	1
+../Core/Src/CC_and_PC.c:202:9:Read_and_Interpret_Preset_From_Flash	6
+../Core/Src/CC_and_PC.c:220:9:Pack_Misc_Into_Doubleword	7
+../Core/Src/CC_and_PC.c:251:9:Read_and_Interpret_Misc_From_Flash	11
+../Core/Src/CC_and_PC.c:309:9:Update_Converted_Preset_Array_with_User_or_Factory_Presets	5
+../Core/Src/CC_and_PC.c:328:9:Read_and_Interpret_User_Presets_From_Flash	21
