@@ -24,7 +24,7 @@ uint8_t Startup(void){
 	//Read User Presets From Flash, regardless of whether they have been written to before
 	Read_and_Interpret_User_Presets_From_Flash();
 
-	//Read 'User Preset Used' Bytes and 'Start Required Before MIDI CLK' Byte
+	//Read 'User Preset Used' Bytes, 'Start Required Before MIDI CLK' Byte, MIDI Omni On/Off Status Bit, and MIDI Basic Channel
 	Read_and_Interpret_Misc_From_Flash(MISC_FLASH_MEMORY_ADDRESS, user_presets_used_array, &statuses, &MIDI_basic_channel, NUM_PRESETS);
 
 	//Set the Converted Preset Array to the Relevant Factory/User Preset depending upon the 'User Preset Used' Byte read from Flash
