@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.3 Safari/605.1.15" version="26.1.0">
   <diagram name="Page-1" id="MCokuwG6os_PI19OrNsB">
-    <mxGraphModel dx="9560" dy="6682" grid="1" gridSize="5" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="7170" dy="5304" grid="1" gridSize="5" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -426,10 +426,10 @@
         <mxCell id="ROZJgOX0GMissYNZLgex-276" value="Data byte?" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="1680" y="585" width="160" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="ROZJgOX0GMissYNZLgex-284" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="ROZJgOX0GMissYNZLgex-277" target="ROZJgOX0GMissYNZLgex-283">
+        <mxCell id="ROZJgOX0GMissYNZLgex-290" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="ROZJgOX0GMissYNZLgex-277" target="ROZJgOX0GMissYNZLgex-288">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="ROZJgOX0GMissYNZLgex-290" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="ROZJgOX0GMissYNZLgex-277" target="ROZJgOX0GMissYNZLgex-288">
+        <mxCell id="ROZJgOX0GMissYNZLgex-731" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="ROZJgOX0GMissYNZLgex-277" target="ROZJgOX0GMissYNZLgex-730">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="ROZJgOX0GMissYNZLgex-277" value="Utilised non-realtime&amp;nbsp;&lt;div&gt;Status byte (not&amp;nbsp;&lt;/div&gt;&lt;div&gt;inc. Sysex, but inc. Ch Mode&lt;/div&gt;&lt;div&gt;and voice)?&lt;/div&gt;" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
@@ -450,8 +450,8 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="ROZJgOX0GMissYNZLgex-283" value="Reset Timer and data buffer, store active status byte in buffer" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="1900" y="495" width="120" height="60" as="geometry" />
+        <mxCell id="ROZJgOX0GMissYNZLgex-283" value="Reset Timer and data buffer, store active status byte in buffer, update running status" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1900" y="233.5" width="120" height="77" as="geometry" />
         </mxCell>
         <mxCell id="ROZJgOX0GMissYNZLgex-287" value="No" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
           <mxGeometry x="2035" y="595" width="35" height="30" as="geometry" />
@@ -1475,6 +1475,27 @@
         </mxCell>
         <mxCell id="ROZJgOX0GMissYNZLgex-728" value="Yes" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
           <mxGeometry x="2080" y="2224.8" width="40" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ROZJgOX0GMissYNZLgex-733" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="ROZJgOX0GMissYNZLgex-730" target="ROZJgOX0GMissYNZLgex-732">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ROZJgOX0GMissYNZLgex-735" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="ROZJgOX0GMissYNZLgex-730" target="ROZJgOX0GMissYNZLgex-283">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ROZJgOX0GMissYNZLgex-730" value="Sysex&lt;div&gt;actively serviced?&lt;/div&gt;" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1880" y="467" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="ROZJgOX0GMissYNZLgex-734" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="ROZJgOX0GMissYNZLgex-732" target="ROZJgOX0GMissYNZLgex-283">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ROZJgOX0GMissYNZLgex-732" value="Abort Sysex" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1900" y="362" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ROZJgOX0GMissYNZLgex-736" value="Yes" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="1956" y="433" width="40" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ROZJgOX0GMissYNZLgex-737" value="No" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="2026" y="477" width="35" height="30" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
