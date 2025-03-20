@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.3 Safari/605.1.15" version="26.1.0">
   <diagram name="Page-1" id="MCokuwG6os_PI19OrNsB">
-    <mxGraphModel dx="7170" dy="5304" grid="1" gridSize="5" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="2390" dy="2547" grid="1" gridSize="5" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -148,7 +148,7 @@
         <mxCell id="ROZJgOX0GMissYNZLgex-52" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="ROZJgOX0GMissYNZLgex-43" target="ROZJgOX0GMissYNZLgex-50">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="ROZJgOX0GMissYNZLgex-43" value="Store running status,&lt;div&gt;and status byte in&lt;/div&gt;&lt;div&gt;buffer&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="ROZJgOX0GMissYNZLgex-43" value="Store running status" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="354" y="1267" width="120" height="60" as="geometry" />
         </mxCell>
         <mxCell id="ROZJgOX0GMissYNZLgex-44" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1">
@@ -160,7 +160,7 @@
         <mxCell id="ROZJgOX0GMissYNZLgex-45" value="Yes" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
           <mxGeometry x="570" y="1297" width="40" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="ROZJgOX0GMissYNZLgex-46" value="Store running status,&lt;div&gt;and status byte in buffer&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="ROZJgOX0GMissYNZLgex-46" value="Store running status" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="514" y="1337" width="120" height="60" as="geometry" />
         </mxCell>
         <mxCell id="ROZJgOX0GMissYNZLgex-48" value="Yes" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
@@ -205,10 +205,8 @@
         <mxCell id="ROZJgOX0GMissYNZLgex-71" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="ROZJgOX0GMissYNZLgex-61" target="ROZJgOX0GMissYNZLgex-70">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="ROZJgOX0GMissYNZLgex-97" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="ROZJgOX0GMissYNZLgex-61">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="735" y="1597.3333333333335" as="targetPoint" />
-          </mxGeometry>
+        <mxCell id="ROZJgOX0GMissYNZLgex-738" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;jumpStyle=arc;" edge="1" parent="1" source="ROZJgOX0GMissYNZLgex-61" target="ROZJgOX0GMissYNZLgex-69">
+          <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="ROZJgOX0GMissYNZLgex-61" value="Received on&amp;nbsp;&lt;div&gt;Basic Channel?&lt;/div&gt;" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="494" y="1557" width="160" height="80" as="geometry" />
@@ -241,19 +239,14 @@
         <mxCell id="ROZJgOX0GMissYNZLgex-69" value="Active status byte being serviced" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="354" y="1487" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="ROZJgOX0GMissYNZLgex-92" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="ROZJgOX0GMissYNZLgex-70">
+        <mxCell id="ROZJgOX0GMissYNZLgex-739" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="ROZJgOX0GMissYNZLgex-70">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="735" y="1717" as="targetPoint" />
+            <mxPoint x="675" y="1595" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="ROZJgOX0GMissYNZLgex-94" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;jumpStyle=arc;" edge="1" parent="1" source="ROZJgOX0GMissYNZLgex-70">
+        <mxCell id="ROZJgOX0GMissYNZLgex-740" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="ROZJgOX0GMissYNZLgex-70">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="899.9999999999998" y="1327" as="targetPoint" />
-            <Array as="points">
-              <mxPoint x="574" y="1792" />
-              <mxPoint x="901" y="1792" />
-              <mxPoint x="901" y="1327" />
-            </Array>
+            <mxPoint x="900" y="1330" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         <mxCell id="ROZJgOX0GMissYNZLgex-70" value="OMNI on?" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
@@ -285,13 +278,13 @@
           <mxGeometry x="674" y="1407" width="120" height="60" as="geometry" />
         </mxCell>
         <mxCell id="ROZJgOX0GMissYNZLgex-95" value="Yes" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
-          <mxGeometry x="640" y="1687" width="40" height="30" as="geometry" />
+          <mxGeometry x="634" y="1687" width="40" height="30" as="geometry" />
         </mxCell>
         <mxCell id="ROZJgOX0GMissYNZLgex-96" value="No" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
-          <mxGeometry x="575" y="1757" width="35" height="30" as="geometry" />
+          <mxGeometry x="585" y="1740" width="35" height="30" as="geometry" />
         </mxCell>
         <mxCell id="ROZJgOX0GMissYNZLgex-98" value="Yes" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
-          <mxGeometry x="640" y="1567" width="40" height="30" as="geometry" />
+          <mxGeometry x="634" y="1565" width="40" height="30" as="geometry" />
         </mxCell>
         <mxCell id="ROZJgOX0GMissYNZLgex-105" value="Yes" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
           <mxGeometry x="474" y="380" width="40" height="30" as="geometry" />

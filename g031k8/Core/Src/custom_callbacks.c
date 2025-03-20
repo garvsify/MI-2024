@@ -556,51 +556,68 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 			}
 		}
 	}
+	//not a realtime status byte
 	else{
 
-		if(MIDI_fsm.current_state == MIDI_IDLE){
+		if(running_status_byte == 0){
 
-			if(*rx_buffer == CHANNEL_VOICE_PROGRAM_CHANGE){
+			if(active_status_byte == 0){
 
-				MIDI_fsm.current_state = RECEIVED_PC_STATUS_BYTE;
-				MIDI_fsm.prev_state = MIDI_IDLE;
+				if(Is_Data_Buffer_Empty(&MIDI_data) == YES){
 
-				//Start Timer to timeout if data byte doesn't follow PC status byte
-				Set_Status_Bit(&statuses, Software_MIDI_Timer_Is_Running);
-			}
-			else if(*rx_buffer == CHANNEL_VOICE_CONTROL_CHANGE){
+					if(Is_Status_Byte(rx_buffer) == YES){
 
-				MIDI_fsm.current_state = RECEIVED_CC_STATUS_BYTE;
-				MIDI_fsm.prev_state = MIDI_IDLE;
+						if(Is_PC_Status_Byte(rx_buffer) == YES){
 
-				//Start Timer to timeout if data byte doesn't follow PC status byte
-				Set_Status_Bit(&statuses, Software_MIDI_Timer_Is_Running);
-			}
-		}
-		else if(MIDI_fsm.current_state == RECEIVED_PC_STATUS_BYTE){
+							running_status_byte = (uint8_t)*rx_buffer;
 
-			//Check byte received is not a status byte, if it is, reset to awaiting data byte for newly received status byte
-			if(Is_Status_Byte(rx_buffer) == NO){
+							if(Is_Channel_Status_Byte_On_Basic_Channel(rx_buffer, MIDI_basic_channel) == YES){
 
-				//interpret as data byte for PC status byte previously received
-				MIDI_fsm.current_state = RECEIVED_DATA_BYTE_AFTER_PC_STATUS_BYTE;
-				MIDI_fsm.prev_state = RECEIVED_PC_STATUS_BYTE;
-				//shouldn't be needed //midi_running_status.midi_status_byte = CHANNEL_VOICE_PROGRAM_CHANGE;
-				//shouldn't be needed //midi_running_status.status_byte_received = YES;
+								active_status_byte = (uint8_t)*rx_buffer;
+								Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
 
-				if(Is_Program_Change_Data_Byte_In_Range(rx_buffer, NUM_PRESETS) == YES){
+							}
+							else{
 
-					MIDI_fsm.current_state = MIDI_IDLE;
+								if(Is_OMNI_On(&statuses) == YES){
+
+									active_status_byte = (uint8_t)*rx_buffer;
+									Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
+
+								}
+							}
+						}
+						else if(Is_CC_Status_Byte(rx_buffer) == YES){
+
+							running_status_byte = (uint8_t)*rx_buffer;
+
+							if(Is_Channel_Status_Byte_On_Basic_Channel(rx_buffer, MIDI_basic_channel) == YES){
+
+								active_status_byte = (uint8_t)*rx_buffer;
+								Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
+
+							}
+							else{
+
+								if(Is_OMNI_On(&statuses) == YES){
+
+									active_status_byte = (uint8_t)*rx_buffer;
+									Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
+
+								}
+							}
+						}
+						else if(Is_Sysex_Start_Status_Byte(rx_buffer) == YES){
+
+							Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
+
+						}
+					}
+					else if(Is_Status_Byte(rx_buffer) == NO){
+
+						//DO NOTHIMG
+					}
 				}
-				else{
-
-					MIDI_fsm.current_state = RECEIVED_PC_STATUS_BYTE;
-				}
-
-
-			}
-			else{ //reset to awaiting data byte for newly received status byte
-
 			}
 		}
 	}

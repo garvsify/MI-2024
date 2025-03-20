@@ -81,28 +81,6 @@ struct IP_CAP_FSM{
 	enum IP_CAP_FSM_States prev_state;
 };
 
-enum MIDI_FSM_States{
-
-	MIDI_NONE, //startup prev state only
-
-	MIDI_IDLE, //no status byte received
-
-	RECEIVED_CC_STATUS_BYTE,
-	RECEIVED_CH_MODE_DATA_BYTE_AFTER_CC_STATUS_BYTE,
-
-	RECEIVED_CONTROLLER_DATA_BYTE_AFTER_CC_STATUS_BYTE,
-	RECEIVED_CONTROLLER_VALUE_DATA_BYTE_AFTER_CONTROLLER_DATA_BYTE,
-
-	RECEIVED_PC_STATUS_BYTE,
-	RECEIVED_DATA_BYTE_AFTER_PC_STATUS_BYTE,
-};
-
-struct MIDI_FSM{
-
-	enum MIDI_FSM_States current_state;
-	enum MIDI_FSM_States prev_state;
-};
-
 //FUNCTION DECLARATIONS
 uint8_t Advance_Pending_States(void);
 
