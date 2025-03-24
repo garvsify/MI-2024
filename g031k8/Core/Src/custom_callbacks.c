@@ -559,9 +559,9 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 	//not a realtime status byte
 	else{
 
-		if(running_status_byte == 0){
+		if(active_status_byte == 0){
 
-			if(active_status_byte == 0){
+			if(running_status_byte == 0){
 
 				if(Is_Data_Buffer_Empty(&MIDI_data) == YES){
 
@@ -609,16 +609,26 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 						}
 						else if(Is_Sysex_Start_Status_Byte(rx_buffer) == YES){
 
+							active_status_byte = (uint8_t)*rx_buffer;
+							running_status_byte = 0;
 							Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
 
 						}
 					}
-					else if(Is_Status_Byte(rx_buffer) == NO){
+					/*else if(Is_Status_Byte(rx_buffer) == NO){
 
 						//DO NOTHIMG
-					}
+					}*/
 				}
 			}
+			else if(running_status_byte != 0){
+
+				//add code for when no active status byte, but there is a running status byte
+			}
+		}
+		else if(active_status_byte != 0){
+
+			//add code for when there is an active status byte
 		}
 	}
 	*rx_buffer = 0;
