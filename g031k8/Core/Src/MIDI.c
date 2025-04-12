@@ -24,6 +24,22 @@ enum Validate Is_Status_Byte(volatile char *data){
 	}
 }
 
+enum Validate Is_Data_Byte(volatile char *data){
+
+	uint8_t MSB = (uint8_t) *data;
+
+	MSB >>= 8;
+
+	if(MSB){ //status byte
+
+		return (enum Validate)NO;
+	}
+	else{ //data byte
+
+		return (enum Validate)YES;
+	}
+}
+
 enum Validate Is_PC_Status_Byte(volatile char *data){
 
 	uint8_t source;
@@ -119,6 +135,57 @@ enum Validate Is_Data_Buffer_Empty(struct MIDI_Data *MIDI_data_struct){
 	else{
 
 		return (enum Validate)NO;
+	}
+}
+
+uint8_t Num_Data_Bytes_Received(struct MIDI_Data *MIDI_data_struct){
+
+	if(Is_Data_Buffer_Empty(MIDI_data_struct) == YES){
+
+		return 0;
+	}
+	else{
+
+		/*if(MIDI_data_struct->MIDI_data_buffer[9] != 0){
+
+			//will only be for Sysex end, and so we won't need to check
+		}*/
+		if(MIDI_data_struct->MIDI_data_buffer[8] != 0){
+
+			return 9;
+		}
+		else if(MIDI_data_struct->MIDI_data_buffer[7] != 0){
+
+			return 8;
+		}
+		else if(MIDI_data_struct->MIDI_data_buffer[6] != 0){
+
+			return 7;
+		}
+		else if(MIDI_data_struct->MIDI_data_buffer[5] != 0){
+
+			return 6;
+		}
+		else if(MIDI_data_struct->MIDI_data_buffer[4] != 0){
+
+			return 5;
+		}
+		else if(MIDI_data_struct->MIDI_data_buffer[3] != 0){
+
+			return 4;
+		}
+		else if(MIDI_data_struct->MIDI_data_buffer[2] != 0){
+
+			return 3;
+		}
+		else if(MIDI_data_struct->MIDI_data_buffer[1] != 0){
+
+			return 2;
+		}
+		else if(MIDI_data_struct->MIDI_data_buffer[0] != 0){
+
+			return 1;
+		}
 	}
 }
 

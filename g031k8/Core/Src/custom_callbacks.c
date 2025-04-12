@@ -629,6 +629,75 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 		else if(active_status_byte != 0){
 
 			//add code for when there is an active status byte
+			if(Get_Status_Bit(&statuses, Software_MIDI_Timer_Has_Timed_Out) == YES){
+
+				active_status_byte = 0;
+				MIDI_data.MIDI_data_buffer = 0;
+				//running status is kept
+
+				Clear_Status_Bit(&statuses, Software_MIDI_Timer_Has_Timed_Out);
+
+				//In this condition, the data bytes haven't been received in enough time, so any subsequent data bytes
+				//sent after this are simply ignored
+			}
+			else{ //not timed out
+
+				if(Is_Data_Byte(*rx_buffer) == YES){
+
+					if(Is_PC_Status_Byte((volatile char*)&active_status_byte) == YES){
+
+						if(Is_Data_Buffer_Empty(&MIDI_data) == YES){
+
+							//first data byte received
+
+						}
+						/*else{
+
+							PC messages do not require more than 1 data byte
+						}*/
+
+					}
+					else if(Is_CC_Status_Byte((volatile char*)&active_status_byte) == YES){
+
+						if(Is_Data_Buffer_Empty(&MIDI_data) == YES){
+
+													//first data byte received
+						}
+						else{
+
+
+						}
+
+					}
+					else if(Is_Sysex_Start_Status_Byte((volatile char*)&active_status_byte) == YES){
+
+						if(Is_Data_Buffer_Empty(&MIDI_data) == YES){
+
+							//first data byte received
+						}
+						else{
+
+
+						}
+
+					}
+				}
+				else{
+
+					if(Is_PC_Status_Byte((volatile char*)&active_status_byte) == YES){
+
+
+					}
+					else if(Is_CC_Status_Byte((volatile char*)&active_status_byte) == YES){
+
+
+					}
+					else if(Is_Sysex_Start_Status_Byte((volatile char*)&active_status_byte) == YES){
+
+
+					}
+				}
+			}
 		}
 	}
 	*rx_buffer = 0;
