@@ -4,6 +4,13 @@
 //MACROS
 #define NUM_PRESETS 4
 
+//pot CC values
+#define WAVESHAPE_CC 20
+#define SPEED_CC 21
+#define DEPTH_CC 22
+#define SYMMETRY_CC 23
+#define PHASE_CC 24
+
 
 //FACTORY PRESET VALUES
 

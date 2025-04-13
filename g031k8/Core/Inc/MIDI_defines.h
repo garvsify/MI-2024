@@ -49,22 +49,6 @@ enum MIDI_Status_Byte{
 	SYSTEM_REAL_TIME_RESET = 0xFF
 };
 
-enum MIDI_Channel_Mode_Data_Byte_0{
-
-	LOCAL_CONTROL = 122,
-
-	//needed for checking only
-	ALL_NOTES_OFF = 123,
-
-	OMNI_OFF = 124,
-	OMNI_ON = 125,
-
-	//needed for checking only
-	MONO_ON = 126,
-	//needed for checking only
-	POLY_ON = 127
-};
-
 #endif
 
 

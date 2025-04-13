@@ -1,5 +1,6 @@
 //INCLUDES
 #include "MIDI.h"
+#include "CC_and_PC.h"
 
 //VARIABLE DEFINITIONS
 volatile enum MIDI_Channel MIDI_basic_channel = MIDI_CH_ONE;
@@ -73,6 +74,72 @@ enum Validate Is_CC_Status_Byte(volatile char *data){
 	else{
 
 		return (enum Validate)NO;
+	}
+}
+
+enum Validate Is_Utilised_Channel_Mode_CC_First_Data_Byte(volatile char *first_data_byte){
+
+	if(*first_data_byte >= CHANNEL_MODE_CC_THRESHOLD){
+
+		if(*first_data_byte == RESET_ALL_CONTROLLERS){ //put all pots into CC mode and set to 50%
+
+			return (enum Validate)YES;
+		}
+		else if(*first_data_byte == LOCAL_CONTROL){
+
+			return (enum Validate)YES;
+		}
+		else if(*first_data_byte == OMNI_MODE_ON){
+
+			return (enum Validate)YES;
+		}
+		else if(*first_data_byte == OMNI_MODE_OFF){
+
+			return (enum Validate)YES;
+		}
+		else{
+
+			return (enum Validate)NO;
+		}
+	}
+	else{
+
+		return (enum Validate)NO;
+	}
+}
+
+enum Validate Is_Utilised_CC_First_Data_Byte(volatile char *first_data_byte){
+
+	if(*first_data_byte >= CHANNEL_MODE_CC_THRESHOLD){
+
+		return (enum Validate)NO;
+	}
+	else{
+
+		if(*first_data_byte == WAVESHAPE_CC){
+
+			return (enum Validate)YES;
+		}
+		else if(*first_data_byte == SPEED_CC){
+
+			return (enum Validate)YES;
+		}
+		else if(*first_data_byte == DEPTH_CC){
+
+			return (enum Validate)YES;
+		}
+		else if(*first_data_byte == SYMMETRY_CC){
+
+			return (enum Validate)YES;
+		}
+		else if(*first_data_byte == PHASE_CC){
+
+			return (enum Validate)YES;
+		}
+		else{
+
+			return (enum Validate)NO;
+		}
 	}
 }
 
@@ -250,4 +317,13 @@ enum Validate Is_OMNI_On(volatile uint32_t *statuses_ptr){
 
 		return (enum Validate)NO;
 	}
+}
+
+uint8_t Reset_and_Stop_MIDI_Software_Timer(uint32_t *midi_counter_ptr, volatile uint32_t *statuses_ptr){
+
+	Clear_Status_Bit(statuses_ptr, Software_MIDI_Timer_Is_Running);
+	Clear_Status_Bit(statuses_ptr, Software_MIDI_Timer_Has_Timed_Out);
+	*midi_counter_ptr = 0;
+
+	return 1;
 }

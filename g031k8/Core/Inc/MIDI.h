@@ -4,6 +4,21 @@
 //MACROS
 #define MIDI_BASIC_CHANNEL_DEFAULT 0 //CH1
 
+#define CHANNEL_MODE_CC_THRESHOLD 120
+
+//channel mode first data byte defines
+#define ALL_SOUND_OFF 120
+#define RESET_ALL_CONTROLLERS 121
+#define LOCAL_CONTROL 122
+//#define ALL_NOTES_OFF 123
+#define OMNI_MODE_OFF 124
+#define OMNI_MODE_ON 125
+//#define MONO_MODE_ON 126
+//#define POLY_MODE_ON 127
+
+#define LOCAL_CONTROL_OFF 0
+#define LOCAL_CONTROL_ON 127
+
 //INCLUDES
 #include <stdint.h>
 #include "utility.h"
@@ -30,7 +45,7 @@ enum MIDI_Channel{
 
 struct MIDI_Data{
 
-	uint8_t MIDI_data_buffer[10];
+	volatile char MIDI_data_buffer[10];
 };
 
 //VARIABLE DECLARATIONS
@@ -44,6 +59,8 @@ enum Validate Is_Status_Byte(volatile char *data);
 enum Validate Is_Data_Byte(volatile char *data);
 enum Validate Is_PC_Status_Byte(volatile char *data);
 enum Validate Is_CC_Status_Byte(volatile char *data);
+enum Validate Is_Utilised_Channel_Mode_CC_First_Data_Byte(volatile char *first_data_byte);
+enum Validate Is_Utilised_CC_First_Data_Byte(volatile char *first_data_byte);
 enum Validate Is_Sysex_Start_Status_Byte(volatile char *data);
 enum Validate Is_Sysex_End_Status_Byte(volatile char *data);
 enum Validate Is_Channel_Status_Byte_On_Basic_Channel(volatile char *data, volatile enum MIDI_Channel MIDI_basic_channel);
@@ -53,5 +70,6 @@ uint8_t Clear_Data_Buffer(volatile struct MIDI_Data *MIDI_data_struct);
 enum Validate Is_Program_Change_Data_Byte_In_Range(volatile char *PC_data, uint8_t size_of_factory_or_user_array);
 enum Validate Is_System_Real_Time_Status_Byte(volatile char *data);
 enum Validate Is_OMNI_On(volatile uint32_t *statuses_ptr);
+uint8_t Reset_and_Stop_MIDI_Software_Timer(uint32_t *midi_counter_ptr, volatile uint32_t *statuses_ptr);
 
 #endif /* SRC_MIDI_H_ */

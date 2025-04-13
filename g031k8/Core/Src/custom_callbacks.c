@@ -652,15 +652,14 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 							if(Is_Program_Change_Data_Byte_In_Range(rx_buffer, NUM_PRESETS) == YES){
 
 								Update_All_with_Converted_Preset_Values(&presets_converted_array[(uint8_t)*rx_buffer], &params, &delay_line);
+								preset_selected = (enum Preset_Selected)*rx_buffer;
 							}
 
-							//whether the program change data byte is in range or not, clear the data buffer and active status byte
+							//whether the program change data byte is in range or not, clear the data buffer and active status byte, and reset timer
 							Clear_Data_Buffer(&MIDI_data);
 							active_status_byte = 0;
 
-							Clear_Status_Bit(&statuses, Software_MIDI_Timer_Is_Running);
-							Clear_Status_Bit(&statuses, Software_MIDI_Timer_Has_Timed_Out);
-							midi_counter = 0;
+							Reset_and_Stop_MIDI_Software_Timer(&midi_counter, &statuses);
 
 						}
 						/*else{
@@ -673,11 +672,33 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
 						if(Is_Data_Buffer_Empty(&MIDI_data) == YES){
 
-													//first data byte received
+							//first data byte received
+							MIDI_data.MIDI_data_buffer[0] = *rx_buffer;
+							midi_counter = 0; //reset timer
+
 						}
 						else{
 
+							//second data byte received
+							MIDI_data.MIDI_data_buffer[1] = *rx_buffer;
+							Reset_and_Stop_MIDI_Software_Timer(&midi_counter, &statuses);
 
+							//if a CC byte is active, either it was received on the basic channel, or OMNI is on, so we can
+							//simply just use it, although we will need to check that when a channel mode message is sent,
+							//that it was received on the basic channel
+
+							if(Is_Utilised_Channel_Mode_CC_First_Data_Byte(&MIDI_data.MIDI_data_buffer[0]) == YES){
+
+								//check on basic channel
+							}
+							else if(Is_Utilised_CC_First_Data_Byte(&MIDI_data.MIDI_data_buffer[0]) == YES){
+
+
+							}
+							else{
+
+								//not a utilised Ch mode message on basic channel, or utilised CC message
+							}
 						}
 
 					}
