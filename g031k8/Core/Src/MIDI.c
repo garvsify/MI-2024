@@ -143,6 +143,90 @@ enum Validate Is_Utilised_CC_First_Data_Byte(volatile char *first_data_byte){
 	}
 }
 
+enum Validate Channel_Mode_CC_Second_Data_Byte_Is_Valid_Given_Utilised_First_Data_Byte(volatile char *first_data_byte, volatile char *second_data_byte){
+
+	if(*first_data_byte == RESET_ALL_CONTROLLERS){
+
+		if(*second_data_byte == 0){
+
+			return (enum Validate)YES;
+		}
+		else{
+
+			return (enum Validate)NO;
+		}
+	}
+	else if(*first_data_byte == LOCAL_CONTROL){
+
+		if((*second_data_byte == 0) || (*second_data_byte == 127)){
+
+			return (enum Validate)YES;
+		}
+		else{
+
+			return (enum Validate)NO;
+		}
+	}
+	else if(*first_data_byte == OMNI_MODE_OFF){
+
+		if((*second_data_byte == 0)){
+
+			return (enum Validate)YES;
+		}
+		else{
+
+			return (enum Validate)NO;
+		}
+	}
+	else if(*first_data_byte == OMNI_MODE_ON){
+
+		if((*second_data_byte == 0)){
+
+			return (enum Validate)YES;
+		}
+		else{
+
+			return (enum Validate)NO;
+		}
+	}
+	else{
+
+		return (enum Validate)NO; //should not even be called if first data byte is always valid
+	}
+}
+
+uint8_t Process_Channel_Mode_Message(volatile struct MIDI_Data *MIDI_data_ptr, uint32_t *statuses_ptr){
+
+	//once it has been determined a CC message on basic channel has been
+	//received, and that the first and second data bytes are valid, this function enacts on the ch mode message
+
+	if(*MIDI_data_ptr->MIDI_data_buffer[0] == RESET_ALL_CONTROLLERS){
+
+		//add code
+	}
+	else if(*MIDI_data_ptr->MIDI_data_buffer[0] == LOCAL_CONTROL){
+
+		if(*MIDI_data_ptr->MIDI_data_buffer[1] == LOCAL_CONTROL_OFF){
+
+			//add code
+		}
+		else if(*MIDI_data_ptr->MIDI_data_buffer[1] == LOCAL_CONTROL_ON){
+
+			//add code
+		}
+	}
+	else if(*MIDI_data_ptr->MIDI_data_buffer[0] == OMNI_NODE_OFF){
+
+		Clear_Status_Bit(statuses_ptr, MIDI_Channel_Voice_Mode);
+	}
+	else if(*MIDI_data_ptr->MIDI_data_buffer[0] == OMNI_NODE_ON){
+
+		Set_Status_Bit(statuses_ptr, MIDI_Channel_Voice_Mode);
+	}
+
+	return 1;
+}
+
 enum Validate Is_Sysex_Start_Status_Byte(volatile char *data){
 
 	uint8_t temp_data = (uint8_t)*data;

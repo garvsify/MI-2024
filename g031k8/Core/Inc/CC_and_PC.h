@@ -110,7 +110,7 @@ extern enum Validate user_presets_used_array[NUM_PRESETS];
 
 //FUNCTION DECLARATIONS
 uint8_t Initialise_Preset_Arrays(void);
-uint8_t Update_Params_If_PC_Mode_Selected(void);
+uint8_t Update_Params_Based_On_Mode_Selected(void);
 
 uint8_t Convert_All_Preset_Values(struct Preset* preset_ptr, struct Preset_Converted* preset_converted_ptr);
 uint8_t Update_All_with_Converted_Preset_Values(struct Preset_Converted* preset_converted_ptr, struct Params* params_ptr, struct Delay_Line* delay_line_ptr);

@@ -628,7 +628,6 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 		}
 		else if(active_status_byte != 0){
 
-			//add code for when there is an active status byte
 			if(Get_Status_Bit(&statuses, Software_MIDI_Timer_Has_Timed_Out) == YES){
 
 				active_status_byte = 0;
@@ -690,6 +689,13 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 							if(Is_Utilised_Channel_Mode_CC_First_Data_Byte(&MIDI_data.MIDI_data_buffer[0]) == YES){
 
 								//check on basic channel
+								if(Is_Channel_Status_Byte_On_Basic_Channel(&active_status_byte, MIDI_basic_channel) == YES){
+
+									if(Channel_Mode_CC_Second_Data_Byte_Is_Valid_Given_Utilised_First_Data_Byte(&MIDI_data.MIDI_data_buffer[0], &MIDI_data.MIDI_data_buffer[1]) == YES){
+
+
+									}
+								}
 							}
 							else if(Is_Utilised_CC_First_Data_Byte(&MIDI_data.MIDI_data_buffer[0]) == YES){
 

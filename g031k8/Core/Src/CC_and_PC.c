@@ -47,7 +47,7 @@ uint8_t Initialise_Preset_Arrays(void){
 	return 1;
 }
 
-uint8_t Update_Params_If_PC_Mode_Selected(void){
+uint8_t Update_Params_Based_On_Mode_Selected(void){
 
 	if(waveshape_fsm.current_state == PC_MODE){
 		Update_Waveshape_with_Converted_Preset_Value(&presets_converted_array[(uint8_t)preset_selected - 1], &params);
@@ -64,6 +64,8 @@ uint8_t Update_Params_If_PC_Mode_Selected(void){
 	if(phase_fsm.current_state == PC_MODE){
 		Update_Phase_with_Converted_Preset_Value(&presets_converted_array[(uint8_t)preset_selected - 1], &delay_line);
 	}
+
+	//@TODO: add code to check if pots are in CC mode
 
 	return 1;
 }

@@ -7,7 +7,7 @@
 #define CHANNEL_MODE_CC_THRESHOLD 120
 
 //channel mode first data byte defines
-#define ALL_SOUND_OFF 120
+//#define ALL_SOUND_OFF 120
 #define RESET_ALL_CONTROLLERS 121
 #define LOCAL_CONTROL 122
 //#define ALL_NOTES_OFF 123
@@ -61,6 +61,7 @@ enum Validate Is_PC_Status_Byte(volatile char *data);
 enum Validate Is_CC_Status_Byte(volatile char *data);
 enum Validate Is_Utilised_Channel_Mode_CC_First_Data_Byte(volatile char *first_data_byte);
 enum Validate Is_Utilised_CC_First_Data_Byte(volatile char *first_data_byte);
+enum Validate Channel_Mode_CC_Second_Data_Byte_Is_Valid_Given_Utilised_First_Data_Byte(volatile char *first_data_byte, volatile char *second_data_byte);
 enum Validate Is_Sysex_Start_Status_Byte(volatile char *data);
 enum Validate Is_Sysex_End_Status_Byte(volatile char *data);
 enum Validate Is_Channel_Status_Byte_On_Basic_Channel(volatile char *data, volatile enum MIDI_Channel MIDI_basic_channel);
