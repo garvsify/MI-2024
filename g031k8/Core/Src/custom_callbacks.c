@@ -649,6 +649,18 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 						if(Is_Data_Buffer_Empty(&MIDI_data) == YES){
 
 							//first data byte received
+							if(Is_Program_Change_Data_Byte_In_Range(rx_buffer, NUM_PRESETS) == YES){
+
+								Update_All_with_Converted_Preset_Values(&presets_converted_array[(uint8_t)*rx_buffer], &params, &delay_line);
+							}
+
+							//whether the program change data byte is in range or not, clear the data buffer and active status byte
+							Clear_Data_Buffer(&MIDI_data);
+							active_status_byte = 0;
+
+							Clear_Status_Bit(&statuses, Software_MIDI_Timer_Is_Running);
+							Clear_Status_Bit(&statuses, Software_MIDI_Timer_Has_Timed_Out);
+							midi_counter = 0;
 
 						}
 						/*else{
