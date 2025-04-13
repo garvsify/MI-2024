@@ -1,3 +1,13 @@
-../Core/Src/MIDI.c:8:15:Is_Status_Byte	0	static
-../Core/Src/MIDI.c:24:15:Is_Program_Change_Data_Byte_In_Range	0	static
-../Core/Src/MIDI.c:38:15:Is_System_Real_Time_Status_Byte	0	static
+../Core/Src/MIDI.c:11:15:Is_Status_Byte	0	static
+../Core/Src/MIDI.c:27:15:Is_Data_Byte	0	static
+../Core/Src/MIDI.c:43:15:Is_PC_Status_Byte	0	static
+../Core/Src/MIDI.c:61:15:Is_CC_Status_Byte	0	static
+../Core/Src/MIDI.c:79:15:Is_Sysex_Start_Status_Byte	0	static
+../Core/Src/MIDI.c:93:15:Is_Sysex_End_Status_Byte	0	static
+../Core/Src/MIDI.c:107:15:Is_Channel_Status_Byte_On_Basic_Channel	8	static
+../Core/Src/MIDI.c:122:15:Is_Data_Buffer_Empty	0	static
+../Core/Src/MIDI.c:141:9:Num_Data_Bytes_Received	0	static
+../Core/Src/MIDI.c:192:9:Clear_Data_Buffer	0	static
+../Core/Src/MIDI.c:202:15:Is_Program_Change_Data_Byte_In_Range	0	static
+../Core/Src/MIDI.c:216:15:Is_System_Real_Time_Status_Byte	0	static
+../Core/Src/MIDI.c:241:15:Is_OMNI_On	8	static

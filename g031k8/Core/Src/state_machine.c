@@ -9,7 +9,6 @@ volatile struct Normal_FSM symmetry_fsm = {.current_state = MANUAL_MODE, .prev_s
 volatile struct Normal_FSM phase_fsm = {.current_state = MANUAL_MODE, .prev_state = NONE};
 volatile struct IP_CAP_FSM IP_CAP_fsm = {.current_state = IDLE, .prev_state = IP_CAP_NONE};
 volatile enum MIDI_CLK_FSM_State MIDI_CLK_fsm = NOT_COMPILING;
-volatile struct MIDI_FSM MIDI_fsm = {.current_state = MIDI_IDLE, .prev_state = MIDI_NONE};
 
 //FUNCTION DEFINITIONS
 uint8_t Advance_Pending_States(void){

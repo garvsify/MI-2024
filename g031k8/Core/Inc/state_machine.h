@@ -13,7 +13,6 @@ volatile extern struct Normal_FSM symmetry_fsm;
 volatile extern struct Normal_FSM phase_fsm;
 volatile extern struct IP_CAP_FSM IP_CAP_fsm;
 volatile extern enum MIDI_CLK_FSM_State MIDI_CLK_fsm;
-volatile extern struct MIDI_FSM MIDI_fsm;
 
 enum MIDI_CLK_FSM_State{
 

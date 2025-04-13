@@ -37,7 +37,7 @@ struct MIDI_Data{
 volatile extern enum MIDI_Channel MIDI_basic_channel;
 volatile extern uint8_t active_status_byte;
 volatile extern uint8_t running_status_byte;
-volatile extern struct MIDI_Data MIDI_data = {.MIDI_data_buffer = 0};
+volatile extern struct MIDI_Data MIDI_data;
 
 //FUNCTION DECLARATIONS
 enum Validate Is_Status_Byte(volatile char *data);
@@ -47,8 +47,9 @@ enum Validate Is_CC_Status_Byte(volatile char *data);
 enum Validate Is_Sysex_Start_Status_Byte(volatile char *data);
 enum Validate Is_Sysex_End_Status_Byte(volatile char *data);
 enum Validate Is_Channel_Status_Byte_On_Basic_Channel(volatile char *data, volatile enum MIDI_Channel MIDI_basic_channel);
-enum Validate Is_Data_Buffer_Empty(struct MIDI_Data *MIDI_data_struct);
-uint8_t Num_Data_Bytes_Received(struct MIDI_Data *MIDI_data_struct);
+enum Validate Is_Data_Buffer_Empty(volatile struct MIDI_Data *MIDI_data_struct);
+uint8_t Num_Data_Bytes_Received(volatile struct MIDI_Data *MIDI_data_struct);
+uint8_t Clear_Data_Buffer(volatile struct MIDI_Data *MIDI_data_struct);
 enum Validate Is_Program_Change_Data_Byte_In_Range(volatile char *PC_data, uint8_t size_of_factory_or_user_array);
 enum Validate Is_System_Real_Time_Status_Byte(volatile char *data);
 enum Validate Is_OMNI_On(volatile uint32_t *statuses_ptr);

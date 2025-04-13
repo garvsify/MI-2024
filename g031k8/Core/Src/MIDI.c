@@ -119,9 +119,9 @@ enum Validate Is_Channel_Status_Byte_On_Basic_Channel(volatile char *data, volat
 	}
 }
 
-enum Validate Is_Data_Buffer_Empty(struct MIDI_Data *MIDI_data_struct){
+enum Validate Is_Data_Buffer_Empty(volatile struct MIDI_Data *MIDI_data_struct){
 
-	uint16_t sum;
+	uint16_t sum = 0;
 
 	for(uint8_t i = 0; i < sizeof(MIDI_data_struct->MIDI_data_buffer); i++){
 
@@ -138,7 +138,7 @@ enum Validate Is_Data_Buffer_Empty(struct MIDI_Data *MIDI_data_struct){
 	}
 }
 
-uint8_t Num_Data_Bytes_Received(struct MIDI_Data *MIDI_data_struct){
+uint8_t Num_Data_Bytes_Received(volatile struct MIDI_Data *MIDI_data_struct){
 
 	if(Is_Data_Buffer_Empty(MIDI_data_struct) == YES){
 
@@ -148,7 +148,7 @@ uint8_t Num_Data_Bytes_Received(struct MIDI_Data *MIDI_data_struct){
 
 		/*if(MIDI_data_struct->MIDI_data_buffer[9] != 0){
 
-			//will only be for Sysex end, and so we won't need to check
+			//will only be for Sysex end, and so we won't need to check how many bytes are present
 		}*/
 		if(MIDI_data_struct->MIDI_data_buffer[8] != 0){
 
@@ -182,11 +182,21 @@ uint8_t Num_Data_Bytes_Received(struct MIDI_Data *MIDI_data_struct){
 
 			return 2;
 		}
-		else if(MIDI_data_struct->MIDI_data_buffer[0] != 0){
+		else{
 
 			return 1;
 		}
 	}
+}
+
+uint8_t Clear_Data_Buffer(volatile struct MIDI_Data *MIDI_data_struct){
+
+	for(uint8_t i = 0; i < sizeof(MIDI_data_struct->MIDI_data_buffer); i++){
+
+		MIDI_data_struct->MIDI_data_buffer[i] = 0;
+	}
+
+	return 1;
 }
 
 enum Validate Is_Program_Change_Data_Byte_In_Range(volatile char *PC_data, uint8_t size_of_factory_or_user_array){

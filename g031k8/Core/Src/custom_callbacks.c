@@ -632,7 +632,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 			if(Get_Status_Bit(&statuses, Software_MIDI_Timer_Has_Timed_Out) == YES){
 
 				active_status_byte = 0;
-				MIDI_data.MIDI_data_buffer = 0;
+				Clear_Data_Buffer(&MIDI_data);
 				//running status is kept
 
 				Clear_Status_Bit(&statuses, Software_MIDI_Timer_Has_Timed_Out);
@@ -642,7 +642,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 			}
 			else{ //not timed out
 
-				if(Is_Data_Byte(*rx_buffer) == YES){
+				if(Is_Data_Byte(rx_buffer) == YES){
 
 					if(Is_PC_Status_Byte((volatile char*)&active_status_byte) == YES){
 
