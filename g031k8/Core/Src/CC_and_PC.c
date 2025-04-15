@@ -65,7 +65,23 @@ uint8_t Update_Params_Based_On_Mode_Selected(void){
 		Update_Phase_with_Converted_Preset_Value(&presets_converted_array[(uint8_t)preset_selected - 1], &delay_line);
 	}
 
-	//@TODO: add code to check if pots are in CC mode
+
+
+	if(waveshape_fsm.current_state == CC_MODE){
+
+	}
+	if(speed_fsm.current_state.shared_state == CC_MODE){
+
+	}
+	if(depth_fsm.current_state == CC_MODE){
+
+	}
+	if(symmetry_fsm.current_state == CC_MODE){
+
+	}
+	if(phase_fsm.current_state == CC_MODE){
+
+	}
 
 	return 1;
 }
@@ -333,6 +349,61 @@ uint8_t Read_and_Interpret_User_Presets_From_Flash(void){
 	Read_and_Interpret_Preset_From_Flash(USER_PRESET_1_FLASH_MEMORY_ADDRESS, &user_preset_1);
 	Read_and_Interpret_Preset_From_Flash(USER_PRESET_2_FLASH_MEMORY_ADDRESS, &user_preset_2);
 	Read_and_Interpret_Preset_From_Flash(USER_PRESET_3_FLASH_MEMORY_ADDRESS, &user_preset_3);
+
+	return 1;
+}
+
+uint8_t Update_Waveshape_with_CC_Value(volatile char *data, struct Params* params_ptr){
+
+	uint8_t waveshape = (uint8_t)*data;
+
+	if(waveshape <= TRIANGLE_MODE_ADC_THRESHOLD){
+		params_ptr->waveshape = TRIANGLE_MODE;
+	}
+	else if (waveshape <= SINE_MODE_ADC_THRESHOLD){
+		params_ptr->waveshape = SINE_MODE;
+	}
+	else if (waveshape <= SQUARE_MODE_ADC_THRESHOLD){
+		params_ptr->waveshape = SQUARE_MODE;
+	}
+
+	return 1;
+}
+
+uint8_t Update_Speed_with_CC_Value(volatile char *data, struct Params* params_ptr){
+
+	uint16_t speed = (uint16_t)*data;
+
+	speed <<= 3; //convert to 10-bit
+	params_ptr->speed = speed;
+
+	return 1;
+}
+
+uint8_t Update_Depth_with_CC_Value(volatile char *data, struct Params* params_ptr){
+
+	uint8_t depth = (uint8_t)*data;
+	params_ptr->depth = depth;
+
+	return 1;
+}
+
+uint8_t Update_Symmetry_with_CC_Value(volatile char *data, struct Params* params_ptr){
+
+	uint8_t symmetry = (uint8_t)*data;
+
+	symmetry <<= 1; //convert to 8-bit
+	params_ptr->symmetry = symmetry;
+
+	return 1;
+}
+
+uint8_t Update_Phase_with_CC_Value(volatile char *data, struct Delay_Line* delay_line_ptr){
+
+	uint8_t phase = (uint8_t)*data;
+
+	phase <<= 2; //convert to 9-bit
+	delay_line_ptr->duty_delay_line_read_pointer_offset = phase;
 
 	return 1;
 }

@@ -21,7 +21,10 @@
 
 //INCLUDES
 #include <stdint.h>
+#include "oscillator.h"
 #include "utility.h"
+
+
 
 //CUSTOM TYPES
 enum MIDI_Channel{
@@ -62,6 +65,8 @@ enum Validate Is_CC_Status_Byte(volatile char *data);
 enum Validate Is_Utilised_Channel_Mode_CC_First_Data_Byte(volatile char *first_data_byte);
 enum Validate Is_Utilised_CC_First_Data_Byte(volatile char *first_data_byte);
 enum Validate Channel_Mode_CC_Second_Data_Byte_Is_Valid_Given_Utilised_First_Data_Byte(volatile char *first_data_byte, volatile char *second_data_byte);
+uint8_t Process_CC_Message(volatile struct MIDI_Data *MIDI_data_ptr, struct Params *params_ptr, struct Delay_Line *delay_line_ptr);
+uint8_t Process_Channel_Mode_Message(volatile struct MIDI_Data *MIDI_data_ptr, volatile uint32_t *statuses_ptr);
 enum Validate Is_Sysex_Start_Status_Byte(volatile char *data);
 enum Validate Is_Sysex_End_Status_Byte(volatile char *data);
 enum Validate Is_Channel_Status_Byte_On_Basic_Channel(volatile char *data, volatile enum MIDI_Channel MIDI_basic_channel);

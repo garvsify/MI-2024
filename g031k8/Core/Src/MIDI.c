@@ -1,6 +1,7 @@
 //INCLUDES
 #include "MIDI.h"
 #include "CC_and_PC.h"
+#include "oscillator.h"
 
 //VARIABLE DEFINITIONS
 volatile enum MIDI_Channel MIDI_basic_channel = MIDI_CH_ONE;
@@ -195,36 +196,72 @@ enum Validate Channel_Mode_CC_Second_Data_Byte_Is_Valid_Given_Utilised_First_Dat
 	}
 }
 
-uint8_t Process_Channel_Mode_Message(volatile struct MIDI_Data *MIDI_data_ptr, uint32_t *statuses_ptr){
+uint8_t Process_Channel_Mode_Message(volatile struct MIDI_Data *MIDI_data_ptr, volatile uint32_t *statuses_ptr){
 
 	//once it has been determined a CC message on basic channel has been
 	//received, and that the first and second data bytes are valid, this function enacts on the ch mode message
 
-	if(*MIDI_data_ptr->MIDI_data_buffer[0] == RESET_ALL_CONTROLLERS){
+	if(MIDI_data_ptr->MIDI_data_buffer[0] == RESET_ALL_CONTROLLERS){
 
 		//add code
 	}
-	else if(*MIDI_data_ptr->MIDI_data_buffer[0] == LOCAL_CONTROL){
+	else if(MIDI_data_ptr->MIDI_data_buffer[0] == LOCAL_CONTROL){
 
-		if(*MIDI_data_ptr->MIDI_data_buffer[1] == LOCAL_CONTROL_OFF){
+		if(MIDI_data_ptr->MIDI_data_buffer[1] == LOCAL_CONTROL_OFF){
 
 			//add code
 		}
-		else if(*MIDI_data_ptr->MIDI_data_buffer[1] == LOCAL_CONTROL_ON){
+		else if(MIDI_data_ptr->MIDI_data_buffer[1] == LOCAL_CONTROL_ON){
 
 			//add code
 		}
 	}
-	else if(*MIDI_data_ptr->MIDI_data_buffer[0] == OMNI_NODE_OFF){
+	else if(MIDI_data_ptr->MIDI_data_buffer[0] == OMNI_MODE_OFF){
 
 		Clear_Status_Bit(statuses_ptr, MIDI_Channel_Voice_Mode);
 	}
-	else if(*MIDI_data_ptr->MIDI_data_buffer[0] == OMNI_NODE_ON){
+	else if(MIDI_data_ptr->MIDI_data_buffer[0] == OMNI_MODE_ON){
 
 		Set_Status_Bit(statuses_ptr, MIDI_Channel_Voice_Mode);
 	}
 
 	return 1;
+}
+
+uint8_t Process_CC_Message(volatile struct MIDI_Data *MIDI_data_ptr, struct Params *params_ptr, struct Delay_Line* delay_line_ptr){
+
+	//once it has been determined a CC message on basic channel/when OMNI enabled has been
+	//received, and that the first data byte is valid, this function enacts on the CC message
+
+	if(MIDI_data_ptr->MIDI_data_buffer[0] == WAVESHAPE_CC){
+
+		Update_Waveshape_with_CC_Value(&MIDI_data_ptr->MIDI_data_buffer[1], params_ptr);
+	}
+	else if(MIDI_data_ptr->MIDI_data_buffer[0] == SPEED_CC){
+
+		Update_Speed_with_CC_Value(&MIDI_data_ptr->MIDI_data_buffer[1], params_ptr);
+	}
+	else if(MIDI_data_ptr->MIDI_data_buffer[0] == DEPTH_CC){
+
+		Update_Depth_with_CC_Value(&MIDI_data_ptr->MIDI_data_buffer[1], params_ptr);
+	}
+	else if(MIDI_data_ptr->MIDI_data_buffer[0] == SYMMETRY_CC){
+
+		Update_Symmetry_with_CC_Value(&MIDI_data_ptr->MIDI_data_buffer[1], params_ptr);
+	}
+	else if(MIDI_data_ptr->MIDI_data_buffer[0] == PHASE_CC){
+
+		Update_Phase_with_CC_Value(&MIDI_data_ptr->MIDI_data_buffer[1], delay_line_ptr);
+	}
+
+	return 1;
+}
+
+uint8_t Reset_All_Controllers(struct Params *params_ptr){
+
+	//Put all pots into CC mode
+
+	//Set the value of the pots to 50%
 }
 
 enum Validate Is_Sysex_Start_Status_Byte(volatile char *data){

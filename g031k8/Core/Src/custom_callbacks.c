@@ -19,7 +19,7 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 	HAL_ADC_Stop_DMA(hadc); //disable ADC DMA
 	Process_ADC_Conversion_Values(&params, &delay_line, ADCResultsDMA);
 
-	Update_Params_If_PC_Mode_Selected();
+	Update_Params_Based_On_Mode_Selected();
 
 	enum Validate first_sync_complete = Get_Status_Bit(&statuses, First_Sync_Complete);
 
@@ -37,6 +37,7 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 
 	//after initial conversion is complete, set the conversion complete flag - leave this after raw/final value processing rather than actually when ADC values are converted for startup routine reasons.
 	if(Get_Status_Bit(&statuses, Initial_ADC_Conversion_Complete) == NO){
+
 		Set_Status_Bit(&statuses, Initial_ADC_Conversion_Complete);
 	}
 
@@ -689,17 +690,17 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 							if(Is_Utilised_Channel_Mode_CC_First_Data_Byte(&MIDI_data.MIDI_data_buffer[0]) == YES){
 
 								//check on basic channel
-								if(Is_Channel_Status_Byte_On_Basic_Channel(&active_status_byte, MIDI_basic_channel) == YES){
+								if(Is_Channel_Status_Byte_On_Basic_Channel((volatile char*)&active_status_byte, MIDI_basic_channel) == YES){
 
 									if(Channel_Mode_CC_Second_Data_Byte_Is_Valid_Given_Utilised_First_Data_Byte(&MIDI_data.MIDI_data_buffer[0], &MIDI_data.MIDI_data_buffer[1]) == YES){
 
-
+										Process_Channel_Mode_Message(&MIDI_data, &statuses);
 									}
 								}
 							}
 							else if(Is_Utilised_CC_First_Data_Byte(&MIDI_data.MIDI_data_buffer[0]) == YES){
 
-
+								Process_CC_Message(&MIDI_data, &params, &delay_line);
 							}
 							else{
 
