@@ -15,13 +15,13 @@
 //INCLUDES
 #include <stdint.h>
 
-#include "utility.h"
 #include "oscillator_params_type.h"
 #include "oscillator.h"
 #include "timers.h"
 #include "tap_tempo.h"
 #include "CLK_IN.h"
-#include <state_machine.h>
+#include "state_machine.h"
+#include "utility.h"
 
 //CUSTOM TYPES
 

@@ -7,8 +7,6 @@
 #define SOFTWARE_MIDI_TIMER_HAS_TIMED_OUT (0b1 << 9)
 #define MIDI_CHANNEL_VOICE_MODE (0b1 << 10)
 
-#define MIDI_MS_NIBBLE_SHIFT 4
-
 volatile extern uint8_t MIDI_CLK_tag;
 
 enum MIDI_Status_Byte{

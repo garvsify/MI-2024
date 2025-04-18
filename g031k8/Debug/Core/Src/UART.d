@@ -1,4 +1,5 @@
 Core/Src/UART.o: ../Core/Src/UART.c ../Core/Inc/UART.h \
+ ../Core/Inc/utility.h ../Core/Inc/input_capture.h ../Core/Inc/main.h \
  ../Core/Inc/config.h ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal.h \
  ../Core/Inc/stm32g0xx_hal_conf.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_rcc.h \
@@ -36,16 +37,19 @@ Core/Src/UART.o: ../Core/Src/UART.c ../Core/Inc/UART.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_tim_ex.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart_ex.h \
- ../Core/Inc/utility.h ../Core/Inc/input_capture.h ../Core/Inc/main.h \
  ../Core/Inc/oscillator.h ../Core/Inc/symmetry_adjustment.h \
  ../Core/Inc/oscillator_params_type.h \
  ../Core/Inc/symmetry_adjustment_types.h \
  ../Core/Inc/oscillator_params_type.h ../Core/Inc/timers.h \
- ../Core/Inc/oscillator_macros.h ../Core/Inc/startup.h \
+ ../Core/Inc/oscillator_macros.h ../Core/Inc/midi_defines.h \
+ ../Core/Inc/delay_line.h ../Core/Inc/startup.h \
  ../Core/Inc/checking_functions.h ../Core/Inc/tap_tempo.h \
  ../Core/Inc/CLK_IN.h ../Core/Inc/state_machine.h ../Core/Inc/UART.h \
- ../Core/Inc/MIDI.h ../Core/Inc/MIDI_defines.h
+ ../Core/Inc/MIDI.h
 ../Core/Inc/UART.h:
+../Core/Inc/utility.h:
+../Core/Inc/input_capture.h:
+../Core/Inc/main.h:
 ../Core/Inc/config.h:
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal.h:
 ../Core/Inc/stm32g0xx_hal_conf.h:
@@ -84,9 +88,6 @@ Core/Src/UART.o: ../Core/Src/UART.c ../Core/Inc/UART.h \
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_tim_ex.h:
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart.h:
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart_ex.h:
-../Core/Inc/utility.h:
-../Core/Inc/input_capture.h:
-../Core/Inc/main.h:
 ../Core/Inc/oscillator.h:
 ../Core/Inc/symmetry_adjustment.h:
 ../Core/Inc/oscillator_params_type.h:
@@ -94,6 +95,8 @@ Core/Src/UART.o: ../Core/Src/UART.c ../Core/Inc/UART.h \
 ../Core/Inc/oscillator_params_type.h:
 ../Core/Inc/timers.h:
 ../Core/Inc/oscillator_macros.h:
+../Core/Inc/midi_defines.h:
+../Core/Inc/delay_line.h:
 ../Core/Inc/startup.h:
 ../Core/Inc/checking_functions.h:
 ../Core/Inc/tap_tempo.h:
@@ -101,4 +104,3 @@ Core/Src/UART.o: ../Core/Src/UART.c ../Core/Inc/UART.h \
 ../Core/Inc/state_machine.h:
 ../Core/Inc/UART.h:
 ../Core/Inc/MIDI.h:
-../Core/Inc/MIDI_defines.h:

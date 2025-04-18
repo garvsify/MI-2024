@@ -4,7 +4,6 @@
 //INCLUDES
 #include <stdint.h>
 
-#include "config.h"
 #include "utility.h"
 
 //VARIABLE DECLARATIONS

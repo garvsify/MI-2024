@@ -2,8 +2,6 @@
 
 #include "stm32g0xx_ll_lptim.h"
 
-#include "CC_and_PC.h" //for some reason compiler shits itself if this is included in startup.h
-
 uint8_t Startup(void){
 
 	//Shouldn't be required now we have a default state set below, even in case flash not programmed //Set_Status_Bit(&statuses, Start_Required_Before_Sync_Mode); //set default mode to requiring START MIDI message before beginning a sync

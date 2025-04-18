@@ -4,7 +4,6 @@
 #include <stdint.h>
 
 #include <checking_functions.h>
-#include <CC_and_PC.h>
 #include <oscillator.h>
 #include <state_machine.h>
 #include "input_capture.h"

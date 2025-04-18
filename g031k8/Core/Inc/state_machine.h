@@ -5,6 +5,12 @@
 //INCLUDES
 #include <stdint.h>
 
+//MACROS
+#define NORMAL_FSM_TYPE 0
+#define SPEED_FSM_TYPE 1
+#define IP_CAP_FSM_TYPE 2
+#define NUM_FSM_TYPES 3
+
 //VARIABLES
 volatile extern struct Speed_FSM speed_fsm;
 volatile extern struct Normal_FSM depth_fsm;
