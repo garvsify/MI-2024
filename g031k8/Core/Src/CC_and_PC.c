@@ -337,3 +337,56 @@ uint8_t Read_and_Interpret_User_Presets_From_Flash(void){
 	return 1;
 }
 
+uint8_t Update_Waveshape_with_CC_Value(volatile uint8_t *data, struct Params* params_ptr){
+
+	if(*data <= TRIANGLE_MODE_ADC_THRESHOLD){
+		params_ptr->waveshape = TRIANGLE_MODE;
+	}
+	else if (*data <= SINE_MODE_ADC_THRESHOLD){
+		params_ptr->waveshape = SINE_MODE;
+	}
+	else if (*data <= SQUARE_MODE_ADC_THRESHOLD){
+		params_ptr->waveshape = SQUARE_MODE;
+	}
+
+	return 1;
+}
+
+uint8_t Update_Speed_with_CC_Value(volatile uint8_t *data, struct Params* params_ptr){
+
+	uint16_t speed = (uint16_t)*data;
+
+	speed <<= 3; //convert to 10-bit
+	params_ptr->speed = speed;
+
+	return 1;
+}
+
+uint8_t Update_Depth_with_CC_Value(volatile uint8_t *data, struct Params* params_ptr){
+
+	uint8_t depth = (uint8_t)*data;
+	params_ptr->depth = depth;
+
+	return 1;
+}
+
+uint8_t Update_Symmetry_with_CC_Value(volatile uint8_t *data, struct Params* params_ptr){
+
+	uint8_t symmetry = (uint8_t)*data;
+
+	symmetry <<= 1; //convert to 8-bit
+	params_ptr->symmetry = symmetry;
+
+	return 1;
+}
+
+uint8_t Update_Phase_with_CC_Value(volatile uint8_t *data, struct Delay_Line* delay_line_ptr){
+
+	uint8_t phase = (uint8_t)*data;
+
+	phase <<= 2; //convert to 9-bit
+	delay_line_ptr->duty_delay_line_read_pointer_offset = phase;
+
+	return 1;
+}
+
