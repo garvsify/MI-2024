@@ -8,7 +8,7 @@
 #include "utility.h"
 
 //VARIABLE DECLARATIONS
-volatile extern char rx_buffer[1];
+volatile extern uint8_t rx_buffer[1];
 volatile extern enum Validate UART_DMA_TX_is_complete;
 
 //FUNCTION DECLARATIONS

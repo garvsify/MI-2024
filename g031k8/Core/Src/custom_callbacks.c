@@ -19,7 +19,7 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 	HAL_ADC_Stop_DMA(hadc); //disable ADC DMA
 	Process_ADC_Conversion_Values(&params, &delay_line, ADCResultsDMA);
 
-	Update_Params_If_PC_Mode_Selected();
+	Update_Params_Based_On_Mode_Selected();
 
 	enum Validate first_sync_complete = Get_Status_Bit(&statuses, First_Sync_Complete);
 
@@ -643,14 +643,14 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
 				if(Is_Data_Byte(rx_buffer) == YES){
 
-					if(Is_PC_Status_Byte((volatile char*)&active_status_byte) == YES){
+					if(Is_PC_Status_Byte(&active_status_byte) == YES){
 
 						if(Is_Data_Buffer_Empty(&MIDI_data) == YES){
 
 							//first data byte received
 							if(Is_Program_Change_Data_Byte_In_Range(rx_buffer, NUM_PRESETS) == YES){
 
-								Update_All_with_Converted_Preset_Values(&presets_converted_array[(uint8_t)*rx_buffer], &params, &delay_line);
+								Update_All_with_Converted_Preset_Values(&presets_converted_array[*rx_buffer], &params, &delay_line);
 								preset_selected = (enum Preset_Selected)*rx_buffer;
 							}
 
@@ -667,7 +667,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 						}*/
 
 					}
-					else if(Is_CC_Status_Byte((volatile char*)&active_status_byte) == YES){
+					else if(Is_CC_Status_Byte(&active_status_byte) == YES){
 
 						if(Is_Data_Buffer_Empty(&MIDI_data) == YES){
 
@@ -708,7 +708,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 						}
 
 					}
-					else if(Is_Sysex_Start_Status_Byte((volatile char*)&active_status_byte) == YES){
+					else if(Is_Sysex_Start_Status_Byte(&active_status_byte) == YES){
 
 						if(Is_Data_Buffer_Empty(&MIDI_data) == YES){
 
@@ -723,15 +723,15 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 				}
 				else{
 
-					if(Is_PC_Status_Byte((volatile char*)&active_status_byte) == YES){
+					if(Is_PC_Status_Byte(&active_status_byte) == YES){
 
 
 					}
-					else if(Is_CC_Status_Byte((volatile char*)&active_status_byte) == YES){
+					else if(Is_CC_Status_Byte(&active_status_byte) == YES){
 
 
 					}
-					else if(Is_Sysex_Start_Status_Byte((volatile char*)&active_status_byte) == YES){
+					else if(Is_Sysex_Start_Status_Byte(&active_status_byte) == YES){
 
 
 					}

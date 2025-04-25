@@ -9,9 +9,9 @@ volatile uint8_t running_status_byte;
 volatile struct MIDI_Data MIDI_data = {.MIDI_data_buffer = 0};
 
 //FUNCTION DEFINITIONS
-enum Validate Is_Status_Byte(volatile char *data){
+enum Validate Is_Status_Byte(volatile uint8_t *data){
 
-	uint8_t MSB = (uint8_t) *data;
+	uint8_t MSB = *data;
 
 	MSB >>= 8;
 
@@ -25,9 +25,9 @@ enum Validate Is_Status_Byte(volatile char *data){
 	}
 }
 
-enum Validate Is_Data_Byte(volatile char *data){
+enum Validate Is_Data_Byte(volatile uint8_t *data){
 
-	uint8_t MSB = (uint8_t) *data;
+	uint8_t MSB = *data;
 
 	MSB >>= 8;
 
@@ -41,13 +41,13 @@ enum Validate Is_Data_Byte(volatile char *data){
 	}
 }
 
-enum Validate Is_PC_Status_Byte(volatile char *data){
+enum Validate Is_PC_Status_Byte(volatile uint8_t *data){
 
 	uint8_t source;
 	uint8_t temp_data;
 
 	source = (uint8_t)CHANNEL_VOICE_PROGRAM_CHANGE >> 4;
-	temp_data = (uint8_t)*data;
+	temp_data = *data;
 
 	if(temp_data == source){
 
@@ -59,13 +59,13 @@ enum Validate Is_PC_Status_Byte(volatile char *data){
 	}
 }
 
-enum Validate Is_CC_Status_Byte(volatile char *data){
+enum Validate Is_CC_Status_Byte(volatile uint8_t *data){
 
 	uint8_t source;
 	uint8_t temp_data;
 
 	source = (uint8_t)CHANNEL_VOICE_CONTROL_CHANGE >> 4;
-	temp_data = (uint8_t)*data;
+	temp_data = *data;
 
 	if(temp_data == source){
 
@@ -77,7 +77,7 @@ enum Validate Is_CC_Status_Byte(volatile char *data){
 	}
 }
 
-enum Validate Is_Utilised_Channel_Mode_CC_First_Data_Byte(volatile char *first_data_byte){
+enum Validate Is_Utilised_Channel_Mode_CC_First_Data_Byte(volatile uint8_t *first_data_byte){
 
 	if(*first_data_byte >= CHANNEL_MODE_CC_THRESHOLD){
 
@@ -108,7 +108,7 @@ enum Validate Is_Utilised_Channel_Mode_CC_First_Data_Byte(volatile char *first_d
 	}
 }
 
-enum Validate Is_Utilised_CC_First_Data_Byte(volatile char *first_data_byte){
+enum Validate Is_Utilised_CC_First_Data_Byte(volatile uint8_t *first_data_byte){
 
 	if(*first_data_byte >= CHANNEL_MODE_CC_THRESHOLD){
 
@@ -143,7 +143,7 @@ enum Validate Is_Utilised_CC_First_Data_Byte(volatile char *first_data_byte){
 	}
 }
 
-enum Validate Channel_Mode_CC_Second_Data_Byte_Is_Valid_Given_Utilised_First_Data_Byte(volatile char *first_data_byte, volatile char *second_data_byte){
+enum Validate Channel_Mode_CC_Second_Data_Byte_Is_Valid_Given_Utilised_First_Data_Byte(volatile uint8_t *first_data_byte, volatile uint8_t *second_data_byte){
 
 	if(*first_data_byte == RESET_ALL_CONTROLLERS){
 
@@ -200,26 +200,26 @@ uint8_t Process_Channel_Mode_Message(volatile struct MIDI_Data *MIDI_data_ptr, u
 	//once it has been determined a CC message on basic channel has been
 	//received, and that the first and second data bytes are valid, this function enacts on the ch mode message
 
-	if(*MIDI_data_ptr->MIDI_data_buffer[0] == RESET_ALL_CONTROLLERS){
+	if(MIDI_data_ptr->MIDI_data_buffer[0] == RESET_ALL_CONTROLLERS){
 
 		//add code
 	}
-	else if(*MIDI_data_ptr->MIDI_data_buffer[0] == LOCAL_CONTROL){
+	else if(MIDI_data_ptr->MIDI_data_buffer[0] == LOCAL_CONTROL){
 
-		if(*MIDI_data_ptr->MIDI_data_buffer[1] == LOCAL_CONTROL_OFF){
+		if(MIDI_data_ptr->MIDI_data_buffer[1] == LOCAL_CONTROL_OFF){
 
 			//add code
 		}
-		else if(*MIDI_data_ptr->MIDI_data_buffer[1] == LOCAL_CONTROL_ON){
+		else if(MIDI_data_ptr->MIDI_data_buffer[1] == LOCAL_CONTROL_ON){
 
 			//add code
 		}
 	}
-	else if(*MIDI_data_ptr->MIDI_data_buffer[0] == OMNI_NODE_OFF){
+	else if(MIDI_data_ptr->MIDI_data_buffer[0] == OMNI_MODE_OFF){
 
 		Clear_Status_Bit(statuses_ptr, MIDI_Channel_Voice_Mode);
 	}
-	else if(*MIDI_data_ptr->MIDI_data_buffer[0] == OMNI_NODE_ON){
+	else if(MIDI_data_ptr->MIDI_data_buffer[0] == OMNI_MODE_ON){
 
 		Set_Status_Bit(statuses_ptr, MIDI_Channel_Voice_Mode);
 	}
@@ -227,11 +227,9 @@ uint8_t Process_Channel_Mode_Message(volatile struct MIDI_Data *MIDI_data_ptr, u
 	return 1;
 }
 
-enum Validate Is_Sysex_Start_Status_Byte(volatile char *data){
+enum Validate Is_Sysex_Start_Status_Byte(volatile uint8_t *data){
 
-	uint8_t temp_data = (uint8_t)*data;
-
-	if(temp_data == (uint8_t)SYSTEM_EXCLUSIVE_START){
+	if(*data == (uint8_t)SYSTEM_EXCLUSIVE_START){
 
 		return (enum Validate)YES;
 	}
@@ -241,11 +239,9 @@ enum Validate Is_Sysex_Start_Status_Byte(volatile char *data){
 	}
 }
 
-enum Validate Is_Sysex_End_Status_Byte(volatile char *data){
+enum Validate Is_Sysex_End_Status_Byte(volatile uint8_t *data){
 
-	uint8_t temp_data = (uint8_t)*data;
-
-	if(temp_data == (uint8_t)SYSTEM_EXCLUSIVE_END){
+	if(*data == (uint8_t)SYSTEM_EXCLUSIVE_END){
 
 		return (enum Validate)YES;
 	}
@@ -255,9 +251,9 @@ enum Validate Is_Sysex_End_Status_Byte(volatile char *data){
 	}
 }
 
-enum Validate Is_Channel_Status_Byte_On_Basic_Channel(volatile char *data, volatile enum MIDI_Channel MIDI_basic_channel){
+enum Validate Is_Channel_Status_Byte_On_Basic_Channel(volatile uint8_t *data, volatile enum MIDI_Channel MIDI_basic_channel){
 
-	uint8_t ch = (uint8_t)*data & 0x0F;
+	uint8_t ch = *data & 0x0F;
 	uint8_t b_ch = (uint8_t)MIDI_basic_channel;
 
 	if(ch == b_ch){
@@ -350,11 +346,9 @@ uint8_t Clear_Data_Buffer(volatile struct MIDI_Data *MIDI_data_struct){
 	return 1;
 }
 
-enum Validate Is_Program_Change_Data_Byte_In_Range(volatile char *PC_data, uint8_t size_of_factory_or_user_array){
+enum Validate Is_Program_Change_Data_Byte_In_Range(volatile uint8_t *PC_data, uint8_t size_of_factory_or_user_array){
 
-	uint8_t PCdata = (uint8_t) *PC_data;
-
-	if(PCdata <= size_of_factory_or_user_array - 1){
+	if(*PC_data <= size_of_factory_or_user_array - 1){
 
 		return (enum Validate)YES;
 	}
@@ -364,7 +358,7 @@ enum Validate Is_Program_Change_Data_Byte_In_Range(volatile char *PC_data, uint8
 	}
 }
 
-enum Validate Is_System_Real_Time_Status_Byte(volatile char *data){
+enum Validate Is_System_Real_Time_Status_Byte(volatile uint8_t *data){
 
 	if(*data == SYSTEM_REAL_TIME_MIDI_CLOCK){
 		return (enum Validate)YES;

@@ -2,7 +2,7 @@
 #include "UART.h"
 
 //VARIABLE DEFINITIONS
-volatile char rx_buffer[1] = {0};
+volatile uint8_t rx_buffer[1] = {0};
 volatile enum Validate UART_DMA_TX_is_complete = YES;
 
 //FUNCTION DEFINITIONS
