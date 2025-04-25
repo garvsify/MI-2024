@@ -139,5 +139,10 @@ uint8_t Update_Converted_Preset_Array_with_User_or_Factory_Presets(struct Preset
 																	const struct Preset **factory_preset_array_ptr,
 																	struct Preset **user_preset_array_ptr,
 																	uint8_t size_of_factory_and_user_arrays);
+uint8_t Update_Waveshape_with_CC_Value(volatile char *data, struct Params* params_ptr);
+uint8_t Update_Speed_with_CC_Value(volatile char *data, struct Params* params_ptr);
+uint8_t Update_Depth_with_CC_Value(volatile char *data, struct Params* params_ptr);
+uint8_t Update_Symmetry_with_CC_Value(volatile char *data, struct Params* params_ptr);
+uint8_t Update_Phase_with_CC_Value(volatile char *data, struct Delay_Line* delay_line_ptr);
 
 #endif /* INC_CC_AND_PC_H_ */
