@@ -11,6 +11,13 @@
 #define SYMMETRY_CC 23
 #define PHASE_CC 24
 
+#define WAVESHAPE_ARR 0
+#define SPEED_ARR 1
+#define DEPTH_ARR 2
+#define SYMMETRY_ARR 3
+#define PHASE_ARR 4
+
+#define NUM_POTS 5
 
 //FACTORY PRESET VALUES
 
@@ -107,6 +114,8 @@ extern struct Preset user_preset_3;
 
 extern enum Validate user_presets_used_array[NUM_PRESETS];
 
+extern uint8_t CC_array[5];
+
 
 //FUNCTION DECLARATIONS
 uint8_t Initialise_Preset_Arrays(void);
@@ -139,10 +148,15 @@ uint8_t Update_Converted_Preset_Array_with_User_or_Factory_Presets(struct Preset
 																	const struct Preset **factory_preset_array_ptr,
 																	struct Preset **user_preset_array_ptr,
 																	uint8_t size_of_factory_and_user_arrays);
-uint8_t Update_Waveshape_with_CC_Value(volatile uint8_t *data, struct Params* params_ptr);
-uint8_t Update_Speed_with_CC_Value(volatile uint8_t *data, struct Params* params_ptr);
-uint8_t Update_Depth_with_CC_Value(volatile uint8_t *data, struct Params* params_ptr);
-uint8_t Update_Symmetry_with_CC_Value(volatile uint8_t *data, struct Params* params_ptr);
-uint8_t Update_Phase_with_CC_Value(volatile uint8_t *data, struct Delay_Line* delay_line_ptr);
+uint8_t Update_Waveshape_with_CC_Value(uint8_t *data, struct Params* params_ptr);
+uint8_t Update_Speed_with_CC_Value(uint8_t *data, struct Params* params_ptr);
+uint8_t Update_Depth_with_CC_Value(uint8_t *data, struct Params* params_ptr);
+uint8_t Update_Symmetry_with_CC_Value(uint8_t *data, struct Params* params_ptr);
+uint8_t Update_Phase_with_CC_Value(uint8_t *data, struct Delay_Line* delay_line_ptr);
+uint8_t Set_Waveshape_to_CC_Mode_and_Value(uint8_t *data);
+uint8_t Set_Speed_to_CC_Mode_and_Value(uint8_t *data);
+uint8_t Set_Depth_to_CC_Mode_and_Value(uint8_t *data);
+uint8_t Set_Symmetry_to_CC_Mode_and_Value(uint8_t *data);
+uint8_t Set_Phase_to_CC_Mode_and_Value(uint8_t *data);
 
 #endif /* INC_CC_AND_PC_H_ */

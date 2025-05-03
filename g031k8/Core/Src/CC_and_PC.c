@@ -21,6 +21,8 @@ struct Preset user_preset_3 = factory_preset_3;
 
 enum Validate user_presets_used_array[NUM_PRESETS] = {(enum Validate)NO};
 
+uint8_t CC_array[5] = {0};
+
 //FUNCTION DEFINITIONS
 uint8_t Initialise_Preset_Arrays(void){
 
@@ -65,7 +67,22 @@ uint8_t Update_Params_Based_On_Mode_Selected(void){
 		Update_Phase_with_Converted_Preset_Value(&presets_converted_array[(uint8_t)preset_selected - 1], &delay_line);
 	}
 
-	//@TODO: add code to check if pots are in CC mode
+
+	if(waveshape_fsm.current_state == CC_MODE){
+		Update_Waveshape_with_CC_Value(&CC_array[WAVESHAPE_ARR], &params);
+	}
+	if(speed_fsm.current_state.shared_state == CC_MODE){
+		Update_Speed_with_CC_Value(&CC_array[SPEED_ARR], &params);
+	}
+	if(depth_fsm.current_state == CC_MODE){
+		Update_Depth_with_CC_Value(&CC_array[DEPTH_ARR], &params);
+	}
+	if(symmetry_fsm.current_state == CC_MODE){
+		Update_Symmetry_with_CC_Value(&CC_array[SYMMETRY_ARR], &params);
+	}
+	if(phase_fsm.current_state == CC_MODE){
+		Update_Phase_with_CC_Value(&CC_array[PHASE_ARR], &delay_line);
+	}
 
 	return 1;
 }
@@ -337,7 +354,7 @@ uint8_t Read_and_Interpret_User_Presets_From_Flash(void){
 	return 1;
 }
 
-uint8_t Update_Waveshape_with_CC_Value(volatile uint8_t *data, struct Params* params_ptr){
+uint8_t Update_Waveshape_with_CC_Value(uint8_t *data, struct Params* params_ptr){
 
 	if(*data <= TRIANGLE_MODE_ADC_THRESHOLD){
 		params_ptr->waveshape = TRIANGLE_MODE;
@@ -352,7 +369,7 @@ uint8_t Update_Waveshape_with_CC_Value(volatile uint8_t *data, struct Params* pa
 	return 1;
 }
 
-uint8_t Update_Speed_with_CC_Value(volatile uint8_t *data, struct Params* params_ptr){
+uint8_t Update_Speed_with_CC_Value(uint8_t *data, struct Params* params_ptr){
 
 	uint16_t speed = (uint16_t)*data;
 
@@ -362,7 +379,7 @@ uint8_t Update_Speed_with_CC_Value(volatile uint8_t *data, struct Params* params
 	return 1;
 }
 
-uint8_t Update_Depth_with_CC_Value(volatile uint8_t *data, struct Params* params_ptr){
+uint8_t Update_Depth_with_CC_Value(uint8_t *data, struct Params* params_ptr){
 
 	uint8_t depth = (uint8_t)*data;
 	params_ptr->depth = depth;
@@ -370,7 +387,7 @@ uint8_t Update_Depth_with_CC_Value(volatile uint8_t *data, struct Params* params
 	return 1;
 }
 
-uint8_t Update_Symmetry_with_CC_Value(volatile uint8_t *data, struct Params* params_ptr){
+uint8_t Update_Symmetry_with_CC_Value(uint8_t *data, struct Params* params_ptr){
 
 	uint8_t symmetry = (uint8_t)*data;
 
@@ -380,12 +397,62 @@ uint8_t Update_Symmetry_with_CC_Value(volatile uint8_t *data, struct Params* par
 	return 1;
 }
 
-uint8_t Update_Phase_with_CC_Value(volatile uint8_t *data, struct Delay_Line* delay_line_ptr){
+uint8_t Update_Phase_with_CC_Value(uint8_t *data, struct Delay_Line* delay_line_ptr){
 
 	uint8_t phase = (uint8_t)*data;
 
 	phase <<= 2; //convert to 9-bit
 	delay_line_ptr->duty_delay_line_read_pointer_offset = phase;
+
+	return 1;
+}
+
+uint8_t Set_Waveshape_to_CC_Mode_and_Value(uint8_t *data){
+
+	waveshape_fsm.prev_state = waveshape_fsm.current_state;
+	waveshape_fsm.current_state = CC_MODE;
+
+	CC_array[WAVESHAPE_ARR] = *data;
+
+	return 1;
+}
+
+uint8_t Set_Speed_to_CC_Mode_and_Value(uint8_t *data){
+
+	speed_fsm.prev_state.speed_exclusive_state = speed_fsm.current_state.speed_exclusive_state;
+	speed_fsm.current_state.speed_exclusive_state = CC_MODE;
+
+	CC_array[SPEED_ARR] = *data;
+
+	return 1;
+}
+
+uint8_t Set_Depth_to_CC_Mode_and_Value(uint8_t *data){
+
+	depth_fsm.prev_state = depth_fsm.current_state;
+	depth_fsm.current_state = CC_MODE;
+
+	CC_array[DEPTH_ARR] = *data;
+
+	return 1;
+}
+
+uint8_t Set_Symmetry_to_CC_Mode_and_Value(uint8_t *data){
+
+	symmetry_fsm.prev_state = symmetry_fsm.current_state;
+	symmetry_fsm.current_state = CC_MODE;
+
+	CC_array[SYMMETRY_ARR] = *data;
+
+	return 1;
+}
+
+uint8_t Set_Phase_to_CC_Mode_and_Value(uint8_t *data){
+
+	phase_fsm.prev_state = phase_fsm.current_state;
+	phase_fsm.current_state = CC_MODE;
+
+	CC_array[PHASE_ARR] = *data;
 
 	return 1;
 }

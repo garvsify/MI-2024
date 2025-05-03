@@ -65,7 +65,7 @@ enum Validate Channel_Mode_CC_Second_Data_Byte_Is_Valid_Given_Utilised_First_Dat
 uint8_t Process_Channel_Mode_Message(volatile struct MIDI_Data *MIDI_data_ptr, uint32_t *statuses_ptr);
 enum Validate Is_Sysex_Start_Status_Byte(volatile uint8_t *data);
 enum Validate Is_Sysex_End_Status_Byte(volatile uint8_t *data);
-enum Validate Is_Channel_Status_Byte_On_Basic_Channel(volatile uint8_t *data, volatile enum MIDI_Channel MIDI_basic_channel);
+enum Validate Is_Channelised_Status_Byte_On_Basic_Channel(volatile uint8_t *data, volatile enum MIDI_Channel MIDI_basic_channel);
 enum Validate Is_Data_Buffer_Empty(volatile struct MIDI_Data *MIDI_data_struct);
 uint8_t Num_Data_Bytes_Received(volatile struct MIDI_Data *MIDI_data_struct);
 uint8_t Clear_Data_Buffer(volatile struct MIDI_Data *MIDI_data_struct);
@@ -73,5 +73,9 @@ enum Validate Is_Program_Change_Data_Byte_In_Range(volatile uint8_t *PC_data, ui
 enum Validate Is_System_Real_Time_Status_Byte(volatile uint8_t *data);
 enum Validate Is_OMNI_On(volatile uint32_t *statuses_ptr);
 uint8_t Reset_and_Stop_MIDI_Software_Timer(uint32_t *midi_counter_ptr, volatile uint32_t *statuses_ptr);
+uint8_t Reset_All_Controllers();
+uint8_t Set_Local_Control();
+uint8_t Set_OMNI_Off(volatile uint32_t *statuses_ptr);
+uint8_t Set_OMNI_On(volatile uint32_t *statuses_ptr);
 
 #endif /* SRC_MIDI_H_ */

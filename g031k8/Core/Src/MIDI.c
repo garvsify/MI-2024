@@ -251,7 +251,7 @@ enum Validate Is_Sysex_End_Status_Byte(volatile uint8_t *data){
 	}
 }
 
-enum Validate Is_Channel_Status_Byte_On_Basic_Channel(volatile uint8_t *data, volatile enum MIDI_Channel MIDI_basic_channel){
+enum Validate Is_Channelised_Status_Byte_On_Basic_Channel(volatile uint8_t *data, volatile enum MIDI_Channel MIDI_basic_channel){
 
 	uint8_t ch = *data & 0x0F;
 	uint8_t b_ch = (uint8_t)MIDI_basic_channel;
@@ -402,6 +402,67 @@ uint8_t Reset_and_Stop_MIDI_Software_Timer(uint32_t *midi_counter_ptr, volatile 
 	Clear_Status_Bit(statuses_ptr, Software_MIDI_Timer_Is_Running);
 	Clear_Status_Bit(statuses_ptr, Software_MIDI_Timer_Has_Timed_Out);
 	*midi_counter_ptr = 0;
+
+	return 1;
+}
+
+uint8_t Reset_All_Controllers(struct Params *params_ptr, struct Delay_Line* delay_line_ptr){
+
+	//Store previous states
+	waveshape_fsm.prev_state = waveshape_fsm.current_state;
+	speed_fsm.prev_state.speed_exclusive_state = speed_fsm.current_state.speed_exclusive_state;
+	depth_fsm.prev_state = depth_fsm.current_state;
+	symmetry_fsm.prev_state = symmetry_fsm.current_state;
+	phase_fsm.prev_state = phase_fsm.current_state;
+
+	//Put all pots into CC mode
+	waveshape_fsm.current_state = CC_MODE;
+	speed_fsm.current_state.speed_exclusive_state = CC_MODE;
+	depth_fsm.current_state = CC_MODE;
+	symmetry_fsm.current_state = CC_MODE;
+	phase_fsm.current_state = CC_MODE;
+
+	uint8_t data = 127 >> 1;
+
+	for(uint8_t index = 0; index < NUM_POTS; index++){
+
+		CC_array[index] = data;
+	}
+
+	return 1;
+}
+
+uint8_t Set_Local_Control(){
+
+	//Store previous states
+	waveshape_fsm.prev_state = waveshape_fsm.current_state;
+	speed_fsm.prev_state.speed_exclusive_state = speed_fsm.current_state.speed_exclusive_state;
+	depth_fsm.prev_state = depth_fsm.current_state;
+	symmetry_fsm.prev_state = symmetry_fsm.current_state;
+	phase_fsm.prev_state = phase_fsm.current_state;
+
+	//Put all pots into manual mode
+	waveshape_fsm.current_state = MANUAL_MODE;
+	speed_fsm.current_state.speed_exclusive_state = MANUAL_MODE;
+	depth_fsm.current_state = MANUAL_MODE;
+	symmetry_fsm.current_state = MANUAL_MODE;
+	phase_fsm.current_state = MANUAL_MODE;
+
+	return 1;
+}
+
+uint8_t Set_OMNI_Off(volatile uint32_t *statuses_ptr){
+
+	//Clear status bit
+	Clear_Status_Bit(statuses_ptr, MIDI_Channel_Voice_Mode);
+
+	return 1;
+}
+
+uint8_t Set_OMNI_On(volatile uint32_t *statuses_ptr){
+
+	//Set status bit
+	Set_Status_Bit(statuses_ptr, MIDI_Channel_Voice_Mode);
 
 	return 1;
 }

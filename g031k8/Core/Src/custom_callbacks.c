@@ -561,69 +561,60 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
 		if(active_status_byte == 0){
 
-			if(running_status_byte == 0){
+			//whether there is a running status or not, the code is the same here
 
-				if(Is_Data_Buffer_Empty(&MIDI_data) == YES){
+			if(Is_Data_Buffer_Empty(&MIDI_data) == YES){
 
-					if(Is_Status_Byte(rx_buffer) == YES){
+				if(Is_Status_Byte(rx_buffer) == YES){
 
-						if(Is_PC_Status_Byte(rx_buffer) == YES){
+					if(Is_PC_Status_Byte(rx_buffer) == YES){
 
-							running_status_byte = (uint8_t)*rx_buffer;
+						running_status_byte = (uint8_t)*rx_buffer;
 
-							if(Is_Channel_Status_Byte_On_Basic_Channel(rx_buffer, MIDI_basic_channel) == YES){
-
-								active_status_byte = (uint8_t)*rx_buffer;
-								Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
-
-							}
-							else{
-
-								if(Is_OMNI_On(&statuses) == YES){
-
-									active_status_byte = (uint8_t)*rx_buffer;
-									Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
-
-								}
-							}
-						}
-						else if(Is_CC_Status_Byte(rx_buffer) == YES){
-
-							running_status_byte = (uint8_t)*rx_buffer;
-
-							if(Is_Channel_Status_Byte_On_Basic_Channel(rx_buffer, MIDI_basic_channel) == YES){
-
-								active_status_byte = (uint8_t)*rx_buffer;
-								Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
-
-							}
-							else{
-
-								if(Is_OMNI_On(&statuses) == YES){
-
-									active_status_byte = (uint8_t)*rx_buffer;
-									Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
-
-								}
-							}
-						}
-						else if(Is_Sysex_Start_Status_Byte(rx_buffer) == YES){
+						if(Is_Channelised_Status_Byte_On_Basic_Channel(rx_buffer, MIDI_basic_channel) == YES){
 
 							active_status_byte = (uint8_t)*rx_buffer;
-							running_status_byte = 0;
 							Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
 
 						}
+						else{
+
+							if(Is_OMNI_On(&statuses) == YES){
+
+								active_status_byte = (uint8_t)*rx_buffer;
+								Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
+
+							}
+						}
 					}
-					/*else if(Is_Status_Byte(rx_buffer) == NO){
+					else if(Is_CC_Status_Byte(rx_buffer) == YES){
 
-						//DO NOTHIMG
-					}*/
+						running_status_byte = (uint8_t)*rx_buffer;
+
+						if(Is_Channelised_Status_Byte_On_Basic_Channel(rx_buffer, MIDI_basic_channel) == YES){
+
+							active_status_byte = (uint8_t)*rx_buffer;
+							Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
+
+						}
+						else{
+
+							if(Is_OMNI_On(&statuses) == YES){
+
+								active_status_byte = (uint8_t)*rx_buffer;
+								Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
+
+							}
+						}
+					}
+					else if(Is_Sysex_Start_Status_Byte(rx_buffer) == YES){
+
+						active_status_byte = (uint8_t)*rx_buffer;
+						running_status_byte = 0;
+						Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
+
+					}
 				}
-			}
-			else if(running_status_byte != 0){
-
-				//add code for when no active status byte, but there is a running status byte
 			}
 		}
 		else if(active_status_byte != 0){
@@ -661,11 +652,6 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 							Reset_and_Stop_MIDI_Software_Timer(&midi_counter, &statuses);
 
 						}
-						/*else{
-
-							PC messages do not require more than 1 data byte
-						}*/
-
 					}
 					else if(Is_CC_Status_Byte(&active_status_byte) == YES){
 
@@ -676,7 +662,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 							midi_counter = 0; //reset timer
 
 						}
-						else{
+						else{ //not empty
 
 							//second data byte received
 							MIDI_data.MIDI_data_buffer[1] = *rx_buffer;
@@ -689,26 +675,75 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 							if(Is_Utilised_Channel_Mode_CC_First_Data_Byte(&MIDI_data.MIDI_data_buffer[0]) == YES){
 
 								//check on basic channel
-								if(Is_Channel_Status_Byte_On_Basic_Channel(&active_status_byte, MIDI_basic_channel) == YES){
+								if(Is_Channelised_Status_Byte_On_Basic_Channel(&active_status_byte, MIDI_basic_channel) == YES){
 
 									if(Channel_Mode_CC_Second_Data_Byte_Is_Valid_Given_Utilised_First_Data_Byte(&MIDI_data.MIDI_data_buffer[0], &MIDI_data.MIDI_data_buffer[1]) == YES){
 
+										//Implement new channel mode
+										if(MIDI_data.MIDI_data_buffer[1] == RESET_ALL_CONTROLLERS){
 
+											Reset_All_Controllers(&params, &delay_line);
+										}
+										else if(MIDI_data.MIDI_data_buffer[1] == LOCAL_CONTROL){
+
+											Set_Local_Control();
+										}
+										else if(MIDI_data.MIDI_data_buffer[1] == OMNI_MODE_OFF){
+
+											Set_OMNI_Off(&statuses);
+										}
+										else if(MIDI_data.MIDI_data_buffer[1] == OMNI_MODE_ON){
+
+											Set_OMNI_On(&statuses);
+										}
 									}
 								}
+
+								active_status_byte = 0;
+								Clear_Data_Buffer(&MIDI_data);
+
 							}
 							else if(Is_Utilised_CC_First_Data_Byte(&MIDI_data.MIDI_data_buffer[0]) == YES){
 
+								if((Is_Channelised_Status_Byte_On_Basic_Channel(&active_status_byte, MIDI_basic_channel) == YES)
+										|| (Is_OMNI_On(&statuses) == YES)){
 
+									if(MIDI_data.MIDI_data_buffer[0] == WAVESHAPE_CC){
+
+										Set_Waveshape_to_CC_Mode_and_Value((uint8_t*)&MIDI_data.MIDI_data_buffer[1]);
+									}
+									else if(MIDI_data.MIDI_data_buffer[0] == SPEED_CC){
+
+										Set_Speed_to_CC_Mode_and_Value((uint8_t*)&MIDI_data.MIDI_data_buffer[1]);
+									}
+									else if(MIDI_data.MIDI_data_buffer[0] == DEPTH_CC){
+
+										Set_Depth_to_CC_Mode_and_Value((uint8_t*)&MIDI_data.MIDI_data_buffer[1]);
+									}
+									else if(MIDI_data.MIDI_data_buffer[0] == SYMMETRY_CC){
+
+										Set_Symmetry_to_CC_Mode_and_Value((uint8_t*)&MIDI_data.MIDI_data_buffer[1]);
+									}
+									else if(MIDI_data.MIDI_data_buffer[0] == PHASE_CC){
+
+										Set_Phase_to_CC_Mode_and_Value((uint8_t*)&MIDI_data.MIDI_data_buffer[1]);
+									}
+								}
+
+								active_status_byte = 0;
+								Clear_Data_Buffer(&MIDI_data);
 							}
 							else{
 
 								//not a utilised Ch mode message on basic channel, or utilised CC message
+								active_status_byte = 0;
+								Clear_Data_Buffer(&MIDI_data);
 							}
 						}
-
 					}
 					else if(Is_Sysex_Start_Status_Byte(&active_status_byte) == YES){
+
+						//@TODO
 
 						if(Is_Data_Buffer_Empty(&MIDI_data) == YES){
 
@@ -721,24 +756,63 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
 					}
 				}
-				else{
+				else{ // is a status byte -> status byte interrupts an active status byte (when data bytes should be being received)
 
-					if(Is_PC_Status_Byte(&active_status_byte) == YES){
+					Clear_Data_Buffer(&MIDI_data);
+					Reset_and_Stop_MIDI_Software_Timer(&midi_counter, &statuses);
 
+					if(Is_PC_Status_Byte(rx_buffer) == YES){
 
+						running_status_byte = (uint8_t)*rx_buffer;
+
+						if(Is_Channelised_Status_Byte_On_Basic_Channel(rx_buffer, MIDI_basic_channel) == YES){
+
+							active_status_byte = (uint8_t)*rx_buffer;
+							Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
+
+						}
+						else{
+
+							if(Is_OMNI_On(&statuses) == YES){
+
+								active_status_byte = (uint8_t)*rx_buffer;
+								Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
+
+							}
+						}
 					}
-					else if(Is_CC_Status_Byte(&active_status_byte) == YES){
+					else if(Is_CC_Status_Byte(rx_buffer) == YES){
 
+						running_status_byte = (uint8_t)*rx_buffer;
 
+						if(Is_Channelised_Status_Byte_On_Basic_Channel(rx_buffer, MIDI_basic_channel) == YES){
+
+							active_status_byte = (uint8_t)*rx_buffer;
+							Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
+
+						}
+						else{
+
+							if(Is_OMNI_On(&statuses) == YES){
+
+								active_status_byte = (uint8_t)*rx_buffer;
+								Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
+
+							}
+						}
 					}
-					else if(Is_Sysex_Start_Status_Byte(&active_status_byte) == YES){
+					else if(Is_Sysex_Start_Status_Byte(rx_buffer) == YES){
 
+						active_status_byte = (uint8_t)*rx_buffer;
+						running_status_byte = 0;
+						Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
 
 					}
 				}
 			}
 		}
 	}
+
 	*rx_buffer = 0;
 
 	HAL_UART_Receive_DMA(&huart2, (uint8_t*)rx_buffer, sizeof(rx_buffer));
