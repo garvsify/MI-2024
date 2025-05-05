@@ -271,7 +271,7 @@ uint8_t Read_and_Interpret_Misc_From_Flash(uint32_t address_val, enum Validate *
 
 	uint8_t *address = (uint8_t *)address_val;
 
-	uint8_t interpretted_value = 0;
+	volatile uint8_t interpretted_value = 0;
 
 	//PRESETS
 	for(uint8_t i = 0; i < num_presets; i++){
@@ -294,7 +294,7 @@ uint8_t Read_and_Interpret_Misc_From_Flash(uint32_t address_val, enum Validate *
 	if(interpretted_value == (enum Validate)NO){
 		Clear_Status_Bit(statuses_ptr, Start_Required_Before_Sync_Mode);
 	}
-	else if(interpretted_value == (enum Validate)YES){
+	else if((interpretted_value == (enum Validate)YES) || (interpretted_value == 0xFF)){
 		Set_Status_Bit(statuses_ptr, Start_Required_Before_Sync_Mode);
 	}
 
@@ -304,14 +304,14 @@ uint8_t Read_and_Interpret_Misc_From_Flash(uint32_t address_val, enum Validate *
 	if(interpretted_value == (enum Validate)NO){
 		Clear_Status_Bit(statuses_ptr, MIDI_Channel_Voice_Mode); //OMNI OFF
 	}
-	else if(interpretted_value == (enum Validate)YES){
+	else if((interpretted_value == (enum Validate)YES) || (interpretted_value == 0xFF)){
 		Set_Status_Bit(statuses_ptr, MIDI_Channel_Voice_Mode); //OMNI ON
 	}
 
 	//BASIC CHANNEL
 	interpretted_value = *(address + num_presets + 2);
 
-	if(interpretted_value >= 16){
+	if(interpretted_value > 15){
 
 		uint8_t midi_channel_default = MIDI_BASIC_CHANNEL_DEFAULT;
 

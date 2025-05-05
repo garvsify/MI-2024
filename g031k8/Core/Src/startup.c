@@ -34,8 +34,6 @@ uint8_t Startup(void){
 															  factory_presets_array,
 															  user_presets_array,
 															  NUM_PRESETS);
-	//Does this unbrick things?
-	Set_Status_Bit(&statuses, Start_Required_Before_Sync_Mode);
 
 	//GET ADC VALUES
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions);
