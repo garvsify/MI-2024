@@ -10,7 +10,7 @@ const struct Preset factory_preset_3 = {.waveshape = FACTORY_PRESET_3_WAVESHAPE,
 //VARIABLE DEFINITIONS
 const struct Preset *factory_presets_array[NUM_PRESETS] = {0};
 volatile struct Preset *user_presets_array[NUM_PRESETS] = {0};
-volatile struct Preset_Converted presets_converted_array[NUM_PRESETS] = {0}; //elements are volatile
+volatile struct Preset_Converted presets_converted_array[NUM_PRESETS] = {0};
 volatile enum Preset_Selected preset_selected = NO_PRESET_SELECTED;
 
 //default values that may be selectively over-written by the user - and which are overwritten by flash-reads upon startup

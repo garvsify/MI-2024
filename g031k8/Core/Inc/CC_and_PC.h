@@ -114,6 +114,7 @@ volatile extern enum Validate user_presets_used_array[NUM_PRESETS];
 
 volatile extern uint8_t CC_array[5];
 
+volatile extern enum Preset_Selected preset_selected;
 
 //FUNCTION DECLARATIONS
 uint8_t Initialise_Preset_Arrays(void);
