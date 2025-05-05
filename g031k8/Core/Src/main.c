@@ -5,6 +5,8 @@ Issues:
 
 - When the MIDI CLKs are ceased, the device goes back into manual mode when the speed pot isn't wiggled
 
+- PC not working properly
+
 Potential Issues:
 
 

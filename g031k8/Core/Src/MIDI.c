@@ -348,7 +348,7 @@ uint8_t Clear_Data_Buffer(volatile struct MIDI_Data *MIDI_data_struct){
 
 enum Validate Is_Program_Change_Data_Byte_In_Range(volatile uint8_t *PC_data, uint8_t size_of_factory_or_user_array){
 
-	if(*PC_data <= size_of_factory_or_user_array - 1){
+	if(*PC_data < size_of_factory_or_user_array){
 
 		return (enum Validate)YES;
 	}

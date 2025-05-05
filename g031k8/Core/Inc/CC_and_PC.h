@@ -158,5 +158,6 @@ uint8_t Set_Speed_to_CC_Mode_and_Value(uint8_t *data);
 uint8_t Set_Depth_to_CC_Mode_and_Value(uint8_t *data);
 uint8_t Set_Symmetry_to_CC_Mode_and_Value(uint8_t *data);
 uint8_t Set_Phase_to_CC_Mode_and_Value(uint8_t *data);
+uint8_t Set_All_Pots_to_PC_Mode();
 
 #endif /* INC_CC_AND_PC_H_ */

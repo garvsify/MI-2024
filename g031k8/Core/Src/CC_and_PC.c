@@ -457,3 +457,23 @@ uint8_t Set_Phase_to_CC_Mode_and_Value(uint8_t *data){
 	return 1;
 }
 
+uint8_t Set_All_Pots_to_PC_Mode(){
+
+	waveshape_fsm.prev_state = waveshape_fsm.current_state;
+	waveshape_fsm.current_state = PC_MODE;
+
+	speed_fsm.prev_state.speed_exclusive_state = speed_fsm.current_state.speed_exclusive_state;
+	speed_fsm.current_state.shared_state = PC_MODE;
+
+	depth_fsm.prev_state = depth_fsm.current_state;
+	depth_fsm.current_state = PC_MODE;
+
+	symmetry_fsm.prev_state = symmetry_fsm.current_state;
+	symmetry_fsm.current_state = PC_MODE;
+
+	phase_fsm.prev_state = phase_fsm.current_state;
+	phase_fsm.current_state = PC_MODE;
+
+	return 1;
+}
+

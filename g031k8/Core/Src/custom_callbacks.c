@@ -641,8 +641,9 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 							//first data byte received
 							if(Is_Program_Change_Data_Byte_In_Range(rx_buffer, NUM_PRESETS) == YES){
 
-								Update_All_with_Converted_Preset_Values(&presets_converted_array[*rx_buffer], &params, &delay_line);
-								preset_selected = (enum Preset_Selected)*rx_buffer;
+								//not needed! //Update_All_with_Converted_Preset_Values(&presets_converted_array[*rx_buffer], &params, &delay_line);
+								Set_All_Pots_to_PC_Mode();
+								preset_selected = (enum Preset_Selected)*rx_buffer + 1; //since 0 is no preset selected, we have to add 1
 							}
 
 							//whether the program change data byte is in range or not, clear the data buffer and active status byte, and reset timer
