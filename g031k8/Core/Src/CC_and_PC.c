@@ -9,19 +9,19 @@ const struct Preset factory_preset_3 = {.waveshape = FACTORY_PRESET_3_WAVESHAPE,
 
 //VARIABLE DEFINITIONS
 const struct Preset *factory_presets_array[NUM_PRESETS] = {0};
-struct Preset *user_presets_array[NUM_PRESETS] = {0};
-struct Preset_Converted presets_converted_array[NUM_PRESETS] = {0};
-enum Preset_Selected preset_selected = NO_PRESET_SELECTED;
+volatile struct Preset *user_presets_array[NUM_PRESETS] = {0};
+volatile struct Preset_Converted presets_converted_array[NUM_PRESETS] = {0}; //elements are volatile
+volatile enum Preset_Selected preset_selected = NO_PRESET_SELECTED;
 
 //default values that may be selectively over-written by the user - and which are overwritten by flash-reads upon startup
-struct Preset user_preset_0 = factory_preset_0;
-struct Preset user_preset_1 = factory_preset_1;
-struct Preset user_preset_2 = factory_preset_2;
-struct Preset user_preset_3 = factory_preset_3;
+volatile struct Preset user_preset_0 = factory_preset_0;
+volatile struct Preset user_preset_1 = factory_preset_1;
+volatile struct Preset user_preset_2 = factory_preset_2;
+volatile struct Preset user_preset_3 = factory_preset_3;
 
-enum Validate user_presets_used_array[NUM_PRESETS] = {(enum Validate)NO};
+volatile enum Validate user_presets_used_array[NUM_PRESETS] = {(enum Validate)NO};
 
-uint8_t CC_array[5] = {0};
+volatile uint8_t CC_array[5] = {0};
 
 //FUNCTION DEFINITIONS
 uint8_t Initialise_Preset_Arrays(void){
@@ -88,7 +88,7 @@ uint8_t Update_Params_Based_On_Mode_Selected(void){
 }
 
 
-uint8_t Convert_All_Preset_Values(struct Preset* preset_ptr, struct Preset_Converted* preset_converted_ptr){
+uint8_t Convert_All_Preset_Values(volatile struct Preset* preset_ptr, volatile struct Preset_Converted* preset_converted_ptr){
 
 	preset_converted_ptr->waveshape = preset_ptr->waveshape; //7-bit copy
 	preset_converted_ptr->speed = (preset_ptr->speed) << 3; //convert to 10-bit
@@ -124,7 +124,7 @@ uint8_t Update_All_with_Converted_Preset_Values(struct Preset_Converted* preset_
 	return 1;
 }
 
-uint8_t Update_Waveshape_with_Converted_Preset_Value(struct Preset_Converted* preset_converted_ptr, struct Params* params_ptr){
+uint8_t Update_Waveshape_with_Converted_Preset_Value(volatile struct Preset_Converted* preset_converted_ptr, struct Params* params_ptr){
 
 	uint8_t waveshape = preset_converted_ptr->waveshape;
 
@@ -141,63 +141,63 @@ uint8_t Update_Waveshape_with_Converted_Preset_Value(struct Preset_Converted* pr
 	return 1;
 }
 
-uint8_t Update_Speed_with_Converted_Preset_Value(struct Preset_Converted* preset_converted_ptr, struct Params* params_ptr){
+uint8_t Update_Speed_with_Converted_Preset_Value(volatile struct Preset_Converted* preset_converted_ptr, struct Params* params_ptr){
 
 	params_ptr->speed = preset_converted_ptr->speed;
 
 	return 1;
 }
 
-uint8_t Update_Depth_with_Converted_Preset_Value(struct Preset_Converted* preset_converted_ptr, struct Params* params_ptr){
+uint8_t Update_Depth_with_Converted_Preset_Value(volatile struct Preset_Converted* preset_converted_ptr, struct Params* params_ptr){
 
 	params_ptr->depth = preset_converted_ptr->depth;
 
 	return 1;
 }
 
-uint8_t Update_Symmetry_with_Converted_Preset_Value(struct Preset_Converted* preset_converted_ptr, struct Params* params_ptr){
+uint8_t Update_Symmetry_with_Converted_Preset_Value(volatile struct Preset_Converted* preset_converted_ptr, struct Params* params_ptr){
 
 	params_ptr->symmetry = preset_converted_ptr->symmetry;
 
 	return 1;
 }
 
-uint8_t Update_Phase_with_Converted_Preset_Value(struct Preset_Converted* preset_converted_ptr, struct Delay_Line* delay_line_ptr){
+uint8_t Update_Phase_with_Converted_Preset_Value(volatile struct Preset_Converted* preset_converted_ptr, struct Delay_Line* delay_line_ptr){
 
 	delay_line_ptr->duty_delay_line_read_pointer_offset = preset_converted_ptr->phase;
 
 	return 1;
 }
 
-uint8_t Convert_Waveshape_Preset_Value(struct Preset* preset_ptr, struct Preset_Converted* preset_converted_ptr){
+uint8_t Convert_Waveshape_Preset_Value(struct Preset* preset_ptr, volatile struct Preset_Converted* preset_converted_ptr){
 
 	preset_converted_ptr->waveshape = preset_ptr->waveshape; //7-bit copy
 
 	return 1;
 }
 
-uint8_t Convert_Speed_Preset_Value(struct Preset* preset_ptr, struct Preset_Converted* preset_converted_ptr){
+uint8_t Convert_Speed_Preset_Value(struct Preset* preset_ptr, volatile struct Preset_Converted* preset_converted_ptr){
 
 	preset_converted_ptr->speed = (preset_ptr->speed) << 3; //convert to 10-bit
 
 	return 1;
 }
 
-uint8_t Convert_Depth_Preset_Value(struct Preset* preset_ptr, struct Preset_Converted* preset_converted_ptr){
+uint8_t Convert_Depth_Preset_Value(struct Preset* preset_ptr, volatile struct Preset_Converted* preset_converted_ptr){
 
 	preset_converted_ptr->depth = preset_ptr->depth; //7-bit copy
 
 	return 1;
 }
 
-uint8_t Convert_Symmetry_Preset_Value(struct Preset* preset_ptr, struct Preset_Converted* preset_converted_ptr){
+uint8_t Convert_Symmetry_Preset_Value(struct Preset* preset_ptr, volatile struct Preset_Converted* preset_converted_ptr){
 
 	preset_converted_ptr->symmetry = (preset_ptr->symmetry) << 1; //convert to 8-bit
 
 	return 1;
 }
 
-uint8_t Convert_Phase_Preset_Value(struct Preset* preset_ptr, struct Preset_Converted* preset_converted_ptr){
+uint8_t Convert_Phase_Preset_Value(struct Preset* preset_ptr, volatile struct Preset_Converted* preset_converted_ptr){
 
 	preset_converted_ptr->phase = (preset_ptr->phase) << 2; //convert to 9-bit
 
@@ -218,7 +218,7 @@ uint8_t Pack_Preset_Into_Doubleword(struct Preset* preset_ptr, uint64_t *Doublew
 	return 1;
 }
 
-uint8_t Read_and_Interpret_Preset_From_Flash(uint32_t address_val, struct Preset* preset_ptr){
+uint8_t Read_and_Interpret_Preset_From_Flash(uint32_t address_val, volatile struct Preset* preset_ptr){
 
 	uint8_t *flash = (uint8_t *)address_val;
 	uint8_t *preset = (uint8_t *)preset_ptr;
@@ -267,7 +267,7 @@ uint8_t Pack_Misc_Into_Doubleword(enum Validate *user_presets_used_array_ptr, vo
 	return 1;
 }
 
-uint8_t Read_and_Interpret_Misc_From_Flash(uint32_t address_val, enum Validate *user_presets_used_array_ptr, volatile uint32_t *statuses_ptr, volatile enum MIDI_Channel *MIDI_basic_channel_ptr, uint8_t num_presets){
+uint8_t Read_and_Interpret_Misc_From_Flash(uint32_t address_val, volatile enum Validate *user_presets_used_array_ptr, volatile uint32_t *statuses_ptr, volatile enum MIDI_Channel *MIDI_basic_channel_ptr, uint8_t num_presets){
 
 	uint8_t *address = (uint8_t *)address_val;
 
@@ -325,10 +325,10 @@ uint8_t Read_and_Interpret_Misc_From_Flash(uint32_t address_val, enum Validate *
 	return 1;
 }
 
-uint8_t Update_Converted_Preset_Array_with_User_or_Factory_Presets(struct Preset_Converted* presets_converted_array_ptr,
-																	enum Validate *user_presets_used_array_ptr,
+uint8_t Update_Converted_Preset_Array_with_User_or_Factory_Presets(volatile struct Preset_Converted* presets_converted_array_ptr,
+																	volatile enum Validate *user_presets_used_array_ptr,
 																	const struct Preset **factory_presets_array_ptr,
-																	struct Preset **user_presets_array_ptr,
+																	volatile struct Preset **user_presets_array_ptr,
 																	uint8_t size_of_factory_and_user_arrays){
 
 	for(uint8_t i = 0; i < size_of_factory_and_user_arrays; i++){
@@ -354,7 +354,7 @@ uint8_t Read_and_Interpret_User_Presets_From_Flash(void){
 	return 1;
 }
 
-uint8_t Update_Waveshape_with_CC_Value(uint8_t *data, struct Params* params_ptr){
+uint8_t Update_Waveshape_with_CC_Value(volatile uint8_t *data, struct Params* params_ptr){
 
 	if(*data <= TRIANGLE_MODE_ADC_THRESHOLD){
 		params_ptr->waveshape = TRIANGLE_MODE;
@@ -369,7 +369,7 @@ uint8_t Update_Waveshape_with_CC_Value(uint8_t *data, struct Params* params_ptr)
 	return 1;
 }
 
-uint8_t Update_Speed_with_CC_Value(uint8_t *data, struct Params* params_ptr){
+uint8_t Update_Speed_with_CC_Value(volatile uint8_t *data, struct Params* params_ptr){
 
 	uint16_t speed = (uint16_t)*data;
 
@@ -379,7 +379,7 @@ uint8_t Update_Speed_with_CC_Value(uint8_t *data, struct Params* params_ptr){
 	return 1;
 }
 
-uint8_t Update_Depth_with_CC_Value(uint8_t *data, struct Params* params_ptr){
+uint8_t Update_Depth_with_CC_Value(volatile uint8_t *data, struct Params* params_ptr){
 
 	uint8_t depth = (uint8_t)*data;
 	params_ptr->depth = depth;
@@ -387,7 +387,7 @@ uint8_t Update_Depth_with_CC_Value(uint8_t *data, struct Params* params_ptr){
 	return 1;
 }
 
-uint8_t Update_Symmetry_with_CC_Value(uint8_t *data, struct Params* params_ptr){
+uint8_t Update_Symmetry_with_CC_Value(volatile uint8_t *data, struct Params* params_ptr){
 
 	uint8_t symmetry = (uint8_t)*data;
 
@@ -397,7 +397,7 @@ uint8_t Update_Symmetry_with_CC_Value(uint8_t *data, struct Params* params_ptr){
 	return 1;
 }
 
-uint8_t Update_Phase_with_CC_Value(uint8_t *data, struct Delay_Line* delay_line_ptr){
+uint8_t Update_Phase_with_CC_Value(volatile uint8_t *data, struct Delay_Line* delay_line_ptr){
 
 	uint8_t phase = (uint8_t)*data;
 
@@ -457,7 +457,7 @@ uint8_t Set_Phase_to_CC_Mode_and_Value(uint8_t *data){
 	return 1;
 }
 
-uint8_t Set_All_Pots_to_PC_Mode(){
+uint8_t Set_All_Pots_to_PC_Mode(void){
 
 	waveshape_fsm.prev_state = waveshape_fsm.current_state;
 	waveshape_fsm.current_state = PC_MODE;
