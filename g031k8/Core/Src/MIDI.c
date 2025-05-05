@@ -13,7 +13,7 @@ enum Validate Is_Status_Byte(volatile uint8_t *data){
 
 	uint8_t MSB = *data;
 
-	MSB >>= 8;
+	MSB >>= 7;
 
 	if(MSB){ //status byte
 
@@ -29,7 +29,7 @@ enum Validate Is_Data_Byte(volatile uint8_t *data){
 
 	uint8_t MSB = *data;
 
-	MSB >>= 8;
+	MSB >>= 7;
 
 	if(MSB){ //status byte
 
@@ -47,7 +47,7 @@ enum Validate Is_PC_Status_Byte(volatile uint8_t *data){
 	uint8_t temp_data;
 
 	source = (uint8_t)CHANNEL_VOICE_PROGRAM_CHANGE >> 4;
-	temp_data = *data;
+	temp_data = *data >> 4;
 
 	if(temp_data == source){
 
@@ -65,7 +65,7 @@ enum Validate Is_CC_Status_Byte(volatile uint8_t *data){
 	uint8_t temp_data;
 
 	source = (uint8_t)CHANNEL_VOICE_CONTROL_CHANGE >> 4;
-	temp_data = *data;
+	temp_data = *data >> 4;
 
 	if(temp_data == source){
 
