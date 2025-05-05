@@ -3,11 +3,11 @@
 
 Issues:
 
-- MIDI CLK resync seems not to be syncing properly when 'Start' is triggered
+- Reading presets stored in flash is not correctly loading at least the 'Start required before sync' bit
+- When the MIDI CLKs are ceased, the device goes back into manual mode when the speed pot isn't wiggled
 
 Potential Issues:
 
-- What happens if 'Start' is received and no MIDI CLKs follow it???? Unlikely I know, but we'll have to deal with this rare case!
 
 */
 

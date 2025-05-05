@@ -18,6 +18,7 @@ uint8_t Startup(void){
 	HAL_GPIO_WritePin(HACK_POT_HIGH_GPIO_Port, HACK_POT_HIGH_Pin, 1);
 	HAL_GPIO_WritePin(HACK_POT_LOW_GPIO_Port, HACK_POT_LOW_Pin, 0);
 
+
 	//Point Arrays to Presets
 	Initialise_Preset_Arrays();
 
@@ -33,6 +34,8 @@ uint8_t Startup(void){
 															  factory_presets_array,
 															  user_presets_array,
 															  NUM_PRESETS);
+	//Does this unbrick things?
+	Set_Status_Bit(&statuses, Start_Required_Before_Sync_Mode);
 
 	//GET ADC VALUES
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions);
