@@ -282,9 +282,13 @@ uint8_t Read_and_Interpret_Misc_From_Flash(uint32_t address_val, volatile enum V
 
 			*(user_presets_used_array_ptr + i) = (enum Validate)NO;
 		}
-		else if((interpretted_value == 0xFF) || (interpretted_value == (enum Validate)YES)){
+		else if (interpretted_value == (enum Validate)YES) { // Only explicit YES means use user
 
 			*(user_presets_used_array_ptr + i) = (enum Validate)YES;
+		}
+		else { // Covers 0xFF (unwritten flash) and any other unexpected values, defaulting to NO
+
+			*(user_presets_used_array_ptr + i) = (enum Validate)NO;
 		}
 	}
 
