@@ -4,7 +4,7 @@
 
 #include "CC_and_PC.h" //for some reason compiler shits itself if this is included in startup.h
 
-uint8_t Startup(void){
+uint8_t __attribute__((optimize("O0")))Startup(void){
 
 	//Shouldn't be required now we have a default state set below, even in case flash not programmed //Set_Status_Bit(&statuses, Start_Required_Before_Sync_Mode); //set default mode to requiring START MIDI message before beginning a sync
 
@@ -17,7 +17,6 @@ uint8_t Startup(void){
 	HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1); //latch high the debounced o/p
 	HAL_GPIO_WritePin(HACK_POT_HIGH_GPIO_Port, HACK_POT_HIGH_Pin, 1);
 	HAL_GPIO_WritePin(HACK_POT_LOW_GPIO_Port, HACK_POT_LOW_Pin, 0);
-
 
 	//Point Arrays to Presets
 	Initialise_Preset_Arrays();

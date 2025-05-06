@@ -12,6 +12,6 @@
 #include "MIDI.h"
 
 //FUNCTION DECLARATIONS
-uint8_t Startup(void);
+uint8_t __attribute__((optimize("O0")))Startup(void);
 
 #endif /* INC_STARTUP_H_ */

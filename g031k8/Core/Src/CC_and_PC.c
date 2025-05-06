@@ -278,13 +278,13 @@ uint8_t Read_and_Interpret_Misc_From_Flash(uint32_t address_val, volatile enum V
 
 		interpretted_value = *(address + i);
 
-		if(interpretted_value == (enum Validate)NO){
-
-			*(user_presets_used_array_ptr + i) = (enum Validate)NO;
-		}
-		else if((interpretted_value == 0xFF) || (interpretted_value == (enum Validate)YES)){
+		if(interpretted_value == (enum Validate)YES){
 
 			*(user_presets_used_array_ptr + i) = (enum Validate)YES;
+		}
+		else if((interpretted_value == 0xFF) || (interpretted_value == (enum Validate)NO)){
+
+			*(user_presets_used_array_ptr + i) = (enum Validate)NO;
 		}
 	}
 
@@ -311,7 +311,7 @@ uint8_t Read_and_Interpret_Misc_From_Flash(uint32_t address_val, volatile enum V
 	//BASIC CHANNEL
 	interpretted_value = *(address + num_presets + 2);
 
-	if(interpretted_value > 15){
+	if(interpretted_value > (uint8_t)MIDI_CH_SIXTEEN){
 
 		uint8_t midi_channel_default = MIDI_BASIC_CHANNEL_DEFAULT;
 
