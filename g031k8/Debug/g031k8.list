@@ -39,15 +39,15 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  17 .debug_macro  0001a60f  00000000  00000000  00050f6c  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_line   0002ce42  00000000  00000000  0006b57b  2**0
+ 18 .debug_line   0002db37  00000000  00000000  0006b57b  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .debug_str    000a0f34  00000000  00000000  000983bd  2**0
+ 19 .debug_str    000a0f5d  00000000  00000000  000990b2  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 20 .comment      00000043  00000000  00000000  001392f1  2**0
+ 20 .comment      00000043  00000000  00000000  0013a00f  2**0
                   CONTENTS, READONLY
- 21 .debug_frame  0000382c  00000000  00000000  00139334  2**2
+ 21 .debug_frame  0000382c  00000000  00000000  0013a054  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 22 .debug_line_str 00000054  00000000  00000000  0013cb60  2**0
+ 22 .debug_line_str 00000054  00000000  00000000  0013d880  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -2307,7 +2307,7 @@ uint8_t Speed_Pot_Check(struct Params* params_ptr){
  8000cde:	d906      	bls.n	8000cee <Speed_Pot_Check+0x46>
 			if(first_speed_measurement - second_speed_measurement > SPEED_TOLERANCE){
  8000ce0:	1a9b      	subs	r3, r3, r2
- 8000ce2:	2b05      	cmp	r3, #5
+ 8000ce2:	2b06      	cmp	r3, #6
  8000ce4:	ddec      	ble.n	8000cc0 <Speed_Pot_Check+0x18>
  8000ce6:	e007      	b.n	8000cf8 <Speed_Pot_Check+0x50>
 		second_speed_measurement = params_ptr->speed;
@@ -2319,7 +2319,7 @@ uint8_t Speed_Pot_Check(struct Params* params_ptr){
  8000cf0:	d2e6      	bcs.n	8000cc0 <Speed_Pot_Check+0x18>
 			if(second_speed_measurement - first_speed_measurement > SPEED_TOLERANCE){
  8000cf2:	1ad2      	subs	r2, r2, r3
- 8000cf4:	2a05      	cmp	r2, #5
+ 8000cf4:	2a06      	cmp	r2, #6
  8000cf6:	dde3      	ble.n	8000cc0 <Speed_Pot_Check+0x18>
 				speed_fsm.prev_state = speed_fsm.current_state;
  8000cf8:	4b0c      	ldr	r3, [pc, #48]	@ (8000d2c <Speed_Pot_Check+0x84>)
@@ -9335,110 +9335,49 @@ void Clear_Status_Bit(volatile uint32_t *bits, enum Status_Bit bit){
  800330e:	4770      	bx	lr
 
 08003310 <Reset_Handler>:
-
-  .section .text.Reset_Handler
-  .weak Reset_Handler
-  .type Reset_Handler, %function
-Reset_Handler:
-  ldr   r0, =_estack
  8003310:	480d      	ldr	r0, [pc, #52]	@ (8003348 <LoopForever+0x2>)
-  mov   sp, r0          /* set stack pointer */
  8003312:	4685      	mov	sp, r0
-
-/* Call the clock system initialization function.*/
-  bl  SystemInit
  8003314:	f7ff ffb4 	bl	8003280 <SystemInit>
-
-/* Copy the data segment initializers from flash to SRAM */
-  ldr r0, =_sdata
  8003318:	480c      	ldr	r0, [pc, #48]	@ (800334c <LoopForever+0x6>)
-  ldr r1, =_edata
  800331a:	490d      	ldr	r1, [pc, #52]	@ (8003350 <LoopForever+0xa>)
-  ldr r2, =_sidata
  800331c:	4a0d      	ldr	r2, [pc, #52]	@ (8003354 <LoopForever+0xe>)
-  movs r3, #0
  800331e:	2300      	movs	r3, #0
-  b LoopCopyDataInit
  8003320:	e002      	b.n	8003328 <LoopCopyDataInit>
 
 08003322 <CopyDataInit>:
-
-CopyDataInit:
-  ldr r4, [r2, r3]
  8003322:	58d4      	ldr	r4, [r2, r3]
-  str r4, [r0, r3]
  8003324:	50c4      	str	r4, [r0, r3]
-  adds r3, r3, #4
  8003326:	3304      	adds	r3, #4
 
 08003328 <LoopCopyDataInit>:
-
-LoopCopyDataInit:
-  adds r4, r0, r3
  8003328:	18c4      	adds	r4, r0, r3
-  cmp r4, r1
  800332a:	428c      	cmp	r4, r1
-  bcc CopyDataInit
  800332c:	d3f9      	bcc.n	8003322 <CopyDataInit>
-
-/* Zero fill the bss segment. */
-  ldr r2, =_sbss
  800332e:	4a0a      	ldr	r2, [pc, #40]	@ (8003358 <LoopForever+0x12>)
-  ldr r4, =_ebss
  8003330:	4c0a      	ldr	r4, [pc, #40]	@ (800335c <LoopForever+0x16>)
-  movs r3, #0
  8003332:	2300      	movs	r3, #0
-  b LoopFillZerobss
  8003334:	e001      	b.n	800333a <LoopFillZerobss>
 
 08003336 <FillZerobss>:
-
-FillZerobss:
-  str  r3, [r2]
  8003336:	6013      	str	r3, [r2, #0]
-  adds r2, r2, #4
  8003338:	3204      	adds	r2, #4
 
 0800333a <LoopFillZerobss>:
-
-LoopFillZerobss:
-  cmp r2, r4
  800333a:	42a2      	cmp	r2, r4
-  bcc FillZerobss
  800333c:	d3fb      	bcc.n	8003336 <FillZerobss>
-
-/* Call static constructors */
-  bl __libc_init_array
  800333e:	f004 fc4b 	bl	8007bd8 <__libc_init_array>
-/* Call the application s entry point.*/
-  bl main
  8003342:	f7ff f8ef 	bl	8002524 <main>
 
 08003346 <LoopForever>:
-
-LoopForever:
-  b LoopForever
  8003346:	e7fe      	b.n	8003346 <LoopForever>
-  ldr   r0, =_estack
  8003348:	20002000 	.word	0x20002000
-  ldr r0, =_sdata
  800334c:	20000000 	.word	0x20000000
-  ldr r1, =_edata
  8003350:	2000044c 	.word	0x2000044c
-  ldr r2, =_sidata
  8003354:	08008794 	.word	0x08008794
-  ldr r2, =_sbss
  8003358:	20000450 	.word	0x20000450
-  ldr r4, =_ebss
  800335c:	20000cc4 	.word	0x20000cc4
 
 08003360 <ADC1_IRQHandler>:
- * @retval None
-*/
-  .section .text.Default_Handler,"ax",%progbits
-Default_Handler:
-Infinite_Loop:
-  b Infinite_Loop
  8003360:	e7fe      	b.n	8003360 <ADC1_IRQHandler>
 	...
 
