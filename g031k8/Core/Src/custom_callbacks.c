@@ -17,12 +17,14 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
 
 	HAL_ADC_Stop_DMA(hadc); //disable ADC DMA
-	Process_ADC_Conversion_Values(&params, &delay_line, ADCResultsDMA);
+	Process_ADC_Conversion_Values(&params_manual, ADCResultsDMA);
 
+	//copies into running params based on mode
 	Update_Params_Based_On_Mode_Selected();
 
 	enum Validate first_sync_complete = Get_Status_Bit(&statuses, First_Sync_Complete);
 
+	//overwrites raw speed values if a sync has completed
 	if(first_sync_complete == YES){
 
 		params.raw_start_value = params_working.raw_start_value;
@@ -981,7 +983,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 	//PERFORM SPEED POT CHECKING
 	if((speed_fsm.current_state.shared_state == PC_MODE) || (speed_fsm.current_state.shared_state == CC_MODE)){
 
-		Speed_Pot_Check(&params);
+		Speed_Pot_Check(&params_manual);
 	}
 	else if((speed_fsm.current_state.speed_exclusive_state == CLK_IN_MODE) && (IP_CAP_fsm.current_state == IDLE)){
 
@@ -989,7 +991,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 		if(Get_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out) == YES){
 
-			Speed_Pot_Check(&params);
+			Speed_Pot_Check(&params_manual);
 		}
 	}
 	else if((speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_MODE) && (IP_CAP_fsm.current_state == IDLE)){
@@ -1004,7 +1006,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 			MIDI_CLK_fsm = NOT_COMPILING;
 			MIDI_CLK_tag = 0;
 
-			Speed_Pot_Check(&params);
+			Speed_Pot_Check(&params_manual);
 		}
 	}
 	else if((speed_fsm.current_state.speed_exclusive_state == TAP_MODE) && (IP_CAP_fsm.current_state == IDLE)){
@@ -1013,7 +1015,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 		if(Get_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out) == YES){
 
-			Speed_Pot_Check(&params);
+			Speed_Pot_Check(&params_manual);
 		}
 	}
 

@@ -52,9 +52,9 @@ const extern uint8_t num_ADC_conversions;
 
 //STRUCT VARIABLES
 extern struct Params params; //running variables of the oscillator/s
+extern struct Params params_manual; //values of manual pots that are, dependent on mode, copied into running params
 extern struct Params params_to_be_loaded; //'to be loaded' params for the oscillators for when I/P capture states are active
 extern struct Params params_working; //upon overflow of re-elapse timer (TIM3), 'to_be_loaded' values are copied into this struct
-extern struct Params params_PC;
 extern struct Delay_Line delay_line;
 
 //CUSTOM TYPES
@@ -69,7 +69,6 @@ struct Delay_Line{
 	volatile uint16_t duty_delay_line_storage_array[513]; //one index larger than the number of indexes (wave samples) to allow us to 'wrap' the array into a kind of circular buffer
 	volatile uint16_t duty_delay_line_start_offset; //initial value is 1st index
 	volatile uint16_t duty_delay_line_finish_offset; //initial value is 512th index (513th value)
-	volatile uint16_t duty_delay_line_read_pointer_offset;
 };
 
 //FUNCTION DECLARATIONS
@@ -79,7 +78,7 @@ uint8_t Start_Freq_Gen_Timer(void);
 uint8_t Set_Oscillator_Values(struct Params* params_ptr);
 uint8_t Calculate_Next_Main_Oscillator_Values(struct Params* params_ptr, enum Next_Values_Processing_Mode mode);
 uint8_t Write_Next_Main_Oscillator_Values_to_Delay_Line(struct Params* params_ptr, struct Delay_Line* delay_line_ptr);
-uint8_t Process_ADC_Conversion_Values(struct Params* params_ptr, struct Delay_Line* delay_line_ptr, volatile uint16_t* ADCResultsDMA_ptr);
+uint8_t Process_ADC_Conversion_Values(struct Params* params_ptr, volatile uint16_t* ADCResultsDMA_ptr);
 uint8_t Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(struct Params* params_ptr);
 
 #endif

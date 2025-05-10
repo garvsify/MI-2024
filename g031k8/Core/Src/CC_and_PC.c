@@ -51,6 +51,22 @@ uint8_t Initialise_Preset_Arrays(void){
 
 uint8_t Update_Params_Based_On_Mode_Selected(void){
 
+	if(waveshape_fsm.current_state == MANUAL_MODE){
+		params.waveshape = params_manual.waveshape;
+	}
+	if(speed_fsm.current_state.shared_state == MANUAL_MODE){
+		params.speed = params_manual.speed;
+	}
+	if(depth_fsm.current_state == MANUAL_MODE){
+		params.depth = params_manual.depth;
+	}
+	if(symmetry_fsm.current_state == MANUAL_MODE){
+		params.symmetry = params_manual.symmetry;
+	}
+	if(phase_fsm.current_state == MANUAL_MODE){
+		params.duty_delay_line_read_pointer_offset = params_manual.duty_delay_line_read_pointer_offset;
+	}
+
 	if(waveshape_fsm.current_state == PC_MODE){
 		Update_Waveshape_with_Converted_Preset_Value(&presets_converted_array[(uint8_t)preset_selected - 1], &params);
 	}
@@ -64,7 +80,7 @@ uint8_t Update_Params_Based_On_Mode_Selected(void){
 		Update_Symmetry_with_Converted_Preset_Value(&presets_converted_array[(uint8_t)preset_selected - 1], &params);
 	}
 	if(phase_fsm.current_state == PC_MODE){
-		Update_Phase_with_Converted_Preset_Value(&presets_converted_array[(uint8_t)preset_selected - 1], &delay_line);
+		Update_Phase_with_Converted_Preset_Value(&presets_converted_array[(uint8_t)preset_selected - 1], &params);
 	}
 
 
@@ -81,7 +97,7 @@ uint8_t Update_Params_Based_On_Mode_Selected(void){
 		Update_Symmetry_with_CC_Value(&CC_array[SYMMETRY_ARR], &params);
 	}
 	if(phase_fsm.current_state == CC_MODE){
-		Update_Phase_with_CC_Value(&CC_array[PHASE_ARR], &delay_line);
+		Update_Phase_with_CC_Value(&CC_array[PHASE_ARR], &params);
 	}
 
 	return 1;
@@ -99,7 +115,7 @@ uint8_t Convert_All_Preset_Values(volatile struct Preset* preset_ptr, volatile s
 	return 1;
 }
 
-uint8_t Update_All_with_Converted_Preset_Values(struct Preset_Converted* preset_converted_ptr, struct Params* params_ptr, struct Delay_Line* delay_line_ptr){
+uint8_t Update_All_with_Converted_Preset_Values(struct Preset_Converted* preset_converted_ptr, struct Params* params_ptr){
 
 	uint8_t waveshape = preset_converted_ptr->waveshape;
 
@@ -119,7 +135,7 @@ uint8_t Update_All_with_Converted_Preset_Values(struct Preset_Converted* preset_
 
 	params_ptr->symmetry = preset_converted_ptr->symmetry;
 
-	delay_line_ptr->duty_delay_line_read_pointer_offset = preset_converted_ptr->phase;
+	params_ptr->duty_delay_line_read_pointer_offset = preset_converted_ptr->phase;
 
 	return 1;
 }
@@ -162,9 +178,9 @@ uint8_t Update_Symmetry_with_Converted_Preset_Value(volatile struct Preset_Conve
 	return 1;
 }
 
-uint8_t Update_Phase_with_Converted_Preset_Value(volatile struct Preset_Converted* preset_converted_ptr, struct Delay_Line* delay_line_ptr){
+uint8_t Update_Phase_with_Converted_Preset_Value(volatile struct Preset_Converted* preset_converted_ptr, struct Params* params_ptr){
 
-	delay_line_ptr->duty_delay_line_read_pointer_offset = preset_converted_ptr->phase;
+	params_ptr->duty_delay_line_read_pointer_offset = preset_converted_ptr->phase;
 
 	return 1;
 }
@@ -397,12 +413,12 @@ uint8_t Update_Symmetry_with_CC_Value(volatile uint8_t *data, struct Params* par
 	return 1;
 }
 
-uint8_t Update_Phase_with_CC_Value(volatile uint8_t *data, struct Delay_Line* delay_line_ptr){
+uint8_t Update_Phase_with_CC_Value(volatile uint8_t *data, struct Params* params_ptr){
 
 	uint8_t phase = (uint8_t)*data;
 
 	phase <<= 2; //convert to 9-bit
-	delay_line_ptr->duty_delay_line_read_pointer_offset = phase;
+	params_ptr->duty_delay_line_read_pointer_offset = phase;
 
 	return 1;
 }

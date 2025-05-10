@@ -121,13 +121,13 @@ uint8_t Initialise_Preset_Arrays(void);
 uint8_t Update_Params_Based_On_Mode_Selected(void);
 
 uint8_t Convert_All_Preset_Values(volatile struct Preset* preset_ptr, volatile struct Preset_Converted* preset_converted_ptr);
-uint8_t Update_All_with_Converted_Preset_Values(struct Preset_Converted* preset_converted_ptr, struct Params* params_ptr, struct Delay_Line* delay_line_ptr);
+uint8_t Update_All_with_Converted_Preset_Values(struct Preset_Converted* preset_converted_ptr, struct Params* params_ptr);
 
 uint8_t Update_Waveshape_with_Converted_Preset_Value(volatile struct Preset_Converted* preset_converted_ptr, struct Params* params_ptr);
 uint8_t Update_Speed_with_Converted_Preset_Value(volatile struct Preset_Converted* preset_converted_ptr, struct Params* params_ptr);
 uint8_t Update_Depth_with_Converted_Preset_Value(volatile struct Preset_Converted* preset_converted_ptr, struct Params* params_ptr);
 uint8_t Update_Symmetry_with_Converted_Preset_Value(volatile struct Preset_Converted* preset_converted_ptr, struct Params* params_ptr);
-uint8_t Update_Phase_with_Converted_Preset_Value(volatile struct Preset_Converted* preset_converted_ptr, struct Delay_Line* delay_line_ptr);
+uint8_t Update_Phase_with_Converted_Preset_Value(volatile struct Preset_Converted* preset_converted_ptr, struct Params* params_ptr);
 
 uint8_t Convert_Waveshape_Preset_Value(struct Preset* preset_ptr, volatile struct Preset_Converted* preset_converted_ptr);
 uint8_t Convert_Speed_Preset_Value(struct Preset* preset_ptr, volatile struct Preset_Converted* preset_converted_ptr);
@@ -151,7 +151,7 @@ uint8_t Update_Waveshape_with_CC_Value(volatile uint8_t *data, struct Params* pa
 uint8_t Update_Speed_with_CC_Value(volatile uint8_t *data, struct Params* params_ptr);
 uint8_t Update_Depth_with_CC_Value(volatile uint8_t *data, struct Params* params_ptr);
 uint8_t Update_Symmetry_with_CC_Value(volatile uint8_t *data, struct Params* params_ptr);
-uint8_t Update_Phase_with_CC_Value(volatile uint8_t *data, struct Delay_Line* delay_line_ptr);
+uint8_t Update_Phase_with_CC_Value(volatile uint8_t *data, struct Params* params_ptr);
 uint8_t Set_Waveshape_to_CC_Mode_and_Value(uint8_t *data);
 uint8_t Set_Speed_to_CC_Mode_and_Value(uint8_t *data);
 uint8_t Set_Depth_to_CC_Mode_and_Value(uint8_t *data);

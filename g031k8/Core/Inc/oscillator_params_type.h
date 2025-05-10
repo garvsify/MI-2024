@@ -28,6 +28,7 @@ struct Params{
 	volatile uint16_t final_prescaler;
 	volatile uint16_t final_prescaler_minus_one;
 	volatile enum Adjust_Prescaler_Action prescaler_adjust;
+	volatile uint16_t duty_delay_line_read_pointer_offset;
 };
 
 #endif // - end INC_OSCILLATOR_PARAMS_TYPE_H_

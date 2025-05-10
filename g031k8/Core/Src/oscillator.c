@@ -12,13 +12,12 @@ volatile uint16_t ADCResultsDMA[5] = {0};
 
 //STRUCT VARIABLES
 struct Params params = {0};
+struct Params params_manual = {0};
 struct Params params_to_be_loaded = {0};
 struct Params params_working = {0};
-struct Params params_PC = {0};
 struct Delay_Line delay_line = {.duty_delay_line_storage_array = 0, //one index larger than the number of indexes (wave samples) to allow us to 'wrap' the array into a kind of circular buffer - this is reinitialised to mid-scale on runtime
 								.duty_delay_line_start_offset = 1,  //initial value is 1st index - to give us space to fill index 0
-								.duty_delay_line_finish_offset = FINAL_INDEX + 1, //initial value is 512th index, one larger than the index of the final sample
-								.duty_delay_line_read_pointer_offset = 0}; //determined in running
+								.duty_delay_line_finish_offset = FINAL_INDEX + 1}; //initial value is 512th index, one larger than the index of the final sample
 
 //FUNCTION DEFINITIONS
 uint8_t Start_PWM_Gen_Timer_Main_and_Secondary_Oscillators(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel_1, uint32_t PWM_TIM_channel_2)
@@ -197,17 +196,17 @@ uint8_t Write_Next_Main_Oscillator_Values_to_Delay_Line(struct Params* params_pt
 		}
 
 		//DETERMINE THE DELAYED WAVE'S VALUES
-		if(delay_line_ptr->duty_delay_line_start_offset + delay_line_ptr->duty_delay_line_read_pointer_offset > FINAL_INDEX + 1){ //if the desired starting index falls off the end of the array
-			params_ptr->duty_delayed = *(delay_line_ptr->duty_delay_line_storage_array + (delay_line_ptr->duty_delay_line_start_offset + delay_line_ptr->duty_delay_line_read_pointer_offset - (FINAL_INDEX + 1)));
+		if(delay_line_ptr->duty_delay_line_start_offset + params_ptr->duty_delay_line_read_pointer_offset > FINAL_INDEX + 1){ //if the desired starting index falls off the end of the array
+			params_ptr->duty_delayed = *(delay_line_ptr->duty_delay_line_storage_array + (delay_line_ptr->duty_delay_line_start_offset + params_ptr->duty_delay_line_read_pointer_offset - (FINAL_INDEX + 1)));
 		}
 		else{
-			params_ptr->duty_delayed = *(delay_line_ptr->duty_delay_line_storage_array + delay_line_ptr->duty_delay_line_start_offset + delay_line_ptr->duty_delay_line_read_pointer_offset);
+			params_ptr->duty_delayed = *(delay_line_ptr->duty_delay_line_storage_array + delay_line_ptr->duty_delay_line_start_offset + params_ptr->duty_delay_line_read_pointer_offset);
 		}
 
 	return 1;
 }
 
-uint8_t Process_ADC_Conversion_Values(struct Params* params_ptr, struct Delay_Line* delay_line_ptr, volatile uint16_t* ADCResultsDMA_ptr){
+uint8_t Process_ADC_Conversion_Values(struct Params* params_ptr, volatile uint16_t* ADCResultsDMA_ptr){
 
 	//GET WAVESHAPE
 	uint16_t ADC_result = ADCResultsDMA_ptr[WAVESHAPE_ADC_RESULT_INDEX] >> 5; //set ADC_Result to waveshape index value, truncate to 7-bit
@@ -248,7 +247,7 @@ uint8_t Process_ADC_Conversion_Values(struct Params* params_ptr, struct Delay_Li
 
 	uint16_t temp_delay = ADCResultsDMA_ptr[DUTY_DELAY_LINE_READ_POINTER_OFFSET_ADC_RESULT_INDEX] >> 5; //truncate to 7-bit
 	temp_delay <<= 2; //convert to 9-bit
-	delay_line_ptr->duty_delay_line_read_pointer_offset = temp_delay;
+	params_ptr->duty_delay_line_read_pointer_offset = temp_delay;
 
 	return 1;
 }
