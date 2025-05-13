@@ -1,54 +1,132 @@
 #include "checking_functions.h"
+#include "main.h"
 
 //VARIABLE DEFINITIONS
+volatile uint8_t waveshape_pot_adc_measurement_num = 0;
 volatile uint8_t speed_pot_adc_measurement_num = 0;
+volatile uint8_t depth_pot_adc_measurement_num = 0;
+volatile uint8_t symmetry_pot_adc_measurement_num = 0;
+volatile uint8_t phase_pot_adc_measurement_num = 0;
 
 //FUNCTION DEFINITIONS
-uint8_t Speed_Pot_Check(struct Params* params_ptr){
+uint8_t Pot_Check(struct Params* params_ptr, enum Pot_Type pot_type){
+
+	static uint16_t first_waveshape_measurement;
+	static uint16_t second_waveshape_measurement;
 
 	static uint16_t first_speed_measurement;
-
 	static uint16_t second_speed_measurement;
 
-	if(speed_pot_adc_measurement_num == 0){
+	static uint16_t first_depth_measurement;
+	static uint16_t second_depth_measurement;
 
-		first_speed_measurement = params_ptr->speed;
+	static uint16_t first_symmetry_measurement;
+	static uint16_t second_symmetry_measurement;
 
-		speed_pot_adc_measurement_num++;
+	static uint16_t first_phase_measurement;
+	static uint16_t second_phase_measurement;
+
+	uint16_t *first_measurement_ptr = NULL;
+	uint16_t *second_measurement_ptr = NULL;
+	volatile uint8_t *measurement_num_ptr = NULL;
+	void *measurement_ptr = NULL;
+	uint8_t tolerance = 0;
+	volatile struct Normal_FSM* normal_fsm_ptr = NULL;
+	volatile struct Speed_FSM* speed_fsm_ptr = NULL;
+
+	if(pot_type == WAVESHAPE_POT){
+
+		first_measurement_ptr = &first_waveshape_measurement;
+		second_measurement_ptr = &second_waveshape_measurement;
+		measurement_num_ptr = &waveshape_pot_adc_measurement_num;
+		measurement_ptr = (uint16_t*)&params_ptr->waveshape;
+		tolerance = WAVESHAPE_TOLERANCE;
+		normal_fsm_ptr = &waveshape_fsm;
 	}
-	else if(speed_pot_adc_measurement_num == 1){
+	else if(pot_type == SPEED_POT){
 
-		second_speed_measurement = params_ptr->speed;
-
-		speed_pot_adc_measurement_num++;
+		first_measurement_ptr = &first_speed_measurement;
+		second_measurement_ptr = &second_speed_measurement;
+		measurement_num_ptr = &speed_pot_adc_measurement_num;
+		measurement_ptr = (uint16_t*)&params_ptr->speed;
+		tolerance = SPEED_TOLERANCE;
+		speed_fsm_ptr = &speed_fsm;
 	}
-	else if(speed_pot_adc_measurement_num == 2){
+	else if(pot_type == DEPTH_POT){
 
-		speed_pot_adc_measurement_num = 0;
+		first_measurement_ptr = &first_depth_measurement;
+		second_measurement_ptr = &second_depth_measurement;
+		measurement_num_ptr = &depth_pot_adc_measurement_num;
+		measurement_ptr = (uint16_t*)&params_ptr->depth;
+		tolerance = DEPTH_TOLERANCE;
+		normal_fsm_ptr = &depth_fsm;
+	}
+	else if(pot_type == SYMMETRY_POT){
 
-		if(first_speed_measurement > second_speed_measurement){
+		first_measurement_ptr = &first_symmetry_measurement;
+		second_measurement_ptr = &second_symmetry_measurement;
+		measurement_num_ptr = &symmetry_pot_adc_measurement_num;
+		measurement_ptr = (uint16_t*)&params_ptr->symmetry;
+		tolerance = SYMMETRY_TOLERANCE;
+		normal_fsm_ptr = &symmetry_fsm;
+	}
+	else if(pot_type == PHASE_POT){
 
-			if(first_speed_measurement - second_speed_measurement > SPEED_TOLERANCE){
+		first_measurement_ptr = &first_phase_measurement;
+		second_measurement_ptr = &second_phase_measurement;
+		measurement_num_ptr = &phase_pot_adc_measurement_num;
+		measurement_ptr = (uint16_t*)&params_ptr->duty_delay_line_read_pointer_offset;
+		tolerance = PHASE_TOLERANCE;
+		normal_fsm_ptr = &phase_fsm;
+	}
 
-				speed_fsm.prev_state = speed_fsm.current_state;
-				speed_fsm.current_state.shared_state = MANUAL_MODE;
+	if(*measurement_num_ptr == 0){
+
+		*first_measurement_ptr = *((uint16_t*)measurement_ptr);
+
+			(*measurement_num_ptr)++;
+	}
+	else if(*measurement_num_ptr == 1){
+
+		*second_measurement_ptr = *((uint16_t*)measurement_ptr);
+
+		(*measurement_num_ptr)++;
+	}
+	else if(*measurement_num_ptr == 2){
+
+		*measurement_num_ptr = 0;
+
+		uint16_t diff = 0;
+
+		if(*first_measurement_ptr > *second_measurement_ptr){
+
+			diff = *first_measurement_ptr - *second_measurement_ptr;
+
+		}
+		else{
+
+			diff = *second_measurement_ptr - *first_measurement_ptr;
+		}
+
+		if(diff > tolerance){
+
+			if(normal_fsm_ptr != NULL){
+
+				normal_fsm_ptr->prev_state = normal_fsm_ptr->current_state;
+				normal_fsm_ptr->current_state = MANUAL_MODE;
+
+			}
+			else if(speed_fsm_ptr != NULL){
+
+				speed_fsm_ptr->prev_state = speed_fsm_ptr->current_state;
+				speed_fsm_ptr->current_state.shared_state = MANUAL_MODE;
 				Clear_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out);
 				Clear_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
 				Clear_Status_Bit(&statuses, First_Sync_Complete);
 			}
 		}
-		else if(second_speed_measurement > first_speed_measurement){
-
-			if(second_speed_measurement - first_speed_measurement > SPEED_TOLERANCE){
-
-				speed_fsm.prev_state = speed_fsm.current_state;
-				speed_fsm.current_state.shared_state = MANUAL_MODE;
-				Clear_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out);
-				Clear_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
-				Clear_Status_Bit(&statuses, First_Sync_Complete);
-			}
-		}
 	}
+
 	return 1;
 }
 

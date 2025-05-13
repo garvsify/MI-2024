@@ -3,9 +3,11 @@
 
 Issues:
 
+(not sure if an issue anymore)
 - When the MIDI CLKs are ceased, the device goes back into manual mode when the speed pot isn't wiggled
 
-- PC not working properly
+- TAP tempo can be seen to be entering correctly into the synced tempo, but after like one oscillation of the new tempo,
+it goes back to its old tempo?
 
 Potential Issues:
 

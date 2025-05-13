@@ -983,7 +983,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 	//PERFORM SPEED POT CHECKING
 	if((speed_fsm.current_state.shared_state == PC_MODE) || (speed_fsm.current_state.shared_state == CC_MODE)){
 
-		Speed_Pot_Check(&params_manual);
+		Pot_Check(&params_manual, SPEED_POT);
 	}
 	else if((speed_fsm.current_state.speed_exclusive_state == CLK_IN_MODE) && (IP_CAP_fsm.current_state == IDLE)){
 
@@ -991,7 +991,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 		if(Get_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out) == YES){
 
-			Speed_Pot_Check(&params_manual);
+			Pot_Check(&params_manual, SPEED_POT);
 		}
 	}
 	else if((speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_MODE) && (IP_CAP_fsm.current_state == IDLE)){
@@ -1006,7 +1006,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 			MIDI_CLK_fsm = NOT_COMPILING;
 			MIDI_CLK_tag = 0;
 
-			Speed_Pot_Check(&params_manual);
+			Pot_Check(&params_manual, SPEED_POT);
 		}
 	}
 	else if((speed_fsm.current_state.speed_exclusive_state == TAP_MODE) && (IP_CAP_fsm.current_state == IDLE)){
@@ -1015,7 +1015,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 		if(Get_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out) == YES){
 
-			Speed_Pot_Check(&params_manual);
+			Pot_Check(&params_manual, SPEED_POT);
 		}
 	}
 
