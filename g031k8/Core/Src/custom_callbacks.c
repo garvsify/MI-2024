@@ -563,11 +563,184 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
 		if(active_status_byte == 0){
 
-			//whether there is a running status or not, the code is the same here
+			if(running_status_byte == 0){
 
-			if(Is_Data_Buffer_Empty(&MIDI_data) == YES){
+				if(Is_Data_Buffer_Empty(&MIDI_data) == YES){
 
-				if(Is_Status_Byte(rx_buffer) == YES){
+					if(Is_Status_Byte(rx_buffer) == YES){
+
+						if(Is_PC_Status_Byte(rx_buffer) == YES){
+
+							running_status_byte = (uint8_t)*rx_buffer;
+
+							if(Is_Channelised_Status_Byte_On_Basic_Channel(rx_buffer, MIDI_basic_channel) == YES){
+
+								active_status_byte = (uint8_t)*rx_buffer;
+								Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
+
+							}
+							else{
+
+								if(Is_OMNI_On(&statuses) == YES){
+
+									active_status_byte = (uint8_t)*rx_buffer;
+									Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
+
+								}
+							}
+						}
+						else if(Is_CC_Status_Byte(rx_buffer) == YES){
+
+							running_status_byte = (uint8_t)*rx_buffer;
+
+							if(Is_Channelised_Status_Byte_On_Basic_Channel(rx_buffer, MIDI_basic_channel) == YES){
+
+								active_status_byte = (uint8_t)*rx_buffer;
+								Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
+
+							}
+							else{
+
+								if(Is_OMNI_On(&statuses) == YES){
+
+									active_status_byte = (uint8_t)*rx_buffer;
+									Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
+
+								}
+							}
+						}
+						else if(Is_Sysex_Start_Status_Byte(rx_buffer) == YES){
+
+							active_status_byte = (uint8_t)*rx_buffer;
+							running_status_byte = 0;
+							Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
+
+						}
+					}
+				}
+			}
+			else if(running_status_byte != 0){
+
+				if(Is_Data_Byte(rx_buffer) == YES){
+
+					Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
+
+					if(Is_PC_Status_Byte(&running_status_byte) == YES){
+
+						if(Is_Data_Buffer_Empty(&MIDI_data) == YES){
+
+							//first data byte received
+							if(Is_Program_Change_Data_Byte_In_Range(rx_buffer, NUM_PRESETS) == YES){
+
+								Set_All_Pots_to_PC_Mode();
+								preset_selected = (enum Preset_Selected)*rx_buffer + 1; //since 0 is no preset selected, we have to add 1
+								//Update_Params_Based_On_Mode_Selected(); // Update parameters immediately with preset values
+							}
+
+							//whether the program change data byte is in range or not, clear the data buffer and active status byte, and reset timer
+							Clear_Data_Buffer(&MIDI_data);
+							active_status_byte = 0;
+
+							//not really required
+							Reset_and_Stop_MIDI_Software_Timer(&midi_counter, &statuses);
+
+						}
+					}
+					else if(Is_CC_Status_Byte(&running_status_byte) == YES){
+
+						if(Is_Data_Buffer_Empty(&MIDI_data) == YES){
+
+							//first data byte received
+							MIDI_data.MIDI_data_buffer[0] = *rx_buffer;
+							midi_counter = 0; //reset timer
+
+						}
+						else{ //not empty
+
+							//second data byte received
+							MIDI_data.MIDI_data_buffer[1] = *rx_buffer;
+							Reset_and_Stop_MIDI_Software_Timer(&midi_counter, &statuses);
+
+							//if a CC byte is active, either it was received on the basic channel, or OMNI is on, so we can
+							//simply just use it, although we will need to check that when a channel mode message is sent,
+							//that it was received on the basic channel
+
+							if(Is_Utilised_Channel_Mode_CC_First_Data_Byte(&MIDI_data.MIDI_data_buffer[0]) == YES){
+
+								//check on basic channel
+								if(Is_Channelised_Status_Byte_On_Basic_Channel(&active_status_byte, MIDI_basic_channel) == YES){
+
+									if(Channel_Mode_CC_Second_Data_Byte_Is_Valid_Given_Utilised_First_Data_Byte(&MIDI_data.MIDI_data_buffer[0], &MIDI_data.MIDI_data_buffer[1]) == YES){
+
+										//Implement new channel mode
+										if(MIDI_data.MIDI_data_buffer[1] == RESET_ALL_CONTROLLERS){
+
+											Reset_All_Controllers(&params, &delay_line);
+										}
+										else if(MIDI_data.MIDI_data_buffer[1] == LOCAL_CONTROL){
+
+											Set_Local_Control();
+										}
+										else if(MIDI_data.MIDI_data_buffer[1] == OMNI_MODE_OFF){
+
+											Set_OMNI_Off(&statuses);
+										}
+										else if(MIDI_data.MIDI_data_buffer[1] == OMNI_MODE_ON){
+
+											Set_OMNI_On(&statuses);
+										}
+									}
+								}
+
+								//not required
+								active_status_byte = 0;
+								Clear_Data_Buffer(&MIDI_data);
+
+							}
+							else if(Is_Utilised_CC_First_Data_Byte(&MIDI_data.MIDI_data_buffer[0]) == YES){
+
+								if((Is_Channelised_Status_Byte_On_Basic_Channel(&active_status_byte, MIDI_basic_channel) == YES)
+										|| (Is_OMNI_On(&statuses) == YES)){
+
+									if(MIDI_data.MIDI_data_buffer[0] == WAVESHAPE_CC){
+
+										Set_Waveshape_to_CC_Mode_and_Value((uint8_t*)&MIDI_data.MIDI_data_buffer[1]);
+									}
+									else if(MIDI_data.MIDI_data_buffer[0] == SPEED_CC){
+
+										Set_Speed_to_CC_Mode_and_Value((uint8_t*)&MIDI_data.MIDI_data_buffer[1]);
+									}
+									else if(MIDI_data.MIDI_data_buffer[0] == DEPTH_CC){
+
+										Set_Depth_to_CC_Mode_and_Value((uint8_t*)&MIDI_data.MIDI_data_buffer[1]);
+									}
+									else if(MIDI_data.MIDI_data_buffer[0] == SYMMETRY_CC){
+
+										Set_Symmetry_to_CC_Mode_and_Value((uint8_t*)&MIDI_data.MIDI_data_buffer[1]);
+									}
+									else if(MIDI_data.MIDI_data_buffer[0] == PHASE_CC){
+
+										Set_Phase_to_CC_Mode_and_Value((uint8_t*)&MIDI_data.MIDI_data_buffer[1]);
+									}
+								}
+
+								active_status_byte = 0;
+								Clear_Data_Buffer(&MIDI_data);
+							}
+							else{
+
+								//not a utilised Ch mode message on basic channel, or utilised CC message
+								active_status_byte = 0;
+								Clear_Data_Buffer(&MIDI_data);
+							}
+						}
+					}
+					//don't need to check Sysex with running status, as not supported by MIDI
+				}
+				else{ // is a status byte -> status byte interrupts an active status byte (when data bytes should be being received)
+
+					Clear_Data_Buffer(&MIDI_data);
+					Reset_and_Stop_MIDI_Software_Timer(&midi_counter, &statuses);
 
 					if(Is_PC_Status_Byte(rx_buffer) == YES){
 
@@ -645,7 +818,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
 								Set_All_Pots_to_PC_Mode();
 								preset_selected = (enum Preset_Selected)*rx_buffer + 1; //since 0 is no preset selected, we have to add 1
-								Update_Params_Based_On_Mode_Selected(); // Update parameters immediately with preset values
+								//Update_Params_Based_On_Mode_Selected(); // Update parameters immediately with preset values
 							}
 
 							//whether the program change data byte is in range or not, clear the data buffer and active status byte, and reset timer

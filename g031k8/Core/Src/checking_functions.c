@@ -103,10 +103,14 @@ uint8_t Pot_Check(struct Params* params_ptr, enum Pot_Type pot_type){
 			diff = *first_measurement_ptr - *second_measurement_ptr;
 
 		}
-		else{
+		else if(*second_measurement_ptr > *first_measurement_ptr){
 
 			diff = *second_measurement_ptr - *first_measurement_ptr;
 		}
+		/*else{
+
+			diff = 0
+		}*/
 
 		if(diff > tolerance){
 
