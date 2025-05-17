@@ -1019,6 +1019,11 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 		}
 	}
 
+	Pot_Check(&params_manual, WAVESHAPE_POT);
+	Pot_Check(&params_manual, DEPTH_POT);
+	Pot_Check(&params_manual, SYMMETRY_POT);
+	Pot_Check(&params_manual, PHASE_POT);
+
 	//SET TIMER TRIGGER
 	HAL_LPTIM_SetOnce_Start_IT(&hlptim1, LPTIM1_CCR_CHECK, LPTIM1_CCR_CHECK);
 
