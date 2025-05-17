@@ -818,7 +818,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
 								Set_All_Pots_to_PC_Mode();
 								preset_selected = (enum Preset_Selected)*rx_buffer + 1; //since 0 is no preset selected, we have to add 1
-								//Update_Params_Based_On_Mode_Selected(); // Update parameters immediately with preset values
+								Update_Params_Based_On_Mode_Selected(); // Update parameters immediately with preset values
 							}
 
 							//whether the program change data byte is in range or not, clear the data buffer and active status byte, and reset timer
