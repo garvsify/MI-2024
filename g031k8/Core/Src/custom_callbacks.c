@@ -1019,10 +1019,18 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 		}
 	}
 
-	Pot_Check(&params_manual, WAVESHAPE_POT);
-	Pot_Check(&params_manual, DEPTH_POT);
-	Pot_Check(&params_manual, SYMMETRY_POT);
-	Pot_Check(&params_manual, PHASE_POT);
+	if((waveshape_fsm.current_state == PC_MODE) || (waveshape_fsm.current_state == CC_MODE)){
+		Pot_Check(&params_manual, WAVESHAPE_POT);
+	}
+	if((depth_fsm.current_state == PC_MODE) || (depth_fsm.current_state == CC_MODE)){
+		Pot_Check(&params_manual, DEPTH_POT);
+	}
+	if((symmetry_fsm.current_state == PC_MODE) || (symmetry_fsm.current_state == CC_MODE)){
+		Pot_Check(&params_manual, SYMMETRY_POT);
+	}
+	if((phase_fsm.current_state == PC_MODE) || (phase_fsm.current_state == CC_MODE)){
+		Pot_Check(&params_manual, PHASE_POT);
+	}
 
 	//SET TIMER TRIGGER
 	HAL_LPTIM_SetOnce_Start_IT(&hlptim1, LPTIM1_CCR_CHECK, LPTIM1_CCR_CHECK);
