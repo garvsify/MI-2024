@@ -44,7 +44,7 @@ extern volatile uint8_t symmetry_pot_adc_measurement_num;
 extern volatile uint8_t phase_pot_adc_measurement_num;
 
 //FUNCTION DECLARATIONS
-uint8_t Pot_Check(struct Params* params_ptr, enum Pot_Type pot_type);
+uint8_t Pot_Check(volatile struct Params* params_ptr, enum Pot_Type pot_type);
 uint8_t Check_Tap_Tempo_Switch_State(volatile struct Tap_Tempo_Switch_States *tap_tempo_switch_states_ptr);
 
 #endif /* INC_CHECKING_FUNCTIONS_H_ */

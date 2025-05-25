@@ -115,7 +115,7 @@ uint8_t Convert_All_Preset_Values(volatile struct Preset* preset_ptr, volatile s
 	return 1;
 }
 
-uint8_t Update_All_with_Converted_Preset_Values(struct Preset_Converted* preset_converted_ptr, struct Params* params_ptr){
+uint8_t Update_All_with_Converted_Preset_Values(struct Preset_Converted* preset_converted_ptr, volatile struct Params* params_ptr){
 
 	uint8_t waveshape = preset_converted_ptr->waveshape;
 
@@ -140,7 +140,7 @@ uint8_t Update_All_with_Converted_Preset_Values(struct Preset_Converted* preset_
 	return 1;
 }
 
-uint8_t Update_Waveshape_with_Converted_Preset_Value(volatile struct Preset_Converted* preset_converted_ptr, struct Params* params_ptr){
+uint8_t Update_Waveshape_with_Converted_Preset_Value(volatile struct Preset_Converted* preset_converted_ptr, volatile struct Params* params_ptr){
 
 	uint8_t waveshape = preset_converted_ptr->waveshape;
 
@@ -157,28 +157,28 @@ uint8_t Update_Waveshape_with_Converted_Preset_Value(volatile struct Preset_Conv
 	return 1;
 }
 
-uint8_t Update_Speed_with_Converted_Preset_Value(volatile struct Preset_Converted* preset_converted_ptr, struct Params* params_ptr){
+uint8_t Update_Speed_with_Converted_Preset_Value(volatile struct Preset_Converted* preset_converted_ptr, volatile struct Params* params_ptr){
 
 	params_ptr->speed = preset_converted_ptr->speed;
 
 	return 1;
 }
 
-uint8_t Update_Depth_with_Converted_Preset_Value(volatile struct Preset_Converted* preset_converted_ptr, struct Params* params_ptr){
+uint8_t Update_Depth_with_Converted_Preset_Value(volatile struct Preset_Converted* preset_converted_ptr, volatile struct Params* params_ptr){
 
 	params_ptr->depth = preset_converted_ptr->depth;
 
 	return 1;
 }
 
-uint8_t Update_Symmetry_with_Converted_Preset_Value(volatile struct Preset_Converted* preset_converted_ptr, struct Params* params_ptr){
+uint8_t Update_Symmetry_with_Converted_Preset_Value(volatile struct Preset_Converted* preset_converted_ptr, volatile struct Params* params_ptr){
 
 	params_ptr->symmetry = preset_converted_ptr->symmetry;
 
 	return 1;
 }
 
-uint8_t Update_Phase_with_Converted_Preset_Value(volatile struct Preset_Converted* preset_converted_ptr, struct Params* params_ptr){
+uint8_t Update_Phase_with_Converted_Preset_Value(volatile struct Preset_Converted* preset_converted_ptr, volatile struct Params* params_ptr){
 
 	params_ptr->duty_delay_line_read_pointer_offset = preset_converted_ptr->phase;
 
@@ -370,7 +370,7 @@ uint8_t Read_and_Interpret_User_Presets_From_Flash(void){
 	return 1;
 }
 
-uint8_t Update_Waveshape_with_CC_Value(volatile uint8_t *data, struct Params* params_ptr){
+uint8_t Update_Waveshape_with_CC_Value(volatile uint8_t *data, volatile struct Params* params_ptr){
 
 	if(*data <= TRIANGLE_MODE_ADC_THRESHOLD){
 		params_ptr->waveshape = TRIANGLE_MODE;
@@ -385,7 +385,7 @@ uint8_t Update_Waveshape_with_CC_Value(volatile uint8_t *data, struct Params* pa
 	return 1;
 }
 
-uint8_t Update_Speed_with_CC_Value(volatile uint8_t *data, struct Params* params_ptr){
+uint8_t Update_Speed_with_CC_Value(volatile uint8_t *data, volatile struct Params* params_ptr){
 
 	uint16_t speed = (uint16_t)*data;
 
@@ -395,7 +395,7 @@ uint8_t Update_Speed_with_CC_Value(volatile uint8_t *data, struct Params* params
 	return 1;
 }
 
-uint8_t Update_Depth_with_CC_Value(volatile uint8_t *data, struct Params* params_ptr){
+uint8_t Update_Depth_with_CC_Value(volatile uint8_t *data, volatile struct Params* params_ptr){
 
 	uint8_t depth = (uint8_t)*data;
 	params_ptr->depth = depth;
@@ -403,7 +403,7 @@ uint8_t Update_Depth_with_CC_Value(volatile uint8_t *data, struct Params* params
 	return 1;
 }
 
-uint8_t Update_Symmetry_with_CC_Value(volatile uint8_t *data, struct Params* params_ptr){
+uint8_t Update_Symmetry_with_CC_Value(volatile uint8_t *data, volatile struct Params* params_ptr){
 
 	uint8_t symmetry = (uint8_t)*data;
 
@@ -413,7 +413,7 @@ uint8_t Update_Symmetry_with_CC_Value(volatile uint8_t *data, struct Params* par
 	return 1;
 }
 
-uint8_t Update_Phase_with_CC_Value(volatile uint8_t *data, struct Params* params_ptr){
+uint8_t Update_Phase_with_CC_Value(volatile uint8_t *data, volatile struct Params* params_ptr){
 
 	uint8_t phase = (uint8_t)*data;
 

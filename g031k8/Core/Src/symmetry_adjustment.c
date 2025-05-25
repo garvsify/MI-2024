@@ -1,7 +1,7 @@
 #include "symmetry_adjustment.h"
 
 
-uint8_t Adjust_TIM16_Prescaler(struct Params* params_ptr){
+uint8_t Adjust_TIM16_Prescaler(volatile struct Params* params_ptr){
 
     if(params_ptr->prescaler_adjust == MULTIPLY_BY_TWO){
     	params_ptr->final_prescaler = params_ptr->raw_prescaler << 1;
@@ -12,7 +12,7 @@ uint8_t Adjust_TIM16_Prescaler(struct Params* params_ptr){
     return 1;
 }
 
-uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* params_ptr){
+uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(volatile struct Params* params_ptr){
 
     #if SYMMETRY_ON_OR_OFF == ON
 

@@ -14,6 +14,7 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 
 void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 {
+	Global_Interrupt_Disable();
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
 
 	HAL_ADC_Stop_DMA(hadc); //disable ADC DMA
@@ -43,6 +44,7 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 	}
 
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
+	Global_Interrupt_Enable();
 }
 
 void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){

@@ -6,7 +6,7 @@ volatile uint16_t interrupt_period = 0;
 volatile uint8_t MIDI_CLK_tag = 0;
 
 //FUNCTION DEFINITIONS
-uint8_t Input_Capture_Processing(volatile uint16_t interrupt_period_value, struct Params *params_ptr){
+uint8_t Input_Capture_Processing(volatile uint16_t interrupt_period_value, volatile struct Params *params_ptr){
 
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
 
@@ -69,7 +69,7 @@ uint8_t Start_IC_TIM(TIM_HandleTypeDef *TIM, uint32_t IC_TIM_channel){
 	return ok_AND;
 }
 
-uint8_t Copy_Params_Structs(struct Params *src_ptr, struct Params *dst_ptr){
+uint8_t Copy_Params_Structs(volatile struct Params *src_ptr, volatile struct Params *dst_ptr){
 
 	*dst_ptr = *src_ptr;
 

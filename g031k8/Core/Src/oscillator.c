@@ -47,7 +47,7 @@ uint8_t Start_Freq_Gen_Timer(void)
 	return ok;
 }
 
-uint8_t Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(struct Params* params_ptr){
+uint8_t Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(volatile struct Params* params_ptr){
 
 	uint32_t speed_control = 0;
 	uint8_t how_many_128 = 0;
@@ -63,7 +63,7 @@ uint8_t Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(struct Params* params_pt
     return 1;
 }
 
-uint8_t Set_Oscillator_Values(struct Params* params_ptr){
+uint8_t Set_Oscillator_Values(volatile struct Params* params_ptr){
 
 	////////////////////////////////////////////////////////
 	//SET THE CURRENT(prev) VALUES FOR THE MAIN OSCILLATOR//
@@ -81,7 +81,7 @@ uint8_t Set_Oscillator_Values(struct Params* params_ptr){
 	return 1;
 }
 
-uint8_t Calculate_Next_Main_Oscillator_Values(struct Params* params_ptr, enum Next_Values_Processing_Mode mode){
+uint8_t Calculate_Next_Main_Oscillator_Values(volatile struct Params* params_ptr, enum Next_Values_Processing_Mode mode){
 
 	if(mode == REGULAR_MODE){
 
@@ -171,7 +171,7 @@ uint8_t Calculate_Next_Main_Oscillator_Values(struct Params* params_ptr, enum Ne
 	return 1;
 }
 
-uint8_t Write_Next_Main_Oscillator_Values_to_Delay_Line(struct Params* params_ptr, struct Delay_Line* delay_line_ptr){
+uint8_t Write_Next_Main_Oscillator_Values_to_Delay_Line(volatile struct Params* params_ptr, volatile struct Delay_Line* delay_line_ptr){
 
 	//STORE THE VALUES IN THE APPROPRIATE '0TH - 1' INDEX RELATIVE TO THE START POINTER
 		if(delay_line_ptr->duty_delay_line_start_offset != 0){
@@ -206,7 +206,7 @@ uint8_t Write_Next_Main_Oscillator_Values_to_Delay_Line(struct Params* params_pt
 	return 1;
 }
 
-uint8_t Process_ADC_Conversion_Values(struct Params* params_ptr, volatile uint16_t* ADCResultsDMA_ptr){
+uint8_t Process_ADC_Conversion_Values(volatile struct Params* params_ptr, volatile uint16_t* ADCResultsDMA_ptr){
 
 	//GET WAVESHAPE
 	uint16_t ADC_result = ADCResultsDMA_ptr[WAVESHAPE_ADC_RESULT_INDEX] >> 5; //set ADC_Result to waveshape index value, truncate to 7-bit
@@ -250,15 +250,6 @@ uint8_t Process_ADC_Conversion_Values(struct Params* params_ptr, volatile uint16
 	params_ptr->duty_delay_line_read_pointer_offset = temp_delay;
 
 	return 1;
-}
-
-void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
-{
-   Global_Interrupt_Disable();
-    Process_ADC_Conversion_Values(&params_manual, ADCResultsDMA);
-   Global_Interrupt_Enable();
-    
-    // ... rest of the callback ...
 }
 
 
