@@ -11,26 +11,26 @@ volatile uint8_t phase_pot_adc_measurement_num = 0;
 //FUNCTION DEFINITIONS
 uint8_t Pot_Check(struct Params* params_ptr, enum Pot_Type pot_type){
 
-	static uint16_t first_waveshape_measurement;
-	static uint16_t second_waveshape_measurement;
+	static volatile uint16_t first_waveshape_measurement;
+	static volatile uint16_t second_waveshape_measurement;
 
-	static uint16_t first_speed_measurement;
-	static uint16_t second_speed_measurement;
+	static volatile uint16_t first_speed_measurement;
+	static volatile uint16_t second_speed_measurement;
 
-	static uint16_t first_depth_measurement;
-	static uint16_t second_depth_measurement;
+	static volatile uint16_t first_depth_measurement;
+	static volatile uint16_t second_depth_measurement;
 
-	static uint16_t first_symmetry_measurement;
-	static uint16_t second_symmetry_measurement;
+	static volatile uint16_t first_symmetry_measurement;
+	static volatile uint16_t second_symmetry_measurement;
 
-	static uint16_t first_phase_measurement;
-	static uint16_t second_phase_measurement;
+	static volatile uint16_t first_phase_measurement;
+	static volatile uint16_t second_phase_measurement;
 
-	uint16_t *first_measurement_ptr = NULL;
-	uint16_t *second_measurement_ptr = NULL;
+	volatile uint16_t *first_measurement_ptr = NULL;
+	volatile uint16_t *second_measurement_ptr = NULL;
 	volatile uint8_t *measurement_num_ptr = NULL;
 	void *measurement_ptr = NULL;
-	uint8_t tolerance = 0;
+	volatile uint8_t tolerance = 0;
 	volatile struct Normal_FSM* normal_fsm_ptr = NULL;
 	volatile struct Speed_FSM* speed_fsm_ptr = NULL;
 
@@ -129,6 +129,9 @@ uint8_t Pot_Check(struct Params* params_ptr, enum Pot_Type pot_type){
 				Clear_Status_Bit(&statuses, First_Sync_Complete);
 			}
 		}
+
+		*first_measurement_ptr = 0;
+		*second_measurement_ptr = 0;
 	}
 
 	return 1;
