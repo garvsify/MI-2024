@@ -11,6 +11,8 @@ volatile uint8_t phase_pot_adc_measurement_num = 0;
 //FUNCTION DEFINITIONS
 uint8_t Pot_Check(struct Params* params_ptr, enum Pot_Type pot_type){
 
+	Global_Interrupt_Disable();
+
 	static volatile uint16_t first_waveshape_measurement;
 	static volatile uint16_t second_waveshape_measurement;
 
@@ -133,6 +135,8 @@ uint8_t Pot_Check(struct Params* params_ptr, enum Pot_Type pot_type){
 		*first_measurement_ptr = 0;
 		*second_measurement_ptr = 0;
 	}
+
+	Global_Interrupt_Enable();
 
 	return 1;
 }

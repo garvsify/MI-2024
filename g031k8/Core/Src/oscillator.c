@@ -11,11 +11,11 @@ const uint8_t num_ADC_conversions = sizeof(ADCResultsDMA) / sizeof(ADCResultsDMA
 volatile uint16_t ADCResultsDMA[5] = {0};
 
 //STRUCT VARIABLES
-struct Params params = {0};
-struct Params params_manual = {0};
-struct Params params_to_be_loaded = {0};
-struct Params params_working = {0};
-struct Delay_Line delay_line = {.duty_delay_line_storage_array = 0, //one index larger than the number of indexes (wave samples) to allow us to 'wrap' the array into a kind of circular buffer - this is reinitialised to mid-scale on runtime
+volatile struct Params params = {0};
+volatile struct Params params_manual;
+volatile struct Params params_to_be_loaded = {0};
+volatile struct Params params_working = {0};
+volatile struct Delay_Line delay_line = {.duty_delay_line_storage_array = 0, //one index larger than the number of indexes (wave samples) to allow us to 'wrap' the array into a kind of circular buffer - this is reinitialised to mid-scale on runtime
 								.duty_delay_line_start_offset = 1,  //initial value is 1st index - to give us space to fill index 0
 								.duty_delay_line_finish_offset = FINAL_INDEX + 1}; //initial value is 512th index, one larger than the index of the final sample
 
@@ -250,6 +250,15 @@ uint8_t Process_ADC_Conversion_Values(struct Params* params_ptr, volatile uint16
 	params_ptr->duty_delay_line_read_pointer_offset = temp_delay;
 
 	return 1;
+}
+
+void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
+{
+   Global_Interrupt_Disable();
+    Process_ADC_Conversion_Values(&params_manual, ADCResultsDMA);
+   Global_Interrupt_Enable();
+    
+    // ... rest of the callback ...
 }
 
 
