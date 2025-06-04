@@ -40,10 +40,10 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Core/Inc/input_capture.h ../Core/Inc/main.h \
  ../Core/Inc/oscillator_params_type.h \
  ../Core/Inc/symmetry_adjustment_types.h ../Core/Inc/oscillator_macros.h \
- ../Core/Inc/MIDI_defines.h ../Core/Inc/symmetry_adjustment.h \
- ../Core/Inc/oscillator_params_type.h ../Core/Inc/timers.h \
- ../Core/Inc/startup.h ../Core/Inc/checking_functions.h \
- ../Core/Inc/tap_tempo.h ../Core/Inc/CLK_IN.h ../Core/Inc/state_machine.h \
+ ../Core/Inc/MIDI_defines.h ../Core/Inc/checking_functions.h \
+ ../Core/Inc/timers.h ../Core/Inc/tap_tempo.h ../Core/Inc/CLK_IN.h \
+ ../Core/Inc/state_machine.h ../Core/Inc/symmetry_adjustment.h \
+ ../Core/Inc/oscillator_params_type.h ../Core/Inc/startup.h \
  ../Core/Inc/UART.h ../Core/Inc/MIDI.h ../Core/Inc/main_vars.h
 ../Core/Inc/main.h:
 ../Core/Inc/config.h:
@@ -92,14 +92,14 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Core/Inc/symmetry_adjustment_types.h:
 ../Core/Inc/oscillator_macros.h:
 ../Core/Inc/MIDI_defines.h:
-../Core/Inc/symmetry_adjustment.h:
-../Core/Inc/oscillator_params_type.h:
-../Core/Inc/timers.h:
-../Core/Inc/startup.h:
 ../Core/Inc/checking_functions.h:
+../Core/Inc/timers.h:
 ../Core/Inc/tap_tempo.h:
 ../Core/Inc/CLK_IN.h:
 ../Core/Inc/state_machine.h:
+../Core/Inc/symmetry_adjustment.h:
+../Core/Inc/oscillator_params_type.h:
+../Core/Inc/startup.h:
 ../Core/Inc/UART.h:
 ../Core/Inc/MIDI.h:
 ../Core/Inc/main_vars.h:

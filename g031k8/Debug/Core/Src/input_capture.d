@@ -39,13 +39,12 @@ Core/Src/input_capture.o: ../Core/Src/input_capture.c \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart_ex.h \
  ../Core/Inc/oscillator.h ../Core/Inc/utility.h \
  ../Core/Inc/input_capture.h ../Core/Inc/oscillator_macros.h \
- ../Core/Inc/MIDI_defines.h ../Core/Inc/symmetry_adjustment.h \
+ ../Core/Inc/MIDI_defines.h ../Core/Inc/checking_functions.h \
  ../Core/Inc/oscillator_params_type.h \
- ../Core/Inc/symmetry_adjustment_types.h \
- ../Core/Inc/oscillator_params_type.h ../Core/Inc/timers.h \
- ../Core/Inc/startup.h ../Core/Inc/checking_functions.h \
+ ../Core/Inc/symmetry_adjustment_types.h ../Core/Inc/timers.h \
  ../Core/Inc/tap_tempo.h ../Core/Inc/CLK_IN.h ../Core/Inc/state_machine.h \
- ../Core/Inc/UART.h ../Core/Inc/MIDI.h
+ ../Core/Inc/symmetry_adjustment.h ../Core/Inc/oscillator_params_type.h \
+ ../Core/Inc/startup.h ../Core/Inc/UART.h ../Core/Inc/MIDI.h
 ../Core/Inc/input_capture.h:
 ../Core/Inc/main.h:
 ../Core/Inc/config.h:
@@ -91,15 +90,15 @@ Core/Src/input_capture.o: ../Core/Src/input_capture.c \
 ../Core/Inc/input_capture.h:
 ../Core/Inc/oscillator_macros.h:
 ../Core/Inc/MIDI_defines.h:
-../Core/Inc/symmetry_adjustment.h:
+../Core/Inc/checking_functions.h:
 ../Core/Inc/oscillator_params_type.h:
 ../Core/Inc/symmetry_adjustment_types.h:
-../Core/Inc/oscillator_params_type.h:
 ../Core/Inc/timers.h:
-../Core/Inc/startup.h:
-../Core/Inc/checking_functions.h:
 ../Core/Inc/tap_tempo.h:
 ../Core/Inc/CLK_IN.h:
 ../Core/Inc/state_machine.h:
+../Core/Inc/symmetry_adjustment.h:
+../Core/Inc/oscillator_params_type.h:
+../Core/Inc/startup.h:
 ../Core/Inc/UART.h:
 ../Core/Inc/MIDI.h:

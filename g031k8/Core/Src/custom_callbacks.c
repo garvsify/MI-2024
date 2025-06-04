@@ -1152,57 +1152,74 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 	//SET PREVIOUS STATE TO CURRENT STATE
 	//tap_tempo_switch_states.tap_tempo_switch_prev_state = tap_tempo_switch_states.tap_tempo_switch_state;
 
+	if(Get_Status_Bit(&statuses, Pots_Counter_Has_Timed_Out) == YES){
 
-	//PERFORM SPEED POT CHECKING
-	if((speed_fsm.current_state.shared_state == PC_MODE) || (speed_fsm.current_state.shared_state == CC_MODE)){
+		Clear_Status_Bit(&statuses, Pots_Counter_Has_Timed_Out);
 
-		Pot_Check(&params_manual, SPEED_POT);
-	}
-	else if((speed_fsm.current_state.speed_exclusive_state == CLK_IN_MODE) && (IP_CAP_fsm.current_state == IDLE)){
+		pots_counter = 0;
 
-		Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
-
-		if(Get_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out) == YES){
+		//PERFORM SPEED POT CHECKING
+		if((speed_fsm.current_state.shared_state == PC_MODE) || (speed_fsm.current_state.shared_state == CC_MODE)){
 
 			Pot_Check(&params_manual, SPEED_POT);
 		}
-	}
-	else if((speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_MODE) && (IP_CAP_fsm.current_state == IDLE)){
+		else if((speed_fsm.current_state.speed_exclusive_state == CLK_IN_MODE) && (IP_CAP_fsm.current_state == IDLE)){
 
-		Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
+			Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
 
-		if(Get_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out) == YES){
+			if(Get_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out) == YES){
 
-			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1); //reset
-			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
-
-			MIDI_CLK_fsm = NOT_COMPILING;
-			MIDI_CLK_tag = 0;
-
-			Pot_Check(&params_manual, SPEED_POT);
+				Pot_Check(&params_manual, SPEED_POT);
+			}
 		}
-	}
-	else if((speed_fsm.current_state.speed_exclusive_state == TAP_MODE) && (IP_CAP_fsm.current_state == IDLE)){
+		else if((speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_MODE) && (IP_CAP_fsm.current_state == IDLE)){
 
-		Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
+			Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
 
-		if(Get_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out) == YES){
+			if(Get_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out) == YES){
 
-			Pot_Check(&params_manual, SPEED_POT);
+				HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1); //reset
+				HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+
+				MIDI_CLK_fsm = NOT_COMPILING;
+				MIDI_CLK_tag = 0;
+
+				Pot_Check(&params_manual, SPEED_POT);
+			}
 		}
-	}
+		else if((speed_fsm.current_state.speed_exclusive_state == TAP_MODE) && (IP_CAP_fsm.current_state == IDLE)){
 
-	if((waveshape_fsm.current_state == PC_MODE) || (waveshape_fsm.current_state == CC_MODE)){
-		Pot_Check(&params_manual, WAVESHAPE_POT);
+			Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
+
+			if(Get_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out) == YES){
+
+				Pot_Check(&params_manual, SPEED_POT);
+			}
+		}
+
+		if((waveshape_fsm.current_state == PC_MODE) || (waveshape_fsm.current_state == CC_MODE)){
+			Pot_Check(&params_manual, WAVESHAPE_POT);
+		}
+		if((depth_fsm.current_state == PC_MODE) || (depth_fsm.current_state == CC_MODE)){
+			Pot_Check(&params_manual, DEPTH_POT);
+		}
+		if((symmetry_fsm.current_state == PC_MODE) || (symmetry_fsm.current_state == CC_MODE)){
+			Pot_Check(&params_manual, SYMMETRY_POT);
+		}
+		if((phase_fsm.current_state == PC_MODE) || (phase_fsm.current_state == CC_MODE)){
+			Pot_Check(&params_manual, PHASE_POT);
+		}
+
 	}
-	if((depth_fsm.current_state == PC_MODE) || (depth_fsm.current_state == CC_MODE)){
-		Pot_Check(&params_manual, DEPTH_POT);
-	}
-	if((symmetry_fsm.current_state == PC_MODE) || (symmetry_fsm.current_state == CC_MODE)){
-		Pot_Check(&params_manual, SYMMETRY_POT);
-	}
-	if((phase_fsm.current_state == PC_MODE) || (phase_fsm.current_state == CC_MODE)){
-		Pot_Check(&params_manual, PHASE_POT);
+	else{
+		if(pots_counter == POT_COUNTER_COUNT){
+
+			Set_Status_Bit(&statuses, Pots_Counter_Has_Timed_Out);
+		}
+		else{
+
+			pots_counter++;
+		}
 	}
 
 	//SET TIMER TRIGGER

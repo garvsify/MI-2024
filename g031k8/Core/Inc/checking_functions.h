@@ -3,9 +3,10 @@
 
 //MACROS
 //#define LPTIM1_CCR_TAP_TEMPO_SW_IN_CHECK 4001 - 1 //4ms overflow with prescaler of 128
-//#define LPTIM1_CCR_CHECK 251 - 1 //value tested most with
-#define LPTIM1_CCR_CHECK 4001 - 1
+#define LPTIM1_CCR_CHECK 251 - 1
 #define LPTIM2_COUNT_MAX 24
+
+#define POT_COUNTER_COUNT 64
 
 #define SPEED_POT_CHECK_COUNTER_LENGTH 50
 #define SPEED_TOLERANCE 10
@@ -16,6 +17,8 @@
 
 #define IDLE_COUNT 32000
 #define MIDI_COUNT 32000 //@TODO
+
+#define POTS_COUNTER_HAS_TIMED_OUT (0b1 << 11)
 
 //INCLUDES
 #include <stdint.h>
@@ -43,6 +46,7 @@ extern volatile uint8_t speed_pot_adc_measurement_num;
 extern volatile uint8_t depth_pot_adc_measurement_num;
 extern volatile uint8_t symmetry_pot_adc_measurement_num;
 extern volatile uint8_t phase_pot_adc_measurement_num;
+extern volatile uint8_t pots_counter;
 
 //FUNCTION DECLARATIONS
 uint8_t Pot_Check(struct Params* params_ptr, enum Pot_Type pot_type);

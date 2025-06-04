@@ -3,11 +3,8 @@
 
 Issues:
 
-(not sure if an issue anymore)
-- When the MIDI CLKs are ceased, the device goes back into manual mode when the speed pot isn't wiggled
-
-- TAP tempo can be seen to be entering correctly into the synced tempo, but after like one oscillation of the new tempo,
-it goes back to its old tempo?
+- After in PC_MODE, when tap_tempo mode is entered. Sending a PC msg does not update the
+speed parameter, but does update the other values
 
 Potential Issues:
 

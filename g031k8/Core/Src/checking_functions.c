@@ -7,6 +7,7 @@ volatile uint8_t speed_pot_adc_measurement_num = 0;
 volatile uint8_t depth_pot_adc_measurement_num = 0;
 volatile uint8_t symmetry_pot_adc_measurement_num = 0;
 volatile uint8_t phase_pot_adc_measurement_num = 0;
+volatile uint8_t pots_counter = 0;
 
 //FUNCTION DEFINITIONS
 uint8_t Pot_Check(struct Params* params_ptr, enum Pot_Type pot_type){

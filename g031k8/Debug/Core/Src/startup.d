@@ -40,10 +40,10 @@ Core/Src/startup.o: ../Core/Src/startup.c ../Core/Inc/startup.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart_ex.h \
  ../Core/Inc/startup.h ../Core/Inc/oscillator_params_type.h \
  ../Core/Inc/symmetry_adjustment_types.h ../Core/Inc/oscillator_macros.h \
- ../Core/Inc/MIDI_defines.h ../Core/Inc/symmetry_adjustment.h \
- ../Core/Inc/oscillator_params_type.h ../Core/Inc/timers.h \
- ../Core/Inc/checking_functions.h ../Core/Inc/tap_tempo.h \
- ../Core/Inc/CLK_IN.h ../Core/Inc/state_machine.h ../Core/Inc/UART.h \
+ ../Core/Inc/MIDI_defines.h ../Core/Inc/checking_functions.h \
+ ../Core/Inc/timers.h ../Core/Inc/tap_tempo.h ../Core/Inc/CLK_IN.h \
+ ../Core/Inc/state_machine.h ../Core/Inc/symmetry_adjustment.h \
+ ../Core/Inc/oscillator_params_type.h ../Core/Inc/UART.h \
  ../Core/Inc/MIDI.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_ll_lptim.h \
  ../Core/Inc/CC_and_PC.h ../Core/Inc/midi_defines.h
@@ -95,13 +95,13 @@ Core/Src/startup.o: ../Core/Src/startup.c ../Core/Inc/startup.h \
 ../Core/Inc/symmetry_adjustment_types.h:
 ../Core/Inc/oscillator_macros.h:
 ../Core/Inc/MIDI_defines.h:
-../Core/Inc/symmetry_adjustment.h:
-../Core/Inc/oscillator_params_type.h:
-../Core/Inc/timers.h:
 ../Core/Inc/checking_functions.h:
+../Core/Inc/timers.h:
 ../Core/Inc/tap_tempo.h:
 ../Core/Inc/CLK_IN.h:
 ../Core/Inc/state_machine.h:
+../Core/Inc/symmetry_adjustment.h:
+../Core/Inc/oscillator_params_type.h:
 ../Core/Inc/UART.h:
 ../Core/Inc/MIDI.h:
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_ll_lptim.h:
