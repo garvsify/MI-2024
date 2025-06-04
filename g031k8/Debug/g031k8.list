@@ -3242,7 +3242,7 @@ uint8_t Pot_Check(struct Params* params_ptr, enum Pot_Type pot_type){
  8001362:	61bb      	str	r3, [r7, #24]
 		tolerance = WAVESHAPE_TOLERANCE;
  8001364:	187b      	adds	r3, r7, r1
- 8001366:	2202      	movs	r2, #2
+ 8001366:	2201      	movs	r2, #1
  8001368:	701a      	strb	r2, [r3, #0]
 		normal_fsm_ptr = &waveshape_fsm;
  800136a:	4b6a      	ldr	r3, [pc, #424]	@ (8001514 <Pot_Check+0x1f8>)
@@ -3271,7 +3271,7 @@ uint8_t Pot_Check(struct Params* params_ptr, enum Pot_Type pot_type){
 		tolerance = SPEED_TOLERANCE;
  800138a:	2317      	movs	r3, #23
  800138c:	18fb      	adds	r3, r7, r3
- 800138e:	2206      	movs	r2, #6
+ 800138e:	220a      	movs	r2, #10
  8001390:	701a      	strb	r2, [r3, #0]
 		speed_fsm_ptr = &speed_fsm;
  8001392:	4b64      	ldr	r3, [pc, #400]	@ (8001524 <Pot_Check+0x208>)
