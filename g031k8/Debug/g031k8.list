@@ -3241,7 +3241,7 @@ uint8_t Pot_Check(volatile uint16_t* ADCResults_arr, enum Pot_Type pot_type){
  8001360:	61bb      	str	r3, [r7, #24]
 		tolerance = WAVESHAPE_TOLERANCE;
  8001362:	187b      	adds	r3, r7, r1
- 8001364:	223c      	movs	r2, #60	@ 0x3c
+ 8001364:	2246      	movs	r2, #70	@ 0x46
  8001366:	701a      	strb	r2, [r3, #0]
 		normal_fsm_ptr = &waveshape_fsm;
  8001368:	4b6a      	ldr	r3, [pc, #424]	@ (8001514 <Pot_Check+0x1f8>)
@@ -3270,7 +3270,7 @@ uint8_t Pot_Check(volatile uint16_t* ADCResults_arr, enum Pot_Type pot_type){
 		tolerance = SPEED_TOLERANCE;
  8001388:	2317      	movs	r3, #23
  800138a:	18fb      	adds	r3, r7, r3
- 800138c:	223c      	movs	r2, #60	@ 0x3c
+ 800138c:	2246      	movs	r2, #70	@ 0x46
  800138e:	701a      	strb	r2, [r3, #0]
 		speed_fsm_ptr = &speed_fsm;
  8001390:	4b64      	ldr	r3, [pc, #400]	@ (8001524 <Pot_Check+0x208>)
@@ -3299,7 +3299,7 @@ uint8_t Pot_Check(volatile uint16_t* ADCResults_arr, enum Pot_Type pot_type){
 		tolerance = DEPTH_TOLERANCE;
  80013b0:	2317      	movs	r3, #23
  80013b2:	18fb      	adds	r3, r7, r3
- 80013b4:	223c      	movs	r2, #60	@ 0x3c
+ 80013b4:	2246      	movs	r2, #70	@ 0x46
  80013b6:	701a      	strb	r2, [r3, #0]
 		normal_fsm_ptr = &depth_fsm;
  80013b8:	4b5e      	ldr	r3, [pc, #376]	@ (8001534 <Pot_Check+0x218>)
@@ -3328,7 +3328,7 @@ uint8_t Pot_Check(volatile uint16_t* ADCResults_arr, enum Pot_Type pot_type){
 		tolerance = SYMMETRY_TOLERANCE;
  80013d8:	2317      	movs	r3, #23
  80013da:	18fb      	adds	r3, r7, r3
- 80013dc:	223c      	movs	r2, #60	@ 0x3c
+ 80013dc:	2246      	movs	r2, #70	@ 0x46
  80013de:	701a      	strb	r2, [r3, #0]
 		normal_fsm_ptr = &symmetry_fsm;
  80013e0:	4b58      	ldr	r3, [pc, #352]	@ (8001544 <Pot_Check+0x228>)
@@ -3357,7 +3357,7 @@ uint8_t Pot_Check(volatile uint16_t* ADCResults_arr, enum Pot_Type pot_type){
 		tolerance = PHASE_TOLERANCE;
  8001400:	2317      	movs	r3, #23
  8001402:	18fb      	adds	r3, r7, r3
- 8001404:	223c      	movs	r2, #60	@ 0x3c
+ 8001404:	2246      	movs	r2, #70	@ 0x46
  8001406:	701a      	strb	r2, [r3, #0]
 		normal_fsm_ptr = &phase_fsm;
  8001408:	4b52      	ldr	r3, [pc, #328]	@ (8001554 <Pot_Check+0x238>)
