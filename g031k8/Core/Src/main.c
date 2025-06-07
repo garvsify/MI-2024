@@ -3,8 +3,7 @@
 
 Issues:
 
-- waveshape pot cannot enter into manual control from PC mode, maybe need to store
-and look at raw ADC value of all pots instead
+ - when TAP TEMPO mode is entered, cannot get it into CC MODE
 
 Potential Issues:
 

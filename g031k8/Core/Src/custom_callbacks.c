@@ -661,6 +661,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 							//second data byte received
 							MIDI_data.MIDI_data_buffer[1] = *rx_buffer;
 							Reset_and_Stop_MIDI_Software_Timer(&midi_counter, &statuses);
+							Clear_Status_Bit(&statuses, First_Sync_Complete); //important for where a synced state (via MIDI CLK, CLK IN, or TAP) is the prior state
 
 							//if a CC byte is active, either it was received on the basic channel, or OMNI is on, so we can
 							//simply just use it, although we will need to check that when a channel mode message is sent,
@@ -845,6 +846,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 							//second data byte received
 							MIDI_data.MIDI_data_buffer[1] = *rx_buffer;
 							Reset_and_Stop_MIDI_Software_Timer(&midi_counter, &statuses);
+							Clear_Status_Bit(&statuses, First_Sync_Complete); //important for where a synced state (via MIDI CLK, CLK IN, or TAP) is the prior state
 
 							//if a CC byte is active, either it was received on the basic channel, or OMNI is on, so we can
 							//simply just use it, although we will need to check that when a channel mode message is sent,
