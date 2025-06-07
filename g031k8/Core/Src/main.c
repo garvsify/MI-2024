@@ -3,7 +3,9 @@
 
 Issues:
 
- - when TAP TEMPO mode is entered, cannot get it into CC MODE
+- OMNI is being set to ON by reading from flash I think. I have included
+some debug code in startup.c to manually turn OMNI off so I could prove PC and CC sent
+not on the basic channel would not be processed
 
 Potential Issues:
 

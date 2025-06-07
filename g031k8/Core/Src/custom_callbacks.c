@@ -627,24 +627,28 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
 					if(Is_PC_Status_Byte(&running_status_byte) == YES){
 
-						if(Is_Data_Buffer_Empty(&MIDI_data) == YES){
+						if((Is_Channelised_Status_Byte_On_Basic_Channel(&running_status_byte, MIDI_basic_channel) == YES)
+																|| (Is_OMNI_On(&statuses) == YES)){
 
-							//first data byte received
-							if(Is_Program_Change_Data_Byte_In_Range(rx_buffer, NUM_PRESETS) == YES){
+							if(Is_Data_Buffer_Empty(&MIDI_data) == YES){
 
-								Set_All_Pots_to_PC_Mode();
-								preset_selected = (enum Preset_Selected)*rx_buffer + 1; //since 0 is no preset selected, we have to add 1
-								Update_Params_Based_On_Mode_Selected(); // Update parameters immediately with preset values
-								Clear_Status_Bit(&statuses, First_Sync_Complete); //important for where a synced state (via MIDI CLK, CLK IN, or TAP) is the prior state
+								//first data byte received
+								if(Is_Program_Change_Data_Byte_In_Range(rx_buffer, NUM_PRESETS) == YES){
+
+									Set_All_Pots_to_PC_Mode();
+									preset_selected = (enum Preset_Selected)*rx_buffer + 1; //since 0 is no preset selected, we have to add 1
+									Update_Params_Based_On_Mode_Selected(); // Update parameters immediately with preset values
+									Clear_Status_Bit(&statuses, First_Sync_Complete); //important for where a synced state (via MIDI CLK, CLK IN, or TAP) is the prior state
+								}
+
+								//whether the program change data byte is in range or not, clear the data buffer and active status byte, and reset timer
+								Clear_Data_Buffer(&MIDI_data);
+								active_status_byte = 0;
+
+								//not really required
+								Reset_and_Stop_MIDI_Software_Timer(&midi_counter, &statuses);
+
 							}
-
-							//whether the program change data byte is in range or not, clear the data buffer and active status byte, and reset timer
-							Clear_Data_Buffer(&MIDI_data);
-							active_status_byte = 0;
-
-							//not really required
-							Reset_and_Stop_MIDI_Software_Timer(&midi_counter, &statuses);
-
 						}
 					}
 					else if(Is_CC_Status_Byte(&running_status_byte) == YES){
@@ -661,7 +665,6 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 							//second data byte received
 							MIDI_data.MIDI_data_buffer[1] = *rx_buffer;
 							Reset_and_Stop_MIDI_Software_Timer(&midi_counter, &statuses);
-							Clear_Status_Bit(&statuses, First_Sync_Complete); //important for where a synced state (via MIDI CLK, CLK IN, or TAP) is the prior state
 
 							//if a CC byte is active, either it was received on the basic channel, or OMNI is on, so we can
 							//simply just use it, although we will need to check that when a channel mode message is sent,
@@ -670,7 +673,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 							if(Is_Utilised_Channel_Mode_CC_First_Data_Byte(&MIDI_data.MIDI_data_buffer[0]) == YES){
 
 								//check on basic channel
-								if(Is_Channelised_Status_Byte_On_Basic_Channel(&active_status_byte, MIDI_basic_channel) == YES){
+								if(Is_Channelised_Status_Byte_On_Basic_Channel(&running_status_byte, MIDI_basic_channel) == YES){
 
 									if(Channel_Mode_CC_Second_Data_Byte_Is_Valid_Given_Utilised_First_Data_Byte(&MIDI_data.MIDI_data_buffer[0], &MIDI_data.MIDI_data_buffer[1]) == YES){
 
@@ -678,10 +681,12 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 										if(MIDI_data.MIDI_data_buffer[1] == RESET_ALL_CONTROLLERS){
 
 											Reset_All_Controllers(&params, &delay_line);
+											Clear_Status_Bit(&statuses, First_Sync_Complete); //important for where a synced state (via MIDI CLK, CLK IN, or TAP) is the prior state
 										}
 										else if(MIDI_data.MIDI_data_buffer[1] == LOCAL_CONTROL){
 
 											Set_Local_Control();
+											Clear_Status_Bit(&statuses, First_Sync_Complete); //important for where a synced state (via MIDI CLK, CLK IN, or TAP) is the prior state
 										}
 										else if(MIDI_data.MIDI_data_buffer[1] == OMNI_MODE_OFF){
 
@@ -701,7 +706,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 							}
 							else if(Is_Utilised_CC_First_Data_Byte(&MIDI_data.MIDI_data_buffer[0]) == YES){
 
-								if((Is_Channelised_Status_Byte_On_Basic_Channel(&active_status_byte, MIDI_basic_channel) == YES)
+								if((Is_Channelised_Status_Byte_On_Basic_Channel(&running_status_byte, MIDI_basic_channel) == YES)
 										|| (Is_OMNI_On(&statuses) == YES)){
 
 									if(MIDI_data.MIDI_data_buffer[0] == WAVESHAPE_CC){
@@ -711,6 +716,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 									else if(MIDI_data.MIDI_data_buffer[0] == SPEED_CC){
 
 										Set_Speed_to_CC_Mode_and_Value((uint8_t*)&MIDI_data.MIDI_data_buffer[1]);
+										Clear_Status_Bit(&statuses, First_Sync_Complete); //important for where a synced state (via MIDI CLK, CLK IN, or TAP) is the prior state
 									}
 									else if(MIDI_data.MIDI_data_buffer[0] == DEPTH_CC){
 
@@ -794,7 +800,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 				}
 			}
 		}
-		else if(active_status_byte != 0){
+		else if(active_status_byte != 0){ //CC/PC only called if on basic channel or omni ON
 
 			if(Get_Status_Bit(&statuses, Software_MIDI_Timer_Has_Timed_Out) == YES){
 
@@ -863,10 +869,12 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 										if(MIDI_data.MIDI_data_buffer[1] == RESET_ALL_CONTROLLERS){
 
 											Reset_All_Controllers(&params, &delay_line);
+											Clear_Status_Bit(&statuses, First_Sync_Complete); //important for where a synced state (via MIDI CLK, CLK IN, or TAP) is the prior state
 										}
 										else if(MIDI_data.MIDI_data_buffer[1] == LOCAL_CONTROL){
 
 											Set_Local_Control();
+											Clear_Status_Bit(&statuses, First_Sync_Complete); //important for where a synced state (via MIDI CLK, CLK IN, or TAP) is the prior state
 										}
 										else if(MIDI_data.MIDI_data_buffer[1] == OMNI_MODE_OFF){
 
@@ -895,6 +903,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 									else if(MIDI_data.MIDI_data_buffer[0] == SPEED_CC){
 
 										Set_Speed_to_CC_Mode_and_Value((uint8_t*)&MIDI_data.MIDI_data_buffer[1]);
+										Clear_Status_Bit(&statuses, First_Sync_Complete); //important for where a synced state (via MIDI CLK, CLK IN, or TAP) is the prior state
 									}
 									else if(MIDI_data.MIDI_data_buffer[0] == DEPTH_CC){
 

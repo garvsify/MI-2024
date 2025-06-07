@@ -77,6 +77,10 @@ uint8_t __attribute__((optimize("O0")))Startup(void){
 	//ENABLE EXTI
 	HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);
 
+	//debug
+	Set_OMNI_Off(&statuses);
+	//debug
+
 	return 1;
 }
 
