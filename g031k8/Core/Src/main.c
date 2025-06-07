@@ -65,6 +65,8 @@ int main(void)
 
 				Clear_Status_Bit(&statuses, Software_MIDI_Timer_Is_Running);
 				Set_Status_Bit(&statuses, Software_MIDI_Timer_Has_Timed_Out);
+				active_status_byte = 0;
+				Clear_Data_Buffer(&MIDI_data);
 				midi_counter = 0;
 			}
 		}
