@@ -8,12 +8,17 @@
 
 #define POT_COUNTER_COUNT 64
 
-#define SPEED_POT_CHECK_COUNTER_LENGTH 50
-#define SPEED_TOLERANCE 10
+/*#define SPEED_TOLERANCE 10
 #define WAVESHAPE_TOLERANCE 1
 #define DEPTH_TOLERANCE 2
 #define SYMMETRY_TOLERANCE 2
-#define PHASE_TOLERANCE 3
+#define PHASE_TOLERANCE 3*/
+
+#define SPEED_TOLERANCE 50
+#define WAVESHAPE_TOLERANCE 50
+#define DEPTH_TOLERANCE 50
+#define SYMMETRY_TOLERANCE 50
+#define PHASE_TOLERANCE 50
 
 #define IDLE_COUNT 32000
 #define MIDI_COUNT 32000 //@TODO
@@ -49,7 +54,7 @@ extern volatile uint8_t phase_pot_adc_measurement_num;
 extern volatile uint8_t pots_counter;
 
 //FUNCTION DECLARATIONS
-uint8_t Pot_Check(struct Params* params_ptr, enum Pot_Type pot_type);
+uint8_t Pot_Check(volatile uint16_t* ADCResults_arr, enum Pot_Type pot_type);
 uint8_t Check_Tap_Tempo_Switch_State(volatile struct Tap_Tempo_Switch_States *tap_tempo_switch_states_ptr);
 
 #endif /* INC_CHECKING_FUNCTIONS_H_ */

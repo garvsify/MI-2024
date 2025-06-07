@@ -10,7 +10,7 @@ volatile uint8_t phase_pot_adc_measurement_num = 0;
 volatile uint8_t pots_counter = 0;
 
 //FUNCTION DEFINITIONS
-uint8_t Pot_Check(struct Params* params_ptr, enum Pot_Type pot_type){
+uint8_t Pot_Check(volatile uint16_t* ADCResults_arr, enum Pot_Type pot_type){
 
 	static uint16_t first_waveshape_measurement;
 	static uint16_t second_waveshape_measurement;
@@ -40,7 +40,7 @@ uint8_t Pot_Check(struct Params* params_ptr, enum Pot_Type pot_type){
 		first_measurement_ptr = &first_waveshape_measurement;
 		second_measurement_ptr = &second_waveshape_measurement;
 		measurement_num_ptr = &waveshape_pot_adc_measurement_num;
-		measurement_ptr = (uint16_t*)&params_ptr->waveshape;
+		measurement_ptr = (uint16_t*)(ADCResults_arr + WAVESHAPE_ADC_RESULT_INDEX);
 		tolerance = WAVESHAPE_TOLERANCE;
 		normal_fsm_ptr = &waveshape_fsm;
 	}
@@ -49,7 +49,7 @@ uint8_t Pot_Check(struct Params* params_ptr, enum Pot_Type pot_type){
 		first_measurement_ptr = &first_speed_measurement;
 		second_measurement_ptr = &second_speed_measurement;
 		measurement_num_ptr = &speed_pot_adc_measurement_num;
-		measurement_ptr = (uint16_t*)&params_ptr->speed;
+		measurement_ptr = (uint16_t*)(ADCResults_arr + SPEED_ADC_RESULT_INDEX);
 		tolerance = SPEED_TOLERANCE;
 		speed_fsm_ptr = &speed_fsm;
 	}
@@ -58,7 +58,7 @@ uint8_t Pot_Check(struct Params* params_ptr, enum Pot_Type pot_type){
 		first_measurement_ptr = &first_depth_measurement;
 		second_measurement_ptr = &second_depth_measurement;
 		measurement_num_ptr = &depth_pot_adc_measurement_num;
-		measurement_ptr = (uint16_t*)&params_ptr->depth;
+		measurement_ptr = (uint16_t*)(ADCResults_arr + DEPTH_ADC_RESULT_INDEX);
 		tolerance = DEPTH_TOLERANCE;
 		normal_fsm_ptr = &depth_fsm;
 	}
@@ -67,7 +67,7 @@ uint8_t Pot_Check(struct Params* params_ptr, enum Pot_Type pot_type){
 		first_measurement_ptr = &first_symmetry_measurement;
 		second_measurement_ptr = &second_symmetry_measurement;
 		measurement_num_ptr = &symmetry_pot_adc_measurement_num;
-		measurement_ptr = (uint16_t*)&params_ptr->symmetry;
+		measurement_ptr = (uint16_t*)(ADCResults_arr + SYMMETRY_ADC_RESULT_INDEX);
 		tolerance = SYMMETRY_TOLERANCE;
 		normal_fsm_ptr = &symmetry_fsm;
 	}
@@ -76,7 +76,7 @@ uint8_t Pot_Check(struct Params* params_ptr, enum Pot_Type pot_type){
 		first_measurement_ptr = &first_phase_measurement;
 		second_measurement_ptr = &second_phase_measurement;
 		measurement_num_ptr = &phase_pot_adc_measurement_num;
-		measurement_ptr = (uint16_t*)&params_ptr->duty_delay_line_read_pointer_offset;
+		measurement_ptr = (uint16_t*)(ADCResults_arr + DUTY_DELAY_LINE_READ_POINTER_OFFSET_ADC_RESULT_INDEX);
 		tolerance = PHASE_TOLERANCE;
 		normal_fsm_ptr = &phase_fsm;
 	}

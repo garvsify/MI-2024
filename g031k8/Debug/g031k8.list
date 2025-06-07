@@ -27,23 +27,23 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  11 .ARM.attributes 00000028  00000000  00000000  0000f44c  2**0
                   CONTENTS, READONLY
- 12 .debug_info   00020345  00000000  00000000  0000f474  2**0
+ 12 .debug_info   0002021c  00000000  00000000  0000f474  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 13 .debug_abbrev 00004585  00000000  00000000  0002f7b9  2**0
+ 13 .debug_abbrev 00004586  00000000  00000000  0002f690  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_aranges 000017b0  00000000  00000000  00033d40  2**3
+ 14 .debug_aranges 000017b0  00000000  00000000  00033c18  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_rnglists 00001257  00000000  00000000  000354f0  2**0
+ 15 .debug_rnglists 00001257  00000000  00000000  000353c8  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_line   00015d40  00000000  00000000  00036747  2**0
+ 16 .debug_line   00015d05  00000000  00000000  0003661f  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_str    0000821e  00000000  00000000  0004c487  2**0
+ 17 .debug_str    0000822d  00000000  00000000  0004c324  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .comment      00000043  00000000  00000000  000546a5  2**0
+ 18 .comment      00000043  00000000  00000000  00054551  2**0
                   CONTENTS, READONLY
- 19 .debug_frame  00005470  00000000  00000000  000546e8  2**2
+ 19 .debug_frame  00005470  00000000  00000000  00054594  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 20 .debug_line_str 00000050  00000000  00000000  00059b58  2**0
+ 20 .debug_line_str 00000050  00000000  00000000  00059a04  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -3184,7 +3184,7 @@ volatile uint8_t phase_pot_adc_measurement_num = 0;
 volatile uint8_t pots_counter = 0;
 
 //FUNCTION DEFINITIONS
-uint8_t Pot_Check(struct Params* params_ptr, enum Pot_Type pot_type){
+uint8_t Pot_Check(volatile uint16_t* ADCResults_arr, enum Pot_Type pot_type){
  800131c:	b580      	push	{r7, lr}
  800131e:	b08a      	sub	sp, #40	@ 0x28
  8001320:	af00      	add	r7, sp, #0
@@ -3225,7 +3225,7 @@ uint8_t Pot_Check(struct Params* params_ptr, enum Pot_Type pot_type){
  800134a:	1cfb      	adds	r3, r7, #3
  800134c:	781b      	ldrb	r3, [r3, #0]
  800134e:	2b00      	cmp	r3, #0
- 8001350:	d10e      	bne.n	8001370 <Pot_Check+0x54>
+ 8001350:	d10d      	bne.n	800136e <Pot_Check+0x52>
 
 		first_measurement_ptr = &first_waveshape_measurement;
  8001352:	4b6d      	ldr	r3, [pc, #436]	@ (8001508 <Pot_Check+0x1ec>)
@@ -3236,309 +3236,309 @@ uint8_t Pot_Check(struct Params* params_ptr, enum Pot_Type pot_type){
 		measurement_num_ptr = &waveshape_pot_adc_measurement_num;
  800135a:	4b6d      	ldr	r3, [pc, #436]	@ (8001510 <Pot_Check+0x1f4>)
  800135c:	61fb      	str	r3, [r7, #28]
-		measurement_ptr = (uint16_t*)&params_ptr->waveshape;
+		measurement_ptr = (uint16_t*)(ADCResults_arr + WAVESHAPE_ADC_RESULT_INDEX);
  800135e:	687b      	ldr	r3, [r7, #4]
- 8001360:	3306      	adds	r3, #6
- 8001362:	61bb      	str	r3, [r7, #24]
+ 8001360:	61bb      	str	r3, [r7, #24]
 		tolerance = WAVESHAPE_TOLERANCE;
- 8001364:	187b      	adds	r3, r7, r1
- 8001366:	2201      	movs	r2, #1
- 8001368:	701a      	strb	r2, [r3, #0]
+ 8001362:	187b      	adds	r3, r7, r1
+ 8001364:	2232      	movs	r2, #50	@ 0x32
+ 8001366:	701a      	strb	r2, [r3, #0]
 		normal_fsm_ptr = &waveshape_fsm;
- 800136a:	4b6a      	ldr	r3, [pc, #424]	@ (8001514 <Pot_Check+0x1f8>)
- 800136c:	613b      	str	r3, [r7, #16]
- 800136e:	e04e      	b.n	800140e <Pot_Check+0xf2>
+ 8001368:	4b6a      	ldr	r3, [pc, #424]	@ (8001514 <Pot_Check+0x1f8>)
+ 800136a:	613b      	str	r3, [r7, #16]
+ 800136c:	e04e      	b.n	800140c <Pot_Check+0xf0>
 	}
 	else if(pot_type == SPEED_POT){
- 8001370:	1cfb      	adds	r3, r7, #3
- 8001372:	781b      	ldrb	r3, [r3, #0]
- 8001374:	2b01      	cmp	r3, #1
- 8001376:	d10f      	bne.n	8001398 <Pot_Check+0x7c>
+ 800136e:	1cfb      	adds	r3, r7, #3
+ 8001370:	781b      	ldrb	r3, [r3, #0]
+ 8001372:	2b01      	cmp	r3, #1
+ 8001374:	d10f      	bne.n	8001396 <Pot_Check+0x7a>
 
 		first_measurement_ptr = &first_speed_measurement;
- 8001378:	4b67      	ldr	r3, [pc, #412]	@ (8001518 <Pot_Check+0x1fc>)
- 800137a:	627b      	str	r3, [r7, #36]	@ 0x24
+ 8001376:	4b68      	ldr	r3, [pc, #416]	@ (8001518 <Pot_Check+0x1fc>)
+ 8001378:	627b      	str	r3, [r7, #36]	@ 0x24
 		second_measurement_ptr = &second_speed_measurement;
- 800137c:	4b67      	ldr	r3, [pc, #412]	@ (800151c <Pot_Check+0x200>)
- 800137e:	623b      	str	r3, [r7, #32]
+ 800137a:	4b68      	ldr	r3, [pc, #416]	@ (800151c <Pot_Check+0x200>)
+ 800137c:	623b      	str	r3, [r7, #32]
 		measurement_num_ptr = &speed_pot_adc_measurement_num;
- 8001380:	4b67      	ldr	r3, [pc, #412]	@ (8001520 <Pot_Check+0x204>)
- 8001382:	61fb      	str	r3, [r7, #28]
-		measurement_ptr = (uint16_t*)&params_ptr->speed;
- 8001384:	687b      	ldr	r3, [r7, #4]
- 8001386:	3308      	adds	r3, #8
- 8001388:	61bb      	str	r3, [r7, #24]
+ 800137e:	4b68      	ldr	r3, [pc, #416]	@ (8001520 <Pot_Check+0x204>)
+ 8001380:	61fb      	str	r3, [r7, #28]
+		measurement_ptr = (uint16_t*)(ADCResults_arr + SPEED_ADC_RESULT_INDEX);
+ 8001382:	687b      	ldr	r3, [r7, #4]
+ 8001384:	3302      	adds	r3, #2
+ 8001386:	61bb      	str	r3, [r7, #24]
 		tolerance = SPEED_TOLERANCE;
- 800138a:	2317      	movs	r3, #23
- 800138c:	18fb      	adds	r3, r7, r3
- 800138e:	220a      	movs	r2, #10
- 8001390:	701a      	strb	r2, [r3, #0]
+ 8001388:	2317      	movs	r3, #23
+ 800138a:	18fb      	adds	r3, r7, r3
+ 800138c:	2232      	movs	r2, #50	@ 0x32
+ 800138e:	701a      	strb	r2, [r3, #0]
 		speed_fsm_ptr = &speed_fsm;
- 8001392:	4b64      	ldr	r3, [pc, #400]	@ (8001524 <Pot_Check+0x208>)
- 8001394:	60fb      	str	r3, [r7, #12]
- 8001396:	e03a      	b.n	800140e <Pot_Check+0xf2>
+ 8001390:	4b64      	ldr	r3, [pc, #400]	@ (8001524 <Pot_Check+0x208>)
+ 8001392:	60fb      	str	r3, [r7, #12]
+ 8001394:	e03a      	b.n	800140c <Pot_Check+0xf0>
 	}
 	else if(pot_type == DEPTH_POT){
- 8001398:	1cfb      	adds	r3, r7, #3
- 800139a:	781b      	ldrb	r3, [r3, #0]
- 800139c:	2b02      	cmp	r3, #2
- 800139e:	d10f      	bne.n	80013c0 <Pot_Check+0xa4>
+ 8001396:	1cfb      	adds	r3, r7, #3
+ 8001398:	781b      	ldrb	r3, [r3, #0]
+ 800139a:	2b02      	cmp	r3, #2
+ 800139c:	d10f      	bne.n	80013be <Pot_Check+0xa2>
 
 		first_measurement_ptr = &first_depth_measurement;
- 80013a0:	4b61      	ldr	r3, [pc, #388]	@ (8001528 <Pot_Check+0x20c>)
- 80013a2:	627b      	str	r3, [r7, #36]	@ 0x24
+ 800139e:	4b62      	ldr	r3, [pc, #392]	@ (8001528 <Pot_Check+0x20c>)
+ 80013a0:	627b      	str	r3, [r7, #36]	@ 0x24
 		second_measurement_ptr = &second_depth_measurement;
- 80013a4:	4b61      	ldr	r3, [pc, #388]	@ (800152c <Pot_Check+0x210>)
- 80013a6:	623b      	str	r3, [r7, #32]
+ 80013a2:	4b62      	ldr	r3, [pc, #392]	@ (800152c <Pot_Check+0x210>)
+ 80013a4:	623b      	str	r3, [r7, #32]
 		measurement_num_ptr = &depth_pot_adc_measurement_num;
- 80013a8:	4b61      	ldr	r3, [pc, #388]	@ (8001530 <Pot_Check+0x214>)
- 80013aa:	61fb      	str	r3, [r7, #28]
-		measurement_ptr = (uint16_t*)&params_ptr->depth;
- 80013ac:	687b      	ldr	r3, [r7, #4]
- 80013ae:	330a      	adds	r3, #10
- 80013b0:	61bb      	str	r3, [r7, #24]
+ 80013a6:	4b62      	ldr	r3, [pc, #392]	@ (8001530 <Pot_Check+0x214>)
+ 80013a8:	61fb      	str	r3, [r7, #28]
+		measurement_ptr = (uint16_t*)(ADCResults_arr + DEPTH_ADC_RESULT_INDEX);
+ 80013aa:	687b      	ldr	r3, [r7, #4]
+ 80013ac:	3304      	adds	r3, #4
+ 80013ae:	61bb      	str	r3, [r7, #24]
 		tolerance = DEPTH_TOLERANCE;
- 80013b2:	2317      	movs	r3, #23
- 80013b4:	18fb      	adds	r3, r7, r3
- 80013b6:	2202      	movs	r2, #2
- 80013b8:	701a      	strb	r2, [r3, #0]
+ 80013b0:	2317      	movs	r3, #23
+ 80013b2:	18fb      	adds	r3, r7, r3
+ 80013b4:	2232      	movs	r2, #50	@ 0x32
+ 80013b6:	701a      	strb	r2, [r3, #0]
 		normal_fsm_ptr = &depth_fsm;
- 80013ba:	4b5e      	ldr	r3, [pc, #376]	@ (8001534 <Pot_Check+0x218>)
- 80013bc:	613b      	str	r3, [r7, #16]
- 80013be:	e026      	b.n	800140e <Pot_Check+0xf2>
+ 80013b8:	4b5e      	ldr	r3, [pc, #376]	@ (8001534 <Pot_Check+0x218>)
+ 80013ba:	613b      	str	r3, [r7, #16]
+ 80013bc:	e026      	b.n	800140c <Pot_Check+0xf0>
 	}
 	else if(pot_type == SYMMETRY_POT){
- 80013c0:	1cfb      	adds	r3, r7, #3
- 80013c2:	781b      	ldrb	r3, [r3, #0]
- 80013c4:	2b03      	cmp	r3, #3
- 80013c6:	d10f      	bne.n	80013e8 <Pot_Check+0xcc>
+ 80013be:	1cfb      	adds	r3, r7, #3
+ 80013c0:	781b      	ldrb	r3, [r3, #0]
+ 80013c2:	2b03      	cmp	r3, #3
+ 80013c4:	d10f      	bne.n	80013e6 <Pot_Check+0xca>
 
 		first_measurement_ptr = &first_symmetry_measurement;
- 80013c8:	4b5b      	ldr	r3, [pc, #364]	@ (8001538 <Pot_Check+0x21c>)
- 80013ca:	627b      	str	r3, [r7, #36]	@ 0x24
+ 80013c6:	4b5c      	ldr	r3, [pc, #368]	@ (8001538 <Pot_Check+0x21c>)
+ 80013c8:	627b      	str	r3, [r7, #36]	@ 0x24
 		second_measurement_ptr = &second_symmetry_measurement;
- 80013cc:	4b5b      	ldr	r3, [pc, #364]	@ (800153c <Pot_Check+0x220>)
- 80013ce:	623b      	str	r3, [r7, #32]
+ 80013ca:	4b5c      	ldr	r3, [pc, #368]	@ (800153c <Pot_Check+0x220>)
+ 80013cc:	623b      	str	r3, [r7, #32]
 		measurement_num_ptr = &symmetry_pot_adc_measurement_num;
- 80013d0:	4b5b      	ldr	r3, [pc, #364]	@ (8001540 <Pot_Check+0x224>)
- 80013d2:	61fb      	str	r3, [r7, #28]
-		measurement_ptr = (uint16_t*)&params_ptr->symmetry;
- 80013d4:	687b      	ldr	r3, [r7, #4]
- 80013d6:	330c      	adds	r3, #12
- 80013d8:	61bb      	str	r3, [r7, #24]
+ 80013ce:	4b5c      	ldr	r3, [pc, #368]	@ (8001540 <Pot_Check+0x224>)
+ 80013d0:	61fb      	str	r3, [r7, #28]
+		measurement_ptr = (uint16_t*)(ADCResults_arr + SYMMETRY_ADC_RESULT_INDEX);
+ 80013d2:	687b      	ldr	r3, [r7, #4]
+ 80013d4:	3306      	adds	r3, #6
+ 80013d6:	61bb      	str	r3, [r7, #24]
 		tolerance = SYMMETRY_TOLERANCE;
- 80013da:	2317      	movs	r3, #23
- 80013dc:	18fb      	adds	r3, r7, r3
- 80013de:	2202      	movs	r2, #2
- 80013e0:	701a      	strb	r2, [r3, #0]
+ 80013d8:	2317      	movs	r3, #23
+ 80013da:	18fb      	adds	r3, r7, r3
+ 80013dc:	2232      	movs	r2, #50	@ 0x32
+ 80013de:	701a      	strb	r2, [r3, #0]
 		normal_fsm_ptr = &symmetry_fsm;
- 80013e2:	4b58      	ldr	r3, [pc, #352]	@ (8001544 <Pot_Check+0x228>)
- 80013e4:	613b      	str	r3, [r7, #16]
- 80013e6:	e012      	b.n	800140e <Pot_Check+0xf2>
+ 80013e0:	4b58      	ldr	r3, [pc, #352]	@ (8001544 <Pot_Check+0x228>)
+ 80013e2:	613b      	str	r3, [r7, #16]
+ 80013e4:	e012      	b.n	800140c <Pot_Check+0xf0>
 	}
 	else if(pot_type == PHASE_POT){
- 80013e8:	1cfb      	adds	r3, r7, #3
- 80013ea:	781b      	ldrb	r3, [r3, #0]
- 80013ec:	2b04      	cmp	r3, #4
- 80013ee:	d10e      	bne.n	800140e <Pot_Check+0xf2>
+ 80013e6:	1cfb      	adds	r3, r7, #3
+ 80013e8:	781b      	ldrb	r3, [r3, #0]
+ 80013ea:	2b04      	cmp	r3, #4
+ 80013ec:	d10e      	bne.n	800140c <Pot_Check+0xf0>
 
 		first_measurement_ptr = &first_phase_measurement;
- 80013f0:	4b55      	ldr	r3, [pc, #340]	@ (8001548 <Pot_Check+0x22c>)
- 80013f2:	627b      	str	r3, [r7, #36]	@ 0x24
+ 80013ee:	4b56      	ldr	r3, [pc, #344]	@ (8001548 <Pot_Check+0x22c>)
+ 80013f0:	627b      	str	r3, [r7, #36]	@ 0x24
 		second_measurement_ptr = &second_phase_measurement;
- 80013f4:	4b55      	ldr	r3, [pc, #340]	@ (800154c <Pot_Check+0x230>)
- 80013f6:	623b      	str	r3, [r7, #32]
+ 80013f2:	4b56      	ldr	r3, [pc, #344]	@ (800154c <Pot_Check+0x230>)
+ 80013f4:	623b      	str	r3, [r7, #32]
 		measurement_num_ptr = &phase_pot_adc_measurement_num;
- 80013f8:	4b55      	ldr	r3, [pc, #340]	@ (8001550 <Pot_Check+0x234>)
- 80013fa:	61fb      	str	r3, [r7, #28]
-		measurement_ptr = (uint16_t*)&params_ptr->duty_delay_line_read_pointer_offset;
- 80013fc:	687b      	ldr	r3, [r7, #4]
- 80013fe:	3322      	adds	r3, #34	@ 0x22
- 8001400:	61bb      	str	r3, [r7, #24]
+ 80013f6:	4b56      	ldr	r3, [pc, #344]	@ (8001550 <Pot_Check+0x234>)
+ 80013f8:	61fb      	str	r3, [r7, #28]
+		measurement_ptr = (uint16_t*)(ADCResults_arr + DUTY_DELAY_LINE_READ_POINTER_OFFSET_ADC_RESULT_INDEX);
+ 80013fa:	687b      	ldr	r3, [r7, #4]
+ 80013fc:	3308      	adds	r3, #8
+ 80013fe:	61bb      	str	r3, [r7, #24]
 		tolerance = PHASE_TOLERANCE;
- 8001402:	2317      	movs	r3, #23
- 8001404:	18fb      	adds	r3, r7, r3
- 8001406:	2203      	movs	r2, #3
- 8001408:	701a      	strb	r2, [r3, #0]
+ 8001400:	2317      	movs	r3, #23
+ 8001402:	18fb      	adds	r3, r7, r3
+ 8001404:	2232      	movs	r2, #50	@ 0x32
+ 8001406:	701a      	strb	r2, [r3, #0]
 		normal_fsm_ptr = &phase_fsm;
- 800140a:	4b52      	ldr	r3, [pc, #328]	@ (8001554 <Pot_Check+0x238>)
- 800140c:	613b      	str	r3, [r7, #16]
+ 8001408:	4b52      	ldr	r3, [pc, #328]	@ (8001554 <Pot_Check+0x238>)
+ 800140a:	613b      	str	r3, [r7, #16]
 	}
 
 	if(*measurement_num_ptr == 0){
- 800140e:	69fb      	ldr	r3, [r7, #28]
- 8001410:	781b      	ldrb	r3, [r3, #0]
- 8001412:	b2db      	uxtb	r3, r3
- 8001414:	2b00      	cmp	r3, #0
- 8001416:	d10b      	bne.n	8001430 <Pot_Check+0x114>
+ 800140c:	69fb      	ldr	r3, [r7, #28]
+ 800140e:	781b      	ldrb	r3, [r3, #0]
+ 8001410:	b2db      	uxtb	r3, r3
+ 8001412:	2b00      	cmp	r3, #0
+ 8001414:	d10b      	bne.n	800142e <Pot_Check+0x112>
 
 		*first_measurement_ptr = *((uint16_t*)measurement_ptr);
- 8001418:	69bb      	ldr	r3, [r7, #24]
- 800141a:	881a      	ldrh	r2, [r3, #0]
- 800141c:	6a7b      	ldr	r3, [r7, #36]	@ 0x24
- 800141e:	801a      	strh	r2, [r3, #0]
+ 8001416:	69bb      	ldr	r3, [r7, #24]
+ 8001418:	881a      	ldrh	r2, [r3, #0]
+ 800141a:	6a7b      	ldr	r3, [r7, #36]	@ 0x24
+ 800141c:	801a      	strh	r2, [r3, #0]
 
 			(*measurement_num_ptr)++;
- 8001420:	69fb      	ldr	r3, [r7, #28]
- 8001422:	781b      	ldrb	r3, [r3, #0]
- 8001424:	b2db      	uxtb	r3, r3
- 8001426:	3301      	adds	r3, #1
- 8001428:	b2da      	uxtb	r2, r3
- 800142a:	69fb      	ldr	r3, [r7, #28]
- 800142c:	701a      	strb	r2, [r3, #0]
- 800142e:	e066      	b.n	80014fe <Pot_Check+0x1e2>
+ 800141e:	69fb      	ldr	r3, [r7, #28]
+ 8001420:	781b      	ldrb	r3, [r3, #0]
+ 8001422:	b2db      	uxtb	r3, r3
+ 8001424:	3301      	adds	r3, #1
+ 8001426:	b2da      	uxtb	r2, r3
+ 8001428:	69fb      	ldr	r3, [r7, #28]
+ 800142a:	701a      	strb	r2, [r3, #0]
+ 800142c:	e066      	b.n	80014fc <Pot_Check+0x1e0>
 	}
 	else if(*measurement_num_ptr == 1){
- 8001430:	69fb      	ldr	r3, [r7, #28]
- 8001432:	781b      	ldrb	r3, [r3, #0]
- 8001434:	b2db      	uxtb	r3, r3
- 8001436:	2b01      	cmp	r3, #1
- 8001438:	d10b      	bne.n	8001452 <Pot_Check+0x136>
+ 800142e:	69fb      	ldr	r3, [r7, #28]
+ 8001430:	781b      	ldrb	r3, [r3, #0]
+ 8001432:	b2db      	uxtb	r3, r3
+ 8001434:	2b01      	cmp	r3, #1
+ 8001436:	d10b      	bne.n	8001450 <Pot_Check+0x134>
 
 		*second_measurement_ptr = *((uint16_t*)measurement_ptr);
- 800143a:	69bb      	ldr	r3, [r7, #24]
- 800143c:	881a      	ldrh	r2, [r3, #0]
- 800143e:	6a3b      	ldr	r3, [r7, #32]
- 8001440:	801a      	strh	r2, [r3, #0]
+ 8001438:	69bb      	ldr	r3, [r7, #24]
+ 800143a:	881a      	ldrh	r2, [r3, #0]
+ 800143c:	6a3b      	ldr	r3, [r7, #32]
+ 800143e:	801a      	strh	r2, [r3, #0]
 
 		(*measurement_num_ptr)++;
- 8001442:	69fb      	ldr	r3, [r7, #28]
- 8001444:	781b      	ldrb	r3, [r3, #0]
- 8001446:	b2db      	uxtb	r3, r3
- 8001448:	3301      	adds	r3, #1
- 800144a:	b2da      	uxtb	r2, r3
- 800144c:	69fb      	ldr	r3, [r7, #28]
- 800144e:	701a      	strb	r2, [r3, #0]
- 8001450:	e055      	b.n	80014fe <Pot_Check+0x1e2>
+ 8001440:	69fb      	ldr	r3, [r7, #28]
+ 8001442:	781b      	ldrb	r3, [r3, #0]
+ 8001444:	b2db      	uxtb	r3, r3
+ 8001446:	3301      	adds	r3, #1
+ 8001448:	b2da      	uxtb	r2, r3
+ 800144a:	69fb      	ldr	r3, [r7, #28]
+ 800144c:	701a      	strb	r2, [r3, #0]
+ 800144e:	e055      	b.n	80014fc <Pot_Check+0x1e0>
 	}
 	else if(*measurement_num_ptr == 2){
- 8001452:	69fb      	ldr	r3, [r7, #28]
- 8001454:	781b      	ldrb	r3, [r3, #0]
- 8001456:	b2db      	uxtb	r3, r3
- 8001458:	2b02      	cmp	r3, #2
- 800145a:	d150      	bne.n	80014fe <Pot_Check+0x1e2>
+ 8001450:	69fb      	ldr	r3, [r7, #28]
+ 8001452:	781b      	ldrb	r3, [r3, #0]
+ 8001454:	b2db      	uxtb	r3, r3
+ 8001456:	2b02      	cmp	r3, #2
+ 8001458:	d150      	bne.n	80014fc <Pot_Check+0x1e0>
 
 		*measurement_num_ptr = 0;
- 800145c:	69fb      	ldr	r3, [r7, #28]
- 800145e:	2200      	movs	r2, #0
- 8001460:	701a      	strb	r2, [r3, #0]
+ 800145a:	69fb      	ldr	r3, [r7, #28]
+ 800145c:	2200      	movs	r2, #0
+ 800145e:	701a      	strb	r2, [r3, #0]
 
 		uint16_t diff = 0;
- 8001462:	200a      	movs	r0, #10
- 8001464:	183b      	adds	r3, r7, r0
- 8001466:	2200      	movs	r2, #0
- 8001468:	801a      	strh	r2, [r3, #0]
+ 8001460:	200a      	movs	r0, #10
+ 8001462:	183b      	adds	r3, r7, r0
+ 8001464:	2200      	movs	r2, #0
+ 8001466:	801a      	strh	r2, [r3, #0]
 
 		if(*first_measurement_ptr > *second_measurement_ptr){
- 800146a:	6a7b      	ldr	r3, [r7, #36]	@ 0x24
- 800146c:	881a      	ldrh	r2, [r3, #0]
- 800146e:	6a3b      	ldr	r3, [r7, #32]
- 8001470:	881b      	ldrh	r3, [r3, #0]
- 8001472:	429a      	cmp	r2, r3
- 8001474:	d907      	bls.n	8001486 <Pot_Check+0x16a>
+ 8001468:	6a7b      	ldr	r3, [r7, #36]	@ 0x24
+ 800146a:	881a      	ldrh	r2, [r3, #0]
+ 800146c:	6a3b      	ldr	r3, [r7, #32]
+ 800146e:	881b      	ldrh	r3, [r3, #0]
+ 8001470:	429a      	cmp	r2, r3
+ 8001472:	d907      	bls.n	8001484 <Pot_Check+0x168>
 
 			diff = *first_measurement_ptr - *second_measurement_ptr;
- 8001476:	6a7b      	ldr	r3, [r7, #36]	@ 0x24
- 8001478:	8819      	ldrh	r1, [r3, #0]
- 800147a:	6a3b      	ldr	r3, [r7, #32]
- 800147c:	881a      	ldrh	r2, [r3, #0]
- 800147e:	183b      	adds	r3, r7, r0
- 8001480:	1a8a      	subs	r2, r1, r2
- 8001482:	801a      	strh	r2, [r3, #0]
- 8001484:	e00d      	b.n	80014a2 <Pot_Check+0x186>
+ 8001474:	6a7b      	ldr	r3, [r7, #36]	@ 0x24
+ 8001476:	8819      	ldrh	r1, [r3, #0]
+ 8001478:	6a3b      	ldr	r3, [r7, #32]
+ 800147a:	881a      	ldrh	r2, [r3, #0]
+ 800147c:	183b      	adds	r3, r7, r0
+ 800147e:	1a8a      	subs	r2, r1, r2
+ 8001480:	801a      	strh	r2, [r3, #0]
+ 8001482:	e00d      	b.n	80014a0 <Pot_Check+0x184>
 
 		}
 		else if(*second_measurement_ptr > *first_measurement_ptr){
- 8001486:	6a3b      	ldr	r3, [r7, #32]
- 8001488:	881a      	ldrh	r2, [r3, #0]
- 800148a:	6a7b      	ldr	r3, [r7, #36]	@ 0x24
- 800148c:	881b      	ldrh	r3, [r3, #0]
- 800148e:	429a      	cmp	r2, r3
- 8001490:	d907      	bls.n	80014a2 <Pot_Check+0x186>
+ 8001484:	6a3b      	ldr	r3, [r7, #32]
+ 8001486:	881a      	ldrh	r2, [r3, #0]
+ 8001488:	6a7b      	ldr	r3, [r7, #36]	@ 0x24
+ 800148a:	881b      	ldrh	r3, [r3, #0]
+ 800148c:	429a      	cmp	r2, r3
+ 800148e:	d907      	bls.n	80014a0 <Pot_Check+0x184>
 
 			diff = *second_measurement_ptr - *first_measurement_ptr;
- 8001492:	6a3b      	ldr	r3, [r7, #32]
- 8001494:	8819      	ldrh	r1, [r3, #0]
- 8001496:	6a7b      	ldr	r3, [r7, #36]	@ 0x24
- 8001498:	881a      	ldrh	r2, [r3, #0]
- 800149a:	230a      	movs	r3, #10
- 800149c:	18fb      	adds	r3, r7, r3
- 800149e:	1a8a      	subs	r2, r1, r2
- 80014a0:	801a      	strh	r2, [r3, #0]
+ 8001490:	6a3b      	ldr	r3, [r7, #32]
+ 8001492:	8819      	ldrh	r1, [r3, #0]
+ 8001494:	6a7b      	ldr	r3, [r7, #36]	@ 0x24
+ 8001496:	881a      	ldrh	r2, [r3, #0]
+ 8001498:	230a      	movs	r3, #10
+ 800149a:	18fb      	adds	r3, r7, r3
+ 800149c:	1a8a      	subs	r2, r1, r2
+ 800149e:	801a      	strh	r2, [r3, #0]
 		/*else{
 
 			diff = 0
 		}*/
 
 		if(diff > tolerance){
- 80014a2:	2317      	movs	r3, #23
- 80014a4:	18fb      	adds	r3, r7, r3
- 80014a6:	781b      	ldrb	r3, [r3, #0]
- 80014a8:	b29b      	uxth	r3, r3
- 80014aa:	220a      	movs	r2, #10
- 80014ac:	18ba      	adds	r2, r7, r2
- 80014ae:	8812      	ldrh	r2, [r2, #0]
- 80014b0:	429a      	cmp	r2, r3
- 80014b2:	d924      	bls.n	80014fe <Pot_Check+0x1e2>
+ 80014a0:	2317      	movs	r3, #23
+ 80014a2:	18fb      	adds	r3, r7, r3
+ 80014a4:	781b      	ldrb	r3, [r3, #0]
+ 80014a6:	b29b      	uxth	r3, r3
+ 80014a8:	220a      	movs	r2, #10
+ 80014aa:	18ba      	adds	r2, r7, r2
+ 80014ac:	8812      	ldrh	r2, [r2, #0]
+ 80014ae:	429a      	cmp	r2, r3
+ 80014b0:	d924      	bls.n	80014fc <Pot_Check+0x1e0>
 
 			if(normal_fsm_ptr != NULL){
- 80014b4:	693b      	ldr	r3, [r7, #16]
- 80014b6:	2b00      	cmp	r3, #0
- 80014b8:	d008      	beq.n	80014cc <Pot_Check+0x1b0>
+ 80014b2:	693b      	ldr	r3, [r7, #16]
+ 80014b4:	2b00      	cmp	r3, #0
+ 80014b6:	d008      	beq.n	80014ca <Pot_Check+0x1ae>
 
 				normal_fsm_ptr->prev_state = normal_fsm_ptr->current_state;
- 80014ba:	693b      	ldr	r3, [r7, #16]
- 80014bc:	781b      	ldrb	r3, [r3, #0]
- 80014be:	b2da      	uxtb	r2, r3
- 80014c0:	693b      	ldr	r3, [r7, #16]
- 80014c2:	705a      	strb	r2, [r3, #1]
+ 80014b8:	693b      	ldr	r3, [r7, #16]
+ 80014ba:	781b      	ldrb	r3, [r3, #0]
+ 80014bc:	b2da      	uxtb	r2, r3
+ 80014be:	693b      	ldr	r3, [r7, #16]
+ 80014c0:	705a      	strb	r2, [r3, #1]
 				normal_fsm_ptr->current_state = MANUAL_MODE;
- 80014c4:	693b      	ldr	r3, [r7, #16]
- 80014c6:	2201      	movs	r2, #1
- 80014c8:	701a      	strb	r2, [r3, #0]
- 80014ca:	e018      	b.n	80014fe <Pot_Check+0x1e2>
+ 80014c2:	693b      	ldr	r3, [r7, #16]
+ 80014c4:	2201      	movs	r2, #1
+ 80014c6:	701a      	strb	r2, [r3, #0]
+ 80014c8:	e018      	b.n	80014fc <Pot_Check+0x1e0>
 
 			}
 			else if(speed_fsm_ptr != NULL){
- 80014cc:	68fb      	ldr	r3, [r7, #12]
- 80014ce:	2b00      	cmp	r3, #0
- 80014d0:	d015      	beq.n	80014fe <Pot_Check+0x1e2>
+ 80014ca:	68fb      	ldr	r3, [r7, #12]
+ 80014cc:	2b00      	cmp	r3, #0
+ 80014ce:	d015      	beq.n	80014fc <Pot_Check+0x1e0>
 
 				speed_fsm_ptr->prev_state = speed_fsm_ptr->current_state;
- 80014d2:	68fb      	ldr	r3, [r7, #12]
- 80014d4:	68fa      	ldr	r2, [r7, #12]
- 80014d6:	7812      	ldrb	r2, [r2, #0]
- 80014d8:	705a      	strb	r2, [r3, #1]
+ 80014d0:	68fb      	ldr	r3, [r7, #12]
+ 80014d2:	68fa      	ldr	r2, [r7, #12]
+ 80014d4:	7812      	ldrb	r2, [r2, #0]
+ 80014d6:	705a      	strb	r2, [r3, #1]
 				speed_fsm_ptr->current_state.shared_state = MANUAL_MODE;
- 80014da:	68fb      	ldr	r3, [r7, #12]
- 80014dc:	2201      	movs	r2, #1
- 80014de:	701a      	strb	r2, [r3, #0]
+ 80014d8:	68fb      	ldr	r3, [r7, #12]
+ 80014da:	2201      	movs	r2, #1
+ 80014dc:	701a      	strb	r2, [r3, #0]
 				Clear_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out);
- 80014e0:	4b1d      	ldr	r3, [pc, #116]	@ (8001558 <Pot_Check+0x23c>)
- 80014e2:	2120      	movs	r1, #32
- 80014e4:	0018      	movs	r0, r3
- 80014e6:	f004 fa9f 	bl	8005a28 <Clear_Status_Bit>
+ 80014de:	4b1e      	ldr	r3, [pc, #120]	@ (8001558 <Pot_Check+0x23c>)
+ 80014e0:	2120      	movs	r1, #32
+ 80014e2:	0018      	movs	r0, r3
+ 80014e4:	f004 faa0 	bl	8005a28 <Clear_Status_Bit>
 				Clear_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
- 80014ea:	4b1b      	ldr	r3, [pc, #108]	@ (8001558 <Pot_Check+0x23c>)
- 80014ec:	2140      	movs	r1, #64	@ 0x40
- 80014ee:	0018      	movs	r0, r3
- 80014f0:	f004 fa9a 	bl	8005a28 <Clear_Status_Bit>
+ 80014e8:	4b1b      	ldr	r3, [pc, #108]	@ (8001558 <Pot_Check+0x23c>)
+ 80014ea:	2140      	movs	r1, #64	@ 0x40
+ 80014ec:	0018      	movs	r0, r3
+ 80014ee:	f004 fa9b 	bl	8005a28 <Clear_Status_Bit>
 				Clear_Status_Bit(&statuses, First_Sync_Complete);
- 80014f4:	4b18      	ldr	r3, [pc, #96]	@ (8001558 <Pot_Check+0x23c>)
- 80014f6:	2108      	movs	r1, #8
- 80014f8:	0018      	movs	r0, r3
- 80014fa:	f004 fa95 	bl	8005a28 <Clear_Status_Bit>
+ 80014f2:	4b19      	ldr	r3, [pc, #100]	@ (8001558 <Pot_Check+0x23c>)
+ 80014f4:	2108      	movs	r1, #8
+ 80014f6:	0018      	movs	r0, r3
+ 80014f8:	f004 fa96 	bl	8005a28 <Clear_Status_Bit>
 			}
 		}
 	}
 
 	return 1;
- 80014fe:	2301      	movs	r3, #1
+ 80014fc:	2301      	movs	r3, #1
 }
- 8001500:	0018      	movs	r0, r3
- 8001502:	46bd      	mov	sp, r7
- 8001504:	b00a      	add	sp, #40	@ 0x28
- 8001506:	bd80      	pop	{r7, pc}
+ 80014fe:	0018      	movs	r0, r3
+ 8001500:	46bd      	mov	sp, r7
+ 8001502:	b00a      	add	sp, #40	@ 0x28
+ 8001504:	bd80      	pop	{r7, pc}
+ 8001506:	46c0      	nop			@ (mov r8, r8)
  8001508:	200004d4 	.word	0x200004d4
  800150c:	200004d6 	.word	0x200004d6
  8001510:	200004cd 	.word	0x200004cd
@@ -9867,7 +9867,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
  8003c8a:	2b02      	cmp	r3, #2
  8003c8c:	d105      	bne.n	8003c9a <LPTIM1_callback+0x1d6>
 
-			Pot_Check(&params_manual, SPEED_POT);
+			Pot_Check(ADCResultsDMA, SPEED_POT);
  8003c8e:	4b63      	ldr	r3, [pc, #396]	@ (8003e1c <LPTIM1_callback+0x358>)
  8003c90:	2101      	movs	r1, #1
  8003c92:	0018      	movs	r0, r3
@@ -9901,7 +9901,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
  8003cc4:	2b01      	cmp	r3, #1
  8003cc6:	d152      	bne.n	8003d6e <LPTIM1_callback+0x2aa>
 
-				Pot_Check(&params_manual, SPEED_POT);
+				Pot_Check(ADCResultsDMA, SPEED_POT);
  8003cc8:	4b54      	ldr	r3, [pc, #336]	@ (8003e1c <LPTIM1_callback+0x358>)
  8003cca:	2101      	movs	r1, #1
  8003ccc:	0018      	movs	r0, r3
@@ -9961,7 +9961,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
  8003d26:	2200      	movs	r2, #0
  8003d28:	701a      	strb	r2, [r3, #0]
 
-				Pot_Check(&params_manual, SPEED_POT);
+				Pot_Check(ADCResultsDMA, SPEED_POT);
  8003d2a:	4b3c      	ldr	r3, [pc, #240]	@ (8003e1c <LPTIM1_callback+0x358>)
  8003d2c:	2101      	movs	r1, #1
  8003d2e:	0018      	movs	r0, r3
@@ -9997,7 +9997,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
  8003d60:	2b01      	cmp	r3, #1
  8003d62:	d104      	bne.n	8003d6e <LPTIM1_callback+0x2aa>
 
-				Pot_Check(&params_manual, SPEED_POT);
+				Pot_Check(ADCResultsDMA, SPEED_POT);
  8003d64:	4b2d      	ldr	r3, [pc, #180]	@ (8003e1c <LPTIM1_callback+0x358>)
  8003d66:	2101      	movs	r1, #1
  8003d68:	0018      	movs	r0, r3
@@ -10016,7 +10016,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
  8003d7c:	b2db      	uxtb	r3, r3
  8003d7e:	2b02      	cmp	r3, #2
  8003d80:	d104      	bne.n	8003d8c <LPTIM1_callback+0x2c8>
-			Pot_Check(&params_manual, WAVESHAPE_POT);
+			Pot_Check(ADCResultsDMA, WAVESHAPE_POT);
  8003d82:	4b26      	ldr	r3, [pc, #152]	@ (8003e1c <LPTIM1_callback+0x358>)
  8003d84:	2100      	movs	r1, #0
  8003d86:	0018      	movs	r0, r3
@@ -10033,7 +10033,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
  8003d9a:	b2db      	uxtb	r3, r3
  8003d9c:	2b02      	cmp	r3, #2
  8003d9e:	d104      	bne.n	8003daa <LPTIM1_callback+0x2e6>
-			Pot_Check(&params_manual, DEPTH_POT);
+			Pot_Check(ADCResultsDMA, DEPTH_POT);
  8003da0:	4b1e      	ldr	r3, [pc, #120]	@ (8003e1c <LPTIM1_callback+0x358>)
  8003da2:	2102      	movs	r1, #2
  8003da4:	0018      	movs	r0, r3
@@ -10050,7 +10050,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
  8003db8:	b2db      	uxtb	r3, r3
  8003dba:	2b02      	cmp	r3, #2
  8003dbc:	d104      	bne.n	8003dc8 <LPTIM1_callback+0x304>
-			Pot_Check(&params_manual, SYMMETRY_POT);
+			Pot_Check(ADCResultsDMA, SYMMETRY_POT);
  8003dbe:	4b17      	ldr	r3, [pc, #92]	@ (8003e1c <LPTIM1_callback+0x358>)
  8003dc0:	2103      	movs	r1, #3
  8003dc2:	0018      	movs	r0, r3
@@ -10067,7 +10067,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
  8003dd6:	b2db      	uxtb	r3, r3
  8003dd8:	2b02      	cmp	r3, #2
  8003dda:	d134      	bne.n	8003e46 <LPTIM1_callback+0x382>
-			Pot_Check(&params_manual, PHASE_POT);
+			Pot_Check(ADCResultsDMA, PHASE_POT);
  8003ddc:	4b0f      	ldr	r3, [pc, #60]	@ (8003e1c <LPTIM1_callback+0x358>)
  8003dde:	2104      	movs	r1, #4
  8003de0:	0018      	movs	r0, r3
@@ -10099,7 +10099,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
  8003e10:	20000c18 	.word	0x20000c18
  8003e14:	50000800 	.word	0x50000800
  8003e18:	200004d2 	.word	0x200004d2
- 8003e1c:	20000c60 	.word	0x20000c60
+ 8003e1c:	20000c30 	.word	0x20000c30
  8003e20:	20000ccc 	.word	0x20000ccc
  8003e24:	20000c22 	.word	0x20000c22
  8003e28:	20000430 	.word	0x20000430

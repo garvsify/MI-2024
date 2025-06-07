@@ -1163,7 +1163,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 		//PERFORM SPEED POT CHECKING
 		if((speed_fsm.current_state.shared_state == PC_MODE) || (speed_fsm.current_state.shared_state == CC_MODE)){
 
-			Pot_Check(&params_manual, SPEED_POT);
+			Pot_Check(ADCResultsDMA, SPEED_POT);
 		}
 		else if((speed_fsm.current_state.speed_exclusive_state == CLK_IN_MODE) && (IP_CAP_fsm.current_state == IDLE)){
 
@@ -1171,7 +1171,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 			if(Get_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out) == YES){
 
-				Pot_Check(&params_manual, SPEED_POT);
+				Pot_Check(ADCResultsDMA, SPEED_POT);
 			}
 		}
 		else if((speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_MODE) && (IP_CAP_fsm.current_state == IDLE)){
@@ -1186,7 +1186,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 				MIDI_CLK_fsm = NOT_COMPILING;
 				MIDI_CLK_tag = 0;
 
-				Pot_Check(&params_manual, SPEED_POT);
+				Pot_Check(ADCResultsDMA, SPEED_POT);
 			}
 		}
 		else if((speed_fsm.current_state.speed_exclusive_state == TAP_MODE) && (IP_CAP_fsm.current_state == IDLE)){
@@ -1195,21 +1195,21 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 			if(Get_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out) == YES){
 
-				Pot_Check(&params_manual, SPEED_POT);
+				Pot_Check(ADCResultsDMA, SPEED_POT);
 			}
 		}
 
 		if((waveshape_fsm.current_state == PC_MODE) || (waveshape_fsm.current_state == CC_MODE)){
-			Pot_Check(&params_manual, WAVESHAPE_POT);
+			Pot_Check(ADCResultsDMA, WAVESHAPE_POT);
 		}
 		if((depth_fsm.current_state == PC_MODE) || (depth_fsm.current_state == CC_MODE)){
-			Pot_Check(&params_manual, DEPTH_POT);
+			Pot_Check(ADCResultsDMA, DEPTH_POT);
 		}
 		if((symmetry_fsm.current_state == PC_MODE) || (symmetry_fsm.current_state == CC_MODE)){
-			Pot_Check(&params_manual, SYMMETRY_POT);
+			Pot_Check(ADCResultsDMA, SYMMETRY_POT);
 		}
 		if((phase_fsm.current_state == PC_MODE) || (phase_fsm.current_state == CC_MODE)){
-			Pot_Check(&params_manual, PHASE_POT);
+			Pot_Check(ADCResultsDMA, PHASE_POT);
 		}
 
 	}
