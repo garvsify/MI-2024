@@ -35,15 +35,15 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  15 .debug_rnglists 00001257  00000000  00000000  00035448  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_line   00015d31  00000000  00000000  0003669f  2**0
+ 16 .debug_line   00015563  00000000  00000000  0003669f  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_str    0000822d  00000000  00000000  0004c3d0  2**0
+ 17 .debug_str    00008259  00000000  00000000  0004bc02  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .comment      00000043  00000000  00000000  000545fd  2**0
+ 18 .comment      00000043  00000000  00000000  00053e5b  2**0
                   CONTENTS, READONLY
- 19 .debug_frame  00005470  00000000  00000000  00054640  2**2
+ 19 .debug_frame  00005470  00000000  00000000  00053ea0  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 20 .debug_line_str 00000050  00000000  00000000  00059ab0  2**0
+ 20 .debug_line_str 00000054  00000000  00000000  00059310  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -11880,10 +11880,12 @@ uint8_t __attribute__((optimize("O0")))Startup(void){
  80048a4:	2007      	movs	r0, #7
  80048a6:	f002 fcda 	bl	800725e <HAL_NVIC_EnableIRQ>
 
+	//debug
 	Set_OMNI_Off(&statuses);
  80048aa:	4b07      	ldr	r3, [pc, #28]	@ (80048c8 <Startup+0x17c>)
  80048ac:	0018      	movs	r0, r3
  80048ae:	f7fc fd05 	bl	80012bc <Set_OMNI_Off>
+	//debug
 
 	return 1;
  80048b2:	2301      	movs	r3, #1
@@ -13415,23 +13417,16 @@ void TIM14_IRQHandler(void)
  800510c:	200005d0 	.word	0x200005d0
 
 08005110 <Adjust_TIM16_Prescaler>:
-#include "symmetry_adjustment.h"
-
-
-uint8_t Adjust_TIM16_Prescaler(struct Params* params_ptr){
  8005110:	b580      	push	{r7, lr}
  8005112:	b082      	sub	sp, #8
  8005114:	af00      	add	r7, sp, #0
  8005116:	6078      	str	r0, [r7, #4]
-
-    if(params_ptr->prescaler_adjust == MULTIPLY_BY_TWO){
  8005118:	687b      	ldr	r3, [r7, #4]
  800511a:	2220      	movs	r2, #32
  800511c:	5c9b      	ldrb	r3, [r3, r2]
  800511e:	b2db      	uxtb	r3, r3
  8005120:	2b01      	cmp	r3, #1
  8005122:	d107      	bne.n	8005134 <Adjust_TIM16_Prescaler+0x24>
-    	params_ptr->final_prescaler = params_ptr->raw_prescaler << 1;
  8005124:	687b      	ldr	r3, [r7, #4]
  8005126:	8b5b      	ldrh	r3, [r3, #26]
  8005128:	b29b      	uxth	r3, r3
@@ -13440,84 +13435,57 @@ uint8_t Adjust_TIM16_Prescaler(struct Params* params_ptr){
  800512e:	687b      	ldr	r3, [r7, #4]
  8005130:	839a      	strh	r2, [r3, #28]
  8005132:	e00a      	b.n	800514a <Adjust_TIM16_Prescaler+0x3a>
-    }
-    else if(params_ptr->prescaler_adjust == DO_NOTHING){
  8005134:	687b      	ldr	r3, [r7, #4]
  8005136:	2220      	movs	r2, #32
  8005138:	5c9b      	ldrb	r3, [r3, r2]
  800513a:	b2db      	uxtb	r3, r3
  800513c:	2b00      	cmp	r3, #0
  800513e:	d104      	bne.n	800514a <Adjust_TIM16_Prescaler+0x3a>
-    	params_ptr->final_prescaler = params_ptr->raw_prescaler;
  8005140:	687b      	ldr	r3, [r7, #4]
  8005142:	8b5b      	ldrh	r3, [r3, #26]
  8005144:	b29a      	uxth	r2, r3
  8005146:	687b      	ldr	r3, [r7, #4]
  8005148:	839a      	strh	r2, [r3, #28]
-    }
-    return 1;
  800514a:	2301      	movs	r3, #1
-}
  800514c:	0018      	movs	r0, r3
  800514e:	46bd      	mov	sp, r7
  8005150:	b002      	add	sp, #8
  8005152:	bd80      	pop	{r7, pc}
 
 08005154 <Process_TIM16_Final_Start_Value_and_Final_Prescaler>:
-
-uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* params_ptr){
  8005154:	b5f0      	push	{r4, r5, r6, r7, lr}
  8005156:	b087      	sub	sp, #28
  8005158:	af00      	add	r7, sp, #0
  800515a:	6078      	str	r0, [r7, #4]
-
-    #if SYMMETRY_ON_OR_OFF == ON
-
-	enum TIM16_final_start_value_Oscillation_Mode TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
  800515c:	2317      	movs	r3, #23
  800515e:	18fb      	adds	r3, r7, r3
  8005160:	2200      	movs	r2, #0
  8005162:	701a      	strb	r2, [r3, #0]
-			enum Symmetry_Type symmetry_type_for_halfcycle = SHORTEN;
  8005164:	2316      	movs	r3, #22
  8005166:	18fb      	adds	r3, r7, r3
  8005168:	2200      	movs	r2, #0
  800516a:	701a      	strb	r2, [r3, #0]
-
-			uint8_t pot_rotation_corrected = 0;
  800516c:	2315      	movs	r3, #21
  800516e:	18fb      	adds	r3, r7, r3
  8005170:	2200      	movs	r2, #0
  8005172:	701a      	strb	r2, [r3, #0]
-			enum Symmetry_Status symmetry_status = CW;
  8005174:	2114      	movs	r1, #20
  8005176:	187b      	adds	r3, r7, r1
  8005178:	2200      	movs	r2, #0
  800517a:	701a      	strb	r2, [r3, #0]
-
-			//DETERMINE IF CW OR CCW SYMMETRY POT ROTATION
-			if(params_ptr->symmetry < SYMMETRY_ADC_HALF_SCALE){ //adc = 0-127
  800517c:	687b      	ldr	r3, [r7, #4]
  800517e:	899b      	ldrh	r3, [r3, #12]
  8005180:	b29b      	uxth	r3, r3
  8005182:	2b7f      	cmp	r3, #127	@ 0x7f
  8005184:	d803      	bhi.n	800518e <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x3a>
-				symmetry_status = CW;
  8005186:	187b      	adds	r3, r7, r1
  8005188:	2200      	movs	r2, #0
  800518a:	701a      	strb	r2, [r3, #0]
  800518c:	e003      	b.n	8005196 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x42>
-			}
-			else{ //adc is 128-255
-				symmetry_status = CCW;
  800518e:	2314      	movs	r3, #20
  8005190:	18fb      	adds	r3, r7, r3
  8005192:	2201      	movs	r2, #1
  8005194:	701a      	strb	r2, [r3, #0]
-			}
-
-			//DETERMINE WHETHER TO SHORTEN OR LENGTHEN BASED ON CURRENT INDEX AND SYMMETRY POT POSITION
-			if((params_ptr->waveshape == SINE_MODE) || (params_ptr->waveshape == TRIANGLE_MODE)){
  8005196:	687b      	ldr	r3, [r7, #4]
  8005198:	799b      	ldrb	r3, [r3, #6]
  800519a:	b2db      	uxtb	r3, r3
@@ -13528,8 +13496,6 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
  80051a4:	b2db      	uxtb	r3, r3
  80051a6:	2b00      	cmp	r3, #0
  80051a8:	d146      	bne.n	8005238 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0xe4>
-
-				if((params_ptr->halfcycle == FIRST_HALFCYCLE && params_ptr->quadrant == FIRST_QUADRANT) || (params_ptr->halfcycle == SECOND_HALFCYCLE && params_ptr->quadrant == SECOND_QUADRANT)){
  80051aa:	687b      	ldr	r3, [r7, #4]
  80051ac:	7c1b      	ldrb	r3, [r3, #16]
  80051ae:	b2db      	uxtb	r3, r3
@@ -13550,34 +13516,21 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
  80051cc:	b2db      	uxtb	r3, r3
  80051ce:	2b01      	cmp	r3, #1
  80051d0:	d10e      	bne.n	80051f0 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x9c>
-
-					if(symmetry_status == CW){
  80051d2:	2314      	movs	r3, #20
  80051d4:	18fb      	adds	r3, r7, r3
  80051d6:	781b      	ldrb	r3, [r3, #0]
  80051d8:	2b00      	cmp	r3, #0
  80051da:	d104      	bne.n	80051e6 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x92>
-
-						symmetry_type_for_halfcycle = LENGTHEN;
  80051dc:	2316      	movs	r3, #22
  80051de:	18fb      	adds	r3, r7, r3
  80051e0:	2201      	movs	r2, #1
  80051e2:	701a      	strb	r2, [r3, #0]
-					if(symmetry_status == CW){
  80051e4:	e027      	b.n	8005236 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0xe2>
-					}
-					else{
-
-						symmetry_type_for_halfcycle = SHORTEN;
  80051e6:	2316      	movs	r3, #22
  80051e8:	18fb      	adds	r3, r7, r3
  80051ea:	2200      	movs	r2, #0
  80051ec:	701a      	strb	r2, [r3, #0]
-					if(symmetry_status == CW){
  80051ee:	e022      	b.n	8005236 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0xe2>
-					}
-				}
-				else if((params_ptr->halfcycle == FIRST_HALFCYCLE && params_ptr->quadrant == SECOND_QUADRANT) || (params_ptr->halfcycle == SECOND_HALFCYCLE && params_ptr->quadrant == FIRST_QUADRANT)){
  80051f0:	687b      	ldr	r3, [r7, #4]
  80051f2:	7c1b      	ldrb	r3, [r3, #16]
  80051f4:	b2db      	uxtb	r3, r3
@@ -13598,111 +13551,68 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
  8005212:	b2db      	uxtb	r3, r3
  8005214:	2b00      	cmp	r3, #0
  8005216:	d137      	bne.n	8005288 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x134>
-
-					if(symmetry_status == CW){
  8005218:	2314      	movs	r3, #20
  800521a:	18fb      	adds	r3, r7, r3
  800521c:	781b      	ldrb	r3, [r3, #0]
  800521e:	2b00      	cmp	r3, #0
  8005220:	d104      	bne.n	800522c <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0xd8>
-
-						symmetry_type_for_halfcycle = SHORTEN;
  8005222:	2316      	movs	r3, #22
  8005224:	18fb      	adds	r3, r7, r3
  8005226:	2200      	movs	r2, #0
  8005228:	701a      	strb	r2, [r3, #0]
-				if((params_ptr->halfcycle == FIRST_HALFCYCLE && params_ptr->quadrant == FIRST_QUADRANT) || (params_ptr->halfcycle == SECOND_HALFCYCLE && params_ptr->quadrant == SECOND_QUADRANT)){
  800522a:	e02d      	b.n	8005288 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x134>
-					}
-					else{
-
-						symmetry_type_for_halfcycle = LENGTHEN;
  800522c:	2316      	movs	r3, #22
  800522e:	18fb      	adds	r3, r7, r3
  8005230:	2201      	movs	r2, #1
  8005232:	701a      	strb	r2, [r3, #0]
-				if((params_ptr->halfcycle == FIRST_HALFCYCLE && params_ptr->quadrant == FIRST_QUADRANT) || (params_ptr->halfcycle == SECOND_HALFCYCLE && params_ptr->quadrant == SECOND_QUADRANT)){
  8005234:	e028      	b.n	8005288 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x134>
  8005236:	e027      	b.n	8005288 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x134>
-					}
-				}
-			}
-			else if(params_ptr->waveshape == SQUARE_MODE){
  8005238:	687b      	ldr	r3, [r7, #4]
  800523a:	799b      	ldrb	r3, [r3, #6]
  800523c:	b2db      	uxtb	r3, r3
  800523e:	2b02      	cmp	r3, #2
  8005240:	d123      	bne.n	800528a <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x136>
-
-				if(params_ptr->halfcycle == FIRST_HALFCYCLE){
  8005242:	687b      	ldr	r3, [r7, #4]
  8005244:	7c1b      	ldrb	r3, [r3, #16]
  8005246:	b2db      	uxtb	r3, r3
  8005248:	2b00      	cmp	r3, #0
  800524a:	d10e      	bne.n	800526a <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x116>
-
-					if(symmetry_status == CW){
  800524c:	2314      	movs	r3, #20
  800524e:	18fb      	adds	r3, r7, r3
  8005250:	781b      	ldrb	r3, [r3, #0]
  8005252:	2b00      	cmp	r3, #0
  8005254:	d104      	bne.n	8005260 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x10c>
-
-						symmetry_type_for_halfcycle = LENGTHEN;
  8005256:	2316      	movs	r3, #22
  8005258:	18fb      	adds	r3, r7, r3
  800525a:	2201      	movs	r2, #1
  800525c:	701a      	strb	r2, [r3, #0]
  800525e:	e014      	b.n	800528a <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x136>
-					}
-					else{
-
-						symmetry_type_for_halfcycle = SHORTEN;
  8005260:	2316      	movs	r3, #22
  8005262:	18fb      	adds	r3, r7, r3
  8005264:	2200      	movs	r2, #0
  8005266:	701a      	strb	r2, [r3, #0]
  8005268:	e00f      	b.n	800528a <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x136>
-					}
-				}
-				else{
-
-					if(symmetry_status == CW){
  800526a:	2314      	movs	r3, #20
  800526c:	18fb      	adds	r3, r7, r3
  800526e:	781b      	ldrb	r3, [r3, #0]
  8005270:	2b00      	cmp	r3, #0
  8005272:	d104      	bne.n	800527e <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x12a>
-
-						symmetry_type_for_halfcycle = SHORTEN;
  8005274:	2316      	movs	r3, #22
  8005276:	18fb      	adds	r3, r7, r3
  8005278:	2200      	movs	r2, #0
  800527a:	701a      	strb	r2, [r3, #0]
  800527c:	e005      	b.n	800528a <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x136>
-					}
-					else{
-
-						symmetry_type_for_halfcycle = LENGTHEN;
  800527e:	2316      	movs	r3, #22
  8005280:	18fb      	adds	r3, r7, r3
  8005282:	2201      	movs	r2, #1
  8005284:	701a      	strb	r2, [r3, #0]
  8005286:	e000      	b.n	800528a <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x136>
-				if((params_ptr->halfcycle == FIRST_HALFCYCLE && params_ptr->quadrant == FIRST_QUADRANT) || (params_ptr->halfcycle == SECOND_HALFCYCLE && params_ptr->quadrant == SECOND_QUADRANT)){
  8005288:	46c0      	nop			@ (mov r8, r8)
-					}
-				}
-			}
-
-			if(symmetry_status == CW){
  800528a:	2314      	movs	r3, #20
  800528c:	18fb      	adds	r3, r7, r3
  800528e:	781b      	ldrb	r3, [r3, #0]
  8005290:	2b00      	cmp	r3, #0
  8005292:	d109      	bne.n	80052a8 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x154>
-
-				pot_rotation_corrected = SYMMETRY_ADC_HALF_SCALE - 1 - params_ptr->symmetry;
  8005294:	687b      	ldr	r3, [r7, #4]
  8005296:	899b      	ldrh	r3, [r3, #12]
  8005298:	b29b      	uxth	r3, r3
@@ -13713,10 +13623,6 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
  80052a2:	1a8a      	subs	r2, r1, r2
  80052a4:	701a      	strb	r2, [r3, #0]
  80052a6:	e007      	b.n	80052b8 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x164>
-			}
-			else{ //CCW
-
-				pot_rotation_corrected = SYMMETRY_ADC_HALF_SCALE - 1 - (SYMMETRY_ADC_FULL_SCALE - params_ptr->symmetry);
  80052a8:	687b      	ldr	r3, [r7, #4]
  80052aa:	899b      	ldrh	r3, [r3, #12]
  80052ac:	b29b      	uxth	r3, r3
@@ -13725,10 +13631,6 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
  80052b2:	18fb      	adds	r3, r7, r3
  80052b4:	3a80      	subs	r2, #128	@ 0x80
  80052b6:	701a      	strb	r2, [r3, #0]
-			}
-
-			//HAVE TO BE uin16_t FOR 1ST AND 3RD VARIABLES HERE BECAUSE A uint8_t IS LIMITED TO 255!
-			uint16_t two_fifty_six_minus_TIM16_raw_start_value = 256 - params_ptr->raw_start_value;
  80052b8:	687b      	ldr	r3, [r7, #4]
  80052ba:	8a5b      	ldrh	r3, [r3, #18]
  80052bc:	b29a      	uxth	r2, r3
@@ -13738,10 +13640,6 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
  80052c4:	0049      	lsls	r1, r1, #1
  80052c6:	1a8a      	subs	r2, r1, r2
  80052c8:	801a      	strh	r2, [r3, #0]
-
-			//uint16_t two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC = (two_fifty_six_minus_TIM16_raw_start_value * pot_rotation_corrected);
-			//COMMENT LINE BELOW IN AND LINE ABOVE OUT TO EXPERIMENT WITH MORE EXTREME SYMMETRY ADJUSTMENT
-			uint16_t two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC = ((two_fifty_six_minus_TIM16_raw_start_value * pot_rotation_corrected) * 12) >> 3; //x(12/8) - 12/8 is the absolute maximum we can get away with
  80052ca:	0001      	movs	r1, r0
  80052cc:	187b      	adds	r3, r7, r1
  80052ce:	881b      	ldrh	r3, [r3, #0]
@@ -13757,18 +13655,12 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
  80052e2:	240c      	movs	r4, #12
  80052e4:	193b      	adds	r3, r7, r4
  80052e6:	801a      	strh	r2, [r3, #0]
-
-			uint16_t two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC_and_shifted_by_ADC_bits = (uint16_t)(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC >> SYMMETRY_ADC_NUM_BITS);
  80052e8:	250a      	movs	r5, #10
  80052ea:	197b      	adds	r3, r7, r5
  80052ec:	193a      	adds	r2, r7, r4
  80052ee:	8812      	ldrh	r2, [r2, #0]
  80052f0:	0a12      	lsrs	r2, r2, #8
  80052f2:	801a      	strh	r2, [r3, #0]
-
-
-			//HAVE TO BE uin16_t HERE BECAUSE A uint8_t IS LIMITED TO 255!
-			uint16_t manipulated_period_shorten = two_fifty_six_minus_TIM16_raw_start_value - two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC_and_shifted_by_ADC_bits; //manipulated shorten will always be less than 256
  80052f4:	2312      	movs	r3, #18
  80052f6:	18fb      	adds	r3, r7, r3
  80052f8:	0008      	movs	r0, r1
@@ -13778,8 +13670,6 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
  8005300:	8812      	ldrh	r2, [r2, #0]
  8005302:	1a8a      	subs	r2, r1, r2
  8005304:	801a      	strh	r2, [r3, #0]
-
-			uint16_t manipulated_period_lengthen = two_fifty_six_minus_TIM16_raw_start_value + two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC_and_shifted_by_ADC_bits; //manipulated lengthen can be greater than 256 up to 381
  8005306:	2610      	movs	r6, #16
  8005308:	19bb      	adds	r3, r7, r6
  800530a:	1839      	adds	r1, r7, r0
@@ -13788,9 +13678,6 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
  8005310:	8812      	ldrh	r2, [r2, #0]
  8005312:	188a      	adds	r2, r1, r2
  8005314:	801a      	strh	r2, [r3, #0]
-
-
-			if((manipulated_period_lengthen < 256) || ((manipulated_period_lengthen == 256) && (unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) == 0))){
  8005316:	19bb      	adds	r3, r7, r6
  8005318:	881b      	ldrh	r3, [r3, #0]
  800531a:	2bff      	cmp	r3, #255	@ 0xff
@@ -13810,8 +13697,6 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
  8005338:	1e03      	subs	r3, r0, #0
  800533a:	d000      	beq.n	800533e <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x1ea>
  800533c:	e0a7      	b.n	800548e <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x33a>
-
-				if(unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) == 128){
  800533e:	230c      	movs	r3, #12
  8005340:	18fb      	adds	r3, r7, r3
  8005342:	881b      	ldrh	r3, [r3, #0]
@@ -13821,47 +13706,30 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
  800534c:	0003      	movs	r3, r0
  800534e:	2b80      	cmp	r3, #128	@ 0x80
  8005350:	d117      	bne.n	8005382 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x22e>
-					//remainder is 128, which means two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC_and_shifted_by_ADC_bits ends in 0.5
-
-					//manipulated_period_shorten should oscillate over the halfperiod between manipulated_period_shorten and manipulated_period_shorten - 1; //DONE
-					//manipulated_period_lengthen should oscillate over the halfperiod between manipulated_period_lengthen and manipulated_period_lengthen + 1; //DONE
-
-					if(symmetry_type_for_halfcycle == SHORTEN){
  8005352:	2316      	movs	r3, #22
  8005354:	18fb      	adds	r3, r7, r3
  8005356:	781b      	ldrb	r3, [r3, #0]
  8005358:	2b00      	cmp	r3, #0
  800535a:	d104      	bne.n	8005366 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x212>
-
-						TIM16_final_start_value_oscillation_mode = OSCILLATE_DOWNWARDS;
  800535c:	2317      	movs	r3, #23
  800535e:	18fb      	adds	r3, r7, r3
  8005360:	2202      	movs	r2, #2
  8005362:	701a      	strb	r2, [r3, #0]
  8005364:	e008      	b.n	8005378 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x224>
-					}
-					else if(symmetry_type_for_halfcycle == LENGTHEN){
  8005366:	2316      	movs	r3, #22
  8005368:	18fb      	adds	r3, r7, r3
  800536a:	781b      	ldrb	r3, [r3, #0]
  800536c:	2b01      	cmp	r3, #1
  800536e:	d103      	bne.n	8005378 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x224>
-
-						TIM16_final_start_value_oscillation_mode = OSCILLATE_UPWARDS;
  8005370:	2317      	movs	r3, #23
  8005372:	18fb      	adds	r3, r7, r3
  8005374:	2201      	movs	r2, #1
  8005376:	701a      	strb	r2, [r3, #0]
-					}
-					params_ptr->prescaler_adjust = DO_NOTHING;
  8005378:	687b      	ldr	r3, [r7, #4]
  800537a:	2220      	movs	r2, #32
  800537c:	2100      	movs	r1, #0
  800537e:	5499      	strb	r1, [r3, r2]
-				if(unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) == 128){
  8005380:	e21f      	b.n	80057c2 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x66e>
-				}
-				else if(unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) == 0){
  8005382:	230c      	movs	r3, #12
  8005384:	18fb      	adds	r3, r7, r3
  8005386:	881b      	ldrh	r3, [r3, #0]
@@ -13870,56 +13738,40 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
  800538c:	f000 fb54 	bl	8005a38 <unsigned_bitwise_modulo>
  8005390:	1e03      	subs	r3, r0, #0
  8005392:	d121      	bne.n	80053d8 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x284>
-
-					//remainder is zero, which means both shortened and lengthened manipulated periods have no no remainder
-
-					manipulated_period_shorten = manipulated_period_shorten; //do nothing //DONE
  8005394:	2212      	movs	r2, #18
  8005396:	18bb      	adds	r3, r7, r2
  8005398:	18ba      	adds	r2, r7, r2
  800539a:	8812      	ldrh	r2, [r2, #0]
  800539c:	801a      	strh	r2, [r3, #0]
-					manipulated_period_lengthen = manipulated_period_lengthen; //do nothing //DONE
  800539e:	2210      	movs	r2, #16
  80053a0:	18bb      	adds	r3, r7, r2
  80053a2:	18ba      	adds	r2, r7, r2
  80053a4:	8812      	ldrh	r2, [r2, #0]
  80053a6:	801a      	strh	r2, [r3, #0]
-
-					if(symmetry_type_for_halfcycle == SHORTEN){
  80053a8:	2316      	movs	r3, #22
  80053aa:	18fb      	adds	r3, r7, r3
  80053ac:	781b      	ldrb	r3, [r3, #0]
  80053ae:	2b00      	cmp	r3, #0
  80053b0:	d104      	bne.n	80053bc <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x268>
-						TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
  80053b2:	2317      	movs	r3, #23
  80053b4:	18fb      	adds	r3, r7, r3
  80053b6:	2200      	movs	r2, #0
  80053b8:	701a      	strb	r2, [r3, #0]
  80053ba:	e008      	b.n	80053ce <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x27a>
-					}
-					else if(symmetry_type_for_halfcycle == LENGTHEN){
  80053bc:	2316      	movs	r3, #22
  80053be:	18fb      	adds	r3, r7, r3
  80053c0:	781b      	ldrb	r3, [r3, #0]
  80053c2:	2b01      	cmp	r3, #1
  80053c4:	d103      	bne.n	80053ce <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x27a>
-						TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
  80053c6:	2317      	movs	r3, #23
  80053c8:	18fb      	adds	r3, r7, r3
  80053ca:	2200      	movs	r2, #0
  80053cc:	701a      	strb	r2, [r3, #0]
-					}
-					params_ptr->prescaler_adjust = DO_NOTHING;
  80053ce:	687b      	ldr	r3, [r7, #4]
  80053d0:	2220      	movs	r2, #32
  80053d2:	2100      	movs	r1, #0
  80053d4:	5499      	strb	r1, [r3, r2]
-				if(unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) == 128){
  80053d6:	e1f4      	b.n	80057c2 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x66e>
-				}
-				else if(unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) < 128){
  80053d8:	230c      	movs	r3, #12
  80053da:	18fb      	adds	r3, r7, r3
  80053dc:	881b      	ldrh	r3, [r3, #0]
@@ -13929,56 +13781,40 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
  80053e6:	0003      	movs	r3, r0
  80053e8:	2b7f      	cmp	r3, #127	@ 0x7f
  80053ea:	d821      	bhi.n	8005430 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x2dc>
-
-					//remainder is less than 128, which means two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC_and_shifted_by_ADC_bits ends in less than 0.5
-
-					manipulated_period_shorten = manipulated_period_shorten; //do nothing //DONE
  80053ec:	2212      	movs	r2, #18
  80053ee:	18bb      	adds	r3, r7, r2
  80053f0:	18ba      	adds	r2, r7, r2
  80053f2:	8812      	ldrh	r2, [r2, #0]
  80053f4:	801a      	strh	r2, [r3, #0]
-					manipulated_period_lengthen = manipulated_period_lengthen; //do nothing //DONE
  80053f6:	2210      	movs	r2, #16
  80053f8:	18bb      	adds	r3, r7, r2
  80053fa:	18ba      	adds	r2, r7, r2
  80053fc:	8812      	ldrh	r2, [r2, #0]
  80053fe:	801a      	strh	r2, [r3, #0]
-
-					if(symmetry_type_for_halfcycle == SHORTEN){
  8005400:	2316      	movs	r3, #22
  8005402:	18fb      	adds	r3, r7, r3
  8005404:	781b      	ldrb	r3, [r3, #0]
  8005406:	2b00      	cmp	r3, #0
  8005408:	d104      	bne.n	8005414 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x2c0>
-						TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
  800540a:	2317      	movs	r3, #23
  800540c:	18fb      	adds	r3, r7, r3
  800540e:	2200      	movs	r2, #0
  8005410:	701a      	strb	r2, [r3, #0]
  8005412:	e008      	b.n	8005426 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x2d2>
-					}
-					else if(symmetry_type_for_halfcycle == LENGTHEN){
  8005414:	2316      	movs	r3, #22
  8005416:	18fb      	adds	r3, r7, r3
  8005418:	781b      	ldrb	r3, [r3, #0]
  800541a:	2b01      	cmp	r3, #1
  800541c:	d103      	bne.n	8005426 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x2d2>
-						TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
  800541e:	2317      	movs	r3, #23
  8005420:	18fb      	adds	r3, r7, r3
  8005422:	2200      	movs	r2, #0
  8005424:	701a      	strb	r2, [r3, #0]
-					}
-					params_ptr->prescaler_adjust = DO_NOTHING;
  8005426:	687b      	ldr	r3, [r7, #4]
  8005428:	2220      	movs	r2, #32
  800542a:	2100      	movs	r1, #0
  800542c:	5499      	strb	r1, [r3, r2]
-				if(unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) == 128){
  800542e:	e1c8      	b.n	80057c2 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x66e>
-				}
-				else if(unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) > 128){
  8005430:	230c      	movs	r3, #12
  8005432:	18fb      	adds	r3, r7, r3
  8005434:	881b      	ldrh	r3, [r3, #0]
@@ -13989,60 +13825,42 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
  8005440:	2b80      	cmp	r3, #128	@ 0x80
  8005442:	d800      	bhi.n	8005446 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x2f2>
  8005444:	e1bd      	b.n	80057c2 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x66e>
-
-					//remainder is greater than 128, which means two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC_and_shifted_by_ADC_bits ends in more than 0.5
-
-					manipulated_period_shorten = manipulated_period_shorten - 1; //DONE
  8005446:	2212      	movs	r2, #18
  8005448:	18bb      	adds	r3, r7, r2
  800544a:	18ba      	adds	r2, r7, r2
  800544c:	8812      	ldrh	r2, [r2, #0]
  800544e:	3a01      	subs	r2, #1
  8005450:	801a      	strh	r2, [r3, #0]
-					manipulated_period_lengthen = manipulated_period_lengthen + 1; //DONE
  8005452:	2210      	movs	r2, #16
  8005454:	18bb      	adds	r3, r7, r2
  8005456:	18ba      	adds	r2, r7, r2
  8005458:	8812      	ldrh	r2, [r2, #0]
  800545a:	3201      	adds	r2, #1
  800545c:	801a      	strh	r2, [r3, #0]
-
-					if(symmetry_type_for_halfcycle == SHORTEN){
  800545e:	2316      	movs	r3, #22
  8005460:	18fb      	adds	r3, r7, r3
  8005462:	781b      	ldrb	r3, [r3, #0]
  8005464:	2b00      	cmp	r3, #0
  8005466:	d104      	bne.n	8005472 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x31e>
-						TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
  8005468:	2317      	movs	r3, #23
  800546a:	18fb      	adds	r3, r7, r3
  800546c:	2200      	movs	r2, #0
  800546e:	701a      	strb	r2, [r3, #0]
  8005470:	e008      	b.n	8005484 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x330>
-					}
-					else if(symmetry_type_for_halfcycle == LENGTHEN){
  8005472:	2316      	movs	r3, #22
  8005474:	18fb      	adds	r3, r7, r3
  8005476:	781b      	ldrb	r3, [r3, #0]
  8005478:	2b01      	cmp	r3, #1
  800547a:	d103      	bne.n	8005484 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x330>
-						TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
  800547c:	2317      	movs	r3, #23
  800547e:	18fb      	adds	r3, r7, r3
  8005480:	2200      	movs	r2, #0
  8005482:	701a      	strb	r2, [r3, #0]
-					}
-					params_ptr->prescaler_adjust = DO_NOTHING;
  8005484:	687b      	ldr	r3, [r7, #4]
  8005486:	2220      	movs	r2, #32
  8005488:	2100      	movs	r1, #0
  800548a:	5499      	strb	r1, [r3, r2]
-				if(unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) == 128){
  800548c:	e199      	b.n	80057c2 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x66e>
-				}
-			}
-
-			else if((manipulated_period_lengthen > 256) || ((manipulated_period_lengthen == 256) && (unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) > 0))){
  800548e:	2110      	movs	r1, #16
  8005490:	187b      	adds	r3, r7, r1
  8005492:	881a      	ldrh	r2, [r3, #0]
@@ -14066,8 +13884,6 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
  80054b8:	1e03      	subs	r3, r0, #0
  80054ba:	d100      	bne.n	80054be <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x36a>
  80054bc:	e182      	b.n	80057c4 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x670>
-
-				if(unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) == 128){
  80054be:	230c      	movs	r3, #12
  80054c0:	18fb      	adds	r3, r7, r3
  80054c2:	881b      	ldrh	r3, [r3, #0]
@@ -14077,24 +13893,18 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
  80054cc:	0003      	movs	r3, r0
  80054ce:	2b80      	cmp	r3, #128	@ 0x80
  80054d0:	d159      	bne.n	8005586 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x432>
-
-					manipulated_period_shorten = manipulated_period_shorten - 1; //DONE
  80054d2:	2212      	movs	r2, #18
  80054d4:	18bb      	adds	r3, r7, r2
  80054d6:	18ba      	adds	r2, r7, r2
  80054d8:	8812      	ldrh	r2, [r2, #0]
  80054da:	3a01      	subs	r2, #1
  80054dc:	801a      	strh	r2, [r3, #0]
-					//NO NEED TO CHECK IF MANIPULATED_PERIOD_SHORTEN ENDS IN 0.5 AS IN THIS SPECIFIC CONDITION, WE HAVE ELIMINATED THAT POSSIBILITY
-					manipulated_period_lengthen = manipulated_period_lengthen + 1; //DONE
  80054de:	2110      	movs	r1, #16
  80054e0:	187b      	adds	r3, r7, r1
  80054e2:	187a      	adds	r2, r7, r1
  80054e4:	8812      	ldrh	r2, [r2, #0]
  80054e6:	3201      	adds	r2, #1
  80054e8:	801a      	strh	r2, [r3, #0]
-
-					if(unsigned_bitwise_modulo(manipulated_period_lengthen, 1) == 0){
  80054ea:	000c      	movs	r4, r1
  80054ec:	187b      	adds	r3, r7, r1
  80054ee:	881b      	ldrh	r3, [r3, #0]
@@ -14103,106 +13913,75 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
  80054f4:	f000 faa0 	bl	8005a38 <unsigned_bitwise_modulo>
  80054f8:	1e03      	subs	r3, r0, #0
  80054fa:	d121      	bne.n	8005540 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x3ec>
-
-						manipulated_period_lengthen = manipulated_period_lengthen >> 1; //DONE
  80054fc:	193b      	adds	r3, r7, r4
  80054fe:	193a      	adds	r2, r7, r4
  8005500:	8812      	ldrh	r2, [r2, #0]
  8005502:	0852      	lsrs	r2, r2, #1
  8005504:	801a      	strh	r2, [r3, #0]
-						//DO NOT OSCILLATE BETWEEN VALUES //DONE
-						//prescaler during lengthened halfperiod should be set to half //DONE
-
-						if(symmetry_type_for_halfcycle == SHORTEN){
  8005506:	2316      	movs	r3, #22
  8005508:	18fb      	adds	r3, r7, r3
  800550a:	781b      	ldrb	r3, [r3, #0]
  800550c:	2b00      	cmp	r3, #0
  800550e:	d108      	bne.n	8005522 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x3ce>
-							TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
  8005510:	2317      	movs	r3, #23
  8005512:	18fb      	adds	r3, r7, r3
  8005514:	2200      	movs	r2, #0
  8005516:	701a      	strb	r2, [r3, #0]
-							params_ptr->prescaler_adjust = DO_NOTHING;
  8005518:	687b      	ldr	r3, [r7, #4]
  800551a:	2220      	movs	r2, #32
  800551c:	2100      	movs	r1, #0
  800551e:	5499      	strb	r1, [r3, r2]
  8005520:	e150      	b.n	80057c4 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x670>
-						}
-						else if(symmetry_type_for_halfcycle == LENGTHEN){
  8005522:	2316      	movs	r3, #22
  8005524:	18fb      	adds	r3, r7, r3
  8005526:	781b      	ldrb	r3, [r3, #0]
  8005528:	2b01      	cmp	r3, #1
  800552a:	d000      	beq.n	800552e <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x3da>
  800552c:	e14a      	b.n	80057c4 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x670>
-							TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
  800552e:	2317      	movs	r3, #23
  8005530:	18fb      	adds	r3, r7, r3
  8005532:	2200      	movs	r2, #0
  8005534:	701a      	strb	r2, [r3, #0]
-							params_ptr->prescaler_adjust = MULTIPLY_BY_TWO;
  8005536:	687b      	ldr	r3, [r7, #4]
  8005538:	2220      	movs	r2, #32
  800553a:	2101      	movs	r1, #1
  800553c:	5499      	strb	r1, [r3, r2]
  800553e:	e141      	b.n	80057c4 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x670>
-						}
-					}
-					else{
-
-						manipulated_period_lengthen = manipulated_period_lengthen >> 1; //DONE
  8005540:	2210      	movs	r2, #16
  8005542:	18bb      	adds	r3, r7, r2
  8005544:	18ba      	adds	r2, r7, r2
  8005546:	8812      	ldrh	r2, [r2, #0]
  8005548:	0852      	lsrs	r2, r2, #1
  800554a:	801a      	strh	r2, [r3, #0]
-						//prescaler during lengthened halfperiod should be set to half //DONE
-						//manipulated period_lengthened should oscillate over the halfperiod between manipulated_period_lengthen and manipulated_period_lengthen + 1. //DONE
-
-						if(symmetry_type_for_halfcycle == SHORTEN){
  800554c:	2316      	movs	r3, #22
  800554e:	18fb      	adds	r3, r7, r3
  8005550:	781b      	ldrb	r3, [r3, #0]
  8005552:	2b00      	cmp	r3, #0
  8005554:	d108      	bne.n	8005568 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x414>
-							TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
  8005556:	2317      	movs	r3, #23
  8005558:	18fb      	adds	r3, r7, r3
  800555a:	2200      	movs	r2, #0
  800555c:	701a      	strb	r2, [r3, #0]
-							params_ptr->prescaler_adjust = DO_NOTHING;
  800555e:	687b      	ldr	r3, [r7, #4]
  8005560:	2220      	movs	r2, #32
  8005562:	2100      	movs	r1, #0
  8005564:	5499      	strb	r1, [r3, r2]
  8005566:	e12d      	b.n	80057c4 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x670>
-						}
-						else if(symmetry_type_for_halfcycle == LENGTHEN){
  8005568:	2316      	movs	r3, #22
  800556a:	18fb      	adds	r3, r7, r3
  800556c:	781b      	ldrb	r3, [r3, #0]
  800556e:	2b01      	cmp	r3, #1
  8005570:	d000      	beq.n	8005574 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x420>
  8005572:	e127      	b.n	80057c4 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x670>
-							TIM16_final_start_value_oscillation_mode = OSCILLATE_UPWARDS;
  8005574:	2317      	movs	r3, #23
  8005576:	18fb      	adds	r3, r7, r3
  8005578:	2201      	movs	r2, #1
  800557a:	701a      	strb	r2, [r3, #0]
-							params_ptr->prescaler_adjust = MULTIPLY_BY_TWO;
  800557c:	687b      	ldr	r3, [r7, #4]
  800557e:	2220      	movs	r2, #32
  8005580:	2101      	movs	r1, #1
  8005582:	5499      	strb	r1, [r3, r2]
  8005584:	e11e      	b.n	80057c4 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x670>
-						}
-					}
-				}
-				else if(unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) == 0){
  8005586:	230c      	movs	r3, #12
  8005588:	18fb      	adds	r3, r7, r3
  800558a:	881b      	ldrh	r3, [r3, #0]
@@ -14211,15 +13990,11 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
  8005590:	f000 fa52 	bl	8005a38 <unsigned_bitwise_modulo>
  8005594:	1e03      	subs	r3, r0, #0
  8005596:	d152      	bne.n	800563e <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x4ea>
-
-					manipulated_period_shorten = manipulated_period_shorten; //do nothing// //DONE
  8005598:	2212      	movs	r2, #18
  800559a:	18bb      	adds	r3, r7, r2
  800559c:	18ba      	adds	r2, r7, r2
  800559e:	8812      	ldrh	r2, [r2, #0]
  80055a0:	801a      	strh	r2, [r3, #0]
-
-					if(unsigned_bitwise_modulo(manipulated_period_lengthen, 1) == 0){
  80055a2:	2410      	movs	r4, #16
  80055a4:	193b      	adds	r3, r7, r4
  80055a6:	881b      	ldrh	r3, [r3, #0]
@@ -14228,106 +14003,75 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
  80055ac:	f000 fa44 	bl	8005a38 <unsigned_bitwise_modulo>
  80055b0:	1e03      	subs	r3, r0, #0
  80055b2:	d121      	bne.n	80055f8 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x4a4>
-
-						manipulated_period_lengthen = manipulated_period_lengthen >> 1; //DONE
  80055b4:	193b      	adds	r3, r7, r4
  80055b6:	193a      	adds	r2, r7, r4
  80055b8:	8812      	ldrh	r2, [r2, #0]
  80055ba:	0852      	lsrs	r2, r2, #1
  80055bc:	801a      	strh	r2, [r3, #0]
-						//DO NOT OSCILLATE BETWEEN VALUES //DONE
-						//prescaler during lengthened halfperiod should be set to half //DONE
-
-						if(symmetry_type_for_halfcycle == SHORTEN){
  80055be:	2316      	movs	r3, #22
  80055c0:	18fb      	adds	r3, r7, r3
  80055c2:	781b      	ldrb	r3, [r3, #0]
  80055c4:	2b00      	cmp	r3, #0
  80055c6:	d108      	bne.n	80055da <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x486>
-							TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
  80055c8:	2317      	movs	r3, #23
  80055ca:	18fb      	adds	r3, r7, r3
  80055cc:	2200      	movs	r2, #0
  80055ce:	701a      	strb	r2, [r3, #0]
-							params_ptr->prescaler_adjust = DO_NOTHING;
  80055d0:	687b      	ldr	r3, [r7, #4]
  80055d2:	2220      	movs	r2, #32
  80055d4:	2100      	movs	r1, #0
  80055d6:	5499      	strb	r1, [r3, r2]
  80055d8:	e0f4      	b.n	80057c4 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x670>
-						}
-						else if(symmetry_type_for_halfcycle == LENGTHEN){
  80055da:	2316      	movs	r3, #22
  80055dc:	18fb      	adds	r3, r7, r3
  80055de:	781b      	ldrb	r3, [r3, #0]
  80055e0:	2b01      	cmp	r3, #1
  80055e2:	d000      	beq.n	80055e6 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x492>
  80055e4:	e0ee      	b.n	80057c4 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x670>
-							TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
  80055e6:	2317      	movs	r3, #23
  80055e8:	18fb      	adds	r3, r7, r3
  80055ea:	2200      	movs	r2, #0
  80055ec:	701a      	strb	r2, [r3, #0]
-							params_ptr->prescaler_adjust = MULTIPLY_BY_TWO;
  80055ee:	687b      	ldr	r3, [r7, #4]
  80055f0:	2220      	movs	r2, #32
  80055f2:	2101      	movs	r1, #1
  80055f4:	5499      	strb	r1, [r3, r2]
  80055f6:	e0e5      	b.n	80057c4 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x670>
-						}
-					}
-					else{
-
-						manipulated_period_lengthen = manipulated_period_lengthen >> 1; //DONE
  80055f8:	2210      	movs	r2, #16
  80055fa:	18bb      	adds	r3, r7, r2
  80055fc:	18ba      	adds	r2, r7, r2
  80055fe:	8812      	ldrh	r2, [r2, #0]
  8005600:	0852      	lsrs	r2, r2, #1
  8005602:	801a      	strh	r2, [r3, #0]
-						//prescaler during lengthened halfperiod should be set to half //DONE
-						//manipulated period_lengthened should oscillate over the halfperiod between manipulated_period_lengthen and manipulated_period_lengthen + 1. //DONE
-
-						if(symmetry_type_for_halfcycle == SHORTEN){
  8005604:	2316      	movs	r3, #22
  8005606:	18fb      	adds	r3, r7, r3
  8005608:	781b      	ldrb	r3, [r3, #0]
  800560a:	2b00      	cmp	r3, #0
  800560c:	d108      	bne.n	8005620 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x4cc>
-							TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
  800560e:	2317      	movs	r3, #23
  8005610:	18fb      	adds	r3, r7, r3
  8005612:	2200      	movs	r2, #0
  8005614:	701a      	strb	r2, [r3, #0]
-							params_ptr->prescaler_adjust = DO_NOTHING;
  8005616:	687b      	ldr	r3, [r7, #4]
  8005618:	2220      	movs	r2, #32
  800561a:	2100      	movs	r1, #0
  800561c:	5499      	strb	r1, [r3, r2]
  800561e:	e0d1      	b.n	80057c4 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x670>
-						}
-						else if(symmetry_type_for_halfcycle == LENGTHEN){
  8005620:	2316      	movs	r3, #22
  8005622:	18fb      	adds	r3, r7, r3
  8005624:	781b      	ldrb	r3, [r3, #0]
  8005626:	2b01      	cmp	r3, #1
  8005628:	d000      	beq.n	800562c <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x4d8>
  800562a:	e0cb      	b.n	80057c4 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x670>
-							TIM16_final_start_value_oscillation_mode = OSCILLATE_UPWARDS;
  800562c:	2317      	movs	r3, #23
  800562e:	18fb      	adds	r3, r7, r3
  8005630:	2201      	movs	r2, #1
  8005632:	701a      	strb	r2, [r3, #0]
-							params_ptr->prescaler_adjust = MULTIPLY_BY_TWO;
  8005634:	687b      	ldr	r3, [r7, #4]
  8005636:	2220      	movs	r2, #32
  8005638:	2101      	movs	r1, #1
  800563a:	5499      	strb	r1, [r3, r2]
  800563c:	e0c2      	b.n	80057c4 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x670>
-						}
-					}
-				}
-				else if(unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) < 128){
  800563e:	230c      	movs	r3, #12
  8005640:	18fb      	adds	r3, r7, r3
  8005642:	881b      	ldrh	r3, [r3, #0]
@@ -14337,22 +14081,16 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
  800564c:	0003      	movs	r3, r0
  800564e:	2b7f      	cmp	r3, #127	@ 0x7f
  8005650:	d856      	bhi.n	8005700 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x5ac>
-
-					manipulated_period_shorten = manipulated_period_shorten; //do nothing// //DONE
  8005652:	2212      	movs	r2, #18
  8005654:	18bb      	adds	r3, r7, r2
  8005656:	18ba      	adds	r2, r7, r2
  8005658:	8812      	ldrh	r2, [r2, #0]
  800565a:	801a      	strh	r2, [r3, #0]
-					//NO NEED TO CHECK IF MANIPULATED_PERIOD_SHORTEN ENDS IN 0.5 AS IN THIS SPECIFIC CONDITION, WE HAVE ELIMINATED THAT POSSIBILITY
-					manipulated_period_lengthen = manipulated_period_lengthen; //do nothing //DONE
  800565c:	2410      	movs	r4, #16
  800565e:	193b      	adds	r3, r7, r4
  8005660:	193a      	adds	r2, r7, r4
  8005662:	8812      	ldrh	r2, [r2, #0]
  8005664:	801a      	strh	r2, [r3, #0]
-
-					if(unsigned_bitwise_modulo(manipulated_period_lengthen, 1) == 0){
  8005666:	193b      	adds	r3, r7, r4
  8005668:	881b      	ldrh	r3, [r3, #0]
  800566a:	2101      	movs	r1, #1
@@ -14360,106 +14098,75 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
  800566e:	f000 f9e3 	bl	8005a38 <unsigned_bitwise_modulo>
  8005672:	1e03      	subs	r3, r0, #0
  8005674:	d121      	bne.n	80056ba <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x566>
-
-						manipulated_period_lengthen = manipulated_period_lengthen >> 1; //DONE
  8005676:	193b      	adds	r3, r7, r4
  8005678:	193a      	adds	r2, r7, r4
  800567a:	8812      	ldrh	r2, [r2, #0]
  800567c:	0852      	lsrs	r2, r2, #1
  800567e:	801a      	strh	r2, [r3, #0]
-						//DO NOT OSCILLATE BETWEEN VALUES //DONE
-						//prescaler during lengthened halfperiod should be set to half //DONE
-
-						if(symmetry_type_for_halfcycle == SHORTEN){
  8005680:	2316      	movs	r3, #22
  8005682:	18fb      	adds	r3, r7, r3
  8005684:	781b      	ldrb	r3, [r3, #0]
  8005686:	2b00      	cmp	r3, #0
  8005688:	d108      	bne.n	800569c <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x548>
-							TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
  800568a:	2317      	movs	r3, #23
  800568c:	18fb      	adds	r3, r7, r3
  800568e:	2200      	movs	r2, #0
  8005690:	701a      	strb	r2, [r3, #0]
-							params_ptr->prescaler_adjust = DO_NOTHING;
  8005692:	687b      	ldr	r3, [r7, #4]
  8005694:	2220      	movs	r2, #32
  8005696:	2100      	movs	r1, #0
  8005698:	5499      	strb	r1, [r3, r2]
  800569a:	e093      	b.n	80057c4 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x670>
-						}
-						else if(symmetry_type_for_halfcycle == LENGTHEN){
  800569c:	2316      	movs	r3, #22
  800569e:	18fb      	adds	r3, r7, r3
  80056a0:	781b      	ldrb	r3, [r3, #0]
  80056a2:	2b01      	cmp	r3, #1
  80056a4:	d000      	beq.n	80056a8 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x554>
  80056a6:	e08d      	b.n	80057c4 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x670>
-							TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
  80056a8:	2317      	movs	r3, #23
  80056aa:	18fb      	adds	r3, r7, r3
  80056ac:	2200      	movs	r2, #0
  80056ae:	701a      	strb	r2, [r3, #0]
-							params_ptr->prescaler_adjust = MULTIPLY_BY_TWO;
  80056b0:	687b      	ldr	r3, [r7, #4]
  80056b2:	2220      	movs	r2, #32
  80056b4:	2101      	movs	r1, #1
  80056b6:	5499      	strb	r1, [r3, r2]
  80056b8:	e084      	b.n	80057c4 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x670>
-						}
-					}
-					else{
-
-						manipulated_period_lengthen = manipulated_period_lengthen >> 1; //DONE
  80056ba:	2210      	movs	r2, #16
  80056bc:	18bb      	adds	r3, r7, r2
  80056be:	18ba      	adds	r2, r7, r2
  80056c0:	8812      	ldrh	r2, [r2, #0]
  80056c2:	0852      	lsrs	r2, r2, #1
  80056c4:	801a      	strh	r2, [r3, #0]
-						//prescaler during lengthened halfperiod should be set to half //DONE
-						//manipulated period_lengthened should oscillate over the halfperiod between manipulated_period_lengthen and manipulated_period_lengthen + 1. //DONE
-
-						if(symmetry_type_for_halfcycle == SHORTEN){
  80056c6:	2316      	movs	r3, #22
  80056c8:	18fb      	adds	r3, r7, r3
  80056ca:	781b      	ldrb	r3, [r3, #0]
  80056cc:	2b00      	cmp	r3, #0
  80056ce:	d108      	bne.n	80056e2 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x58e>
-							TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
  80056d0:	2317      	movs	r3, #23
  80056d2:	18fb      	adds	r3, r7, r3
  80056d4:	2200      	movs	r2, #0
  80056d6:	701a      	strb	r2, [r3, #0]
-							params_ptr->prescaler_adjust = DO_NOTHING;
  80056d8:	687b      	ldr	r3, [r7, #4]
  80056da:	2220      	movs	r2, #32
  80056dc:	2100      	movs	r1, #0
  80056de:	5499      	strb	r1, [r3, r2]
  80056e0:	e070      	b.n	80057c4 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x670>
-						}
-						else if(symmetry_type_for_halfcycle == LENGTHEN){
  80056e2:	2316      	movs	r3, #22
  80056e4:	18fb      	adds	r3, r7, r3
  80056e6:	781b      	ldrb	r3, [r3, #0]
  80056e8:	2b01      	cmp	r3, #1
  80056ea:	d000      	beq.n	80056ee <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x59a>
  80056ec:	e06a      	b.n	80057c4 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x670>
-							TIM16_final_start_value_oscillation_mode = OSCILLATE_UPWARDS;
  80056ee:	2317      	movs	r3, #23
  80056f0:	18fb      	adds	r3, r7, r3
  80056f2:	2201      	movs	r2, #1
  80056f4:	701a      	strb	r2, [r3, #0]
-							params_ptr->prescaler_adjust = MULTIPLY_BY_TWO;
  80056f6:	687b      	ldr	r3, [r7, #4]
  80056f8:	2220      	movs	r2, #32
  80056fa:	2101      	movs	r1, #1
  80056fc:	5499      	strb	r1, [r3, r2]
  80056fe:	e061      	b.n	80057c4 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x670>
-						}
-					}
-				}
-				else if(unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) > 128){
  8005700:	230c      	movs	r3, #12
  8005702:	18fb      	adds	r3, r7, r3
  8005704:	881b      	ldrh	r3, [r3, #0]
@@ -14469,24 +14176,18 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
  800570e:	0003      	movs	r3, r0
  8005710:	2b80      	cmp	r3, #128	@ 0x80
  8005712:	d957      	bls.n	80057c4 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x670>
-
-					manipulated_period_shorten = manipulated_period_shorten - 1; //DONE
  8005714:	2212      	movs	r2, #18
  8005716:	18bb      	adds	r3, r7, r2
  8005718:	18ba      	adds	r2, r7, r2
  800571a:	8812      	ldrh	r2, [r2, #0]
  800571c:	3a01      	subs	r2, #1
  800571e:	801a      	strh	r2, [r3, #0]
-					//NO NEED TO CHECK IF MANIPULATED_PERIOD_SHORTEN ENDS IN 0.5 AS IN THIS SPECIFIC CONDITION, WE HAVE ELIMINATED THAT POSSIBILITY
-					manipulated_period_lengthen = manipulated_period_lengthen + 1; //DONE
  8005720:	2410      	movs	r4, #16
  8005722:	193b      	adds	r3, r7, r4
  8005724:	193a      	adds	r2, r7, r4
  8005726:	8812      	ldrh	r2, [r2, #0]
  8005728:	3201      	adds	r2, #1
  800572a:	801a      	strh	r2, [r3, #0]
-
-					if(unsigned_bitwise_modulo(manipulated_period_lengthen, 1) == 0){
  800572c:	193b      	adds	r3, r7, r4
  800572e:	881b      	ldrh	r3, [r3, #0]
  8005730:	2101      	movs	r1, #1
@@ -14494,122 +14195,84 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
  8005734:	f000 f980 	bl	8005a38 <unsigned_bitwise_modulo>
  8005738:	1e03      	subs	r3, r0, #0
  800573a:	d120      	bne.n	800577e <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x62a>
-
-						manipulated_period_lengthen = manipulated_period_lengthen >> 1; //DONE
  800573c:	193b      	adds	r3, r7, r4
  800573e:	193a      	adds	r2, r7, r4
  8005740:	8812      	ldrh	r2, [r2, #0]
  8005742:	0852      	lsrs	r2, r2, #1
  8005744:	801a      	strh	r2, [r3, #0]
-						//DO NOT OSCILLATE BETWEEN VALUES //DONE
-						//prescaler during lengthened halfperiod should be set to half //DONE
-
-						if(symmetry_type_for_halfcycle == SHORTEN){
  8005746:	2316      	movs	r3, #22
  8005748:	18fb      	adds	r3, r7, r3
  800574a:	781b      	ldrb	r3, [r3, #0]
  800574c:	2b00      	cmp	r3, #0
  800574e:	d108      	bne.n	8005762 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x60e>
-							TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
  8005750:	2317      	movs	r3, #23
  8005752:	18fb      	adds	r3, r7, r3
  8005754:	2200      	movs	r2, #0
  8005756:	701a      	strb	r2, [r3, #0]
-							params_ptr->prescaler_adjust = DO_NOTHING;
  8005758:	687b      	ldr	r3, [r7, #4]
  800575a:	2220      	movs	r2, #32
  800575c:	2100      	movs	r1, #0
  800575e:	5499      	strb	r1, [r3, r2]
  8005760:	e030      	b.n	80057c4 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x670>
-						}
-						else if(symmetry_type_for_halfcycle == LENGTHEN){
  8005762:	2316      	movs	r3, #22
  8005764:	18fb      	adds	r3, r7, r3
  8005766:	781b      	ldrb	r3, [r3, #0]
  8005768:	2b01      	cmp	r3, #1
  800576a:	d12b      	bne.n	80057c4 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x670>
-							TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
  800576c:	2317      	movs	r3, #23
  800576e:	18fb      	adds	r3, r7, r3
  8005770:	2200      	movs	r2, #0
  8005772:	701a      	strb	r2, [r3, #0]
-							params_ptr->prescaler_adjust = MULTIPLY_BY_TWO;
  8005774:	687b      	ldr	r3, [r7, #4]
  8005776:	2220      	movs	r2, #32
  8005778:	2101      	movs	r1, #1
  800577a:	5499      	strb	r1, [r3, r2]
  800577c:	e022      	b.n	80057c4 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x670>
-						}
-					}
-					else{
-
-						manipulated_period_lengthen = manipulated_period_lengthen >> 1; //DONE
  800577e:	2210      	movs	r2, #16
  8005780:	18bb      	adds	r3, r7, r2
  8005782:	18ba      	adds	r2, r7, r2
  8005784:	8812      	ldrh	r2, [r2, #0]
  8005786:	0852      	lsrs	r2, r2, #1
  8005788:	801a      	strh	r2, [r3, #0]
-						//prescaler during lengthened halfperiod should be set to half //DONE
-						//manipulated period_lengthened should oscillate over the halfperiod between manipulated_period_lengthen and manipulated_period_lengthen + 1. //DONE
-
-						if(symmetry_type_for_halfcycle == SHORTEN){
  800578a:	2316      	movs	r3, #22
  800578c:	18fb      	adds	r3, r7, r3
  800578e:	781b      	ldrb	r3, [r3, #0]
  8005790:	2b00      	cmp	r3, #0
  8005792:	d108      	bne.n	80057a6 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x652>
-							TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
  8005794:	2317      	movs	r3, #23
  8005796:	18fb      	adds	r3, r7, r3
  8005798:	2200      	movs	r2, #0
  800579a:	701a      	strb	r2, [r3, #0]
-							params_ptr->prescaler_adjust = DO_NOTHING;
  800579c:	687b      	ldr	r3, [r7, #4]
  800579e:	2220      	movs	r2, #32
  80057a0:	2100      	movs	r1, #0
  80057a2:	5499      	strb	r1, [r3, r2]
  80057a4:	e00e      	b.n	80057c4 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x670>
-						}
-						else if(symmetry_type_for_halfcycle == LENGTHEN){
  80057a6:	2316      	movs	r3, #22
  80057a8:	18fb      	adds	r3, r7, r3
  80057aa:	781b      	ldrb	r3, [r3, #0]
  80057ac:	2b01      	cmp	r3, #1
  80057ae:	d109      	bne.n	80057c4 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x670>
-							TIM16_final_start_value_oscillation_mode = OSCILLATE_UPWARDS;
  80057b0:	2317      	movs	r3, #23
  80057b2:	18fb      	adds	r3, r7, r3
  80057b4:	2201      	movs	r2, #1
  80057b6:	701a      	strb	r2, [r3, #0]
-							params_ptr->prescaler_adjust = MULTIPLY_BY_TWO;
  80057b8:	687b      	ldr	r3, [r7, #4]
  80057ba:	2220      	movs	r2, #32
  80057bc:	2101      	movs	r1, #1
  80057be:	5499      	strb	r1, [r3, r2]
  80057c0:	e000      	b.n	80057c4 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x670>
-				if(unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) == 128){
  80057c2:	46c0      	nop			@ (mov r8, r8)
-			}
-
-	        //DETERMINE THE TIM16_FINAL_START_VALUE FROM MANIPULATED_PERIOD_LENGTHEN/SHORTEN CALCULATED
-	        //NOTE INVERSE RELATIONSHIP BETWEEN TIM16_FINAL_START_VALUE AND MANIPULATED_PERIOD_LENGTHEN/SHORTEN BECAUSE 256-TIM16_FINAL_START_VALUE = MANIPULATED_PERIOD_LENGTHEN/SHORTEN
-	        //ODD VALUES OF CURRENT_INDEX WILL FEATURE THE ADJUSTED(OSCILLATED) VALUE
-	        if(symmetry_type_for_halfcycle == SHORTEN){
  80057c4:	2316      	movs	r3, #22
  80057c6:	18fb      	adds	r3, r7, r3
  80057c8:	781b      	ldrb	r3, [r3, #0]
  80057ca:	2b00      	cmp	r3, #0
  80057cc:	d152      	bne.n	8005874 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x720>
-
-	            if(TIM16_final_start_value_oscillation_mode == DO_NOT_OSCILLATE){
  80057ce:	2317      	movs	r3, #23
  80057d0:	18fb      	adds	r3, r7, r3
  80057d2:	781b      	ldrb	r3, [r3, #0]
  80057d4:	2b00      	cmp	r3, #0
  80057d6:	d109      	bne.n	80057ec <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x698>
-
-	                params_ptr->final_start_value = 256 - manipulated_period_shorten;
  80057d8:	2312      	movs	r3, #18
  80057da:	18fb      	adds	r3, r7, r3
  80057dc:	881b      	ldrh	r3, [r3, #0]
@@ -14620,15 +14283,11 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
  80057e6:	687b      	ldr	r3, [r7, #4]
  80057e8:	829a      	strh	r2, [r3, #20]
  80057ea:	e099      	b.n	8005920 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x7cc>
-	            }
-	            else if(TIM16_final_start_value_oscillation_mode == OSCILLATE_UPWARDS){
  80057ec:	2317      	movs	r3, #23
  80057ee:	18fb      	adds	r3, r7, r3
  80057f0:	781b      	ldrb	r3, [r3, #0]
  80057f2:	2b01      	cmp	r3, #1
  80057f4:	d11b      	bne.n	800582e <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x6da>
-
-	                if(unsigned_bitwise_modulo(params_ptr->index, 1) == 0){ //if current index is even
  80057f6:	687b      	ldr	r3, [r7, #4]
  80057f8:	89db      	ldrh	r3, [r3, #14]
  80057fa:	b29b      	uxth	r3, r3
@@ -14637,8 +14296,6 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
  8005800:	f000 f91a 	bl	8005a38 <unsigned_bitwise_modulo>
  8005804:	1e03      	subs	r3, r0, #0
  8005806:	d109      	bne.n	800581c <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x6c8>
-
-	                    params_ptr->final_start_value = 256 - manipulated_period_shorten;
  8005808:	2312      	movs	r3, #18
  800580a:	18fb      	adds	r3, r7, r3
  800580c:	881b      	ldrh	r3, [r3, #0]
@@ -14649,10 +14306,6 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
  8005816:	687b      	ldr	r3, [r7, #4]
  8005818:	829a      	strh	r2, [r3, #20]
  800581a:	e081      	b.n	8005920 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x7cc>
-	                }
-	                else{ //if current index is odd
-
-	                    params_ptr->final_start_value = 256 - manipulated_period_shorten - 1;
  800581c:	2312      	movs	r3, #18
  800581e:	18fb      	adds	r3, r7, r3
  8005820:	881b      	ldrh	r3, [r3, #0]
@@ -14662,17 +14315,12 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
  8005828:	687b      	ldr	r3, [r7, #4]
  800582a:	829a      	strh	r2, [r3, #20]
  800582c:	e078      	b.n	8005920 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x7cc>
-	                }
-	            }
-	            else if(TIM16_final_start_value_oscillation_mode == OSCILLATE_DOWNWARDS){
  800582e:	2317      	movs	r3, #23
  8005830:	18fb      	adds	r3, r7, r3
  8005832:	781b      	ldrb	r3, [r3, #0]
  8005834:	2b02      	cmp	r3, #2
  8005836:	d000      	beq.n	800583a <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x6e6>
  8005838:	e072      	b.n	8005920 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x7cc>
-
-	                if(unsigned_bitwise_modulo(params_ptr->index, 1) == 0){ //if current index is even
  800583a:	687b      	ldr	r3, [r7, #4]
  800583c:	89db      	ldrh	r3, [r3, #14]
  800583e:	b29b      	uxth	r3, r3
@@ -14681,8 +14329,6 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
  8005844:	f000 f8f8 	bl	8005a38 <unsigned_bitwise_modulo>
  8005848:	1e03      	subs	r3, r0, #0
  800584a:	d109      	bne.n	8005860 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x70c>
-
-	                    params_ptr->final_start_value = 256 - manipulated_period_shorten;
  800584c:	2312      	movs	r3, #18
  800584e:	18fb      	adds	r3, r7, r3
  8005850:	881b      	ldrh	r3, [r3, #0]
@@ -14693,10 +14339,6 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
  800585a:	687b      	ldr	r3, [r7, #4]
  800585c:	829a      	strh	r2, [r3, #20]
  800585e:	e05f      	b.n	8005920 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x7cc>
-	                }
-	                else{ //if current index is odd
-
-	                    params_ptr->final_start_value = 256 - manipulated_period_shorten + 1;
  8005860:	2312      	movs	r3, #18
  8005862:	18fb      	adds	r3, r7, r3
  8005864:	881b      	ldrh	r3, [r3, #0]
@@ -14707,24 +14349,16 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
  800586e:	687b      	ldr	r3, [r7, #4]
  8005870:	829a      	strh	r2, [r3, #20]
  8005872:	e055      	b.n	8005920 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x7cc>
-	                }
-	            }
-	        }
-	        else if(symmetry_type_for_halfcycle == LENGTHEN){
  8005874:	2316      	movs	r3, #22
  8005876:	18fb      	adds	r3, r7, r3
  8005878:	781b      	ldrb	r3, [r3, #0]
  800587a:	2b01      	cmp	r3, #1
  800587c:	d150      	bne.n	8005920 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x7cc>
-
-	            if(TIM16_final_start_value_oscillation_mode == DO_NOT_OSCILLATE){
  800587e:	2317      	movs	r3, #23
  8005880:	18fb      	adds	r3, r7, r3
  8005882:	781b      	ldrb	r3, [r3, #0]
  8005884:	2b00      	cmp	r3, #0
  8005886:	d109      	bne.n	800589c <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x748>
-
-	                params_ptr->final_start_value = 256 - manipulated_period_lengthen;
  8005888:	2310      	movs	r3, #16
  800588a:	18fb      	adds	r3, r7, r3
  800588c:	881b      	ldrh	r3, [r3, #0]
@@ -14735,15 +14369,11 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
  8005896:	687b      	ldr	r3, [r7, #4]
  8005898:	829a      	strh	r2, [r3, #20]
  800589a:	e041      	b.n	8005920 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x7cc>
-	            }
-	            else if(TIM16_final_start_value_oscillation_mode == OSCILLATE_UPWARDS){
  800589c:	2317      	movs	r3, #23
  800589e:	18fb      	adds	r3, r7, r3
  80058a0:	781b      	ldrb	r3, [r3, #0]
  80058a2:	2b01      	cmp	r3, #1
  80058a4:	d11b      	bne.n	80058de <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x78a>
-
-	                if(unsigned_bitwise_modulo(params_ptr->index, 1) == 0){ //if current index is even
  80058a6:	687b      	ldr	r3, [r7, #4]
  80058a8:	89db      	ldrh	r3, [r3, #14]
  80058aa:	b29b      	uxth	r3, r3
@@ -14752,8 +14382,6 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
  80058b0:	f000 f8c2 	bl	8005a38 <unsigned_bitwise_modulo>
  80058b4:	1e03      	subs	r3, r0, #0
  80058b6:	d109      	bne.n	80058cc <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x778>
-
-	                    params_ptr->final_start_value = 256 - manipulated_period_lengthen;
  80058b8:	2310      	movs	r3, #16
  80058ba:	18fb      	adds	r3, r7, r3
  80058bc:	881b      	ldrh	r3, [r3, #0]
@@ -14764,10 +14392,6 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
  80058c6:	687b      	ldr	r3, [r7, #4]
  80058c8:	829a      	strh	r2, [r3, #20]
  80058ca:	e029      	b.n	8005920 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x7cc>
-	                }
-	                else{ //if current index is odd
-
-	                    params_ptr->final_start_value = 256 - manipulated_period_lengthen - 1;
  80058cc:	2310      	movs	r3, #16
  80058ce:	18fb      	adds	r3, r7, r3
  80058d0:	881b      	ldrh	r3, [r3, #0]
@@ -14777,16 +14401,11 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
  80058d8:	687b      	ldr	r3, [r7, #4]
  80058da:	829a      	strh	r2, [r3, #20]
  80058dc:	e020      	b.n	8005920 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x7cc>
-	                }
-	            }
-	            else if(TIM16_final_start_value_oscillation_mode == OSCILLATE_DOWNWARDS){
  80058de:	2317      	movs	r3, #23
  80058e0:	18fb      	adds	r3, r7, r3
  80058e2:	781b      	ldrb	r3, [r3, #0]
  80058e4:	2b02      	cmp	r3, #2
  80058e6:	d11b      	bne.n	8005920 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x7cc>
-
-	                if(unsigned_bitwise_modulo(params_ptr->index, 1) == 0){ //if current index is even
  80058e8:	687b      	ldr	r3, [r7, #4]
  80058ea:	89db      	ldrh	r3, [r3, #14]
  80058ec:	b29b      	uxth	r3, r3
@@ -14795,8 +14414,6 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
  80058f2:	f000 f8a1 	bl	8005a38 <unsigned_bitwise_modulo>
  80058f6:	1e03      	subs	r3, r0, #0
  80058f8:	d109      	bne.n	800590e <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x7ba>
-
-	                    params_ptr->final_start_value = 256 - manipulated_period_lengthen;
  80058fa:	2310      	movs	r3, #16
  80058fc:	18fb      	adds	r3, r7, r3
  80058fe:	881b      	ldrh	r3, [r3, #0]
@@ -14807,10 +14424,6 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
  8005908:	687b      	ldr	r3, [r7, #4]
  800590a:	829a      	strh	r2, [r3, #20]
  800590c:	e008      	b.n	8005920 <Process_TIM16_Final_Start_Value_and_Final_Prescaler+0x7cc>
-	                }
-	                else{ //if current index is odd
-
-	                    params_ptr->final_start_value = 256 - manipulated_period_lengthen + 1;
  800590e:	2310      	movs	r3, #16
  8005910:	18fb      	adds	r3, r7, r3
  8005912:	881b      	ldrh	r3, [r3, #0]
@@ -14820,20 +14433,9 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
  800591a:	b29a      	uxth	r2, r3
  800591c:	687b      	ldr	r3, [r7, #4]
  800591e:	829a      	strh	r2, [r3, #20]
-	                }
-	            }
-	        }
-
-	        Adjust_TIM16_Prescaler(params_ptr);
  8005920:	687b      	ldr	r3, [r7, #4]
  8005922:	0018      	movs	r0, r3
  8005924:	f7ff fbf4 	bl	8005110 <Adjust_TIM16_Prescaler>
-		params_ptr->final_start_value = params_ptr->raw_start_value;
-		params_ptr->prescaler_adjust = DO_NOTHING;
-        Adjust_TIM16_Prescaler(params_ptr);
-    #endif
-
-    params_ptr->final_period = 256 - params_ptr->final_start_value;
  8005928:	687b      	ldr	r3, [r7, #4]
  800592a:	8a9b      	ldrh	r3, [r3, #20]
  800592c:	b29b      	uxth	r3, r3
@@ -14843,7 +14445,6 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
  8005934:	b29a      	uxth	r2, r3
  8005936:	687b      	ldr	r3, [r7, #4]
  8005938:	82da      	strh	r2, [r3, #22]
-    params_ptr->final_ARR = params_ptr->final_period - 1;
  800593a:	687b      	ldr	r3, [r7, #4]
  800593c:	8adb      	ldrh	r3, [r3, #22]
  800593e:	b29b      	uxth	r3, r3
@@ -14851,7 +14452,6 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
  8005942:	b29a      	uxth	r2, r3
  8005944:	687b      	ldr	r3, [r7, #4]
  8005946:	831a      	strh	r2, [r3, #24]
-    params_ptr->final_prescaler_minus_one = params_ptr->final_prescaler - 1;
  8005948:	687b      	ldr	r3, [r7, #4]
  800594a:	8b9b      	ldrh	r3, [r3, #28]
  800594c:	b29b      	uxth	r3, r3
@@ -14859,46 +14459,25 @@ uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* param
  8005950:	b29a      	uxth	r2, r3
  8005952:	687b      	ldr	r3, [r7, #4]
  8005954:	83da      	strh	r2, [r3, #30]
-
-    return 1;
  8005956:	2301      	movs	r3, #1
-}
  8005958:	0018      	movs	r0, r3
  800595a:	46bd      	mov	sp, r7
  800595c:	b007      	add	sp, #28
  800595e:	bdf0      	pop	{r4, r5, r6, r7, pc}
 
 08005960 <SystemInit>:
-  * @brief  Setup the microcontroller system.
-  * @param  None
-  * @retval None
-  */
-void SystemInit(void)
-{
  8005960:	b580      	push	{r7, lr}
  8005962:	af00      	add	r7, sp, #0
-  /* Configure the Vector Table location -------------------------------------*/
-#if defined(USER_VECT_TAB_ADDRESS)
-  SCB->VTOR = VECT_TAB_BASE_ADDRESS | VECT_TAB_OFFSET; /* Vector Table Relocation */
-#endif /* USER_VECT_TAB_ADDRESS */
-}
  8005964:	46c0      	nop			@ (mov r8, r8)
  8005966:	46bd      	mov	sp, r7
  8005968:	bd80      	pop	{r7, pc}
 
 0800596a <Start_OC_TIM>:
-//INCLUDES
-#include "timers.h"
-
-//FUNCTION DEFINITIONS
-uint8_t Start_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t OC_TIM_channel){
  800596a:	b5b0      	push	{r4, r5, r7, lr}
  800596c:	b084      	sub	sp, #16
  800596e:	af00      	add	r7, sp, #0
  8005970:	6078      	str	r0, [r7, #4]
  8005972:	6039      	str	r1, [r7, #0]
-
-	uint8_t ok = HAL_TIM_OC_Start_IT(TIM, OC_TIM_channel); //_IT variant of function
  8005974:	250f      	movs	r5, #15
  8005976:	197c      	adds	r4, r7, r5
  8005978:	683a      	ldr	r2, [r7, #0]
@@ -14908,38 +14487,25 @@ uint8_t Start_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t OC_TIM_channel){
  8005980:	f003 fd8c 	bl	800949c <HAL_TIM_OC_Start_IT>
  8005984:	0003      	movs	r3, r0
  8005986:	7023      	strb	r3, [r4, #0]
-	//means the timer will generate an interrupt on delay_elapsed (CNT = CCR) condition
-
-	if(ok != HAL_OK){
  8005988:	197b      	adds	r3, r7, r5
  800598a:	781b      	ldrb	r3, [r3, #0]
  800598c:	2b00      	cmp	r3, #0
  800598e:	d001      	beq.n	8005994 <Start_OC_TIM+0x2a>
-
-		Error_Handler();
  8005990:	f7fc fc2a 	bl	80021e8 <Error_Handler>
-	}
-
-	return ok;
  8005994:	230f      	movs	r3, #15
  8005996:	18fb      	adds	r3, r7, r3
  8005998:	781b      	ldrb	r3, [r3, #0]
-}
  800599a:	0018      	movs	r0, r3
  800599c:	46bd      	mov	sp, r7
  800599e:	b004      	add	sp, #16
  80059a0:	bdb0      	pop	{r4, r5, r7, pc}
 
 080059a2 <Stop_OC_TIM>:
-
-uint8_t Stop_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t OC_TIM_channel){
  80059a2:	b5b0      	push	{r4, r5, r7, lr}
  80059a4:	b084      	sub	sp, #16
  80059a6:	af00      	add	r7, sp, #0
  80059a8:	6078      	str	r0, [r7, #4]
  80059aa:	6039      	str	r1, [r7, #0]
-
-	uint8_t ok = HAL_TIM_OC_Stop_IT(TIM, OC_TIM_channel);
  80059ac:	250f      	movs	r5, #15
  80059ae:	197c      	adds	r4, r7, r5
  80059b0:	683a      	ldr	r2, [r7, #0]
@@ -14949,44 +14515,31 @@ uint8_t Stop_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t OC_TIM_channel){
  80059b8:	f003 fe94 	bl	80096e4 <HAL_TIM_OC_Stop_IT>
  80059bc:	0003      	movs	r3, r0
  80059be:	7023      	strb	r3, [r4, #0]
-
-	if(ok != HAL_OK){
  80059c0:	197b      	adds	r3, r7, r5
  80059c2:	781b      	ldrb	r3, [r3, #0]
  80059c4:	2b00      	cmp	r3, #0
  80059c6:	d001      	beq.n	80059cc <Stop_OC_TIM+0x2a>
-
-		Error_Handler();
  80059c8:	f7fc fc0e 	bl	80021e8 <Error_Handler>
-	}
-
-	return ok;
  80059cc:	230f      	movs	r3, #15
  80059ce:	18fb      	adds	r3, r7, r3
  80059d0:	781b      	ldrb	r3, [r3, #0]
-}
  80059d2:	0018      	movs	r0, r3
  80059d4:	46bd      	mov	sp, r7
  80059d6:	b004      	add	sp, #16
  80059d8:	bdb0      	pop	{r4, r5, r7, pc}
 
 080059da <isPrime>:
-#include "utility.h"
-
-enum Validate isPrime(uint16_t x){
  80059da:	b580      	push	{r7, lr}
  80059dc:	b084      	sub	sp, #16
  80059de:	af00      	add	r7, sp, #0
  80059e0:	0002      	movs	r2, r0
  80059e2:	1dbb      	adds	r3, r7, #6
  80059e4:	801a      	strh	r2, [r3, #0]
-    for (uint16_t d = 2; d * d <= x; d++) {
  80059e6:	230e      	movs	r3, #14
  80059e8:	18fb      	adds	r3, r7, r3
  80059ea:	2202      	movs	r2, #2
  80059ec:	801a      	strh	r2, [r3, #0]
  80059ee:	e014      	b.n	8005a1a <isPrime+0x40>
-        if (x % d == 0)
  80059f0:	1dba      	adds	r2, r7, #6
  80059f2:	230e      	movs	r3, #14
  80059f4:	18fb      	adds	r3, r7, r3
@@ -14999,10 +14552,8 @@ enum Validate isPrime(uint16_t x){
  8005a04:	b29b      	uxth	r3, r3
  8005a06:	2b00      	cmp	r3, #0
  8005a08:	d101      	bne.n	8005a0e <isPrime+0x34>
-            return NO;
  8005a0a:	2300      	movs	r3, #0
  8005a0c:	e010      	b.n	8005a30 <isPrime+0x56>
-    for (uint16_t d = 2; d * d <= x; d++) {
  8005a0e:	210e      	movs	r1, #14
  8005a10:	187b      	adds	r3, r7, r1
  8005a12:	881a      	ldrh	r2, [r3, #0]
@@ -15019,18 +14570,13 @@ enum Validate isPrime(uint16_t x){
  8005a28:	881b      	ldrh	r3, [r3, #0]
  8005a2a:	429a      	cmp	r2, r3
  8005a2c:	dde0      	ble.n	80059f0 <isPrime+0x16>
-    }
-    return YES;
  8005a2e:	2301      	movs	r3, #1
-}
  8005a30:	0018      	movs	r0, r3
  8005a32:	46bd      	mov	sp, r7
  8005a34:	b004      	add	sp, #16
  8005a36:	bd80      	pop	{r7, pc}
 
 08005a38 <unsigned_bitwise_modulo>:
-
-uint32_t unsigned_bitwise_modulo(uint32_t dividend, uint8_t base_2_exponent){
  8005a38:	b580      	push	{r7, lr}
  8005a3a:	b082      	sub	sp, #8
  8005a3c:	af00      	add	r7, sp, #0
@@ -15038,8 +14584,6 @@ uint32_t unsigned_bitwise_modulo(uint32_t dividend, uint8_t base_2_exponent){
  8005a40:	000a      	movs	r2, r1
  8005a42:	1cfb      	adds	r3, r7, #3
  8005a44:	701a      	strb	r2, [r3, #0]
-
-    return dividend & ((1 << base_2_exponent) - 1);
  8005a46:	1cfb      	adds	r3, r7, #3
  8005a48:	781b      	ldrb	r3, [r3, #0]
  8005a4a:	2201      	movs	r2, #1
@@ -15049,37 +14593,22 @@ uint32_t unsigned_bitwise_modulo(uint32_t dividend, uint8_t base_2_exponent){
  8005a52:	001a      	movs	r2, r3
  8005a54:	687b      	ldr	r3, [r7, #4]
  8005a56:	4013      	ands	r3, r2
-}
  8005a58:	0018      	movs	r0, r3
  8005a5a:	46bd      	mov	sp, r7
  8005a5c:	b002      	add	sp, #8
  8005a5e:	bd80      	pop	{r7, pc}
 
 08005a60 <Global_Interrupt_Enable>:
-
-uint8_t Global_Interrupt_Enable(void){
  8005a60:	b580      	push	{r7, lr}
  8005a62:	af00      	add	r7, sp, #0
-  __ASM volatile ("cpsie i" : : : "memory");
  8005a64:	b662      	cpsie	i
-}
  8005a66:	46c0      	nop			@ (mov r8, r8)
-
-	__enable_irq();
-	return 1;
  8005a68:	2301      	movs	r3, #1
-}
  8005a6a:	0018      	movs	r0, r3
  8005a6c:	46bd      	mov	sp, r7
  8005a6e:	bd80      	pop	{r7, pc}
 
 08005a70 <Get_Status_Bit>:
-
-	__disable_irq();
-	return 1;
-}
-
-enum Validate Get_Status_Bit(volatile uint32_t *bits, enum Status_Bit bit){
  8005a70:	b580      	push	{r7, lr}
  8005a72:	b082      	sub	sp, #8
  8005a74:	af00      	add	r7, sp, #0
@@ -15087,34 +14616,21 @@ enum Validate Get_Status_Bit(volatile uint32_t *bits, enum Status_Bit bit){
  8005a78:	000a      	movs	r2, r1
  8005a7a:	1cbb      	adds	r3, r7, #2
  8005a7c:	801a      	strh	r2, [r3, #0]
-
-    if(*bits & bit){
  8005a7e:	687b      	ldr	r3, [r7, #4]
  8005a80:	681b      	ldr	r3, [r3, #0]
  8005a82:	1cba      	adds	r2, r7, #2
  8005a84:	8812      	ldrh	r2, [r2, #0]
  8005a86:	4013      	ands	r3, r2
  8005a88:	d001      	beq.n	8005a8e <Get_Status_Bit+0x1e>
-
-        return (enum Validate) YES;
  8005a8a:	2301      	movs	r3, #1
  8005a8c:	e000      	b.n	8005a90 <Get_Status_Bit+0x20>
-    }
-
-    else{
-
-        return (enum Validate) NO;
  8005a8e:	2300      	movs	r3, #0
-    }
-}
  8005a90:	0018      	movs	r0, r3
  8005a92:	46bd      	mov	sp, r7
  8005a94:	b002      	add	sp, #8
  8005a96:	bd80      	pop	{r7, pc}
 
 08005a98 <Set_Status_Bit>:
-
-void Set_Status_Bit(volatile uint32_t *bits, enum Status_Bit bit){
  8005a98:	b580      	push	{r7, lr}
  8005a9a:	b082      	sub	sp, #8
  8005a9c:	af00      	add	r7, sp, #0
@@ -15122,8 +14638,6 @@ void Set_Status_Bit(volatile uint32_t *bits, enum Status_Bit bit){
  8005aa0:	000a      	movs	r2, r1
  8005aa2:	1cbb      	adds	r3, r7, #2
  8005aa4:	801a      	strh	r2, [r3, #0]
-
-	*bits |= bit;
  8005aa6:	687b      	ldr	r3, [r7, #4]
  8005aa8:	681a      	ldr	r2, [r3, #0]
  8005aaa:	1cbb      	adds	r3, r7, #2
@@ -15131,15 +14645,12 @@ void Set_Status_Bit(volatile uint32_t *bits, enum Status_Bit bit){
  8005aae:	431a      	orrs	r2, r3
  8005ab0:	687b      	ldr	r3, [r7, #4]
  8005ab2:	601a      	str	r2, [r3, #0]
-}
  8005ab4:	46c0      	nop			@ (mov r8, r8)
  8005ab6:	46bd      	mov	sp, r7
  8005ab8:	b002      	add	sp, #8
  8005aba:	bd80      	pop	{r7, pc}
 
 08005abc <Clear_Status_Bit>:
-
-void Clear_Status_Bit(volatile uint32_t *bits, enum Status_Bit bit){
  8005abc:	b580      	push	{r7, lr}
  8005abe:	b082      	sub	sp, #8
  8005ac0:	af00      	add	r7, sp, #0
@@ -15147,8 +14658,6 @@ void Clear_Status_Bit(volatile uint32_t *bits, enum Status_Bit bit){
  8005ac4:	000a      	movs	r2, r1
  8005ac6:	1cbb      	adds	r3, r7, #2
  8005ac8:	801a      	strh	r2, [r3, #0]
-
-	*bits &= ~bit;
  8005aca:	687b      	ldr	r3, [r7, #4]
  8005acc:	681b      	ldr	r3, [r3, #0]
  8005ace:	1cba      	adds	r2, r7, #2
@@ -15157,7 +14666,6 @@ void Clear_Status_Bit(volatile uint32_t *bits, enum Status_Bit bit){
  8005ad4:	401a      	ands	r2, r3
  8005ad6:	687b      	ldr	r3, [r7, #4]
  8005ad8:	601a      	str	r2, [r3, #0]
-}
  8005ada:	46c0      	nop			@ (mov r8, r8)
  8005adc:	46bd      	mov	sp, r7
  8005ade:	b002      	add	sp, #8

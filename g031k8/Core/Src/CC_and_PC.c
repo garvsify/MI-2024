@@ -317,11 +317,11 @@ uint8_t Read_and_Interpret_Misc_From_Flash(uint32_t address_val, volatile enum V
 	//OMNI ON/OFF
 	interpretted_value = *(address + num_presets + 1);
 
-	if(interpretted_value == (enum Validate)NO){
-		Clear_Status_Bit(statuses_ptr, MIDI_Channel_Voice_Mode); //OMNI OFF
-	}
-	else if((interpretted_value == (enum Validate)YES) || (interpretted_value == 0xFF)){
+	if(interpretted_value == (enum Validate)YES){
 		Set_Status_Bit(statuses_ptr, MIDI_Channel_Voice_Mode); //OMNI ON
+	}
+	else if((interpretted_value == (enum Validate)NO) || (interpretted_value == 0xFF)){
+		Clear_Status_Bit(statuses_ptr, MIDI_Channel_Voice_Mode); //OMNI OFF
 	}
 
 	//BASIC CHANNEL
