@@ -576,7 +576,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 							if(Is_Channelised_Status_Byte_On_Basic_Channel(rx_buffer, MIDI_basic_channel) == YES){
 
 								active_status_byte = (uint8_t)*rx_buffer;
-								Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
+								Set_Status_Bit(&statuses, Software_MIDI_Timer_Is_Running);
 
 							}
 							else{
@@ -584,7 +584,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 								if(Is_OMNI_On(&statuses) == YES){
 
 									active_status_byte = (uint8_t)*rx_buffer;
-									Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
+									Set_Status_Bit(&statuses, Software_MIDI_Timer_Is_Running);
 
 								}
 							}
@@ -596,7 +596,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 							if(Is_Channelised_Status_Byte_On_Basic_Channel(rx_buffer, MIDI_basic_channel) == YES){
 
 								active_status_byte = (uint8_t)*rx_buffer;
-								Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
+								Set_Status_Bit(&statuses, Software_MIDI_Timer_Is_Running);
 
 							}
 							else{
@@ -604,7 +604,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 								if(Is_OMNI_On(&statuses) == YES){
 
 									active_status_byte = (uint8_t)*rx_buffer;
-									Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
+									Set_Status_Bit(&statuses, Software_MIDI_Timer_Is_Running);
 
 								}
 							}
@@ -613,7 +613,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
 							active_status_byte = (uint8_t)*rx_buffer;
 							running_status_byte = 0;
-							Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
+							Set_Status_Bit(&statuses, Software_MIDI_Timer_Is_Running);
 
 						}
 					}
@@ -623,7 +623,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
 				if(Is_Data_Byte(rx_buffer) == YES){
 
-					Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
+					Set_Status_Bit(&statuses, Software_MIDI_Timer_Is_Running);
 
 					if(Is_PC_Status_Byte(&running_status_byte) == YES){
 
@@ -635,6 +635,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 								Set_All_Pots_to_PC_Mode();
 								preset_selected = (enum Preset_Selected)*rx_buffer + 1; //since 0 is no preset selected, we have to add 1
 								Update_Params_Based_On_Mode_Selected(); // Update parameters immediately with preset values
+								Clear_Status_Bit(&statuses, First_Sync_Complete); //important for where a synced state (via MIDI CLK, CLK IN, or TAP) is the prior state
 							}
 
 							//whether the program change data byte is in range or not, clear the data buffer and active status byte, and reset timer
@@ -749,7 +750,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 						if(Is_Channelised_Status_Byte_On_Basic_Channel(rx_buffer, MIDI_basic_channel) == YES){
 
 							active_status_byte = (uint8_t)*rx_buffer;
-							Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
+							Set_Status_Bit(&statuses, Software_MIDI_Timer_Is_Running);
 
 						}
 						else{
@@ -757,7 +758,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 							if(Is_OMNI_On(&statuses) == YES){
 
 								active_status_byte = (uint8_t)*rx_buffer;
-								Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
+								Set_Status_Bit(&statuses, Software_MIDI_Timer_Is_Running);
 
 							}
 						}
@@ -769,7 +770,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 						if(Is_Channelised_Status_Byte_On_Basic_Channel(rx_buffer, MIDI_basic_channel) == YES){
 
 							active_status_byte = (uint8_t)*rx_buffer;
-							Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
+							Set_Status_Bit(&statuses, Software_MIDI_Timer_Is_Running);
 
 						}
 						else{
@@ -777,7 +778,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 							if(Is_OMNI_On(&statuses) == YES){
 
 								active_status_byte = (uint8_t)*rx_buffer;
-								Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
+								Set_Status_Bit(&statuses, Software_MIDI_Timer_Is_Running);
 
 							}
 						}
@@ -786,7 +787,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
 						active_status_byte = (uint8_t)*rx_buffer;
 						running_status_byte = 0;
-						Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
+						Set_Status_Bit(&statuses, Software_MIDI_Timer_Is_Running);
 
 					}
 				}
@@ -800,7 +801,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 				Clear_Data_Buffer(&MIDI_data);
 				//running status is kept
 
-				Clear_Status_Bit(&statuses, Software_MIDI_Timer_Has_Timed_Out);
+				Reset_and_Stop_MIDI_Software_Timer(&midi_counter, &statuses);
 
 				//In this condition, the data bytes haven't been received in enough time, so any subsequent data bytes
 				//sent after this are simply ignored
@@ -819,6 +820,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 								Set_All_Pots_to_PC_Mode();
 								preset_selected = (enum Preset_Selected)*rx_buffer + 1; //since 0 is no preset selected, we have to add 1
 								Update_Params_Based_On_Mode_Selected(); // Update parameters immediately with preset values
+								Clear_Status_Bit(&statuses, First_Sync_Complete); //important for where a synced state (via MIDI CLK, CLK IN, or TAP) is the prior state
 							}
 
 							//whether the program change data byte is in range or not, clear the data buffer and active status byte, and reset timer
@@ -944,7 +946,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 						if(Is_Channelised_Status_Byte_On_Basic_Channel(rx_buffer, MIDI_basic_channel) == YES){
 
 							active_status_byte = (uint8_t)*rx_buffer;
-							Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
+							Set_Status_Bit(&statuses, Software_MIDI_Timer_Is_Running);
 
 						}
 						else{
@@ -952,7 +954,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 							if(Is_OMNI_On(&statuses) == YES){
 
 								active_status_byte = (uint8_t)*rx_buffer;
-								Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
+								Set_Status_Bit(&statuses, Software_MIDI_Timer_Is_Running);
 
 							}
 						}
@@ -964,7 +966,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 						if(Is_Channelised_Status_Byte_On_Basic_Channel(rx_buffer, MIDI_basic_channel) == YES){
 
 							active_status_byte = (uint8_t)*rx_buffer;
-							Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
+							Set_Status_Bit(&statuses, Software_MIDI_Timer_Is_Running);
 
 						}
 						else{
@@ -972,7 +974,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 							if(Is_OMNI_On(&statuses) == YES){
 
 								active_status_byte = (uint8_t)*rx_buffer;
-								Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
+								Set_Status_Bit(&statuses, Software_MIDI_Timer_Is_Running);
 
 							}
 						}
@@ -981,7 +983,7 @@ void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
 						active_status_byte = (uint8_t)*rx_buffer;
 						running_status_byte = 0;
-						Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
+						Set_Status_Bit(&statuses, Software_MIDI_Timer_Is_Running);
 
 					}
 				}

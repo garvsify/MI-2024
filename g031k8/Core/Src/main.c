@@ -3,8 +3,8 @@
 
 Issues:
 
-- After in PC_MODE, when tap_tempo mode is entered. Sending a PC msg does not update the
-speed parameter, but does update the other values
+- waveshape pot cannot enter into manual control from PC mode, maybe need to store
+and look at raw ADC value of all pots instead
 
 Potential Issues:
 
