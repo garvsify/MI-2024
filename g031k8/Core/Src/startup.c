@@ -25,6 +25,11 @@ uint8_t __attribute__((optimize("O0")))Startup(void){
 	//TEST
 	uint64_t preset_packed = 0;
 	Pack_Preset_Into_Doubleword((struct Preset*)&test_preset, &preset_packed);
+
+	uint32_t errors = 0;
+	FLASH_EraseInitTypeDef erase_config = {.TypeErase = FLASH_CR_PER, .Banks = FLASH_CR_MER1, .Page = 31, .NbPages = 1};
+	HAL_FLASHEx_Erase(&erase_config, &errors); //all 0xF is no errors
+
 	HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, USER_PRESET_0_FLASH_MEMORY_ADDRESS, preset_packed);
 	uint8_t *first_value_of_test_preset = (uint8_t*)0x0800F800;
 	uint8_t value = *first_value_of_test_preset;
