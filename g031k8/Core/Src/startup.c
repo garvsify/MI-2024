@@ -1,6 +1,7 @@
 #include "startup.h"
 
 #include "stm32g0xx_ll_lptim.h"
+#include "stm32g0xx_hal_flash.h"
 
 #include "CC_and_PC.h" //for some reason compiler shits itself if this is included in startup.h
 
@@ -20,6 +21,14 @@ uint8_t __attribute__((optimize("O0")))Startup(void){
 
 	//Point Arrays to Presets
 	Initialise_Preset_Arrays();
+
+	//TEST
+	uint64_t preset_packed = 0;
+	Pack_Preset_Into_Doubleword((struct Preset*)&test_preset, &preset_packed);
+	HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, USER_PRESET_0_FLASH_MEMORY_ADDRESS, preset_packed);
+	uint8_t *first_value_of_test_preset = (uint8_t*)0x0800F800;
+	uint8_t value = *first_value_of_test_preset;
+	//TEST
 
 	//Read User Presets From Flash, regardless of whether they have been written to before
 	Read_and_Interpret_User_Presets_From_Flash();

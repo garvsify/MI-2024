@@ -49,6 +49,13 @@
 #define FACTORY_PRESET_3_SYMMETRY 127
 #define FACTORY_PRESET_3_PHASE 100
 
+//TEST PRESET FOR TESTING FLASH MEMORY WRITE/READ
+#define TEST_PRESET_3_WAVESHAPE 64
+#define TEST_PRESET_3_SPEED 64
+#define TEST_PRESET_3_DEPTH 64
+#define TEST_PRESET_3_SYMMETRY 64
+#define TEST_PRESET_3_PHASE 64
+
 
 //USER PRESET FLASH MEMORY ADDRESSES
 #define USER_PRESET_0_FLASH_MEMORY_ADDRESS 0x0800F800
@@ -100,6 +107,9 @@ const extern struct Preset factory_preset_0;
 const extern struct Preset factory_preset_1;
 const extern struct Preset factory_preset_2;
 const extern struct Preset factory_preset_3;
+
+//TEST PRESET
+const extern struct Preset test_preset;
 
 //VARIABLE DECLARATIONS
 extern const struct Preset *factory_presets_array[NUM_PRESETS];
