@@ -7,7 +7,8 @@ const struct Preset factory_preset_1 = {.waveshape = FACTORY_PRESET_1_WAVESHAPE,
 const struct Preset factory_preset_2 = {.waveshape = FACTORY_PRESET_2_WAVESHAPE, .speed = FACTORY_PRESET_2_SPEED, .depth = FACTORY_PRESET_2_DEPTH, .symmetry = FACTORY_PRESET_2_SYMMETRY, .phase = FACTORY_PRESET_2_PHASE};
 const struct Preset factory_preset_3 = {.waveshape = FACTORY_PRESET_3_WAVESHAPE, .speed = FACTORY_PRESET_3_SPEED, .depth = FACTORY_PRESET_3_DEPTH, .symmetry = FACTORY_PRESET_3_SYMMETRY, .phase = FACTORY_PRESET_3_PHASE};
 
-const struct Preset test_preset = {.waveshape = TEST_PRESET_3_WAVESHAPE, .speed = TEST_PRESET_3_SPEED, .depth = TEST_PRESET_3_DEPTH, .symmetry = TEST_PRESET_3_SYMMETRY, .phase = TEST_PRESET_3_PHASE};
+const struct Preset test_preset_0 = {.waveshape = TEST_PRESET_WAVESHAPE, .speed = TEST_PRESET_SPEED, .depth = TEST_PRESET_DEPTH, .symmetry = TEST_PRESET_SYMMETRY, .phase = TEST_PRESET_PHASE};
+struct Preset test_preset_1 = {.depth = 0, .phase = 0, .speed = 0, .symmetry = 0, .waveshape = 0};
 
 //VARIABLE DEFINITIONS
 const struct Preset *factory_presets_array[NUM_PRESETS] = {0};

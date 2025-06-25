@@ -50,11 +50,11 @@
 #define FACTORY_PRESET_3_PHASE 100
 
 //TEST PRESET FOR TESTING FLASH MEMORY WRITE/READ
-#define TEST_PRESET_3_WAVESHAPE 64
-#define TEST_PRESET_3_SPEED 64
-#define TEST_PRESET_3_DEPTH 64
-#define TEST_PRESET_3_SYMMETRY 64
-#define TEST_PRESET_3_PHASE 64
+#define TEST_PRESET_WAVESHAPE 66
+#define TEST_PRESET_SPEED 66
+#define TEST_PRESET_DEPTH 66
+#define TEST_PRESET_SYMMETRY 66
+#define TEST_PRESET_PHASE 66
 
 
 //USER PRESET FLASH MEMORY ADDRESSES
@@ -109,7 +109,8 @@ const extern struct Preset factory_preset_2;
 const extern struct Preset factory_preset_3;
 
 //TEST PRESET
-const extern struct Preset test_preset;
+const extern struct Preset test_preset_0;
+extern struct Preset test_preset_1;
 
 //VARIABLE DECLARATIONS
 extern const struct Preset *factory_presets_array[NUM_PRESETS];
