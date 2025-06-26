@@ -22,28 +22,6 @@ uint8_t __attribute__((optimize("O0")))Startup(void){
 	//Point Arrays to Presets
 	Initialise_Preset_Arrays();
 
-	//TEST
-	uint64_t preset_packed = 0;
-	Pack_Preset_Into_Doubleword((struct Preset*)&test_preset_0, &preset_packed);
-
-
-	uint64_t *test_preset_val = (uint64_t*)0x0800F800;
-	uint32_t errors = 0;
-	FLASH_EraseInitTypeDef erase_config = {.TypeErase = FLASH_CR_PER, .Banks = FLASH_CR_MER1, .Page = 31, .NbPages = 1};
-	HAL_FLASH_Unlock();
-	HAL_FLASHEx_Erase(&erase_config, &errors); //all 0xF is no errors
-
-
-	HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, USER_PRESET_0_FLASH_MEMORY_ADDRESS, preset_packed);
-	uint64_t value = *test_preset_val;
-
-	Read_and_Interpret_Preset_From_Flash(USER_PRESET_0_FLASH_MEMORY_ADDRESS, &test_preset_1);
-
-	struct Preset read_preset = test_preset_1;
-
-	HAL_FLASH_Lock();
-	//TEST
-
 	//Read User Presets From Flash, regardless of whether they have been written to before
 	Read_and_Interpret_User_Presets_From_Flash();
 
