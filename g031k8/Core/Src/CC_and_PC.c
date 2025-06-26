@@ -229,7 +229,7 @@ uint8_t Pack_Preset_Into_Doubleword(struct Preset* preset_ptr, uint64_t *Doublew
 
 	for(uint8_t i = 0; i < sizeof(*preset_ptr); i++){
 
-		packed |= ((uint64_t)*((uint8_t *)preset_ptr) << (i << 3)); //<< (i*8)
+		packed |= ((uint64_t)*(((uint8_t *)preset_ptr)+i) << (i << 3)); //<< (i*8)
 	}
 
 	*Doubleword_ptr = packed;
