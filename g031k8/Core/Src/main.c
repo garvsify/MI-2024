@@ -51,6 +51,8 @@ int main(void)
 	//STARTUP
 	Startup();
 
+	LED_state = LED_TWO_BLINK;
+
 	while (1)
 	{
 		if(Get_Status_Bit(&statuses, Input_Capture_Processing_Can_Be_Started) == YES){
@@ -84,6 +86,7 @@ int main(void)
 				idle_counter = 0;
 			}
 		}
+
 		if(Get_Status_Bit(&statuses, Software_MIDI_Timer_Is_Running) == YES){
 
 			if(midi_counter < MIDI_COUNT){
@@ -99,7 +102,50 @@ int main(void)
 				midi_counter = 0;
 			}
 		}
+
+		if(LED_state == LED_ONE_BLINK){
+
+			if(LED_counter <= LED_ONE_BLINK_DUTY){
+
+				HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+				LED_blink_counter = 1;
+				LED_counter++;
+			}
+			else{
+
+				HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+				LED_blink_counter = 0;
+				LED_counter++;
+
+				if(LED_counter == LED_BLINK_PERIOD){
+
+					LED_counter = 0;
+				}
+			}
+		}
+
+		else if(LED_state == LED_TWO_BLINK){
+
+			if(LED_blink_counter == 0){
+
+				if(LED_counter <= LED_ONE_BLINK_DUTY){
+
+					HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+					LED_counter++;
+				}
+				else{
+
+					HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+					LED_counter =
+
+					if(LED_counter == LED_BLINK_PERIOD){
+
+						LED_counter = 0;
+					}
+			}
+		}
 	}
+
 	return 1;
 }
 

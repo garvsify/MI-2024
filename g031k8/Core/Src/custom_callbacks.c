@@ -1105,7 +1105,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 	static volatile struct Tap_Tempo_Switch_States tap_tempo_switch_states = {0};
 
-	//CHECK IF NEED TO TAP_PENDING TRANSITION
+	//CHECK IF NEED TAP_PENDING TRANSITION
 
 	uint8_t pin_state = (uint8_t)HAL_GPIO_ReadPin(SW_IN_GPIO_Port, SW_IN_Pin);
 
@@ -1142,9 +1142,10 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 	}
 
 	//CHECK TAP TEMPO STATE
-	if((speed_fsm.current_state.speed_exclusive_state == TAP_PENDING_MODE) || (speed_fsm.current_state.speed_exclusive_state == TAP_MODE)){
 
-		Check_Tap_Tempo_Switch_State(&tap_tempo_switch_states);
+	Check_Tap_Tempo_Switch_State(&tap_tempo_switch_states);
+
+	if((speed_fsm.current_state.speed_exclusive_state == TAP_PENDING_MODE) || (speed_fsm.current_state.speed_exclusive_state == TAP_MODE)){
 
 		if(tap_tempo_switch_states.tap_tempo_switch_state == DEPRESSED){
 
@@ -1165,6 +1166,40 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 	//SET PREVIOUS STATE TO CURRENT STATE
 	//tap_tempo_switch_states.tap_tempo_switch_prev_state = tap_tempo_switch_states.tap_tempo_switch_state;
 
+	//CHECK IF TAP TEMPO HELD DOWN - PRESET SAVE MODE
+
+	//enum Validate timeout = Get_Status_Bit(&statuses, Tap_Tempo_Switch_Hold_Timer_Has_Timed_Out);
+
+	static uint32_t depressed_num = 0;
+
+	if(tap_tempo_switch_states.tap_tempo_switch_state == DEPRESSED){
+
+		if(depressed_num < TAP_TEMPO_SWITCH_PRESET_SAVE_MODE_HOLD_TIME_COUNT){
+
+			depressed_num++;
+		}
+		else{
+
+			//enter PRESET SAVE MODE
+
+			//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
+			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1); //reset
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+
+			if(speed_fsm.current_state.speed_exclusive_state == TAP_PENDING_MODE){
+
+				union Speed_FSM_States curr_state = speed_fsm.current_state;
+				speed_fsm.current_state = speed_fsm.prev_state;
+				speed_fsm.prev_state = curr_state;
+			}
+		}
+	}
+	else{
+
+		depressed_num = 0;
+	}
+
+	//CHECK FOR SPEED POT CHANGES
 	if(Get_Status_Bit(&statuses, Pots_Counter_Has_Timed_Out) == YES){
 
 		Clear_Status_Bit(&statuses, Pots_Counter_Has_Timed_Out);
@@ -1225,6 +1260,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 	}
 	else{
+
 		if(pots_counter == POT_COUNTER_COUNT){
 
 			Set_Status_Bit(&statuses, Pots_Counter_Has_Timed_Out);

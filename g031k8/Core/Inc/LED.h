@@ -1,0 +1,34 @@
+#ifndef INC_LED_H_
+#define INC_LED_H_
+
+//DEFINES
+#define LED_BLINK_PERIOD 128000
+#define LED_ONE_BLINK_DUTY LED_BLINK_PERIOD*0.1
+//#define LED_TWO_BLINK_DUTY LED_ONE_BLINK_DUTY*0.5
+//#define LED_THREE_BLINK_DUTY LED_TWO_BLINK_DUTY*0.5
+//#define LED_FOUR_BLINK_DUTY LED_THREE_BLINK_DUTY*0.5
+
+//INCLUDES
+#include "state_machine.h"
+
+//CUSTOM TYPES
+enum LED_State{
+
+	LED_OFF,
+	LED_ON,
+	LED_ONE_BLINK,
+	LED_TWO_BLINK,
+	LED_THREE_BLINK,
+	LED_FOUR_BLINK,
+	LED_CONFIRM,
+};
+
+//VARIABLES
+extern enum LED_State LED_state;
+extern uint32_t LED_counter;
+extern uin32_t LED_blink_counter;
+
+//FUNCTION DECLARATIONS
+
+
+#endif /* INC_LED_H_ */
