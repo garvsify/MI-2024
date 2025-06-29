@@ -1287,7 +1287,7 @@ void TIM14_callback(TIM_HandleTypeDef *htim){
 
 		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
 	}
-	else if(LED_fsm.current_state == LED_OFF){
+	else if((LED_fsm.current_state == LED_OFF) || (LED_fsm.current_state == LED_NONE)){
 
 		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
 	}
@@ -1298,11 +1298,13 @@ void TIM14_callback(TIM_HandleTypeDef *htim){
 		if(LED_counter == 0){
 
 			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+
 			LED_counter++;
 		}
 		else if(LED_counter < (LED_COUNT_OFF_TIME + 1)){
 
 			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+
 			LED_counter++;
 
 			if(LED_counter == LED_COUNT_OFF_TIME + 1){
@@ -1315,19 +1317,15 @@ void TIM14_callback(TIM_HandleTypeDef *htim){
 
 		__HAL_TIM_SET_COUNTER(&htim14, 0);
 
-		if(LED_counter == 0){
+		if((LED_counter < 3) && (LED_counter % 2 == 0)){
 
 			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+
 			LED_counter++;
 		}
-		else if(LED_counter == 1){
+		else if((LED_counter < 3) && (LED_counter % 2 == 1)){
 
 			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
-			LED_counter++;
-		}
-		else if(LED_counter == 2){
-
-			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
 			LED_counter++;
 		}
 		else if(LED_counter < (LED_COUNT_OFF_TIME + 3)){
@@ -1345,34 +1343,22 @@ void TIM14_callback(TIM_HandleTypeDef *htim){
 
 		__HAL_TIM_SET_COUNTER(&htim14, 0);
 
-		if(LED_counter == 0){
+		if((LED_counter < 5) && (LED_counter % 2 == 0)){
 
 			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+
 			LED_counter++;
 		}
-		else if(LED_counter == 1){
+		else if((LED_counter < 5) && (LED_counter % 2 == 1)){
 
 			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
-			LED_counter++;
-		}
-		else if(LED_counter == 2){
 
-			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
-			LED_counter++;
-		}
-		else if(LED_counter == 3){
-
-			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
-			LED_counter++;
-		}
-		else if(LED_counter == 4){
-
-			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
 			LED_counter++;
 		}
 		else if(LED_counter < (LED_COUNT_OFF_TIME + 5)){
 
 			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+
 			LED_counter++;
 
 			if(LED_counter == LED_COUNT_OFF_TIME + 5){
@@ -1385,44 +1371,22 @@ void TIM14_callback(TIM_HandleTypeDef *htim){
 
 		__HAL_TIM_SET_COUNTER(&htim14, 0);
 
-		if(LED_counter == 0){
+		if((LED_counter < 7) && (LED_counter % 2 == 0)){
 
 			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+
 			LED_counter++;
 		}
-		else if(LED_counter == 1){
+		else if((LED_counter < 7) && (LED_counter % 2 == 1)){
 
 			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
-			LED_counter++;
-		}
-		else if(LED_counter == 2){
 
-			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
-			LED_counter++;
-		}
-		else if(LED_counter == 3){
-
-			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
-			LED_counter++;
-		}
-		else if(LED_counter == 4){
-
-			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
-			LED_counter++;
-		}
-		else if(LED_counter == 5){
-
-			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
-			LED_counter++;
-		}
-		else if(LED_counter == 6){
-
-			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
 			LED_counter++;
 		}
 		else if(LED_counter < (LED_COUNT_OFF_TIME + 7)){
 
 			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+
 			LED_counter++;
 
 			if(LED_counter == LED_COUNT_OFF_TIME + 7){
@@ -1435,45 +1399,22 @@ void TIM14_callback(TIM_HandleTypeDef *htim){
 
 		__HAL_TIM_SET_COUNTER(&htim14, 0);
 
-		if(LED_counter == 0){
+		if((LED_counter < 7) && (LED_counter % 2 == 0)){
 
 			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
 
 			LED_counter++;
 		}
-		else if(LED_counter == 1){
+		else if((LED_counter < 7) && (LED_counter % 2 == 1)){
 
 			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
-			LED_counter++;
-		}
-		else if(LED_counter == 2){
 
-			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
-			LED_counter++;
-		}
-		else if(LED_counter == 3){
-
-			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
-			LED_counter++;
-		}
-		else if(LED_counter == 4){
-
-			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
-			LED_counter++;
-		}
-		else if(LED_counter == 5){
-
-			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
-			LED_counter++;
-		}
-		else if(LED_counter == 6){
-
-			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
 			LED_counter++;
 		}
 		else if(LED_counter < (LED_COUNT_OFF_TIME + 7)){
 
 			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+
 			LED_counter++;
 
 			if(LED_counter == LED_COUNT_OFF_TIME + 7){
