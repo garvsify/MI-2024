@@ -1171,6 +1171,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 	//enum Validate timeout = Get_Status_Bit(&statuses, Tap_Tempo_Switch_Hold_Timer_Has_Timed_Out);
 
 	static uint32_t depressed_num = 0;
+	static uint8_t preset_num = 0;
 
 	if(tap_tempo_switch_states.tap_tempo_switch_state == DEPRESSED){
 
@@ -1180,11 +1181,28 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 		}
 		else{
 
-			//enter PRESET SAVE MODE
+			depressed_num = 0;
 
-			//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
-			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1); //reset
-			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+			if(preset_num == 0){
+
+				set_LED_to_state(&LED_fsm, LED_ONE_BLINK);
+				preset_num++;
+			}
+			else if(preset_num == 1){
+
+				set_LED_to_state(&LED_fsm, LED_TWO_BLINK);
+				preset_num++;
+			}
+			else if(preset_num == 2){
+
+				set_LED_to_state(&LED_fsm, LED_THREE_BLINK);
+				preset_num++;
+			}
+			else if(preset_num == 3){
+
+				set_LED_to_state(&LED_fsm, LED_FOUR_BLINK);
+				preset_num = 0;
+			}
 
 			if(speed_fsm.current_state.speed_exclusive_state == TAP_PENDING_MODE){
 
@@ -1287,7 +1305,7 @@ void TIM14_callback(TIM_HandleTypeDef *htim){
 
 		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
 	}
-	else if((LED_fsm.current_state == LED_OFF) || (LED_fsm.current_state == LED_NONE)){
+	else if((LED_fsm.current_state == LED_OFF) || (LED_fsm.current_state)){
 
 		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
 	}
