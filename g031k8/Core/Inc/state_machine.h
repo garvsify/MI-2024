@@ -4,7 +4,6 @@
 
 //INCLUDES
 #include <stdint.h>
-#include "LED.h"
 
 //VARIABLES
 volatile extern struct Speed_FSM speed_fsm;
@@ -62,6 +61,18 @@ enum IP_CAP_FSM_States{
 	MEASUREMENT_REELAPSE,
 	MEASUREMENT_REELAPSE_AND_MEASUREMENT_PENDING,
 	IP_CAP_NONE
+};
+
+enum LED_States{
+
+	LED_NONE, //startup only
+	LED_OFF,
+	LED_ON,
+	LED_ONE_BLINK,
+	LED_TWO_BLINK,
+	LED_THREE_BLINK,
+	LED_FOUR_BLINK,
+	LED_CONFIRM,
 };
 
 struct Speed_FSM{

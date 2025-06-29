@@ -7,25 +7,16 @@
 
 //INCLUDES
 #include <stdint.h>
+#include "config.h"
+#include "state_machine.h"
 
 //CUSTOM TYPES
-enum LED_States{
-
-	LED_NONE, //startup only
-	LED_OFF,
-	LED_ON,
-	LED_ONE_BLINK,
-	LED_TWO_BLINK,
-	LED_THREE_BLINK,
-	LED_FOUR_BLINK,
-	LED_CONFIRM,
-};
 
 //VARIABLES
 volatile extern uint8_t LED_counter;
 volatile extern uint32_t led_blink_period;
 
 //FUNCTION DECLARATIONS
-
+uint8_t set_LED_to_state(volatile struct LED_FSM *LED_FSM_ptr, enum LED_States desired_state);
 
 #endif /* INC_LED_H_ */

@@ -3,9 +3,6 @@
 
 Issues:
 
-- OMNI is being set to ON by reading from flash I think. I have included
-some debug code in startup.c to manually turn OMNI off so I could prove PC and CC sent
-not on the basic channel would not be processed
 
 Potential Issues:
 
@@ -100,24 +97,18 @@ int main(void)
 				midi_counter = 0;
 			}
 		}
-		/*if(speed_fsm.current_state.shared_state == MANUAL_MODE){
 
-			if(LED_state != LED_FOUR_BLINK){
+		if(ADCResultsDMA[SPEED_ADC_RESULT_INDEX] > (4096 >> 1)){
 
-				LED_counter = 0;
-			}
 
-			LED_state = LED_FOUR_BLINK;
+			set_LED_to_state(&LED_fsm, LED_ONE_BLINK);
+
+			//led_blink_period = LED_BLINK_PERIOD >> 1;
 		}
 		else{
 
-			if(LED_state != LED_CONFIRM){
-
-				LED_counter = 0;
-			}
-
-			LED_state = LED_CONFIRM;
-		}*/
+			set_LED_to_state(&LED_fsm, LED_THREE_BLINK);
+		}
 	}
 
 	return 1;

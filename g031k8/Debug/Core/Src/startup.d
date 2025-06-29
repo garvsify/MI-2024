@@ -38,7 +38,7 @@ Core/Src/startup.o: ../Core/Src/startup.c ../Core/Inc/startup.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_tim_ex.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart_ex.h \
- ../Core/Inc/startup.h ../Core/Inc/LED.h \
+ ../Core/Inc/startup.h ../Core/Inc/LED.h ../Core/Inc/state_machine.h \
  ../Core/Inc/oscillator_params_type.h \
  ../Core/Inc/symmetry_adjustment_types.h ../Core/Inc/oscillator_macros.h \
  ../Core/Inc/MIDI_defines.h ../Core/Inc/checking_functions.h \
@@ -93,6 +93,7 @@ Core/Src/startup.o: ../Core/Src/startup.c ../Core/Inc/startup.h \
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart_ex.h:
 ../Core/Inc/startup.h:
 ../Core/Inc/LED.h:
+../Core/Inc/state_machine.h:
 ../Core/Inc/oscillator_params_type.h:
 ../Core/Inc/symmetry_adjustment_types.h:
 ../Core/Inc/oscillator_macros.h:
