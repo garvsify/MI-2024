@@ -1,4 +1,5 @@
 #include "custom_callbacks.h"
+#include "state_machine.h"
 
 void TIM16_callback(TIM_HandleTypeDef *htim)
 {
@@ -1283,5 +1284,216 @@ void TIM17_callback(TIM_HandleTypeDef *htim){
 
 void TIM14_callback(TIM_HandleTypeDef *htim){
 
+	if(LED_fsm.current_state == LED_ONE_BLINK){
 
+		__HAL_TIM_SET_COUNTER(&htim14, 0);
+
+		if(LED_counter == 0){
+
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+			LED_counter++;
+			LED_fsm.prev_state = LED_fsm.current_state;
+			LED_fsm.current_state = LED_ONE_BLINK;
+		}
+		else if(LED_counter < (LED_COUNT_OFF_TIME + 1)){
+
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+			LED_counter++;
+
+			if(LED_counter == LED_COUNT_OFF_TIME + 1){
+
+				LED_counter = 0;
+			}
+		}
+	}
+	else if(LED_fsm.current_state == LED_TWO_BLINK){
+
+		__HAL_TIM_SET_COUNTER(&htim14, 0);
+
+		if(LED_counter == 0){
+
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+			LED_counter++;
+			LED_fsm.prev_state = LED_fsm.current_state;
+			LED_fsm.current_state = LED_TWO_BLINK;
+		}
+		else if(LED_counter == 1){
+
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+			LED_counter++;
+		}
+		else if(LED_counter == 2){
+
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+			LED_counter++;
+		}
+		else if(LED_counter < (LED_COUNT_OFF_TIME + 3)){
+
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+			LED_counter++;
+
+			if(LED_counter == LED_COUNT_OFF_TIME + 3){
+
+				LED_counter = 0;
+			}
+		}
+	}
+	else if(LED_fsm.current_state == LED_THREE_BLINK){
+
+		__HAL_TIM_SET_COUNTER(&htim14, 0);
+
+		if(LED_counter == 0){
+
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+			LED_counter++;
+			LED_fsm.prev_state = LED_fsm.current_state;
+			LED_fsm.current_state = LED_THREE_BLINK;
+		}
+		else if(LED_counter == 1){
+
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+			LED_counter++;
+		}
+		else if(LED_counter == 2){
+
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+			LED_counter++;
+		}
+		else if(LED_counter == 3){
+
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+			LED_counter++;
+		}
+		else if(LED_counter == 4){
+
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+			LED_counter++;
+		}
+		else if(LED_counter < (LED_COUNT_OFF_TIME + 5)){
+
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+			LED_counter++;
+
+			if(LED_counter == LED_COUNT_OFF_TIME + 5){
+
+				LED_counter = 0;
+			}
+		}
+	}
+	else if(LED_fsm.current_state == LED_FOUR_BLINK){
+
+		__HAL_TIM_SET_COUNTER(&htim14, 0);
+
+		if(LED_counter == 0){
+
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+			LED_counter++;
+			LED_fsm.prev_state = LED_fsm.current_state;
+			LED_fsm.current_state = LED_FOUR_BLINK;
+		}
+		else if(LED_counter == 1){
+
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+			LED_counter++;
+		}
+		else if(LED_counter == 2){
+
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+			LED_counter++;
+		}
+		else if(LED_counter == 3){
+
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+			LED_counter++;
+		}
+		else if(LED_counter == 4){
+
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+			LED_counter++;
+		}
+		else if(LED_counter == 5){
+
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+			LED_counter++;
+		}
+		else if(LED_counter == 6){
+
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+			LED_counter++;
+		}
+		else if(LED_counter < (LED_COUNT_OFF_TIME + 7)){
+
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+			LED_counter++;
+
+			if(LED_counter == LED_COUNT_OFF_TIME + 7){
+
+				LED_counter = 0;
+			}
+		}
+	}
+	else if(LED_fsm.current_state == LED_CONFIRM){
+
+		__HAL_TIM_SET_COUNTER(&htim14, 0);
+
+		if(LED_counter == 0){
+
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+
+			led_blink_period >>= 1;
+			__HAL_TIM_SET_COMPARE(&htim14, TIM_CHANNEL_1, led_blink_period);
+
+			LED_fsm.prev_state = LED_fsm.current_state;
+			LED_fsm.current_state = LED_CONFIRM;
+
+			LED_counter++;
+		}
+		else if(LED_counter == 1){
+
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+			LED_counter++;
+		}
+		else if(LED_counter == 2){
+
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+			LED_counter++;
+		}
+		else if(LED_counter == 3){
+
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+			LED_counter++;
+		}
+		else if(LED_counter == 4){
+
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+			LED_counter++;
+		}
+		else if(LED_counter == 5){
+
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+			LED_counter++;
+		}
+		else if(LED_counter == 6){
+
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+			LED_counter++;
+		}
+		else if(LED_counter < (LED_COUNT_OFF_TIME + 7)){
+
+			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+			LED_counter++;
+
+			if(LED_counter == LED_COUNT_OFF_TIME + 7){
+
+				LED_counter = 0;
+
+				led_blink_period <<= 1;
+				__HAL_TIM_SET_COMPARE(&htim14, TIM_CHANNEL_1, led_blink_period);
+
+				enum LED_States prev = LED_fsm.prev_state;
+				LED_fsm.prev_state = LED_fsm.current_state;
+				LED_fsm.current_state = prev;
+			}
+		}
+	}
 }

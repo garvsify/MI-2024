@@ -51,8 +51,6 @@ int main(void)
 	//STARTUP
 	Startup();
 
-	LED_state = LED_TWO_BLINK;
-
 	while (1)
 	{
 		if(Get_Status_Bit(&statuses, Input_Capture_Processing_Can_Be_Started) == YES){
@@ -102,48 +100,24 @@ int main(void)
 				midi_counter = 0;
 			}
 		}
+		/*if(speed_fsm.current_state.shared_state == MANUAL_MODE){
 
-		if(LED_state == LED_ONE_BLINK){
+			if(LED_state != LED_FOUR_BLINK){
 
-			if(LED_counter <= LED_ONE_BLINK_DUTY){
-
-				HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
-				LED_blink_counter = 1;
-				LED_counter++;
+				LED_counter = 0;
 			}
-			else{
 
-				HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
-				LED_blink_counter = 0;
-				LED_counter++;
-
-				if(LED_counter == LED_BLINK_PERIOD){
-
-					LED_counter = 0;
-				}
-			}
+			LED_state = LED_FOUR_BLINK;
 		}
+		else{
 
-		else if(LED_state == LED_TWO_BLINK){
+			if(LED_state != LED_CONFIRM){
 
-			if(LED_blink_counter == 0){
-
-				if(LED_counter <= LED_ONE_BLINK_DUTY){
-
-					HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
-					LED_counter++;
-				}
-				else{
-
-					HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
-					LED_counter =
-
-					if(LED_counter == LED_BLINK_PERIOD){
-
-						LED_counter = 0;
-					}
+				LED_counter = 0;
 			}
-		}
+
+			LED_state = LED_CONFIRM;
+		}*/
 	}
 
 	return 1;

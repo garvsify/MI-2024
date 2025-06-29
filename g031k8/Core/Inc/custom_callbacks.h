@@ -13,6 +13,7 @@
 #include "debug.h"
 #include "MIDI.h"
 #include "main.h"
+#include "LED.h"
 
 void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc);
 void TIM16_callback(TIM_HandleTypeDef *htim);

@@ -75,6 +75,12 @@ uint8_t __attribute__((optimize("O0")))Startup(void){
 	//ENABLE TAP-TEMPO SWITCH CHECKING
 	HAL_LPTIM_SetOnce_Start_IT(&hlptim1, LPTIM1_CCR_CHECK, LPTIM1_CCR_CHECK);
 
+	LED_fsm.prev_state = LED_OFF;
+	LED_fsm.current_state = LED_CONFIRM;
+
+	//ENABLE LED TIMER
+	Start_OC_TIM(&htim14, TIM_CHANNEL_1);
+
 	//ENABLE EXTI
 	HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);
 

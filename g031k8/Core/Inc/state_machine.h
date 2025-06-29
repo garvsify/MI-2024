@@ -4,6 +4,7 @@
 
 //INCLUDES
 #include <stdint.h>
+#include "LED.h"
 
 //VARIABLES
 volatile extern struct Speed_FSM speed_fsm;
@@ -13,6 +14,7 @@ volatile extern struct Normal_FSM symmetry_fsm;
 volatile extern struct Normal_FSM phase_fsm;
 volatile extern struct IP_CAP_FSM IP_CAP_fsm;
 volatile extern enum MIDI_CLK_FSM_State MIDI_CLK_fsm;
+volatile extern struct LED_FSM LED_fsm;
 
 enum MIDI_CLK_FSM_State{
 
@@ -78,6 +80,12 @@ struct IP_CAP_FSM{
 
 	enum IP_CAP_FSM_States current_state;
 	enum IP_CAP_FSM_States prev_state;
+};
+
+struct LED_FSM{
+
+	enum LED_States current_state;
+	enum LED_States prev_state;
 };
 
 //FUNCTION DECLARATIONS

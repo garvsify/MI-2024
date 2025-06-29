@@ -44,9 +44,8 @@ Core/Src/checking_functions.o: ../Core/Src/checking_functions.c \
  ../Core/Inc/oscillator_params_type.h ../Core/Inc/timers.h \
  ../Core/Inc/oscillator_macros.h ../Core/Inc/startup.h \
  ../Core/Inc/checking_functions.h ../Core/Inc/UART.h ../Core/Inc/MIDI.h \
- ../Core/Inc/LED.h ../Core/Inc/state_machine.h ../Core/Inc/MIDI_defines.h \
- ../Core/Inc/tap_tempo.h ../Core/Inc/CLK_IN.h ../Core/Inc/state_machine.h \
- ../Core/Inc/main.h
+ ../Core/Inc/LED.h ../Core/Inc/MIDI_defines.h ../Core/Inc/tap_tempo.h \
+ ../Core/Inc/CLK_IN.h ../Core/Inc/state_machine.h ../Core/Inc/main.h
 ../Core/Inc/checking_functions.h:
 ../Core/Inc/utility.h:
 ../Core/Inc/input_capture.h:
@@ -101,7 +100,6 @@ Core/Src/checking_functions.o: ../Core/Src/checking_functions.c \
 ../Core/Inc/UART.h:
 ../Core/Inc/MIDI.h:
 ../Core/Inc/LED.h:
-../Core/Inc/state_machine.h:
 ../Core/Inc/MIDI_defines.h:
 ../Core/Inc/tap_tempo.h:
 ../Core/Inc/CLK_IN.h:
