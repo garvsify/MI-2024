@@ -97,18 +97,6 @@ int main(void)
 				midi_counter = 0;
 			}
 		}
-
-		if(ADCResultsDMA[SPEED_ADC_RESULT_INDEX] > (4096 >> 1)){
-
-
-			set_LED_to_state(&LED_fsm, LED_ONE_BLINK);
-
-			//led_blink_period = LED_BLINK_PERIOD >> 1;
-		}
-		else{
-
-			set_LED_to_state(&LED_fsm, LED_THREE_BLINK);
-		}
 	}
 
 	return 1;

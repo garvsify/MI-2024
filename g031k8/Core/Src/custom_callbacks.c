@@ -1287,8 +1287,11 @@ void TIM14_callback(TIM_HandleTypeDef *htim){
 
 		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
 	}
+	else if(LED_fsm.current_state == LED_OFF){
 
-	if(LED_fsm.current_state == LED_ONE_BLINK){
+		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+	}
+	else if(LED_fsm.current_state == LED_ONE_BLINK){
 
 		__HAL_TIM_SET_COUNTER(&htim14, 0);
 

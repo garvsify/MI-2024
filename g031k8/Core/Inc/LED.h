@@ -3,7 +3,7 @@
 
 //DEFINES
 #define LED_BLINK_PERIOD 300
-#define LED_COUNT_OFF_TIME 3
+#define LED_COUNT_OFF_TIME 4
 
 //INCLUDES
 #include <stdint.h>
