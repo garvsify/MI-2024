@@ -1253,22 +1253,31 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 	if(tap_tempo_switch_states.tap_tempo_switch_state == DEPRESSED){
 
 		if((Get_Status_Bit(&statuses, Tap_Tempo_Advance_Idle_Timer_is_Running) == YES)
-			&& (Get_Status_Bit(&statuses, Tap_Tempo_Advance_Idle_Timer_Has_Timed_Out) == NO)
-			&& (preset_save_mode_is_inactive == NO)){
+			&& (Get_Status_Bit(&statuses, Tap_Tempo_Advance_Idle_Timer_Has_Timed_Out) == NO)){
 
 			Clear_Status_Bit(&statuses, Tap_Tempo_Advance_Idle_Timer_is_Running);
 			advance_idle_counter = 0;
 		}
 
-		if(depressed_num < TAP_TEMPO_SWITCH_PRESET_SAVE_MODE_ADVANCE_COUNT){
+		if((depressed_num < TAP_TEMPO_SWITCH_PRESET_SAVE_MODE_ADVANCE_COUNT) && (depressed_num < TAP_TEMPO_SWITCH_PRESET_SAVE_COUNT)){
 
 			//save count will always be less than advance count
+			depressed_num++;
+		}
+		else if((depressed_num < TAP_TEMPO_SWITCH_PRESET_SAVE_MODE_ADVANCE_COUNT) && (depressed_num >= TAP_TEMPO_SWITCH_PRESET_SAVE_COUNT)){
+
+			if(Get_Status_Bit(&statuses, Tap_Tempo_Advance_Idle_Timer_Has_Timed_Out) == YES){
+
+				Clear_Status_Bit(&statuses, Tap_Tempo_Advance_Idle_Timer_is_Running);
+				Clear_Status_Bit(&statuses, Tap_Tempo_Advance_Idle_Timer_Has_Timed_Out);
+				advance_idle_counter = 0;
+			}
+
 			depressed_num++;
 		}
 		else{
 
 			preset_save_mode_is_inactive = NO;
-
 			depressed_num = 0;
 
 			if(first_time == YES){
@@ -1308,13 +1317,11 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 	}
 	else{
 
-		if((preset_save_mode_is_inactive == NO)){
+		if((preset_save_mode_is_inactive == NO) && (depressed_num == 0)){ //timer only start counting if footswitch has been held down and released
 
 			if(Get_Status_Bit(&statuses, Tap_Tempo_Advance_Idle_Timer_is_Running) == NO){
 
 				Set_Status_Bit(&statuses, Tap_Tempo_Advance_Idle_Timer_is_Running);
-
-				depressed_num = 0;
 
 				//debug
 				HAL_GPIO_WritePin(MONITOR_2_GPIO_Port, MONITOR_2_Pin, 1);
@@ -1324,17 +1331,14 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 		if(Get_Status_Bit(&statuses, Tap_Tempo_Advance_Idle_Timer_Has_Timed_Out) == YES){
 
-			Clear_Status_Bit(&statuses, Tap_Tempo_Advance_Idle_Timer_Has_Timed_Out);
-			advance_idle_counter = 0;
+			//don't clear timeout flag here
 
 			//debug
 			HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
 			//debug end
 
 			if((depressed_num >= TAP_TEMPO_SWITCH_PRESET_SAVE_COUNT)
-				&& (depressed_num < TAP_TEMPO_SWITCH_PRESET_SAVE_MODE_ADVANCE_COUNT)
-				&& (preset_save_mode_is_inactive == NO)
-				&& (pin_state == 1)){
+				&& (depressed_num < TAP_TEMPO_SWITCH_PRESET_SAVE_MODE_ADVANCE_COUNT)){
 
 				//led confirm - overwrite prev state with saved state
 				LED_fsm.prev_state = led_state_saved;
@@ -1377,17 +1381,11 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 				//store presets in flash
 				//@TODO
 
+				Clear_Status_Bit(&statuses, Tap_Tempo_Advance_Idle_Timer_Has_Timed_Out);
 			}
 		}
 
 		depressed_num = 0; //important if switch is released early
-
-		if(speed_fsm.current_state.speed_exclusive_state == TAP_PENDING_MODE){
-
-			union Speed_FSM_States curr_state = speed_fsm.current_state;
-			speed_fsm.current_state = speed_fsm.prev_state;
-			speed_fsm.prev_state = curr_state;
-		}
 	}
 
 	//SET TIMER TRIGGER
