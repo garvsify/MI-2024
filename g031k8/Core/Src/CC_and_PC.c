@@ -118,6 +118,17 @@ uint8_t Convert_All_Preset_Values(volatile struct Preset* preset_ptr, volatile s
 	return 1;
 }
 
+uint8_t Convert_All_Params_Values_for_Preset(volatile struct Params *params_ptr, volatile struct Preset* preset_ptr){
+
+	preset_ptr->waveshape = params_ptr->waveshape; //7-bit copy
+	preset_ptr->speed = params_ptr->speed >> 3; //convert from 10-bit to 7-bit
+	preset_ptr->depth = params_ptr->depth; //7-bit copy
+	preset_ptr->symmetry = params_ptr->symmetry >> 1; //convert from 8-bit to 7-bit
+	preset_ptr->phase = params_ptr->duty_delay_line_read_pointer_offset >> 2; //convert from 9-bit to 7-bit
+
+	return 1;
+}
+
 uint8_t Update_All_with_Converted_Preset_Values(struct Preset_Converted* preset_converted_ptr, struct Params* params_ptr){
 
 	uint8_t waveshape = preset_converted_ptr->waveshape;
@@ -492,6 +503,23 @@ uint8_t Set_All_Pots_to_PC_Mode(void){
 
 	phase_fsm.prev_state = phase_fsm.current_state;
 	phase_fsm.current_state = PC_MODE;
+
+	return 1;
+}
+
+uint8_t Store_Params_as_User_Preset(enum Preset_Selected preset,
+									volatile struct Params *params_ptr,
+									volatile enum Validate *user_presets_used_array_ptr,
+									volatile struct Preset **user_presets_array_ptr){
+
+	//this function takes whatever the params for the pots are currently set to, regardless of CC, PC, etc.
+	//and stores them to a given preset
+
+	uint8_t preset_index = (uint8_t)preset - 1;
+
+	*(user_presets_used_array_ptr + preset_index) = YES;
+
+	Convert_All_Params_Values_for_Preset(params_ptr, *(user_presets_array_ptr + preset_index));
 
 	return 1;
 }

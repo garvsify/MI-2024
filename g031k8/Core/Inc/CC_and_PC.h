@@ -132,6 +132,7 @@ uint8_t Initialise_Preset_Arrays(void);
 uint8_t Update_Params_Based_On_Mode_Selected(void);
 
 uint8_t Convert_All_Preset_Values(volatile struct Preset* preset_ptr, volatile struct Preset_Converted* preset_converted_ptr);
+uint8_t Convert_All_Params_Values_for_Preset(volatile struct Params *params_ptr, volatile struct Preset* preset_ptr);
 uint8_t Update_All_with_Converted_Preset_Values(struct Preset_Converted* preset_converted_ptr, struct Params* params_ptr);
 
 uint8_t Update_Waveshape_with_Converted_Preset_Value(volatile struct Preset_Converted* preset_converted_ptr, struct Params* params_ptr);
@@ -169,5 +170,10 @@ uint8_t Set_Depth_to_CC_Mode_and_Value(uint8_t *data);
 uint8_t Set_Symmetry_to_CC_Mode_and_Value(uint8_t *data);
 uint8_t Set_Phase_to_CC_Mode_and_Value(uint8_t *data);
 uint8_t Set_All_Pots_to_PC_Mode();
+
+uint8_t Store_Params_as_User_Preset(enum Preset_Selected preset,
+									volatile struct Params *params,
+									volatile enum Validate *user_presets_used_array_ptr,
+									volatile struct Preset **user_presets_array_ptr);
 
 #endif /* INC_CC_AND_PC_H_ */

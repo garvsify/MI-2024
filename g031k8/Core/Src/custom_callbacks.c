@@ -1104,104 +1104,180 @@ void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
 void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 	static volatile struct Tap_Tempo_Switch_States tap_tempo_switch_states = {0};
+	static volatile enum Validate preset_save_mode_is_inactive = YES;
 
 	//CHECK IF NEED TAP_PENDING TRANSITION
 
-	uint8_t pin_state = (uint8_t)HAL_GPIO_ReadPin(SW_IN_GPIO_Port, SW_IN_Pin);
-
-	if((speed_fsm.current_state.shared_state == MANUAL_MODE) && (pin_state == 0)){
-
-		speed_fsm.current_state.speed_exclusive_state = TAP_PENDING_MODE;
-		speed_fsm.prev_state.shared_state = MANUAL_MODE;
-	}
-	else if((speed_fsm.current_state.shared_state == CC_MODE) && (pin_state == 0)){
-
-		speed_fsm.current_state.speed_exclusive_state = TAP_PENDING_MODE;
-		speed_fsm.prev_state.shared_state = CC_MODE;
-	}
-	else if((speed_fsm.current_state.shared_state == PC_MODE) && (pin_state == 0)){
-
-		speed_fsm.current_state.speed_exclusive_state = TAP_PENDING_MODE;
-		speed_fsm.prev_state.shared_state = PC_MODE;
-	}
-	else if((speed_fsm.current_state.speed_exclusive_state == CLK_IN_MODE) && (pin_state == 0) && (IP_CAP_fsm.current_state == IDLE) && (Get_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out) == YES)){
-
-		speed_fsm.current_state.speed_exclusive_state = TAP_PENDING_MODE;
-		speed_fsm.prev_state.speed_exclusive_state = CLK_IN_MODE;
-
-		Clear_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out);
-		Clear_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
-	}
-	else if((speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_MODE) && (pin_state == 0) && (IP_CAP_fsm.current_state == IDLE) && (Get_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out) == YES)){
-
-		speed_fsm.current_state.speed_exclusive_state = TAP_PENDING_MODE;
-		speed_fsm.prev_state.speed_exclusive_state = MIDI_CLK_MODE;
-
-		Clear_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out);
-		Clear_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
-	}
-
-	//CHECK TAP TEMPO STATE
-
 	Check_Tap_Tempo_Switch_State(&tap_tempo_switch_states);
 
-	if((speed_fsm.current_state.speed_exclusive_state == TAP_PENDING_MODE) || (speed_fsm.current_state.speed_exclusive_state == TAP_MODE)){
+	uint8_t pin_state = (uint8_t)HAL_GPIO_ReadPin(SW_IN_GPIO_Port, SW_IN_Pin);
 
-		if(tap_tempo_switch_states.tap_tempo_switch_state == DEPRESSED){
+	if(preset_save_mode_is_inactive == YES){
 
-			//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
-			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
-			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+		if((speed_fsm.current_state.shared_state == MANUAL_MODE) && (pin_state == 0)){
+
+			speed_fsm.current_state.speed_exclusive_state = TAP_PENDING_MODE;
+			speed_fsm.prev_state.shared_state = MANUAL_MODE;
+		}
+		else if((speed_fsm.current_state.shared_state == CC_MODE) && (pin_state == 0)){
+
+			speed_fsm.current_state.speed_exclusive_state = TAP_PENDING_MODE;
+			speed_fsm.prev_state.shared_state = CC_MODE;
+		}
+		else if((speed_fsm.current_state.shared_state == PC_MODE) && (pin_state == 0)){
+
+			speed_fsm.current_state.speed_exclusive_state = TAP_PENDING_MODE;
+			speed_fsm.prev_state.shared_state = PC_MODE;
+		}
+		else if((speed_fsm.current_state.speed_exclusive_state == CLK_IN_MODE) && (pin_state == 0) && (IP_CAP_fsm.current_state == IDLE) && (Get_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out) == YES)){
+
+			speed_fsm.current_state.speed_exclusive_state = TAP_PENDING_MODE;
+			speed_fsm.prev_state.speed_exclusive_state = CLK_IN_MODE;
+
+			Clear_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out);
+			Clear_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
+		}
+		else if((speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_MODE) && (pin_state == 0) && (IP_CAP_fsm.current_state == IDLE) && (Get_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out) == YES)){
+
+			speed_fsm.current_state.speed_exclusive_state = TAP_PENDING_MODE;
+			speed_fsm.prev_state.speed_exclusive_state = MIDI_CLK_MODE;
+
+			Clear_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out);
+			Clear_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
+		}
+
+		//CHECK TAP TEMPO STATE
+
+		if((speed_fsm.current_state.speed_exclusive_state == TAP_PENDING_MODE) || (speed_fsm.current_state.speed_exclusive_state == TAP_MODE)){
+
+			if(tap_tempo_switch_states.tap_tempo_switch_state == DEPRESSED){
+
+				//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
+				HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 0);
+				//HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+
+			}
+			else if(tap_tempo_switch_states.tap_tempo_switch_state == NOT_DEPRESSED){
+
+				//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
+				HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1); //reset
+				//HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+			}
+		}
+
+		//CHECK FOR SPEED POT CHANGES
+		if(Get_Status_Bit(&statuses, Pots_Counter_Has_Timed_Out) == YES){
+
+			Clear_Status_Bit(&statuses, Pots_Counter_Has_Timed_Out);
+
+			pots_counter = 0;
+
+			//PERFORM SPEED POT CHECKING
+			if((speed_fsm.current_state.shared_state == PC_MODE) || (speed_fsm.current_state.shared_state == CC_MODE)){
+
+				Pot_Check(ADCResultsDMA, SPEED_POT);
+			}
+			else if((speed_fsm.current_state.speed_exclusive_state == CLK_IN_MODE) && (IP_CAP_fsm.current_state == IDLE)){
+
+				Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
+
+				if(Get_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out) == YES){
+
+					Pot_Check(ADCResultsDMA, SPEED_POT);
+				}
+			}
+			else if((speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_MODE) && (IP_CAP_fsm.current_state == IDLE)){
+
+				Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
+
+				if(Get_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out) == YES){
+
+					HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1); //reset
+					HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+
+					MIDI_CLK_fsm = NOT_COMPILING;
+					MIDI_CLK_tag = 0;
+
+					Pot_Check(ADCResultsDMA, SPEED_POT);
+				}
+			}
+			else if((speed_fsm.current_state.speed_exclusive_state == TAP_MODE) && (IP_CAP_fsm.current_state == IDLE)){
+
+				Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
+
+				if(Get_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out) == YES){
+
+					Pot_Check(ADCResultsDMA, SPEED_POT);
+				}
+			}
+
+			if((waveshape_fsm.current_state == PC_MODE) || (waveshape_fsm.current_state == CC_MODE)){
+				Pot_Check(ADCResultsDMA, WAVESHAPE_POT);
+			}
+			if((depth_fsm.current_state == PC_MODE) || (depth_fsm.current_state == CC_MODE)){
+				Pot_Check(ADCResultsDMA, DEPTH_POT);
+			}
+			if((symmetry_fsm.current_state == PC_MODE) || (symmetry_fsm.current_state == CC_MODE)){
+				Pot_Check(ADCResultsDMA, SYMMETRY_POT);
+			}
+			if((phase_fsm.current_state == PC_MODE) || (phase_fsm.current_state == CC_MODE)){
+				Pot_Check(ADCResultsDMA, PHASE_POT);
+			}
 
 		}
-		else if(tap_tempo_switch_states.tap_tempo_switch_state == NOT_DEPRESSED){
+		else{
 
-			//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
-			HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1); //reset
-			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+			if(pots_counter == POT_COUNTER_COUNT){
+
+				Set_Status_Bit(&statuses, Pots_Counter_Has_Timed_Out);
+			}
+			else{
+
+				pots_counter++;
+			}
 		}
-
 	}
-
-	//SET PREVIOUS STATE TO CURRENT STATE
-	//tap_tempo_switch_states.tap_tempo_switch_prev_state = tap_tempo_switch_states.tap_tempo_switch_state;
 
 	//CHECK IF TAP TEMPO HELD DOWN - PRESET SAVE MODE
 
-	//enum Validate timeout = Get_Status_Bit(&statuses, Tap_Tempo_Switch_Hold_Timer_Has_Timed_Out);
-
 	static uint32_t depressed_num = 0;
-	static uint8_t preset_num = 0;
+	static enum Preset_Selected preset = PRESET_ONE;
 
 	if(tap_tempo_switch_states.tap_tempo_switch_state == DEPRESSED){
 
-		if(depressed_num < TAP_TEMPO_SWITCH_PRESET_SAVE_MODE_HOLD_TIME_COUNT){
+		if(depressed_num < TAP_TEMPO_SWITCH_PRESET_SAVE_COUNT){
+
+			depressed_num++;
+		}
+		else if(depressed_num < TAP_TEMPO_SWITCH_PRESET_SAVE_MODE_ADVANCE_COUNT){
 
 			depressed_num++;
 		}
 		else{
 
+			preset_save_mode_is_inactive = NO;
+
 			depressed_num = 0;
 
-			if(preset_num == 0){
+			if(preset == PRESET_ONE){
 
 				set_LED_to_state(&LED_fsm, LED_ONE_BLINK);
-				preset_num++;
+				preset = PRESET_TWO;
 			}
-			else if(preset_num == 1){
+			else if(preset == PRESET_TWO){
 
 				set_LED_to_state(&LED_fsm, LED_TWO_BLINK);
-				preset_num++;
+				preset = PRESET_THREE;
 			}
-			else if(preset_num == 2){
+			else if(preset == PRESET_THREE){
 
 				set_LED_to_state(&LED_fsm, LED_THREE_BLINK);
-				preset_num++;
+				preset = PRESET_FOUR;
 			}
-			else if(preset_num == 3){
+			else if(preset == PRESET_FOUR){
 
 				set_LED_to_state(&LED_fsm, LED_FOUR_BLINK);
-				preset_num = 0;
+				preset = PRESET_ONE;
 			}
 
 			if(speed_fsm.current_state.speed_exclusive_state == TAP_PENDING_MODE){
@@ -1214,79 +1290,39 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 	}
 	else{
 
+		if(!(depressed_num < TAP_TEMPO_SWITCH_PRESET_SAVE_COUNT)){
+
+			//get correct preset, as it will be 'off by one'
+			if(preset == PRESET_ONE){
+
+				preset = PRESET_FOUR;
+			}
+			else if(preset == PRESET_TWO){
+
+				preset = PRESET_ONE;
+			}
+			else if(preset == PRESET_THREE){
+
+				preset = PRESET_TWO;
+			}
+			else if(preset == PRESET_FOUR){
+
+				preset = PRESET_THREE;
+			}
+
+			//convert running params to preset, and update user preset and user preset used
+			Store_Params_as_User_Preset(preset,
+										&params,
+										user_presets_used_array,
+										user_presets_array);
+
+			//set the current pot mode to PC_MODE and update current preset active
+			Set_All_Pots_to_PC_Mode();
+			preset_selected = preset;
+
+		}
+
 		depressed_num = 0;
-	}
-
-	//CHECK FOR SPEED POT CHANGES
-	if(Get_Status_Bit(&statuses, Pots_Counter_Has_Timed_Out) == YES){
-
-		Clear_Status_Bit(&statuses, Pots_Counter_Has_Timed_Out);
-
-		pots_counter = 0;
-
-		//PERFORM SPEED POT CHECKING
-		if((speed_fsm.current_state.shared_state == PC_MODE) || (speed_fsm.current_state.shared_state == CC_MODE)){
-
-			Pot_Check(ADCResultsDMA, SPEED_POT);
-		}
-		else if((speed_fsm.current_state.speed_exclusive_state == CLK_IN_MODE) && (IP_CAP_fsm.current_state == IDLE)){
-
-			Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
-
-			if(Get_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out) == YES){
-
-				Pot_Check(ADCResultsDMA, SPEED_POT);
-			}
-		}
-		else if((speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_MODE) && (IP_CAP_fsm.current_state == IDLE)){
-
-			Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
-
-			if(Get_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out) == YES){
-
-				HAL_GPIO_WritePin(SW_OUT_GPIO_Port, SW_OUT_Pin, 1); //reset
-				HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
-
-				MIDI_CLK_fsm = NOT_COMPILING;
-				MIDI_CLK_tag = 0;
-
-				Pot_Check(ADCResultsDMA, SPEED_POT);
-			}
-		}
-		else if((speed_fsm.current_state.speed_exclusive_state == TAP_MODE) && (IP_CAP_fsm.current_state == IDLE)){
-
-			Set_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Is_Running);
-
-			if(Get_Status_Bit(&statuses, Software_IP_CAP_Idle_Timer_Has_Timed_Out) == YES){
-
-				Pot_Check(ADCResultsDMA, SPEED_POT);
-			}
-		}
-
-		if((waveshape_fsm.current_state == PC_MODE) || (waveshape_fsm.current_state == CC_MODE)){
-			Pot_Check(ADCResultsDMA, WAVESHAPE_POT);
-		}
-		if((depth_fsm.current_state == PC_MODE) || (depth_fsm.current_state == CC_MODE)){
-			Pot_Check(ADCResultsDMA, DEPTH_POT);
-		}
-		if((symmetry_fsm.current_state == PC_MODE) || (symmetry_fsm.current_state == CC_MODE)){
-			Pot_Check(ADCResultsDMA, SYMMETRY_POT);
-		}
-		if((phase_fsm.current_state == PC_MODE) || (phase_fsm.current_state == CC_MODE)){
-			Pot_Check(ADCResultsDMA, PHASE_POT);
-		}
-
-	}
-	else{
-
-		if(pots_counter == POT_COUNTER_COUNT){
-
-			Set_Status_Bit(&statuses, Pots_Counter_Has_Timed_Out);
-		}
-		else{
-
-			pots_counter++;
-		}
 	}
 
 	//SET TIMER TRIGGER
@@ -1305,7 +1341,7 @@ void TIM14_callback(TIM_HandleTypeDef *htim){
 
 		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
 	}
-	else if((LED_fsm.current_state == LED_OFF) || (LED_fsm.current_state)){
+	else if(LED_fsm.current_state == LED_OFF){
 
 		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
 	}
