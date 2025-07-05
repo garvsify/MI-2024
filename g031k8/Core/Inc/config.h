@@ -46,6 +46,9 @@
 #define MONITOR_Pin GPIO_PIN_6
 #define MONITOR_GPIO_Port GPIOB
 
+#define MONITOR_2_Pin GPIO_PIN_4
+#define MONITOR_2_GPIO_Port GPIOB
+
 #define CLK_IN_Pin GPIO_PIN_7
 #define CLK_IN_GPIO_Port GPIOB
 

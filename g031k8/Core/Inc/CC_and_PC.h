@@ -172,8 +172,10 @@ uint8_t Set_Phase_to_CC_Mode_and_Value(uint8_t *data);
 uint8_t Set_All_Pots_to_PC_Mode();
 
 uint8_t Store_Params_as_User_Preset(enum Preset_Selected preset,
-									volatile struct Params *params,
+									volatile struct Params *params_ptr,
 									volatile enum Validate *user_presets_used_array_ptr,
-									volatile struct Preset **user_presets_array_ptr);
+									volatile struct Preset **user_presets_array_ptr,
+									const struct Preset **factory_presets_array_ptr,
+									volatile struct Preset_Converted *presets_converted_array_ptr);
 
 #endif /* INC_CC_AND_PC_H_ */

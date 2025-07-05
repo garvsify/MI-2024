@@ -97,6 +97,20 @@ int main(void)
 				midi_counter = 0;
 			}
 		}
+
+		if(Get_Status_Bit(&statuses, Tap_Tempo_Advance_Idle_Timer_is_Running) == YES){
+
+			if(advance_idle_counter < ADVANCE_IDLE_COUNT){
+
+				advance_idle_counter++;
+			}
+			else{
+
+				Clear_Status_Bit(&statuses, Tap_Tempo_Advance_Idle_Timer_is_Running);
+				Set_Status_Bit(&statuses, Tap_Tempo_Advance_Idle_Timer_Has_Timed_Out);
+				advance_idle_counter = 0;
+			}
+		}
 	}
 
 	return 1;

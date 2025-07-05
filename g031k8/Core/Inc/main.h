@@ -11,5 +11,6 @@
 //VARIABLE DECLARATIONS
 volatile extern uint32_t statuses;
 extern uint32_t midi_counter;
+extern uint32_t advance_idle_counter;
 
 #endif /* INC_MAIN_H_ */

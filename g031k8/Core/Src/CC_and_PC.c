@@ -510,7 +510,9 @@ uint8_t Set_All_Pots_to_PC_Mode(void){
 uint8_t Store_Params_as_User_Preset(enum Preset_Selected preset,
 									volatile struct Params *params_ptr,
 									volatile enum Validate *user_presets_used_array_ptr,
-									volatile struct Preset **user_presets_array_ptr){
+									volatile struct Preset **user_presets_array_ptr,
+									const struct Preset **factory_presets_array_ptr,
+									volatile struct Preset_Converted *presets_converted_array_ptr){
 
 	//this function takes whatever the params for the pots are currently set to, regardless of CC, PC, etc.
 	//and stores them to a given preset
@@ -520,6 +522,11 @@ uint8_t Store_Params_as_User_Preset(enum Preset_Selected preset,
 	*(user_presets_used_array_ptr + preset_index) = YES;
 
 	Convert_All_Params_Values_for_Preset(params_ptr, *(user_presets_array_ptr + preset_index));
+	Update_Converted_Preset_Array_with_User_or_Factory_Presets(presets_converted_array_ptr,
+																user_presets_used_array_ptr,
+																factory_presets_array_ptr,
+																user_presets_array_ptr,
+																NUM_PRESETS);
 
 	return 1;
 }
