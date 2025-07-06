@@ -1252,17 +1252,6 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 	if(tap_tempo_switch_states.tap_tempo_switch_state == DEPRESSED){
 
-		if(Get_Status_Bit(&statuses, Tap_Tempo_Preset_Save_Timer_Has_Timed_Out) == YES){
-
-			depressed_num = 0;
-			preset_save_mode_is_inactive = YES;
-			first_time = NO;
-			LED_fsm.prev_state = LED_fsm.current_state;
-			LED_fsm.current_state = led_state_saved;
-
-			Clear_Status_Bit(&statuses, Tap_Tempo_Preset_Save_Timer_Has_Timed_Out);
-		}
-
 		//if switch gets depressed whilst timer hasn't yet timed out, essentially reset the timer
 		if((Get_Status_Bit(&statuses, Tap_Tempo_Advance_Idle_Timer_is_Running) == YES)
 			&& (Get_Status_Bit(&statuses, Tap_Tempo_Advance_Idle_Timer_Has_Timed_Out) == NO)){
@@ -1336,8 +1325,10 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 	}
 	else{
 
+		//if preset save timer has timed out, come out of preset save mode
 		if(Get_Status_Bit(&statuses, Tap_Tempo_Preset_Save_Timer_Has_Timed_Out) == YES){
 
+			preset = PRESET_ONE;
 			depressed_num = 0;
 			preset_save_mode_is_inactive = YES;
 			first_time = NO;
