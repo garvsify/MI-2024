@@ -111,6 +111,20 @@ int main(void)
 				advance_idle_counter = 0;
 			}
 		}
+
+		if(Get_Status_Bit(&statuses, Tap_Tempo_Preset_Save_Timer_Is_Running) == YES){
+
+			if(preset_save_idle_counter < PRESET_SAVE_IDLE_COUNT){
+
+				preset_save_idle_counter++;
+			}
+			else{
+
+				Clear_Status_Bit(&statuses, Tap_Tempo_Preset_Save_Timer_Is_Running);
+				Set_Status_Bit(&statuses, Tap_Tempo_Preset_Save_Timer_Has_Timed_Out);
+				preset_save_idle_counter = 0;
+			}
+		}
 	}
 
 	return 1;

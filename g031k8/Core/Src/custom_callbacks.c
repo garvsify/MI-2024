@@ -1252,6 +1252,18 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 	if(tap_tempo_switch_states.tap_tempo_switch_state == DEPRESSED){
 
+		if(Get_Status_Bit(&statuses, Tap_Tempo_Preset_Save_Timer_Has_Timed_Out) == YES){
+
+			depressed_num = 0;
+			preset_save_mode_is_inactive = YES;
+			first_time = NO;
+			LED_fsm.prev_state = LED_fsm.current_state;
+			LED_fsm.current_state = led_state_saved;
+
+			Clear_Status_Bit(&statuses, Tap_Tempo_Preset_Save_Timer_Has_Timed_Out);
+		}
+
+		//if switch gets depressed whilst timer hasn't yet timed out, essentially reset the timer
 		if((Get_Status_Bit(&statuses, Tap_Tempo_Advance_Idle_Timer_is_Running) == YES)
 			&& (Get_Status_Bit(&statuses, Tap_Tempo_Advance_Idle_Timer_Has_Timed_Out) == NO)){
 
@@ -1266,6 +1278,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 		}
 		else if((depressed_num < TAP_TEMPO_SWITCH_PRESET_SAVE_MODE_ADVANCE_COUNT) && (depressed_num >= TAP_TEMPO_SWITCH_PRESET_SAVE_COUNT)){
 
+			//if the depression of the switch after timeout 'becomes' a long press, reset the timer
 			if(Get_Status_Bit(&statuses, Tap_Tempo_Advance_Idle_Timer_Has_Timed_Out) == YES){
 
 				Clear_Status_Bit(&statuses, Tap_Tempo_Advance_Idle_Timer_is_Running);
@@ -1278,6 +1291,12 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 		else{
 
 			preset_save_mode_is_inactive = NO;
+
+			//start counter
+			Set_Status_Bit(&statuses, Tap_Tempo_Preset_Save_Timer_Is_Running);
+			//reset counter
+			preset_save_idle_counter = 0;
+
 			depressed_num = 0;
 
 			if(first_time == YES){
@@ -1317,7 +1336,18 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 	}
 	else{
 
-		if((preset_save_mode_is_inactive == NO) && (depressed_num == 0)){ //timer only start counting if footswitch has been held down and released
+		if(Get_Status_Bit(&statuses, Tap_Tempo_Preset_Save_Timer_Has_Timed_Out) == YES){
+
+			depressed_num = 0;
+			preset_save_mode_is_inactive = YES;
+			first_time = NO;
+			LED_fsm.prev_state = LED_fsm.current_state;
+			LED_fsm.current_state = led_state_saved;
+
+			Clear_Status_Bit(&statuses, Tap_Tempo_Preset_Save_Timer_Has_Timed_Out);
+		}
+
+		if((preset_save_mode_is_inactive == NO) && (depressed_num == 0)){ //timer only start counting if footswitch has been long pressed, to enter preset save mode, and then released
 
 			if(Get_Status_Bit(&statuses, Tap_Tempo_Advance_Idle_Timer_is_Running) == NO){
 
@@ -1331,14 +1361,13 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 		if(Get_Status_Bit(&statuses, Tap_Tempo_Advance_Idle_Timer_Has_Timed_Out) == YES){
 
-			//don't clear timeout flag here
+			//don't clear timeout flag here, otherwise the depressed_num counter cannot accumulate to cause the below if statement to trigger
 
 			//debug
 			HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
 			//debug end
 
-			if((depressed_num >= TAP_TEMPO_SWITCH_PRESET_SAVE_COUNT)
-				&& (depressed_num < TAP_TEMPO_SWITCH_PRESET_SAVE_MODE_ADVANCE_COUNT)){
+			if((depressed_num >= TAP_TEMPO_SWITCH_PRESET_SAVE_COUNT) && (depressed_num < TAP_TEMPO_SWITCH_PRESET_SAVE_MODE_ADVANCE_COUNT)){
 
 				//led confirm - overwrite prev state with saved state
 				LED_fsm.prev_state = led_state_saved;
@@ -1386,6 +1415,13 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 		}
 
 		depressed_num = 0; //important if switch is released early
+
+		if(speed_fsm.current_state.speed_exclusive_state == TAP_PENDING_MODE){
+
+			union Speed_FSM_States curr_state = speed_fsm.current_state;
+			speed_fsm.current_state = speed_fsm.prev_state;
+			speed_fsm.prev_state = curr_state;
+		}
 	}
 
 	//SET TIMER TRIGGER
