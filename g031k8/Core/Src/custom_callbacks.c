@@ -1,5 +1,10 @@
 #include "custom_callbacks.h"
 
+//debug
+uint32_t depressed_num = 0;
+uint8_t timeout_flag = 0;
+//debug
+
 void TIM16_callback(TIM_HandleTypeDef *htim)
 {
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
@@ -1241,7 +1246,8 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 	//CHECK IF TAP TEMPO HELD DOWN - PRESET SAVE MODE
 
-	static uint32_t depressed_num = 0;
+	//static uint32_t depressed_num = 0;
+
 	static enum Preset_Selected preset = PRESET_ONE;
 	static enum Validate first_time = YES;
 	enum LED_States led_state;
@@ -1251,6 +1257,11 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 
 	if(tap_tempo_switch_states.tap_tempo_switch_state == DEPRESSED){
+
+		if(Get_Status_Bit(&statuses, Tap_Tempo_Preset_Save_Timer_Is_Running) == YES){
+
+			preset_save_idle_counter = 0;
+		}
 
 		//if switch gets depressed whilst timer hasn't yet timed out, essentially reset the timer
 		if((Get_Status_Bit(&statuses, Tap_Tempo_Advance_Idle_Timer_is_Running) == YES)
@@ -1273,6 +1284,10 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 				Clear_Status_Bit(&statuses, Tap_Tempo_Advance_Idle_Timer_is_Running);
 				Clear_Status_Bit(&statuses, Tap_Tempo_Advance_Idle_Timer_Has_Timed_Out);
 				advance_idle_counter = 0;
+
+				//debug
+				timeout_flag = 0;
+				//debug
 			}
 
 			depressed_num++;
@@ -1325,93 +1340,121 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 	}
 	else{
 
-		//if preset save timer has timed out, come out of preset save mode
-		if(Get_Status_Bit(&statuses, Tap_Tempo_Preset_Save_Timer_Has_Timed_Out) == YES){
+		if(preset_save_mode_is_inactive == NO){
 
-			preset = PRESET_ONE;
-			depressed_num = 0;
-			preset_save_mode_is_inactive = YES;
-			first_time = NO;
-			LED_fsm.prev_state = LED_fsm.current_state;
-			LED_fsm.current_state = led_state_saved;
+			if(depressed_num == 0){ //timer only start counting if footswitch has been long pressed, to enter preset save mode, and then released
 
-			Clear_Status_Bit(&statuses, Tap_Tempo_Preset_Save_Timer_Has_Timed_Out);
-		}
+				if(Get_Status_Bit(&statuses, Tap_Tempo_Advance_Idle_Timer_is_Running) == NO){
 
-		if((preset_save_mode_is_inactive == NO) && (depressed_num == 0)){ //timer only start counting if footswitch has been long pressed, to enter preset save mode, and then released
+					Set_Status_Bit(&statuses, Tap_Tempo_Advance_Idle_Timer_is_Running);
 
-			if(Get_Status_Bit(&statuses, Tap_Tempo_Advance_Idle_Timer_is_Running) == NO){
+					//debug
+					//HAL_GPIO_WritePin(MONITOR_2_GPIO_Port, MONITOR_2_Pin, 1);
+					//debug end
+				}
+			}
 
-				Set_Status_Bit(&statuses, Tap_Tempo_Advance_Idle_Timer_is_Running);
+			//if preset save timer has timed out, come out of preset save mode
+			if(Get_Status_Bit(&statuses, Tap_Tempo_Preset_Save_Timer_Has_Timed_Out) == YES){
+
+				preset = PRESET_ONE;
+				depressed_num = 0;
+				preset_save_mode_is_inactive = YES;
+				first_time = NO;
+				LED_fsm.prev_state = LED_fsm.current_state;
+				LED_fsm.current_state = led_state_saved;
+
+				Clear_Status_Bit(&statuses, Tap_Tempo_Preset_Save_Timer_Has_Timed_Out);
+				Clear_Status_Bit(&statuses, Tap_Tempo_Advance_Idle_Timer_Has_Timed_Out);
+
+				//for some reason required - don't remove
+				Clear_Status_Bit(&statuses, Tap_Tempo_Advance_Idle_Timer_is_Running);
+				Clear_Status_Bit(&statuses, Tap_Tempo_Preset_Save_Timer_Is_Running);
 
 				//debug
-				HAL_GPIO_WritePin(MONITOR_2_GPIO_Port, MONITOR_2_Pin, 1);
+				timeout_flag = 0;
+				//debug
+			}
+			if(Get_Status_Bit(&statuses, Tap_Tempo_Advance_Idle_Timer_Has_Timed_Out) == YES){
+
+				//don't clear timeout flag here, otherwise the depressed_num counter cannot accumulate to cause the below if statement to trigger
+
+				//debug
+				//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
 				//debug end
+
+				//if((depressed_num >= TAP_TEMPO_SWITCH_PRESET_SAVE_COUNT) && (depressed_num < TAP_TEMPO_SWITCH_PRESET_SAVE_MODE_ADVANCE_COUNT)){
+
+				if((depressed_num >= TAP_TEMPO_SWITCH_PRESET_SAVE_COUNT) && (depressed_num < TAP_TEMPO_SWITCH_PRESET_SAVE_MODE_ADVANCE_COUNT)){
+
+					//led confirm - overwrite prev state with saved state
+					LED_fsm.prev_state = led_state_saved;
+					set_LED_to_state(&LED_fsm, LED_CONFIRM);
+
+					//reset
+					first_time = YES;
+					preset_save_mode_is_inactive = YES;
+
+					//get correct preset, as it will be 'off by one'
+					if(preset == PRESET_ONE){
+
+						preset = PRESET_FOUR;
+					}
+					else if(preset == PRESET_TWO){
+
+						preset = PRESET_ONE;
+					}
+					else if(preset == PRESET_THREE){
+
+						preset = PRESET_TWO;
+					}
+					else if(preset == PRESET_FOUR){
+
+						preset = PRESET_THREE;
+					}
+
+					//convert running params to preset, and update user preset and user preset used
+					Store_Params_as_User_Preset(preset,
+												&params,
+												user_presets_used_array,
+												user_presets_array,
+												factory_presets_array,
+												presets_converted_array);
+
+					//set the current pot mode to PC_MODE and update current preset active
+					Set_All_Pots_to_PC_Mode();
+					preset_selected = preset;
+
+					//store presets in flash
+					//@TODO
+
+					Clear_Status_Bit(&statuses, Tap_Tempo_Advance_Idle_Timer_Has_Timed_Out);
+
+					//debug
+					timeout_flag = 0;
+					//debug
+				}
+			}
+
+			depressed_num = 0; //important if switch is released early
+
+			if(speed_fsm.current_state.speed_exclusive_state == TAP_PENDING_MODE){
+
+				union Speed_FSM_States curr_state = speed_fsm.current_state;
+				speed_fsm.current_state = speed_fsm.prev_state;
+				speed_fsm.prev_state = curr_state;
 			}
 		}
+		else{
 
-		if(Get_Status_Bit(&statuses, Tap_Tempo_Advance_Idle_Timer_Has_Timed_Out) == YES){
+			depressed_num = 0; //important if switch is released early
 
-			//don't clear timeout flag here, otherwise the depressed_num counter cannot accumulate to cause the below if statement to trigger
+			if(speed_fsm.current_state.speed_exclusive_state == TAP_PENDING_MODE){
 
-			//debug
-			HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
-			//debug end
-
-			if((depressed_num >= TAP_TEMPO_SWITCH_PRESET_SAVE_COUNT) && (depressed_num < TAP_TEMPO_SWITCH_PRESET_SAVE_MODE_ADVANCE_COUNT)){
-
-				//led confirm - overwrite prev state with saved state
-				LED_fsm.prev_state = led_state_saved;
-				set_LED_to_state(&LED_fsm, LED_CONFIRM);
-
-				//reset
-				first_time = YES;
-				preset_save_mode_is_inactive = YES;
-
-				//get correct preset, as it will be 'off by one'
-				if(preset == PRESET_ONE){
-
-					preset = PRESET_FOUR;
-				}
-				else if(preset == PRESET_TWO){
-
-					preset = PRESET_ONE;
-				}
-				else if(preset == PRESET_THREE){
-
-					preset = PRESET_TWO;
-				}
-				else if(preset == PRESET_FOUR){
-
-					preset = PRESET_THREE;
-				}
-
-				//convert running params to preset, and update user preset and user preset used
-				Store_Params_as_User_Preset(preset,
-											&params,
-											user_presets_used_array,
-											user_presets_array,
-											factory_presets_array,
-											presets_converted_array);
-
-				//set the current pot mode to PC_MODE and update current preset active
-				Set_All_Pots_to_PC_Mode();
-				preset_selected = preset;
-
-				//store presets in flash
-				//@TODO
-
-				Clear_Status_Bit(&statuses, Tap_Tempo_Advance_Idle_Timer_Has_Timed_Out);
+				union Speed_FSM_States curr_state = speed_fsm.current_state;
+				speed_fsm.current_state = speed_fsm.prev_state;
+				speed_fsm.prev_state = curr_state;
 			}
-		}
-
-		depressed_num = 0; //important if switch is released early
-
-		if(speed_fsm.current_state.speed_exclusive_state == TAP_PENDING_MODE){
-
-			union Speed_FSM_States curr_state = speed_fsm.current_state;
-			speed_fsm.current_state = speed_fsm.prev_state;
-			speed_fsm.prev_state = curr_state;
 		}
 	}
 

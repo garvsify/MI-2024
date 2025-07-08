@@ -13,5 +13,7 @@ volatile extern uint32_t statuses;
 extern uint32_t midi_counter;
 extern uint32_t advance_idle_counter;
 extern uint32_t preset_save_idle_counter;
+extern uint32_t depressed_num;
+extern uint8_t timeout_flag;
 
 #endif /* INC_MAIN_H_ */
