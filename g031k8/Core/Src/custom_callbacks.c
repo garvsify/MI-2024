@@ -1375,15 +1375,13 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 				timeout_flag = 0;
 				//debug
 			}
-			if(Get_Status_Bit(&statuses, Tap_Tempo_Advance_Idle_Timer_Has_Timed_Out) == YES){
+			//if(Get_Status_Bit(&statuses, Tap_Tempo_Advance_Idle_Timer_Has_Timed_Out) == YES){
 
 				//don't clear timeout flag here, otherwise the depressed_num counter cannot accumulate to cause the below if statement to trigger
 
 				//debug
 				//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
 				//debug end
-
-				//if((depressed_num >= TAP_TEMPO_SWITCH_PRESET_SAVE_COUNT) && (depressed_num < TAP_TEMPO_SWITCH_PRESET_SAVE_MODE_ADVANCE_COUNT)){
 
 				if((depressed_num >= TAP_TEMPO_SWITCH_PRESET_SAVE_COUNT) && (depressed_num < TAP_TEMPO_SWITCH_PRESET_SAVE_MODE_ADVANCE_COUNT)){
 
@@ -1434,7 +1432,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 					timeout_flag = 0;
 					//debug
 				}
-			}
+			//}
 
 			depressed_num = 0; //important if switch is released early
 
