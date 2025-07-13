@@ -98,7 +98,7 @@ int main(void)
 			}
 		}
 
-		if(Get_Status_Bit(&statuses, Tap_Tempo_Advance_Idle_Timer_is_Running) == YES){
+		/*if(Get_Status_Bit(&statuses, Tap_Tempo_Advance_Idle_Timer_is_Running) == YES){
 
 			if(advance_idle_counter < ADVANCE_IDLE_COUNT){
 
@@ -114,7 +114,7 @@ int main(void)
 				timeout_flag = 1;
 				//debug
 			}
-		}
+		}*/
 
 		if(Get_Status_Bit(&statuses, Tap_Tempo_Preset_Save_Timer_Is_Running) == YES){
 
