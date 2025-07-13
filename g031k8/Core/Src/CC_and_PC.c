@@ -163,17 +163,7 @@ uint8_t Update_All_with_Converted_Preset_Values(struct Preset_Converted* preset_
 
 uint8_t Update_Waveshape_with_Converted_Preset_Value(volatile struct Preset_Converted* preset_converted_ptr, struct Params* params_ptr){
 
-	uint8_t waveshape = preset_converted_ptr->waveshape;
-
-	if(waveshape <= TRIANGLE_MODE_ADC_THRESHOLD){
-		params_ptr->waveshape = TRIANGLE_MODE; //triangle wave
-	}
-	else if (waveshape <= SINE_MODE_ADC_THRESHOLD){
-		params_ptr->waveshape = SINE_MODE; //sine wave
-	}
-	else if (waveshape <= SQUARE_MODE_ADC_THRESHOLD){
-		params_ptr->waveshape = SQUARE_MODE; //square wave
-	}
+	params_ptr->waveshape = preset_converted_ptr->waveshape;
 
 	return 1;
 }
