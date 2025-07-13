@@ -35,15 +35,15 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  15 .debug_rnglists 00001381  00000000  00000000  00038f38  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_line   000169b8  00000000  00000000  0003a2b9  2**0
+ 16 .debug_line   00017389  00000000  00000000  0003a2b9  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_str    00008a21  00000000  00000000  00050c71  2**0
+ 17 .debug_str    00008a1d  00000000  00000000  00051642  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .comment      00000043  00000000  00000000  00059692  2**0
+ 18 .comment      00000043  00000000  00000000  0005a05f  2**0
                   CONTENTS, READONLY
- 19 .debug_frame  000059c4  00000000  00000000  000596d8  2**2
+ 19 .debug_frame  000059c4  00000000  00000000  0005a0a4  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 20 .debug_line_str 00000054  00000000  00000000  0005f09c  2**0
+ 20 .debug_line_str 00000050  00000000  00000000  0005fa68  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -12859,11 +12859,8 @@ int main(void)
  8004ff4:	4b19      	ldr	r3, [pc, #100]	@ (800505c <main+0x150>)
  8004ff6:	2200      	movs	r2, #0
  8004ff8:	601a      	str	r2, [r3, #0]
-				timeout_flag = 1;
-				//debug
 			}
-		}*/
-
+		}
 		if(Get_Status_Bit(&statuses, Tap_Tempo_Preset_Save_Timer_Is_Running) == YES){
  8004ffa:	2380      	movs	r3, #128	@ 0x80
  8004ffc:	015a      	lsls	r2, r3, #5

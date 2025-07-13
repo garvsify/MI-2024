@@ -97,25 +97,6 @@ int main(void)
 				midi_counter = 0;
 			}
 		}
-
-		/*if(Get_Status_Bit(&statuses, Tap_Tempo_Advance_Idle_Timer_is_Running) == YES){
-
-			if(advance_idle_counter < ADVANCE_IDLE_COUNT){
-
-				advance_idle_counter++;
-			}
-			else{
-
-				Clear_Status_Bit(&statuses, Tap_Tempo_Advance_Idle_Timer_is_Running);
-				Set_Status_Bit(&statuses, Tap_Tempo_Advance_Idle_Timer_Has_Timed_Out);
-				advance_idle_counter = 0;
-
-				//debug
-				timeout_flag = 1;
-				//debug
-			}
-		}*/
-
 		if(Get_Status_Bit(&statuses, Tap_Tempo_Preset_Save_Timer_Is_Running) == YES){
 
 			if(preset_save_idle_counter < PRESET_SAVE_IDLE_COUNT){
