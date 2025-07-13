@@ -108,20 +108,22 @@ const extern struct Preset factory_preset_1;
 const extern struct Preset factory_preset_2;
 const extern struct Preset factory_preset_3;
 
-//TEST PRESET
-const extern struct Preset test_preset_0;
-extern struct Preset test_preset_1;
-
 //VARIABLE DECLARATIONS
 extern const struct Preset *factory_presets_array[NUM_PRESETS];
 volatile extern struct Preset *user_presets_array[NUM_PRESETS];
 volatile extern struct Preset_Converted presets_converted_array[NUM_PRESETS];
+volatile extern struct Preset *storage_user_presets_array[NUM_PRESETS];
 
 volatile extern struct Preset user_preset_0;
 volatile extern struct Preset user_preset_1;
 volatile extern struct Preset user_preset_2;
 volatile extern struct Preset user_preset_3;
 volatile extern enum Validate user_presets_used_array[NUM_PRESETS];
+
+volatile extern struct Preset storage_user_preset_0;
+volatile extern struct Preset storage_user_preset_1;
+volatile extern struct Preset storage_user_preset_2;
+volatile extern struct Preset storage_user_preset_3;
 
 volatile extern uint8_t CC_array[5];
 
@@ -147,11 +149,11 @@ uint8_t Convert_Depth_Preset_Value(struct Preset* preset_ptr, volatile struct Pr
 uint8_t Convert_Symmetry_Preset_Value(struct Preset* preset_ptr, volatile struct Preset_Converted* preset_converted_ptr);
 uint8_t Convert_Phase_Preset_Value(struct Preset* preset_ptr, volatile struct Preset_Converted* preset_converted_ptr);
 
-uint8_t Pack_Preset_Into_Doubleword(struct Preset* preset_ptr, uint64_t *Doubleword_ptr);
+uint8_t Pack_Preset_Into_Doubleword(volatile struct Preset* preset_ptr, uint64_t *Doubleword_ptr);
 uint8_t Read_and_Interpret_Preset_From_Flash(uint32_t address_val, volatile struct Preset* preset_ptr);
 uint8_t Read_and_Interpret_User_Presets_From_Flash(void);
 
-uint8_t Pack_Misc_Into_Doubleword(enum Validate *user_presets_used_array_ptr, volatile uint32_t *statuses_ptr, volatile enum MIDI_Channel *MIDI_basic_channel_ptr, uint64_t *Doubleword_ptr, uint8_t num_presets);
+uint8_t Pack_Misc_Into_Doubleword(volatile enum Validate *user_presets_used_array_ptr, volatile uint32_t *statuses_ptr, volatile enum MIDI_Channel *MIDI_basic_channel_ptr, uint64_t *Doubleword_ptr, uint8_t num_presets);
 uint8_t Read_and_Interpret_Misc_From_Flash(uint32_t address_val, volatile enum Validate *user_presets_used_array_ptr, volatile uint32_t *statuses_ptr, volatile enum MIDI_Channel *MIDI_basic_channel_ptr, uint8_t num_presets);
 
 uint8_t Update_Converted_Preset_Array_with_User_or_Factory_Presets(volatile struct Preset_Converted* preset_converted_array_ptr,
@@ -177,5 +179,7 @@ uint8_t Store_Params_as_User_Preset(enum Preset_Selected preset,
 									volatile struct Preset **user_presets_array_ptr,
 									const struct Preset **factory_presets_array_ptr,
 									volatile struct Preset_Converted *presets_converted_array_ptr);
+
+uint8_t Store_Single_Preset_In_Flash(volatile struct Preset *preset, uint8_t preset_num);
 
 #endif /* INC_CC_AND_PC_H_ */

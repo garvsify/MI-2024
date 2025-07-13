@@ -7,13 +7,11 @@ const struct Preset factory_preset_1 = {.waveshape = FACTORY_PRESET_1_WAVESHAPE,
 const struct Preset factory_preset_2 = {.waveshape = FACTORY_PRESET_2_WAVESHAPE, .speed = FACTORY_PRESET_2_SPEED, .depth = FACTORY_PRESET_2_DEPTH, .symmetry = FACTORY_PRESET_2_SYMMETRY, .phase = FACTORY_PRESET_2_PHASE};
 const struct Preset factory_preset_3 = {.waveshape = FACTORY_PRESET_3_WAVESHAPE, .speed = FACTORY_PRESET_3_SPEED, .depth = FACTORY_PRESET_3_DEPTH, .symmetry = FACTORY_PRESET_3_SYMMETRY, .phase = FACTORY_PRESET_3_PHASE};
 
-const struct Preset test_preset_0 = {.waveshape = TEST_PRESET_WAVESHAPE, .speed = TEST_PRESET_SPEED, .depth = TEST_PRESET_DEPTH, .symmetry = TEST_PRESET_SYMMETRY, .phase = TEST_PRESET_PHASE};
-struct Preset test_preset_1 = {.depth = 0, .phase = 0, .speed = 0, .symmetry = 0, .waveshape = 0};
-
 //VARIABLE DEFINITIONS
 const struct Preset *factory_presets_array[NUM_PRESETS] = {0};
 volatile struct Preset *user_presets_array[NUM_PRESETS] = {0};
 volatile struct Preset_Converted presets_converted_array[NUM_PRESETS] = {0};
+volatile struct Preset *storage_user_presets_array[NUM_PRESETS] = {0};
 volatile enum Preset_Selected preset_selected = NO_PRESET_SELECTED;
 
 //default values that may be selectively over-written by the user - and which are overwritten by flash-reads upon startup
@@ -21,6 +19,11 @@ volatile struct Preset user_preset_0 = factory_preset_0;
 volatile struct Preset user_preset_1 = factory_preset_1;
 volatile struct Preset user_preset_2 = factory_preset_2;
 volatile struct Preset user_preset_3 = factory_preset_3;
+
+volatile struct Preset storage_user_preset_0;
+volatile struct Preset storage_user_preset_1;
+volatile struct Preset storage_user_preset_2;
+volatile struct Preset storage_user_preset_3;
 
 volatile enum Validate user_presets_used_array[NUM_PRESETS] = {(enum Validate)NO};
 
@@ -34,18 +37,22 @@ uint8_t Initialise_Preset_Arrays(void){
 		if(i == 0){
 			factory_presets_array[i] = &factory_preset_0;
 			user_presets_array[i] = &user_preset_0;
+			storage_user_presets_array[i] = &storage_user_preset_0;
 		}
 		else if(i == 1){
 			factory_presets_array[i] = &factory_preset_1;
 			user_presets_array[i] = &user_preset_1;
+			storage_user_presets_array[i] = &storage_user_preset_1;
 		}
 		else if(i == 2){
 			factory_presets_array[i] = &factory_preset_2;
 			user_presets_array[i] = &user_preset_2;
+			storage_user_presets_array[i] = &storage_user_preset_2;
 		}
 		else if(i == 3){
 			factory_presets_array[i] = &factory_preset_3;
 			user_presets_array[i] = &user_preset_3;
+			storage_user_presets_array[i] = &storage_user_preset_3;
 		}
 	}
 
@@ -234,7 +241,7 @@ uint8_t Convert_Phase_Preset_Value(struct Preset* preset_ptr, volatile struct Pr
 	return 1;
 }
 
-uint8_t Pack_Preset_Into_Doubleword(struct Preset* preset_ptr, uint64_t *Doubleword_ptr){
+uint8_t Pack_Preset_Into_Doubleword(volatile struct Preset* preset_ptr, uint64_t *Doubleword_ptr){
 
 	uint64_t packed = 0;
 
@@ -266,7 +273,7 @@ uint8_t Read_and_Interpret_Preset_From_Flash(uint32_t address_val, volatile stru
 	return 1;
 }
 
-uint8_t Pack_Misc_Into_Doubleword(enum Validate *user_presets_used_array_ptr, volatile uint32_t *statuses_ptr, volatile enum MIDI_Channel *MIDI_basic_channel_ptr, uint64_t *Doubleword_ptr, uint8_t num_presets){
+uint8_t Pack_Misc_Into_Doubleword(volatile enum Validate *user_presets_used_array_ptr, volatile uint32_t *statuses_ptr, volatile enum MIDI_Channel *MIDI_basic_channel_ptr, uint64_t *Doubleword_ptr, uint8_t num_presets){
 
 	//This function will break if presets are bigger than 5
 
@@ -297,7 +304,93 @@ uint8_t Pack_Misc_Into_Doubleword(enum Validate *user_presets_used_array_ptr, vo
 	return 1;
 }
 
-uint8_t Read_and_Interpret_Misc_From_Flash(uint32_t address_val, volatile enum Validate *user_presets_used_array_ptr, volatile uint32_t *statuses_ptr, volatile enum MIDI_Channel *MIDI_basic_channel_ptr, uint8_t num_presets){
+uint8_t Store_Single_Preset_In_Flash(volatile struct Preset *preset, uint8_t preset_num){
+
+	//whole page has to be erased, so first store state of all presets (including one to be overwritten for simplicity)
+	//as well as miscellaneous data
+
+	Read_and_Interpret_Preset_From_Flash(USER_PRESET_0_FLASH_MEMORY_ADDRESS, &storage_user_preset_0);
+	Read_and_Interpret_Preset_From_Flash(USER_PRESET_1_FLASH_MEMORY_ADDRESS, &storage_user_preset_1);
+	Read_and_Interpret_Preset_From_Flash(USER_PRESET_2_FLASH_MEMORY_ADDRESS, &storage_user_preset_2);
+	Read_and_Interpret_Preset_From_Flash(USER_PRESET_3_FLASH_MEMORY_ADDRESS, &storage_user_preset_3);
+
+	uint64_t preset_packed = 0;
+	uint64_t misc_packed = 0;
+	uint32_t errors = 0;
+	FLASH_EraseInitTypeDef erase_config = {.TypeErase = FLASH_CR_PER, .Banks = FLASH_CR_MER1, .Page = 31, .NbPages = 1};
+	HAL_FLASH_Unlock();
+	HAL_FLASHEx_Erase(&erase_config, &errors); //all 0xF is no errors
+
+	if(preset_num == 0){
+
+		Pack_Preset_Into_Doubleword(preset, &preset_packed);
+		HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, USER_PRESET_0_FLASH_MEMORY_ADDRESS, preset_packed);
+
+		Pack_Preset_Into_Doubleword(&storage_user_preset_1, &preset_packed);
+		HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, USER_PRESET_1_FLASH_MEMORY_ADDRESS, preset_packed);
+
+		Pack_Preset_Into_Doubleword(&storage_user_preset_2, &preset_packed);
+		HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, USER_PRESET_2_FLASH_MEMORY_ADDRESS, preset_packed);
+
+		Pack_Preset_Into_Doubleword(&storage_user_preset_3, &preset_packed);
+		HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, USER_PRESET_3_FLASH_MEMORY_ADDRESS, preset_packed);
+	}
+	else if(preset_num == 1){
+
+		Pack_Preset_Into_Doubleword(preset, &preset_packed);
+		HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, USER_PRESET_1_FLASH_MEMORY_ADDRESS, preset_packed);
+
+		Pack_Preset_Into_Doubleword(&storage_user_preset_0, &preset_packed);
+		HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, USER_PRESET_0_FLASH_MEMORY_ADDRESS, preset_packed);
+
+		Pack_Preset_Into_Doubleword(&storage_user_preset_2, &preset_packed);
+		HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, USER_PRESET_2_FLASH_MEMORY_ADDRESS, preset_packed);
+
+		Pack_Preset_Into_Doubleword(&storage_user_preset_3, &preset_packed);
+		HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, USER_PRESET_3_FLASH_MEMORY_ADDRESS, preset_packed);
+	}
+	else if(preset_num == 2){
+
+		Pack_Preset_Into_Doubleword(preset, &preset_packed);
+		HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, USER_PRESET_2_FLASH_MEMORY_ADDRESS, preset_packed);
+
+		Pack_Preset_Into_Doubleword(&storage_user_preset_0, &preset_packed);
+		HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, USER_PRESET_0_FLASH_MEMORY_ADDRESS, preset_packed);
+
+		Pack_Preset_Into_Doubleword(&storage_user_preset_1, &preset_packed);
+		HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, USER_PRESET_1_FLASH_MEMORY_ADDRESS, preset_packed);
+
+		Pack_Preset_Into_Doubleword(&storage_user_preset_3, &preset_packed);
+		HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, USER_PRESET_3_FLASH_MEMORY_ADDRESS, preset_packed);
+	}
+	else if(preset_num == 3){
+
+		Pack_Preset_Into_Doubleword(preset, &preset_packed);
+		HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, USER_PRESET_3_FLASH_MEMORY_ADDRESS, preset_packed);
+
+		Pack_Preset_Into_Doubleword(&storage_user_preset_0, &preset_packed);
+		HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, USER_PRESET_0_FLASH_MEMORY_ADDRESS, preset_packed);
+
+		Pack_Preset_Into_Doubleword(&storage_user_preset_1, &preset_packed);
+		HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, USER_PRESET_1_FLASH_MEMORY_ADDRESS, preset_packed);
+
+		Pack_Preset_Into_Doubleword(&storage_user_preset_2, &preset_packed);
+		HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, USER_PRESET_2_FLASH_MEMORY_ADDRESS, preset_packed);
+	}
+
+	Pack_Misc_Into_Doubleword(user_presets_used_array, &statuses, &MIDI_basic_channel, &misc_packed, NUM_PRESETS);
+	HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, MISC_FLASH_MEMORY_ADDRESS, misc_packed);
+
+	HAL_FLASH_Lock();
+
+	return 1;
+}
+
+uint8_t Read_and_Interpret_Misc_From_Flash(uint32_t address_val,
+										   volatile enum Validate *user_presets_used_array_ptr,
+										   volatile uint32_t *statuses_ptr,
+										   volatile enum MIDI_Channel *MIDI_basic_channel_ptr,
+										   uint8_t num_presets){
 
 	uint8_t *address = (uint8_t *)address_val;
 

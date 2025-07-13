@@ -1,8 +1,8 @@
 #include "custom_callbacks.h"
 
 //debug
-uint32_t depressed_num = 0;
-uint8_t timeout_flag = 0;
+uint64_t depressed_num = 0;
+enum Validate latched = NO;
 //debug
 
 void TIM16_callback(TIM_HandleTypeDef *htim)
@@ -1246,8 +1246,8 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 	//CHECK IF TAP TEMPO HELD DOWN - PRESET SAVE MODE
 
-	//static uint32_t depressed_num = 0;
-
+	static uint64_t depressed_num;
+	static enum Validate latched;
 	static enum Preset_Selected preset = PRESET_ONE;
 	static enum Validate first_time = YES;
 	enum LED_States led_state;
@@ -1263,23 +1263,14 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 			if(Get_Status_Bit(&statuses, Tap_Tempo_Preset_Save_Timer_Has_Timed_Out) == YES){
 
 				preset = PRESET_ONE;
-				depressed_num = 0;
 				preset_save_mode_is_inactive = YES;
-				first_time = NO;
+				first_time = YES;
 				LED_fsm.prev_state = LED_fsm.current_state;
 				LED_fsm.current_state = led_state_saved;
 
 				Clear_Status_Bit(&statuses, Tap_Tempo_Preset_Save_Timer_Has_Timed_Out);
 			}
 			if((depressed_num >= TAP_TEMPO_SWITCH_PRESET_SAVE_COUNT) && (depressed_num < TAP_TEMPO_SWITCH_PRESET_SAVE_MODE_ADVANCE_COUNT)){
-
-				//led confirm - overwrite prev state with saved state
-				LED_fsm.prev_state = led_state_saved;
-				set_LED_to_state(&LED_fsm, LED_CONFIRM);
-
-				//reset
-				first_time = YES;
-				preset_save_mode_is_inactive = YES;
 
 				//get correct preset, as it will be 'off by one'
 				if(preset == PRESET_ONE){
@@ -1312,10 +1303,16 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 				preset_selected = preset;
 
 				//store presets in flash
-				//@TODO
-			}
+				Store_Single_Preset_In_Flash(user_presets_array[(uint8_t)(preset_selected - 1)], (uint8_t)(preset_selected - 1));
 
-			depressed_num = 0; //important if switch is released early
+				//led confirm - overwrite prev state with saved state
+				set_LED_to_state(&LED_fsm, LED_CONFIRM);
+				LED_fsm.prev_state = led_state_saved;
+
+				preset = PRESET_ONE;
+				preset_save_mode_is_inactive = YES;
+				first_time = YES;
+			}
 
 			if(speed_fsm.current_state.speed_exclusive_state == TAP_PENDING_MODE){
 
@@ -1326,8 +1323,6 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 		}
 		else{
 
-			depressed_num = 0; //important if switch is released early
-
 			if(speed_fsm.current_state.speed_exclusive_state == TAP_PENDING_MODE){
 
 				union Speed_FSM_States curr_state = speed_fsm.current_state;
@@ -1335,7 +1330,9 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 				speed_fsm.prev_state = curr_state;
 			}
 		}
+
 		depressed_num = 0;
+		latched = NO;
 	}
 	else if(tap_tempo_switch_states.tap_tempo_switch_state == DEPRESSED){
 
@@ -1370,25 +1367,30 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 				led_state_saved = led_state;
 			}
 
-			if(preset == PRESET_ONE){
+			if(latched == NO){
 
-				set_LED_to_state(&LED_fsm, LED_ONE_BLINK);
-				preset = PRESET_TWO;
-			}
-			else if(preset == PRESET_TWO){
+				latched = YES;
 
-				set_LED_to_state(&LED_fsm, LED_TWO_BLINK);
-				preset = PRESET_THREE;
-			}
-			else if(preset == PRESET_THREE){
+				if(preset == PRESET_ONE){
 
-				set_LED_to_state(&LED_fsm, LED_THREE_BLINK);
-				preset = PRESET_FOUR;
-			}
-			else if(preset == PRESET_FOUR){
+					set_LED_to_state(&LED_fsm, LED_ONE_BLINK);
+					preset = PRESET_TWO;
+				}
+				else if(preset == PRESET_TWO){
 
-				set_LED_to_state(&LED_fsm, LED_FOUR_BLINK);
-				preset = PRESET_ONE;
+					set_LED_to_state(&LED_fsm, LED_TWO_BLINK);
+					preset = PRESET_THREE;
+				}
+				else if(preset == PRESET_THREE){
+
+					set_LED_to_state(&LED_fsm, LED_THREE_BLINK);
+					preset = PRESET_FOUR;
+				}
+				else if(preset == PRESET_FOUR){
+
+					set_LED_to_state(&LED_fsm, LED_FOUR_BLINK);
+					preset = PRESET_ONE;
+				}
 			}
 
 			if(speed_fsm.current_state.speed_exclusive_state == TAP_PENDING_MODE){
