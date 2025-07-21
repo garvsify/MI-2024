@@ -17,6 +17,6 @@ volatile extern uint8_t LED_counter;
 volatile extern uint32_t led_blink_period;
 
 //FUNCTION DECLARATIONS
-uint8_t set_LED_to_state(volatile struct LED_FSM *LED_FSM_ptr, enum LED_States desired_state);
+uint8_t Set_LED_to_State(volatile struct LED_FSM *LED_FSM_ptr, enum LED_States desired_state);
 
 #endif /* INC_LED_H_ */

@@ -5,7 +5,7 @@
 volatile uint8_t LED_counter = 0;
 volatile uint32_t led_blink_period = LED_BLINK_PERIOD;
 
-uint8_t set_LED_to_state(volatile struct LED_FSM *LED_FSM_ptr, enum LED_States desired_state){
+uint8_t Set_LED_to_State(volatile struct LED_FSM *LED_FSM_ptr, enum LED_States desired_state){
 
 	if(desired_state == LED_CONFIRM){
 

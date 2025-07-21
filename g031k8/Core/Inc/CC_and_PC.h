@@ -181,5 +181,6 @@ uint8_t Store_Params_as_User_Preset(enum Preset_Selected preset,
 									volatile struct Preset_Converted *presets_converted_array_ptr);
 
 uint8_t Store_Single_Preset_In_Flash(volatile struct Preset *preset, uint8_t preset_num);
+uint8_t Set_to_PC_Mode(enum Preset_Selected preset);
 
 #endif /* INC_CC_AND_PC_H_ */

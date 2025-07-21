@@ -614,3 +614,13 @@ uint8_t Store_Params_as_User_Preset(enum Preset_Selected preset,
 	return 1;
 }
 
+uint8_t Set_to_PC_Mode(enum Preset_Selected preset){
+
+	preset_selected = preset;
+	Set_All_Pots_to_PC_Mode();
+	Clear_Status_Bit(&statuses, First_Sync_Complete); //important for where a synced state (via MIDI CLK, CLK IN, or TAP) is the prior state
+	Update_Params_Based_On_Mode_Selected(); // Update parameters immediately with preset values
+
+	return 1;
+}
+
