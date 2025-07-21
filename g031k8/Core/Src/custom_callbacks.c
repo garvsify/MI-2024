@@ -1117,7 +1117,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 	uint8_t pin_state = (uint8_t)HAL_GPIO_ReadPin(SW_IN_GPIO_Port, SW_IN_Pin);
 
-	if(preset_save_mode_is_active == NO){
+	if(save_or_preset_mode_engaged == NO){
 
 		if((speed_fsm.current_state.shared_state == MANUAL_MODE) && (pin_state == 0)){
 
@@ -1263,6 +1263,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 		preset = PRESET_ONE;
 		preset_save_mode_is_active = NO;
 		preset_select_mode_is_active = NO;
+		save_or_preset_mode_engaged = NO;
 		LED_fsm.prev_state = LED_fsm.current_state;
 		LED_fsm.current_state = led_state_saved;
 		depressed_num = 0;
@@ -1361,6 +1362,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 					preset = PRESET_ONE;
 					preset_save_mode_is_active = NO;
+					preset_select_mode_is_active = NO;
 					save_or_preset_mode_engaged = NO;
 
 				}
@@ -1408,6 +1410,13 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 			}
 
 			depressed_num++;
+
+			if(speed_fsm.current_state.speed_exclusive_state == TAP_PENDING_MODE){
+
+				union Speed_FSM_States curr_state = speed_fsm.current_state;
+				speed_fsm.current_state = speed_fsm.prev_state;
+				speed_fsm.prev_state = curr_state;
+			}
 		}
 	}
 
