@@ -1267,6 +1267,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 		LED_fsm.prev_state = LED_fsm.current_state;
 		LED_fsm.current_state = led_state_saved;
 		depressed_num = 0;
+
 	}
 	else{
 
@@ -1274,16 +1275,20 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 			if((preset_save_mode_is_active == NO) && (preset_select_mode_is_active == NO)){
 
-				if((depressed_num >= TAP_TEMPO_SWITCH_PRESET_SELECT_MODE_ADVANCE_COUNT) && (depressed_num < TAP_TEMPO_SWITCH_PRESET_SAVE_MODE_ADVANCE_COUNT)){
+				if((depressed_num >= TAP_TEMPO_SWITCH_PRESET_SELECT_MODE_ADVANCE_COUNT_MIN) && (depressed_num <  TAP_TEMPO_SWITCH_PRESET_SELECT_MODE_ADVANCE_COUNT_MAX)){
 
 					preset_select_mode_is_active = YES;
 					save_or_preset_mode_engaged = YES;
 
 				}
-				else if((depressed_num >= TAP_TEMPO_SWITCH_PRESET_SAVE_MODE_ADVANCE_COUNT) && (depressed_num < TAP_TEMPO_SWITCH_PRESET_SAVE_MODE_ADVANCE_MAX_COUNT)){
+				else if((depressed_num >= TAP_TEMPO_SWITCH_PRESET_SAVE_MODE_ADVANCE_COUNT_MIN) && (depressed_num < TAP_TEMPO_SWITCH_PRESET_SAVE_MODE_ADVANCE_COUNT_MAX)){
 
 					preset_save_mode_is_active = YES;
 					save_or_preset_mode_engaged = YES;
+				}
+				else if((depressed_num >= TAP_TEMPO_SWITCH_FACTORY_RESET_COUNT_MIN) && (depressed_num < TAP_TEMPO_SWITCH_FACTORY_RESET_COUNT_MAX)){
+
+					//@TODO Factory Reset Presets, and user preset used array in flash
 				}
 				if(save_or_preset_mode_engaged == YES){
 
