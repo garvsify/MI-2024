@@ -1325,7 +1325,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 			}
 			else{ //at least one of preset_save and preset_select active
 
-				if((depressed_num >= TAP_TEMPO_SWITCH_PRESET_SAVE_COUNT) && (depressed_num < TAP_TEMPO_SWITCH_PRESET_SELECT_MODE_ADVANCE_COUNT)){
+				if((depressed_num >= TAP_TEMPO_SWITCH_PRESET_SAVE_COUNT_MIN) && (depressed_num < TAP_TEMPO_SWITCH_PRESET_SAVE_COUNT_MAX)){
 
 					//get correct preset, as it will be 'off by one'
 					if(preset == PRESET_ONE){
@@ -1371,7 +1371,7 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 					save_or_preset_mode_engaged = NO;
 
 				}
-				else if(((depressed_num >= TAP_TEMPO_SWITCH_PRESET_SELECT_MODE_ADVANCE_COUNT) && (depressed_num < TAP_TEMPO_SWITCH_PRESET_SAVE_MODE_ADVANCE_COUNT))){
+				else if(((depressed_num >= TAP_TEMPO_SWITCH_PRESET_SELECT_MODE_ADVANCE_COUNT_MIN) && (depressed_num < TAP_TEMPO_SWITCH_PRESET_SELECT_MODE_ADVANCE_COUNT_MAX))){
 
 					//we want to have advancing through LED blinks, in either preset save or preset select mode, to
 					//advance by PRESET_SELECT_MODE_ADVANCE_COUNT
@@ -1398,12 +1398,6 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 					}
 				}
 			}
-			if(speed_fsm.current_state.speed_exclusive_state == TAP_PENDING_MODE){
-
-				union Speed_FSM_States curr_state = speed_fsm.current_state;
-				speed_fsm.current_state = speed_fsm.prev_state;
-				speed_fsm.prev_state = curr_state;
-			}
 
 			depressed_num = 0;
 		}
@@ -1415,13 +1409,6 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 			}
 
 			depressed_num++;
-
-			if(speed_fsm.current_state.speed_exclusive_state == TAP_PENDING_MODE){
-
-				union Speed_FSM_States curr_state = speed_fsm.current_state;
-				speed_fsm.current_state = speed_fsm.prev_state;
-				speed_fsm.prev_state = curr_state;
-			}
 		}
 	}
 
