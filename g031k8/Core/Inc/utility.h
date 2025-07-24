@@ -15,6 +15,7 @@
 #include "MIDI_defines.h"
 #include "checking_functions.h"
 #include "tap_tempo.h"
+#include "LED.h"
 
 //CUSTOM TYPES
 enum Polarity{
@@ -38,8 +39,10 @@ enum Status_Bit{
 	Software_MIDI_Timer_Has_Timed_Out = SOFTWARE_MIDI_TIMER_HAS_TIMED_OUT,
 	MIDI_Channel_Voice_Mode = MIDI_CHANNEL_VOICE_MODE,
 	Pots_Counter_Has_Timed_Out = POTS_COUNTER_HAS_TIMED_OUT,
-	Tap_Tempo_Preset_Save_Timer_Is_Running = TAP_TEMPO_PRESET_SAVE_TIMER_IS_RUNNING,
-	Tap_Tempo_Preset_Save_Timer_Has_Timed_Out = TAP_TEMPO_PRESET_SAVE_TIMER_HAS_TIMED_OUT,
+	Tap_Tempo_Preset_Save_Select_Timer_Is_Running = TAP_TEMPO_PRESET_SAVE_SELECT_TIMER_IS_RUNNING,
+	Tap_Tempo_Preset_Save_Select_Timer_Has_Timed_Out = TAP_TEMPO_PRESET_SAVE_SELECT_TIMER_HAS_TIMED_OUT,
+	LED_Pause_Timer_Is_Running = LED_PAUSE_TIMER_IS_RUNNING,
+	LED_Pause_Timer_Has_Timed_Out = LED_PAUSE_TIMER_HAS_TIMED_OUT,
 };
 
 //FUNCTION DECLARATIONS

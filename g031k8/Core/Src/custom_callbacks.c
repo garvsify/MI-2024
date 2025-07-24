@@ -1,9 +1,6 @@
 #include "custom_callbacks.h"
 
-//debug
-uint64_t depressed_num = 0;
-enum Validate latched = NO;
-//debug
+volatile enum Validate save_or_preset_mode_engaged = NO;
 
 void TIM16_callback(TIM_HandleTypeDef *htim)
 {
@@ -1111,7 +1108,6 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 	static volatile struct Tap_Tempo_Switch_States tap_tempo_switch_states = {0};
 	static volatile enum Validate preset_save_mode_is_active = NO;
 	static volatile enum Validate preset_select_mode_is_active = NO;
-	static volatile enum Validate save_or_preset_mode_engaged = NO;
 
 	//CHECK IF NEED TAP_PENDING TRANSITION
 
@@ -1256,9 +1252,9 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 	led_state = LED_fsm.current_state;
 
 	//if preset save timer has timed out, come out of preset save mode
-	if(Get_Status_Bit(&statuses, Tap_Tempo_Preset_Save_Timer_Has_Timed_Out) == YES){
+	if(Get_Status_Bit(&statuses, Tap_Tempo_Preset_Save_Select_Timer_Has_Timed_Out) == YES){
 
-		Clear_Status_Bit(&statuses, Tap_Tempo_Preset_Save_Timer_Has_Timed_Out);
+		Clear_Status_Bit(&statuses, Tap_Tempo_Preset_Save_Select_Timer_Has_Timed_Out);
 
 		preset = PRESET_ONE;
 		preset_save_mode_is_active = NO;
@@ -1288,14 +1284,14 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 				}
 				else if((depressed_num >= TAP_TEMPO_SWITCH_FACTORY_RESET_COUNT_MIN) && (depressed_num < TAP_TEMPO_SWITCH_FACTORY_RESET_COUNT_MAX)){
 
-					//@TODO Factory Reset Presets, and user preset used array in flash
+					//@TODO Factory Reset Presets and user preset used array in flash
 				}
 				if(save_or_preset_mode_engaged == YES){
 
 					//start counter
-					Set_Status_Bit(&statuses, Tap_Tempo_Preset_Save_Timer_Is_Running);
+					Set_Status_Bit(&statuses, Tap_Tempo_Preset_Save_Select_Timer_Is_Running);
 					//reset counter
-					preset_save_idle_counter = 0;
+					preset_save_select_idle_counter = 0;
 
 					depressed_num = 0;
 
@@ -1403,9 +1399,9 @@ void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 		}
 		else if(tap_tempo_switch_states.tap_tempo_switch_state == DEPRESSED){
 
-			if(Get_Status_Bit(&statuses, Tap_Tempo_Preset_Save_Timer_Is_Running) == YES){
+			if(Get_Status_Bit(&statuses, Tap_Tempo_Preset_Save_Select_Timer_Is_Running) == YES){
 
-				preset_save_idle_counter = 0;
+				preset_save_select_idle_counter = 0;
 			}
 
 			depressed_num++;
@@ -1424,145 +1420,152 @@ void TIM17_callback(TIM_HandleTypeDef *htim){
 
 void TIM14_callback(TIM_HandleTypeDef *htim){
 
-	if(LED_fsm.current_state == LED_ON){
-
-		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
-	}
-	else if(LED_fsm.current_state == LED_OFF){
+	if(Get_Status_Bit(&statuses, LED_Pause_Timer_Is_Running) == YES){
 
 		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
 	}
-	else if(LED_fsm.current_state == LED_ONE_BLINK){
+	else{
 
-		__HAL_TIM_SET_COUNTER(&htim14, 0);
-
-		if(LED_counter == 0){
+		if(LED_fsm.current_state == LED_ON){
 
 			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
-
-			LED_counter++;
 		}
-		else if(LED_counter < (LED_COUNT_OFF_TIME + 1)){
+		else if(LED_fsm.current_state == LED_OFF){
 
 			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+		}
+		else if(LED_fsm.current_state == LED_ONE_BLINK){
 
-			LED_counter++;
+			__HAL_TIM_SET_COUNTER(&htim14, 0);
 
-			if(LED_counter == LED_COUNT_OFF_TIME + 1){
+			if(LED_counter == 0){
 
-				LED_counter = 0;
+				HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+
+				LED_counter++;
+			}
+			else if(LED_counter < (LED_COUNT_OFF_TIME + 1)){
+
+				HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+
+				LED_counter++;
+
+				if(LED_counter == LED_COUNT_OFF_TIME + 1){
+
+					LED_counter = 0;
+				}
 			}
 		}
-	}
-	else if(LED_fsm.current_state == LED_TWO_BLINK){
+		else if(LED_fsm.current_state == LED_TWO_BLINK){
 
-		__HAL_TIM_SET_COUNTER(&htim14, 0);
+			__HAL_TIM_SET_COUNTER(&htim14, 0);
 
-		if((LED_counter < 3) && (LED_counter % 2 == 0)){
+			if((LED_counter < 3) && (LED_counter % 2 == 0)){
 
-			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+				HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
 
-			LED_counter++;
-		}
-		else if((LED_counter < 3) && (LED_counter % 2 == 1)){
+				LED_counter++;
+			}
+			else if((LED_counter < 3) && (LED_counter % 2 == 1)){
 
-			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
-			LED_counter++;
-		}
-		else if(LED_counter < (LED_COUNT_OFF_TIME + 3)){
+				HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+				LED_counter++;
+			}
+			else if(LED_counter < (LED_COUNT_OFF_TIME + 3)){
 
-			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
-			LED_counter++;
+				HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+				LED_counter++;
 
-			if(LED_counter == LED_COUNT_OFF_TIME + 3){
+				if(LED_counter == LED_COUNT_OFF_TIME + 3){
 
-				LED_counter = 0;
+					LED_counter = 0;
+				}
 			}
 		}
-	}
-	else if(LED_fsm.current_state == LED_THREE_BLINK){
+		else if(LED_fsm.current_state == LED_THREE_BLINK){
 
-		__HAL_TIM_SET_COUNTER(&htim14, 0);
+			__HAL_TIM_SET_COUNTER(&htim14, 0);
 
-		if((LED_counter < 5) && (LED_counter % 2 == 0)){
+			if((LED_counter < 5) && (LED_counter % 2 == 0)){
 
-			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+				HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
 
-			LED_counter++;
-		}
-		else if((LED_counter < 5) && (LED_counter % 2 == 1)){
+				LED_counter++;
+			}
+			else if((LED_counter < 5) && (LED_counter % 2 == 1)){
 
-			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+				HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
 
-			LED_counter++;
-		}
-		else if(LED_counter < (LED_COUNT_OFF_TIME + 5)){
+				LED_counter++;
+			}
+			else if(LED_counter < (LED_COUNT_OFF_TIME + 5)){
 
-			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+				HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
 
-			LED_counter++;
+				LED_counter++;
 
-			if(LED_counter == LED_COUNT_OFF_TIME + 5){
+				if(LED_counter == LED_COUNT_OFF_TIME + 5){
 
-				LED_counter = 0;
+					LED_counter = 0;
+				}
 			}
 		}
-	}
-	else if(LED_fsm.current_state == LED_FOUR_BLINK){
+		else if(LED_fsm.current_state == LED_FOUR_BLINK){
 
-		__HAL_TIM_SET_COUNTER(&htim14, 0);
+			__HAL_TIM_SET_COUNTER(&htim14, 0);
 
-		if((LED_counter < 7) && (LED_counter % 2 == 0)){
+			if((LED_counter < 7) && (LED_counter % 2 == 0)){
 
-			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+				HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
 
-			LED_counter++;
-		}
-		else if((LED_counter < 7) && (LED_counter % 2 == 1)){
+				LED_counter++;
+			}
+			else if((LED_counter < 7) && (LED_counter % 2 == 1)){
 
-			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+				HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
 
-			LED_counter++;
-		}
-		else if(LED_counter < (LED_COUNT_OFF_TIME + 7)){
+				LED_counter++;
+			}
+			else if(LED_counter < (LED_COUNT_OFF_TIME + 7)){
 
-			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+				HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
 
-			LED_counter++;
+				LED_counter++;
 
-			if(LED_counter == LED_COUNT_OFF_TIME + 7){
+				if(LED_counter == LED_COUNT_OFF_TIME + 7){
 
-				LED_counter = 0;
+					LED_counter = 0;
+				}
 			}
 		}
-	}
-	else if(LED_fsm.current_state == LED_CONFIRM){
+		else if(LED_fsm.current_state == LED_CONFIRM){
 
-		__HAL_TIM_SET_COUNTER(&htim14, 0);
+			__HAL_TIM_SET_COUNTER(&htim14, 0);
 
-		if((LED_counter < 7) && (LED_counter % 2 == 0)){
+			if((LED_counter < 7) && (LED_counter % 2 == 0)){
 
-			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+				HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
 
-			LED_counter++;
-		}
-		else if((LED_counter < 7) && (LED_counter % 2 == 1)){
+				LED_counter++;
+			}
+			else if((LED_counter < 7) && (LED_counter % 2 == 1)){
 
-			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+				HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
 
-			LED_counter++;
-		}
-		else if(LED_counter < (LED_COUNT_OFF_TIME + 7)){
+				LED_counter++;
+			}
+			else if(LED_counter < (LED_COUNT_OFF_TIME + 7)){
 
-			HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+				HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
 
-			LED_counter++;
+				LED_counter++;
 
-			if(LED_counter == LED_COUNT_OFF_TIME + 7){
+				if(LED_counter == LED_COUNT_OFF_TIME + 7){
 
-				enum LED_States prev = LED_fsm.prev_state;
+					enum LED_States prev = LED_fsm.prev_state;
 
-				Set_LED_to_State(&LED_fsm, prev);
+					Set_LED_to_State(&LED_fsm, prev);
+				}
 			}
 		}
 	}

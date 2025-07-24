@@ -71,17 +71,17 @@ int main(void)
 				midi_counter = 0;
 			}
 		}
-		if(Get_Status_Bit(&statuses, Tap_Tempo_Preset_Save_Timer_Is_Running) == YES){
+		if(Get_Status_Bit(&statuses, LED_Pause_Timer_Is_Running) == YES){
 
-			if(preset_save_idle_counter < PRESET_SAVE_IDLE_COUNT){
+			if(led_pause_counter < LED_PAUSE_COUNT){
 
-				preset_save_idle_counter++;
+				led_pause_counter++;
 			}
 			else{
 
-				Clear_Status_Bit(&statuses, Tap_Tempo_Preset_Save_Timer_Is_Running);
-				Set_Status_Bit(&statuses, Tap_Tempo_Preset_Save_Timer_Has_Timed_Out);
-				preset_save_idle_counter = 0;
+				Clear_Status_Bit(&statuses, LED_Pause_Timer_Is_Running);
+				Set_Status_Bit(&statuses, LED_Pause_Timer_Has_Timed_Out);
+				led_pause_counter = 0;
 			}
 		}
 	}

@@ -12,6 +12,8 @@
 volatile extern uint32_t statuses;
 extern uint32_t midi_counter;
 extern uint32_t idle_counter;
-extern uint32_t preset_save_idle_counter;
+extern uint32_t preset_save_select_idle_counter;
+extern uint32_t led_pause_counter;
+volatile extern enum Validate save_or_preset_mode_engaged;
 
 #endif /* INC_MAIN_H_ */
