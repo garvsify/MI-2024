@@ -1422,6 +1422,7 @@ void TIM14_callback(TIM_HandleTypeDef *htim){
 
 	if(Get_Status_Bit(&statuses, LED_Pause_Timer_Is_Running) == YES){
 
+		LED_counter = 0;
 		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
 	}
 	else{

@@ -34,11 +34,12 @@ uint8_t Set_LED_to_State(volatile struct LED_FSM *LED_FSM_ptr, enum LED_States d
 			|| (desired_state != LED_ON)
 			|| (desired_state != LED_CONFIRM))
 	{
-		if(!((LED_fsm.prev_state == LED_OFF) || (LED_fsm.prev_state == LED_ON)))
+		if(!((LED_fsm.prev_state == LED_OFF)
+				|| (LED_fsm.prev_state == LED_ON)
+				|| (LED_fsm.prev_state == LED_NONE)))
 		{
 
 			Set_Status_Bit(&statuses, LED_Pause_Timer_Is_Running);
-			Clear_Status_Bit(&statuses, LED_Pause_Timer_Has_Timed_Out);
 		}
 	}
 

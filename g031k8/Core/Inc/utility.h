@@ -42,7 +42,6 @@ enum Status_Bit{
 	Tap_Tempo_Preset_Save_Select_Timer_Is_Running = TAP_TEMPO_PRESET_SAVE_SELECT_TIMER_IS_RUNNING,
 	Tap_Tempo_Preset_Save_Select_Timer_Has_Timed_Out = TAP_TEMPO_PRESET_SAVE_SELECT_TIMER_HAS_TIMED_OUT,
 	LED_Pause_Timer_Is_Running = LED_PAUSE_TIMER_IS_RUNNING,
-	LED_Pause_Timer_Has_Timed_Out = LED_PAUSE_TIMER_HAS_TIMED_OUT,
 };
 
 //FUNCTION DECLARATIONS

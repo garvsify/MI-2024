@@ -80,7 +80,6 @@ int main(void)
 			else{
 
 				Clear_Status_Bit(&statuses, LED_Pause_Timer_Is_Running);
-				Set_Status_Bit(&statuses, LED_Pause_Timer_Has_Timed_Out);
 				led_pause_counter = 0;
 			}
 		}
