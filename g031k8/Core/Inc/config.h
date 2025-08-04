@@ -28,6 +28,12 @@
 #define ADC_CH5_Pin GPIO_PIN_5
 #define ADC_CH5_GPIO_Port GPIOA
 
+#define ADC_CH6_Pin GPIO_PIN_6
+#define ADC_CH6_GPIO_Port GPIOA
+
+#define ADC_CH16_Pin GPIO_PIN_12
+#define ADC_CH16_GPIO_Port GPIOA
+
 #define MAIN_OSCILLATOR_Pin GPIO_PIN_3
 #define MAIN_OSCILLATOR_GPIO_Port GPIOB
 
@@ -52,11 +58,13 @@
 #define CLK_IN_Pin GPIO_PIN_7
 #define CLK_IN_GPIO_Port GPIOB
 
-#define HACK_POT_HIGH_Pin GPIO_PIN_12
-#define HACK_POT_HIGH_GPIO_Port GPIOA
+#define HACK_POT_HIGH_Pin GPIO_PIN_12 //needs to be changed!
+#define HACK_POT_HIGH_GPIO_Port GPIOA //needs to be changed!
 
 #define HACK_POT_LOW_Pin GPIO_PIN_7
 #define HACK_POT_LOW_GPIO_Port GPIOA
+
+#define NUM_ADC_CONVERSIONS 6
 
 //create instance of peripheral structs (handles)
 extern ADC_HandleTypeDef hadc1;
