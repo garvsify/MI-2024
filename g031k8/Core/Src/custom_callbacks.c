@@ -1,7 +1,5 @@
 #include "custom_callbacks.h"
 
-volatile enum Validate save_or_preset_mode_engaged = NO;
-
 void TIM16_callback(TIM_HandleTypeDef *htim)
 {
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);

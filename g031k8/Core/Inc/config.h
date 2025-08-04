@@ -64,8 +64,6 @@
 #define HACK_POT_LOW_Pin GPIO_PIN_7
 #define HACK_POT_LOW_GPIO_Port GPIOA
 
-#define NUM_ADC_CONVERSIONS 6
-
 //create instance of peripheral structs (handles)
 extern ADC_HandleTypeDef hadc1;
 extern DMA_HandleTypeDef hdma_adc1;
