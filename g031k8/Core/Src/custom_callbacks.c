@@ -232,7 +232,7 @@ void UART2_TX_transfer_complete_callback(UART_HandleTypeDef *huart){
 	//UART_DMA_TX_is_complete = YES;
 }
 
-void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
+void __attribute__((optimize("O0")))UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
 	if(Is_System_Real_Time_Status_Byte(rx_buffer) == YES){
 
@@ -1106,7 +1106,7 @@ void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
 }
 
-void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
+void __attribute__((optimize("O0")))LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 	static volatile struct Tap_Tempo_Switch_States tap_tempo_switch_states = {0};
 	static volatile enum Validate preset_save_mode_is_active = NO;
@@ -1422,7 +1422,7 @@ void TIM17_callback(TIM_HandleTypeDef *htim){
 
 }
 
-void TIM14_callback(TIM_HandleTypeDef *htim){
+void __attribute__((optimize("O0")))TIM14_callback(TIM_HandleTypeDef *htim){
 
 	if(LED_fsm.current_state == LED_ON){
 
