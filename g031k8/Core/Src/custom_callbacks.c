@@ -12,7 +12,7 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	Set_Oscillator_Values(&params);
 	Calculate_Next_Main_Oscillator_Values(&params, (enum Next_Values_Processing_Mode)REGULAR_MODE);
 	Write_Next_Main_Oscillator_Values_to_Delay_Line(&params, &delay_line);
-	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions); //this function takes ages to execute!
+	//HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions); //this function takes ages to execute!
 
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
 }
@@ -46,6 +46,8 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 	if(Get_Status_Bit(&statuses, Initial_ADC_Conversion_Complete) == NO){
 		Set_Status_Bit(&statuses, Initial_ADC_Conversion_Complete);
 	}
+
+	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions);
 
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
 }
