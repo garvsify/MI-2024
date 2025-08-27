@@ -9,6 +9,7 @@
 #define THIRD_QUADRANT_START_INDEX 256
 #define FOURTH_QUADRANT_START_INDEX 384
 #define FINAL_INDEX 511
+#define DELAY_LINE_FINAL_INDEX 1023 //actually one more than this in real array
 #define TRIANGLE_MODE 0
 #define SINE_MODE 1
 #define SQUARE_MODE 2

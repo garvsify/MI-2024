@@ -2,7 +2,7 @@
 #define INC_TIMERS_H_
 
 //DEFINES
-#define HTIM17_DMA_M2M_DELAY 8000
+#define HTIM17_DMA_M2M_DELAY 2000
 
 //INCLUDES
 #include <stdint.h>

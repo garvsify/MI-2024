@@ -1415,7 +1415,7 @@ void __attribute__((optimize("O0")))LPTIM1_callback(LPTIM_HandleTypeDef *hlptim)
 
 void TIM17_callback(TIM_HandleTypeDef *htim){
 
-	HAL_DMA_Start_IT(&hdma_memtomem_dma1_channel4, (uint32_t)&params.prev_duty, (uint32_t)&params.duty_delayed, sizeof(params.prev_duty));
+	HAL_DMA_Start_IT(&hdma_memtomem_dma1_channel4, (uint32_t)&params.prev_duty, (uint32_t)&params.duty_temp, sizeof(params.prev_duty));
 }
 
 void __attribute__((optimize("O0")))TIM14_callback(TIM_HandleTypeDef *htim){
@@ -1567,6 +1567,9 @@ void __attribute__((optimize("O0")))TIM14_callback(TIM_HandleTypeDef *htim){
 void DMA_M2M_Callback(DMA_HandleTypeDef *hdma){
 
 	HAL_GPIO_WritePin(MONITOR_2_GPIO_Port, MONITOR_2_Pin, 1);
+
+	Write_Next_Main_Oscillator_Values_to_Delay_Line(&params, &delay_line);
+	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, params.duty_delayed); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
 
 	Start_DMA_M2M_Timer();
 

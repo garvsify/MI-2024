@@ -17,7 +17,7 @@ struct Params params_to_be_loaded = {0};
 struct Params params_working = {0};
 struct Delay_Line delay_line = {.duty_delay_line_storage_array = 0, //one index larger than the number of indexes (wave samples) to allow us to 'wrap' the array into a kind of circular buffer - this is reinitialised to mid-scale on runtime
 								.duty_delay_line_start_offset = 1,  //initial value is 1st index - to give us space to fill index 0
-								.duty_delay_line_finish_offset = FINAL_INDEX + 1}; //initial value is 512th index, one larger than the index of the final sample
+								.duty_delay_line_finish_offset = DELAY_LINE_FINAL_INDEX + 1}; //initial value is 512th index, one larger than the index of the final sample
 
 //FUNCTION DEFINITIONS
 uint8_t Start_PWM_Gen_Timer_Main_and_Secondary_Oscillators(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel_1, uint32_t PWM_TIM_channel_2)
@@ -76,7 +76,7 @@ uint8_t Set_Oscillator_Values(struct Params* params_ptr){
 	/////////////////////////////////////////////////////////////
 	//SET THE CURRENT(prev) VALUES FOR THE SECONDARY OSCILLATOR//
 	/////////////////////////////////////////////////////////////
-	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, params_ptr->duty_delayed); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
+	//__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, params_ptr->duty_delayed); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
 
 	return 1;
 }
@@ -175,19 +175,19 @@ uint8_t Write_Next_Main_Oscillator_Values_to_Delay_Line(struct Params* params_pt
 
 	//STORE THE VALUES IN THE APPROPRIATE '0TH - 1' INDEX RELATIVE TO THE START POINTER
 		if(delay_line_ptr->duty_delay_line_start_offset != 0){
-			delay_line_ptr->duty_delay_line_storage_array[delay_line_ptr->duty_delay_line_start_offset - 1] = params_ptr->duty;
+			delay_line_ptr->duty_delay_line_storage_array[delay_line_ptr->duty_delay_line_start_offset - 1] = params_ptr->duty_temp;
 		}
 		else{
-			delay_line_ptr->duty_delay_line_storage_array[FINAL_INDEX + 1] = params_ptr->duty;
+			delay_line_ptr->duty_delay_line_storage_array[DELAY_LINE_FINAL_INDEX + 1] = params_ptr->duty_temp;
 		}
 
 		//DECREMENT THE START AND FINISH POINTERS
 		if(delay_line_ptr->duty_delay_line_start_offset == 0){
-			delay_line_ptr->duty_delay_line_start_offset = FINAL_INDEX + 1;
+			delay_line_ptr->duty_delay_line_start_offset = DELAY_LINE_FINAL_INDEX + 1;
 			delay_line_ptr->duty_delay_line_finish_offset = delay_line_ptr->duty_delay_line_finish_offset - 1;
 		}
 		else if(delay_line_ptr->duty_delay_line_finish_offset == 0){
-			delay_line_ptr->duty_delay_line_finish_offset = FINAL_INDEX + 1;
+			delay_line_ptr->duty_delay_line_finish_offset = DELAY_LINE_FINAL_INDEX + 1;
 			delay_line_ptr->duty_delay_line_start_offset = delay_line_ptr->duty_delay_line_start_offset - 1;
 		}
 		else{
@@ -196,8 +196,8 @@ uint8_t Write_Next_Main_Oscillator_Values_to_Delay_Line(struct Params* params_pt
 		}
 
 		//DETERMINE THE DELAYED WAVE'S VALUES
-		if(delay_line_ptr->duty_delay_line_start_offset + params_ptr->duty_delay_line_read_pointer_offset > FINAL_INDEX + 1){ //if the desired starting index falls off the end of the array
-			params_ptr->duty_delayed = *(delay_line_ptr->duty_delay_line_storage_array + (delay_line_ptr->duty_delay_line_start_offset + params_ptr->duty_delay_line_read_pointer_offset - (FINAL_INDEX + 1)));
+		if(delay_line_ptr->duty_delay_line_start_offset + params_ptr->duty_delay_line_read_pointer_offset > DELAY_LINE_FINAL_INDEX + 1){ //if the desired starting index falls off the end of the array
+			params_ptr->duty_delayed = *(delay_line_ptr->duty_delay_line_storage_array + (delay_line_ptr->duty_delay_line_start_offset + params_ptr->duty_delay_line_read_pointer_offset - (DELAY_LINE_FINAL_INDEX + 1)));
 		}
 		else{
 			params_ptr->duty_delayed = *(delay_line_ptr->duty_delay_line_storage_array + delay_line_ptr->duty_delay_line_start_offset + params_ptr->duty_delay_line_read_pointer_offset);
