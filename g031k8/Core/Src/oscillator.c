@@ -8,7 +8,7 @@ const uint16_t TIM16_prescalers[6] = {2048, 1024, 512, 256, 128, 64}; //2048 is 
 const uint8_t num_ADC_conversions = sizeof(ADCResultsDMA) / sizeof(ADCResultsDMA[0]);
 
 //VARIABLE DEFINITIONS
-volatile uint16_t ADCResultsDMA[6] = {0};
+volatile uint16_t ADCResultsDMA[5] = {0};
 
 //STRUCT VARIABLES
 struct Params params = {0};
@@ -73,10 +73,10 @@ uint8_t Set_Oscillator_Values(struct Params* params_ptr){
 
 	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, params_ptr->prev_duty); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
 
-	/*/////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////
 	//SET THE CURRENT(prev) VALUES FOR THE SECONDARY OSCILLATOR//
 	/////////////////////////////////////////////////////////////
-	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, params_ptr->duty_delay);*/ //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
+	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, params_ptr->duty_delayed); //updates the CCR register of TIM14, which sets duty, i.e. the ON time relative to the total period which is set by the ARR.
 
 	return 1;
 }
@@ -248,11 +248,6 @@ uint8_t Process_ADC_Conversion_Values(struct Params* params_ptr, volatile uint16
 	uint16_t temp_delay = ADCResultsDMA_ptr[DUTY_DELAY_LINE_READ_POINTER_OFFSET_ADC_RESULT_INDEX] >> 5; //truncate to 7-bit
 	temp_delay <<= 2; //convert to 9-bit
 	params_ptr->duty_delay_line_read_pointer_offset = temp_delay;
-
-	uint16_t temp_sample = ADCResultsDMA_ptr[SAMPLE_ADC_RESULT_INDEX];
-	temp_sample >>= 2; //convert to 10-bit
-	params_ptr->sample = temp_sample;
-	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, params_ptr->sample);
 
 	return 1;
 }

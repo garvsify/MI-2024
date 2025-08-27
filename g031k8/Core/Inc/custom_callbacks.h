@@ -26,5 +26,6 @@ void __attribute__((optimize("O0")))TIM14_callback(TIM_HandleTypeDef *htim);
 void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin);
 void UART2_TX_transfer_complete_callback(UART_HandleTypeDef *huart);
 void __attribute__((optimize("O0")))UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart);
+void DMA_M2M_Callback(DMA_HandleTypeDef *hdma);
 
 #endif /* INC_CUSTOM_CALLBACKS_H_ */

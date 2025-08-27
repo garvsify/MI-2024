@@ -63,6 +63,10 @@ uint8_t __attribute__((optimize("O0")))Startup(void){
 	Start_PWM_Gen_Timer_Main_and_Secondary_Oscillators(&htim1, TIM_CHANNEL_2, TIM_CHANNEL_4);
 	Start_Freq_Gen_Timer();
 
+	//START DMA TRANSFERS
+	//HAL_DMA_Start_IT(&hdma_memtomem_dma1_channel4, (uint32_t)&params.prev_duty, (uint32_t)&params.duty_delayed, sizeof(params.prev_duty));
+	Start_DMA_M2M_Timer();
+
 	//START UART RECEIVE
 	Start_UART_Receive();
 

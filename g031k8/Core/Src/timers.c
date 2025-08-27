@@ -26,3 +26,13 @@ uint8_t Stop_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t OC_TIM_channel){
 
 	return ok;
 }
+
+uint8_t Start_DMA_M2M_Timer(void){
+
+	Stop_OC_TIM(&htim17, TIM_CHANNEL_1);
+	__HAL_TIM_SET_COUNTER(&htim17, 0);
+	__HAL_TIM_SET_COMPARE(&htim17, TIM_CHANNEL_1, HTIM17_DMA_M2M_DELAY);
+	Start_OC_TIM(&htim17, TIM_CHANNEL_1);
+
+	return 1;
+}

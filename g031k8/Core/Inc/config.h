@@ -52,6 +52,7 @@ extern TIM_HandleTypeDef htim1;
 extern UART_HandleTypeDef huart2;
 extern DMA_HandleTypeDef hdma_usart2_rx;
 extern DMA_HandleTypeDef hdma_usart2_tx;
+extern DMA_HandleTypeDef hdma_memtomem_dma1_channel4;
 
 extern IWDG_HandleTypeDef hiwdg;
 
