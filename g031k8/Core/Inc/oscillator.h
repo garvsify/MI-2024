@@ -47,7 +47,7 @@ extern const uint16_t tri_wavetable[512];
 extern const uint16_t TIM16_prescalers[6];
 
 //VARIABLES
-volatile extern uint16_t ADCResultsDMA[5];
+volatile extern uint16_t ADCResultsDMA[6];
 const extern uint8_t num_ADC_conversions;
 
 //STRUCT VARIABLES

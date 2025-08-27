@@ -9,54 +9,34 @@
 #define T_VCP_TX_GPIO_Port GPIOA
 #define T_VCP_RX_Pin GPIO_PIN_3
 #define T_VCP_RX_GPIO_Port GPIOA
+#define HACK_POT_LOW_Pin GPIO_PIN_7
+#define HACK_POT_LOW_GPIO_Port GPIOA
+#define SW_OUT_Pin GPIO_PIN_9
+#define SW_OUT_GPIO_Port GPIOA
 #define LD3_Pin GPIO_PIN_6
 #define LD3_GPIO_Port GPIOC
+#define SW_IN_Pin GPIO_PIN_10
+#define SW_IN_GPIO_Port GPIOA
+#define SW_IN_EXTI_IRQn EXTI4_15_IRQn
+#define SECONDARY_OSCILLATOR_Pin GPIO_PIN_11
+#define SECONDARY_OSCILLATOR_GPIO_Port GPIOA
+#define HACK_POT_HIGH_Pin GPIO_PIN_12
+#define HACK_POT_HIGH_GPIO_Port GPIOA
 #define T_JTMS_Pin GPIO_PIN_13
 #define T_JTMS_GPIO_Port GPIOA
 #define T_JTCK_Pin GPIO_PIN_14
 #define T_JTCK_GPIO_Port GPIOA
-
-#define ADC_CH0_Pin GPIO_PIN_0
-#define ADC_CH0_GPIO_Port GPIOA
-
-#define ADC_CH1_Pin GPIO_PIN_1
-#define ADC_CH1_GPIO_Port GPIOA
-
-#define ADC_CH4_Pin GPIO_PIN_4
-#define ADC_CH4_GPIO_Port GPIOA
-
-#define ADC_CH5_Pin GPIO_PIN_5
-#define ADC_CH5_GPIO_Port GPIOA
-
-#define MAIN_OSCILLATOR_Pin GPIO_PIN_3
-#define MAIN_OSCILLATOR_GPIO_Port GPIOB
-
-#define SECONDARY_OSCILLATOR_Pin GPIO_PIN_11
-#define SECONDARY_OSCILLATOR_GPIO_Port GPIOA
-
 #define IP_CAP_Pin GPIO_PIN_15
 #define IP_CAP_GPIO_Port GPIOA
-
-#define SW_OUT_Pin GPIO_PIN_9
-#define SW_OUT_GPIO_Port GPIOA
-
-#define SW_IN_Pin GPIO_PIN_10
-#define SW_IN_GPIO_Port GPIOA
-
-#define MONITOR_Pin GPIO_PIN_6
-#define MONITOR_GPIO_Port GPIOB
-
+#define MAIN_OSCILLATOR_Pin GPIO_PIN_3
+#define MAIN_OSCILLATOR_GPIO_Port GPIOB
 #define MONITOR_2_Pin GPIO_PIN_4
 #define MONITOR_2_GPIO_Port GPIOB
-
-#define CLK_IN_Pin GPIO_PIN_7
+#define MONITOR_Pin GPIO_PIN_6
+#define MONITOR_GPIO_Port GPIOB
+#define CLK_IN_Pin GPIO_PIN_8
 #define CLK_IN_GPIO_Port GPIOB
-
-#define HACK_POT_HIGH_Pin GPIO_PIN_12
-#define HACK_POT_HIGH_GPIO_Port GPIOA
-
-#define HACK_POT_LOW_Pin GPIO_PIN_7
-#define HACK_POT_LOW_GPIO_Port GPIOA
+#define CLK_IN_EXTI_IRQn EXTI4_15_IRQn
 
 //create instance of peripheral structs (handles)
 extern ADC_HandleTypeDef hadc1;

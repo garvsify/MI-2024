@@ -8,7 +8,7 @@ const uint16_t TIM16_prescalers[6] = {2048, 1024, 512, 256, 128, 64}; //2048 is 
 const uint8_t num_ADC_conversions = sizeof(ADCResultsDMA) / sizeof(ADCResultsDMA[0]);
 
 //VARIABLE DEFINITIONS
-volatile uint16_t ADCResultsDMA[5] = {0};
+volatile uint16_t ADCResultsDMA[6] = {0};
 
 //STRUCT VARIABLES
 struct Params params = {0};

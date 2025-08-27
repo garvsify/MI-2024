@@ -65,6 +65,8 @@ void Error_Handler(void);
 #define T_VCP_TX_GPIO_Port GPIOA
 #define T_VCP_RX_Pin GPIO_PIN_3
 #define T_VCP_RX_GPIO_Port GPIOA
+#define HACK_POT_LOW_Pin GPIO_PIN_7
+#define HACK_POT_LOW_GPIO_Port GPIOA
 #define SW_OUT_Pin GPIO_PIN_9
 #define SW_OUT_GPIO_Port GPIOA
 #define LD3_Pin GPIO_PIN_6
@@ -74,6 +76,8 @@ void Error_Handler(void);
 #define SW_IN_EXTI_IRQn EXTI4_15_IRQn
 #define SECONDARY_OSCILLATOR_Pin GPIO_PIN_11
 #define SECONDARY_OSCILLATOR_GPIO_Port GPIOA
+#define HACK_POT_HIGH_Pin GPIO_PIN_12
+#define HACK_POT_HIGH_GPIO_Port GPIOA
 #define T_JTMS_Pin GPIO_PIN_13
 #define T_JTMS_GPIO_Port GPIOA
 #define T_JTCK_Pin GPIO_PIN_14
@@ -82,6 +86,13 @@ void Error_Handler(void);
 #define IP_CAP_GPIO_Port GPIOA
 #define MAIN_OSCILLATOR_Pin GPIO_PIN_3
 #define MAIN_OSCILLATOR_GPIO_Port GPIOB
+#define MONITOR_2_Pin GPIO_PIN_4
+#define MONITOR_2_GPIO_Port GPIOB
+#define MONITOR_Pin GPIO_PIN_6
+#define MONITOR_GPIO_Port GPIOB
+#define CLK_IN_Pin GPIO_PIN_8
+#define CLK_IN_GPIO_Port GPIOB
+#define CLK_IN_EXTI_IRQn EXTI4_15_IRQn
 
 /* USER CODE BEGIN Private defines */
 

@@ -1,10 +1,5 @@
 #include "custom_callbacks.h"
 
-//debug
-uint64_t depressed_num = 0;
-enum Validate latched = NO;
-//debug
-
 void TIM16_callback(TIM_HandleTypeDef *htim)
 {
 	HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
@@ -44,6 +39,7 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 
 	//after initial conversion is complete, set the conversion complete flag - leave this after raw/final value processing rather than actually when ADC values are converted for startup routine reasons.
 	if(Get_Status_Bit(&statuses, Initial_ADC_Conversion_Complete) == NO){
+
 		Set_Status_Bit(&statuses, Initial_ADC_Conversion_Complete);
 	}
 
