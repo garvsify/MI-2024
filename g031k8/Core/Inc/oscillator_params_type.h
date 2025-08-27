@@ -11,6 +11,7 @@
 struct Params{
 
 	volatile uint16_t duty;
+	volatile uint16_t sample;
 	volatile uint16_t prev_duty;
 	volatile uint16_t duty_delayed;
 	volatile uint8_t waveshape;
