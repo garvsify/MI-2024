@@ -40,7 +40,7 @@ enum Status_Bit{
 	Pots_Counter_Has_Timed_Out = POTS_COUNTER_HAS_TIMED_OUT,
 	Tap_Tempo_Preset_Save_Timer_Is_Running = TAP_TEMPO_PRESET_SAVE_TIMER_IS_RUNNING,
 	Tap_Tempo_Preset_Save_Timer_Has_Timed_Out = TAP_TEMPO_PRESET_SAVE_TIMER_HAS_TIMED_OUT,
-	Processing_Mutex = PROCESSING_MUTEX,
+	Waiting_For_Processing = WAITING_FOR_PROCESSING,
 };
 
 //FUNCTION DECLARATIONS

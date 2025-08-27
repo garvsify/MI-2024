@@ -36,6 +36,7 @@ uint8_t __attribute__((optimize("O0")))Startup(void){
 															  NUM_PRESETS);
 
 	//GET ADC VALUES
+	Set_Status_Bit(&statuses, Waiting_For_Processing);
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions);
 
 	//WAIT

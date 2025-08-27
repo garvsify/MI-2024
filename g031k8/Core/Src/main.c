@@ -13,7 +13,7 @@ Potential Issues:
 //INCLUDES
 #include "main.h"
 
-int main(void)
+int __attribute__((optimize("O0")))main(void)
 {
 	//SYSTEM INIT
 	System_Init();

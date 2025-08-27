@@ -87,7 +87,7 @@ void MX_TIM16_Init(void); //Frequency Gen.
 void MX_TIM2_Init(void); //I/P Capture Measurement is TIM2_ch1,
 void MX_TIM3_Init(void); //I/P Capture Measurement Re-Elapse is TIM3_ch1,
 void MX_TIM1_Init(void); //PWM Gen. Main/Secondary Oscillator
-void MX_TIM17_Init(void); //EXTI Interrupt Enable
+void MX_TIM17_Init(void); //DMA Timer
 void MX_TIM14_Init(void);
 void MX_IWDG_Init(void);
 void MX_LPTIM1_Init(void); //Tap tempo checking/debouncing timer

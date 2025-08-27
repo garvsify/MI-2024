@@ -2,55 +2,56 @@
 
 void __attribute__((optimize("O0")))TIM16_callback(TIM_HandleTypeDef *htim)
 {
-	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
+	HAL_GPIO_WritePin(MONITOR_2_GPIO_Port, MONITOR_2_Pin, 1);
 
 	Set_Oscillator_Values(&params);
+
 	Calculate_Next_Main_Oscillator_Values(&params, (enum Next_Values_Processing_Mode)REGULAR_MODE);
 	Write_Next_Main_Oscillator_Values_to_Delay_Line(&params, &delay_line);
-	//HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions); //this function takes ages to execute!
 
-	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
+	Set_Status_Bit(&statuses, Waiting_For_Processing);
+
+	HAL_GPIO_WritePin(MONITOR_2_GPIO_Port, MONITOR_2_Pin, 0);
 }
 
 void __attribute__((optimize("O0")))ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 {
-	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
-
-	Clear_Status_Bit(&statuses, Processing_Mutex);
 
 	HAL_ADC_Stop_DMA(hadc); //disable ADC DMA
 
-	Process_ADC_Conversion_Values(&params_manual, ADCResultsDMA);
+	if(Get_Status_Bit(&statuses, Waiting_For_Processing) == YES){
 
-	//copies into running params based on mode
-	Update_Params_Based_On_Mode_Selected();
+		Clear_Status_Bit(&statuses, Waiting_For_Processing);
 
-	enum Validate first_sync_complete = Get_Status_Bit(&statuses, First_Sync_Complete);
+		Process_ADC_Conversion_Values(&params_manual, ADCResultsDMA);
 
-	//overwrites raw speed values if a sync has completed
-	if(first_sync_complete == YES){
+		//copies into running params based on mode
+		Update_Params_Based_On_Mode_Selected();
 
-		params.raw_start_value = params_working.raw_start_value;
-		params.raw_prescaler = params_working.raw_prescaler;
+		enum Validate first_sync_complete = Get_Status_Bit(&statuses, First_Sync_Complete);
+
+		//overwrites raw speed values if a sync has completed
+		if(first_sync_complete == YES){
+
+			params.raw_start_value = params_working.raw_start_value;
+			params.raw_prescaler = params_working.raw_prescaler;
+		}
+		else{
+
+			Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(&params);
+		}
+
+		Process_TIM16_Final_Start_Value_and_Final_Prescaler(&params);
+
+		//after initial conversion is complete, set the conversion complete flag - leave this after raw/final value processing rather than actually when ADC values are converted for startup routine reasons.
+		if(Get_Status_Bit(&statuses, Initial_ADC_Conversion_Complete) == NO){
+
+			Set_Status_Bit(&statuses, Initial_ADC_Conversion_Complete);
+		}
+
 	}
-	else{
-
-		Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(&params);
-	}
-
-	Process_TIM16_Final_Start_Value_and_Final_Prescaler(&params);
-
-	//after initial conversion is complete, set the conversion complete flag - leave this after raw/final value processing rather than actually when ADC values are converted for startup routine reasons.
-	if(Get_Status_Bit(&statuses, Initial_ADC_Conversion_Complete) == NO){
-
-		Set_Status_Bit(&statuses, Initial_ADC_Conversion_Complete);
-	}
-
-	//HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions);
 
 	Start_DMA_Timer();
-
-	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
 }
 
 void __attribute__((optimize("O0")))TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
@@ -1422,8 +1423,11 @@ void __attribute__((optimize("O0")))LPTIM1_callback(LPTIM_HandleTypeDef *hlptim)
 
 void __attribute__((optimize("O0")))TIM17_callback(TIM_HandleTypeDef *htim){
 
-	Set_Status_Bit(&statuses, Processing_Mutex);
+	HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
+
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions);
+
+	HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
 }
 
 void __attribute__((optimize("O0")))TIM14_callback(TIM_HandleTypeDef *htim){
