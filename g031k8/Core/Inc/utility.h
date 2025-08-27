@@ -40,15 +40,16 @@ enum Status_Bit{
 	Pots_Counter_Has_Timed_Out = POTS_COUNTER_HAS_TIMED_OUT,
 	Tap_Tempo_Preset_Save_Timer_Is_Running = TAP_TEMPO_PRESET_SAVE_TIMER_IS_RUNNING,
 	Tap_Tempo_Preset_Save_Timer_Has_Timed_Out = TAP_TEMPO_PRESET_SAVE_TIMER_HAS_TIMED_OUT,
+	Processing_Mutex = PROCESSING_MUTEX,
 };
 
 //FUNCTION DECLARATIONS
-enum Validate isPrime(uint16_t x);
-uint32_t unsigned_bitwise_modulo(uint32_t dividend, uint8_t base_2_exponent);
-uint8_t Global_Interrupt_Enable(void);
-uint8_t Global_Interrupt_Disable(void);
-enum Validate Get_Status_Bit(volatile uint32_t *bits, enum Status_Bit bit);
-void Set_Status_Bit(volatile uint32_t *bits, enum Status_Bit bit);
-void Clear_Status_Bit(volatile uint32_t *bits, enum Status_Bit bit);
+enum Validate __attribute__((optimize("O0")))isPrime(uint16_t x);
+uint32_t __attribute__((optimize("O0")))unsigned_bitwise_modulo(uint32_t dividend, uint8_t base_2_exponent);
+uint8_t __attribute__((optimize("O0")))Global_Interrupt_Enable(void);
+uint8_t __attribute__((optimize("O0")))Global_Interrupt_Disable(void);
+enum Validate __attribute__((optimize("O0")))Get_Status_Bit(volatile uint32_t *bits, enum Status_Bit bit);
+void __attribute__((optimize("O0")))Set_Status_Bit(volatile uint32_t *bits, enum Status_Bit bit);
+void __attribute__((optimize("O0")))Clear_Status_Bit(volatile uint32_t *bits, enum Status_Bit bit);
 
 #endif /* SRC_UTILITY_H_ */

@@ -1,7 +1,7 @@
-../Core/Src/utility.c:3:15:isPrime	16	static
-../Core/Src/utility.c:11:10:unsigned_bitwise_modulo	0	static
-../Core/Src/utility.c:16:9:Global_Interrupt_Enable	0	static,ignoring_inline_asm
-../Core/Src/utility.c:22:9:Global_Interrupt_Disable	0	static,ignoring_inline_asm
-../Core/Src/utility.c:28:15:Get_Status_Bit	0	static
-../Core/Src/utility.c:41:6:Set_Status_Bit	0	static
-../Core/Src/utility.c:46:6:Clear_Status_Bit	0	static
+../Core/Src/utility.c:3:46:isPrime	24	static
+../Core/Src/utility.c:11:41:unsigned_bitwise_modulo	16	static
+../Core/Src/utility.c:16:40:Global_Interrupt_Enable	8	static,ignoring_inline_asm
+../Core/Src/utility.c:22:40:Global_Interrupt_Disable	8	static,ignoring_inline_asm
+../Core/Src/utility.c:28:46:Get_Status_Bit	16	static
+../Core/Src/utility.c:41:37:Set_Status_Bit	16	static
+../Core/Src/utility.c:46:37:Clear_Status_Bit	16	static

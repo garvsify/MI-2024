@@ -10,7 +10,7 @@ volatile uint8_t phase_pot_adc_measurement_num = 0;
 volatile uint8_t pots_counter = 0;
 
 //FUNCTION DEFINITIONS
-uint8_t Pot_Check(volatile uint16_t* ADCResults_arr, enum Pot_Type pot_type){
+uint8_t __attribute__((optimize("O0")))Pot_Check(volatile uint16_t* ADCResults_arr, enum Pot_Type pot_type){
 
 	static uint16_t first_waveshape_measurement;
 	static uint16_t second_waveshape_measurement;
@@ -135,7 +135,7 @@ uint8_t Pot_Check(volatile uint16_t* ADCResults_arr, enum Pot_Type pot_type){
 	return 1;
 }
 
-uint8_t Check_Tap_Tempo_Switch_State(volatile struct Tap_Tempo_Switch_States *tap_tempo_switch_states_ptr){
+uint8_t __attribute__((optimize("O0")))Check_Tap_Tempo_Switch_State(volatile struct Tap_Tempo_Switch_States *tap_tempo_switch_states_ptr){
 
 	static uint8_t extend_rising_edge = 0;
 	static uint8_t tap_tempo_switch_state_counter = TAP_TEMPO_SWITCH_CONFIDENCE_COUNT;

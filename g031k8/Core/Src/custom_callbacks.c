@@ -1,11 +1,6 @@
 #include "custom_callbacks.h"
 
-//debug
-uint64_t depressed_num = 0;
-enum Validate latched = NO;
-//debug
-
-void TIM16_callback(TIM_HandleTypeDef *htim)
+void __attribute__((optimize("O0")))TIM16_callback(TIM_HandleTypeDef *htim)
 {
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
 
@@ -17,11 +12,14 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
 }
 
-void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
+void __attribute__((optimize("O0")))ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 {
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
 
+	Clear_Status_Bit(&statuses, Processing_Mutex);
+
 	HAL_ADC_Stop_DMA(hadc); //disable ADC DMA
+
 	Process_ADC_Conversion_Values(&params_manual, ADCResultsDMA);
 
 	//copies into running params based on mode
@@ -44,15 +42,18 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 
 	//after initial conversion is complete, set the conversion complete flag - leave this after raw/final value processing rather than actually when ADC values are converted for startup routine reasons.
 	if(Get_Status_Bit(&statuses, Initial_ADC_Conversion_Complete) == NO){
+
 		Set_Status_Bit(&statuses, Initial_ADC_Conversion_Complete);
 	}
 
-	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions);
+	//HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions);
+
+	Start_DMA_Timer();
 
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
 }
 
-void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
+void __attribute__((optimize("O0")))TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 
 	TIM2_ch1_input_capture_value = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
 
@@ -136,7 +137,7 @@ void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
 }
 
 
-void TIM2_ch1_overflow_callback(TIM_HandleTypeDef *htim){
+void __attribute__((optimize("O0")))TIM2_ch1_overflow_callback(TIM_HandleTypeDef *htim){
 
 	union Speed_FSM_States previous = speed_fsm.prev_state;
 
@@ -178,7 +179,7 @@ void TIM2_ch1_overflow_callback(TIM_HandleTypeDef *htim){
 	}
 }
 
-void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
+void __attribute__((optimize("O0")))TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
 
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
 
@@ -229,7 +230,7 @@ void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
 }
 
-void UART2_TX_transfer_complete_callback(UART_HandleTypeDef *huart){
+void __attribute__((optimize("O0")))UART2_TX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
 	//UART_DMA_TX_is_complete = YES;
 }
@@ -1014,7 +1015,7 @@ void __attribute__((optimize("O0")))UART2_RX_transfer_complete_callback(UART_Han
 	HAL_UART_Receive_DMA(&huart2, (uint8_t*)rx_buffer, sizeof(rx_buffer));
 }
 
-void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
+void __attribute__((optimize("O0")))HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
 
 	if((GPIO_Pin == CLK_IN_Pin)){ //if specifically CLK IN pin with falling interrupt
 
@@ -1026,7 +1027,7 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
 	}
 }
 
-void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
+void __attribute__((optimize("O0")))HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
 
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
 
@@ -1419,9 +1420,10 @@ void __attribute__((optimize("O0")))LPTIM1_callback(LPTIM_HandleTypeDef *hlptim)
 
 }
 
-void TIM17_callback(TIM_HandleTypeDef *htim){
+void __attribute__((optimize("O0")))TIM17_callback(TIM_HandleTypeDef *htim){
 
-
+	Set_Status_Bit(&statuses, Processing_Mutex);
+	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions);
 }
 
 void __attribute__((optimize("O0")))TIM14_callback(TIM_HandleTypeDef *htim){

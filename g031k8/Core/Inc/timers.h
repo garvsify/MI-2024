@@ -5,9 +5,11 @@
 #include <stdint.h>
 
 #include "config.h"
+#include "utility.h"
 
 //FUNCTION DECLARATIONS
-uint8_t Start_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel);
-uint8_t Stop_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel);
+uint8_t __attribute__((optimize("O0")))Start_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel);
+uint8_t __attribute__((optimize("O0")))Stop_OC_TIM(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel);
+uint8_t __attribute__((optimize("O0")))Check_Software_Timers(void);
 
 #endif /* INC_TIMERS_H_ */
