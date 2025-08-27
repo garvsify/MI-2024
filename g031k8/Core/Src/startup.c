@@ -36,11 +36,11 @@ uint8_t __attribute__((optimize("O0")))Startup(void){
 															  NUM_PRESETS);
 
 	//GET ADC VALUES
-	Set_Status_Bit(&statuses, Waiting_For_Processing);
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions);
 
 	//WAIT
-	while(Get_Status_Bit(&statuses, Initial_ADC_Conversion_Complete) == NO){}; //wait while first ADC conversion is ongoing - raw and final values will be computed within this time
+	//while(Get_Status_Bit(&statuses, Initial_ADC_Conversion_Complete) == NO){}; //wait while first ADC conversion is ongoing - raw and final values will be computed within this time
+	HAL_Delay(10);
 
 	// re-initialise all values in delay line storage array to middle value of wave (if sine/triangle mode) or bottom of wave if square mode, as they are initialised to 0 on startup
 	for(uint16_t i = 0; i < FINAL_INDEX + 2; i++){ //513
@@ -78,6 +78,9 @@ uint8_t __attribute__((optimize("O0")))Startup(void){
 
 	//TURN LED OFF ON STARTUP
 	LED_fsm.current_state = LED_OFF;
+
+	//START DMA
+	Set_Status_Bit(&statuses, DMA_To_Start);
 
 	//ENABLE LED TIMER
 	Start_OC_TIM(&htim14, TIM_CHANNEL_1);

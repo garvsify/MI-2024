@@ -6,6 +6,8 @@
 #define OFF 0
 
 #define START_REQUIRED_BEFORE_SYNC_MODE (0b1 << 7)
+#define DMA_TO_START (0b1 << 15)
+#define FREQ_GEN_OCCURRING (0b1 << 16)
 
 //INCLUDES
 #include <stdint.h>
@@ -41,6 +43,8 @@ enum Status_Bit{
 	Tap_Tempo_Preset_Save_Timer_Is_Running = TAP_TEMPO_PRESET_SAVE_TIMER_IS_RUNNING,
 	Tap_Tempo_Preset_Save_Timer_Has_Timed_Out = TAP_TEMPO_PRESET_SAVE_TIMER_HAS_TIMED_OUT,
 	Waiting_For_Processing = WAITING_FOR_PROCESSING,
+	DMA_To_Start = DMA_TO_START,
+	Freq_Gen_Occurring = FREQ_GEN_OCCURRING,
 };
 
 //FUNCTION DECLARATIONS

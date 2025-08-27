@@ -2,6 +2,7 @@
 
 void __attribute__((optimize("O0")))TIM16_callback(TIM_HandleTypeDef *htim)
 {
+	Clear_Status_Bit(&statuses, DMA_To_Start);
 	HAL_GPIO_WritePin(MONITOR_2_GPIO_Port, MONITOR_2_Pin, 1);
 
 	Set_Oscillator_Values(&params);
@@ -9,53 +10,50 @@ void __attribute__((optimize("O0")))TIM16_callback(TIM_HandleTypeDef *htim)
 	Calculate_Next_Main_Oscillator_Values(&params, (enum Next_Values_Processing_Mode)REGULAR_MODE);
 	Write_Next_Main_Oscillator_Values_to_Delay_Line(&params, &delay_line);
 
-	Set_Status_Bit(&statuses, Waiting_For_Processing);
+	Set_Status_Bit(&statuses, DMA_To_Start);
 
 	HAL_GPIO_WritePin(MONITOR_2_GPIO_Port, MONITOR_2_Pin, 0);
+
 }
 
 void __attribute__((optimize("O0")))ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 {
+	HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
 
 	HAL_ADC_Stop_DMA(hadc); //disable ADC DMA
 
-	if(Get_Status_Bit(&statuses, Waiting_For_Processing) == YES){
+	Process_ADC_Conversion_Values(&params_manual, ADCResultsDMA);
 
-		Clear_Status_Bit(&statuses, Waiting_For_Processing);
+	//copies into running params based on mode
+	Update_Params_Based_On_Mode_Selected();
 
-		Process_ADC_Conversion_Values(&params_manual, ADCResultsDMA);
+	enum Validate first_sync_complete = Get_Status_Bit(&statuses, First_Sync_Complete);
 
-		//copies into running params based on mode
-		Update_Params_Based_On_Mode_Selected();
+	//overwrites raw speed values if a sync has completed
+	if(first_sync_complete == YES){
 
-		enum Validate first_sync_complete = Get_Status_Bit(&statuses, First_Sync_Complete);
+	params.raw_start_value = params_working.raw_start_value;
+	params.raw_prescaler = params_working.raw_prescaler;
+	}
+	else{
 
-		//overwrites raw speed values if a sync has completed
-		if(first_sync_complete == YES){
-
-			params.raw_start_value = params_working.raw_start_value;
-			params.raw_prescaler = params_working.raw_prescaler;
-		}
-		else{
-
-			Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(&params);
-		}
-
-		Process_TIM16_Final_Start_Value_and_Final_Prescaler(&params);
-
-		//after initial conversion is complete, set the conversion complete flag - leave this after raw/final value processing rather than actually when ADC values are converted for startup routine reasons.
-		if(Get_Status_Bit(&statuses, Initial_ADC_Conversion_Complete) == NO){
-
-			Set_Status_Bit(&statuses, Initial_ADC_Conversion_Complete);
-		}
-
+		Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(&params);
 	}
 
-	Start_DMA_Timer();
+	Process_TIM16_Final_Start_Value_and_Final_Prescaler(&params);
+
+	/*//after initial conversion is complete, set the conversion complete flag - leave this after raw/final value processing rather than actually when ADC values are converted for startup routine reasons.
+	if(Get_Status_Bit(&statuses, Initial_ADC_Conversion_Complete) == NO){
+
+
+		Set_Status_Bit(&statuses, Initial_ADC_Conversion_Complete);
+	}*/
+
+	HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
 }
 
-void __attribute__((optimize("O0")))TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
-
+void __attribute__((optimize("O0")))TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim)
+{
 	TIM2_ch1_input_capture_value = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
 
 	interrupt_period = TIM2_ch1_input_capture_value >> 9; //divided by 512
@@ -138,8 +136,8 @@ void __attribute__((optimize("O0")))TIM2_ch1_IP_capture_callback(TIM_HandleTypeD
 }
 
 
-void __attribute__((optimize("O0")))TIM2_ch1_overflow_callback(TIM_HandleTypeDef *htim){
-
+void __attribute__((optimize("O0")))TIM2_ch1_overflow_callback(TIM_HandleTypeDef *htim)
+{
 	union Speed_FSM_States previous = speed_fsm.prev_state;
 
 	if(IP_CAP_fsm.current_state == MEASUREMENT_PENDING){
@@ -180,8 +178,8 @@ void __attribute__((optimize("O0")))TIM2_ch1_overflow_callback(TIM_HandleTypeDef
 	}
 }
 
-void __attribute__((optimize("O0")))TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
-
+void __attribute__((optimize("O0")))TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim)
+{
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
 
 	if(!((speed_fsm.current_state.speed_exclusive_state == MIDI_CLK_PENDING_B0_MODE)
@@ -231,13 +229,13 @@ void __attribute__((optimize("O0")))TIM3_ch1_IP_capture_measurement_reelapse_cal
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
 }
 
-void __attribute__((optimize("O0")))UART2_TX_transfer_complete_callback(UART_HandleTypeDef *huart){
-
+void __attribute__((optimize("O0")))UART2_TX_transfer_complete_callback(UART_HandleTypeDef *huart)
+{
 	//UART_DMA_TX_is_complete = YES;
 }
 
-void __attribute__((optimize("O0")))UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
-
+void __attribute__((optimize("O0")))UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart)
+{
 	if(Is_System_Real_Time_Status_Byte(rx_buffer) == YES){
 
 		if(Get_Status_Bit(&statuses, Start_Required_Before_Sync_Mode) == YES){
@@ -1016,8 +1014,8 @@ void __attribute__((optimize("O0")))UART2_RX_transfer_complete_callback(UART_Han
 	HAL_UART_Receive_DMA(&huart2, (uint8_t*)rx_buffer, sizeof(rx_buffer));
 }
 
-void __attribute__((optimize("O0")))HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
-
+void __attribute__((optimize("O0")))HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
+{
 	if((GPIO_Pin == CLK_IN_Pin)){ //if specifically CLK IN pin with falling interrupt
 
 		if((speed_fsm.current_state.speed_exclusive_state == CLK_IN_MODE) || (speed_fsm.current_state.speed_exclusive_state == CLK_IN_PENDING_MODE)){
@@ -1028,8 +1026,8 @@ void __attribute__((optimize("O0")))HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO
 	}
 }
 
-void __attribute__((optimize("O0")))HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
-
+void __attribute__((optimize("O0")))HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin)
+{
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
 
 	if((GPIO_Pin == CLK_IN_Pin)){ //if specifically CLK IN pin with rising interrupt
@@ -1110,8 +1108,8 @@ void __attribute__((optimize("O0")))HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
 }
 
-void __attribute__((optimize("O0")))LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
-
+void __attribute__((optimize("O0")))LPTIM1_callback(LPTIM_HandleTypeDef *hlptim)
+{
 	static volatile struct Tap_Tempo_Switch_States tap_tempo_switch_states = {0};
 	static volatile enum Validate preset_save_mode_is_active = NO;
 	static volatile enum Validate preset_select_mode_is_active = NO;
@@ -1421,17 +1419,17 @@ void __attribute__((optimize("O0")))LPTIM1_callback(LPTIM_HandleTypeDef *hlptim)
 
 }
 
-void __attribute__((optimize("O0")))TIM17_callback(TIM_HandleTypeDef *htim){
-
-	HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
+void __attribute__((optimize("O0")))TIM17_callback(TIM_HandleTypeDef *htim)
+{
+	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
 
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions);
 
-	HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
+	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
 }
 
-void __attribute__((optimize("O0")))TIM14_callback(TIM_HandleTypeDef *htim){
-
+void __attribute__((optimize("O0")))TIM14_callback(TIM_HandleTypeDef *htim)
+{
 	if(LED_fsm.current_state == LED_ON){
 
 		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
