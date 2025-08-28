@@ -3,7 +3,9 @@
 
 Issues:
 
- - not sure what I'm trying to achieve is even possible lol
+- I've realised that the 'read pointer offset index' needs to be set as a function of the 'speed' since the amount of indexes needed for a given
+percentage phase delay is dependent on the speed of the oscillator. So we need to produce a function that outputs the index delay based on the phase
+pot setting and the speed...
 
 Potential Issues:
 
