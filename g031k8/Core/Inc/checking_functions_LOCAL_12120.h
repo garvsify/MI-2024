@@ -22,7 +22,7 @@
 
 #define IDLE_COUNT 32000 //roughly 300ms
 #define MIDI_COUNT 200000 //roughly 1s
-#define PRESET_SAVE_IDLE_COUNT 3700000 //roughly 10s
+#define PRESET_SAVE_SELECT_IDLE_COUNT 1850000 //roughly 10s
 
 #define POTS_COUNTER_HAS_TIMED_OUT (0b1 << 11)
 

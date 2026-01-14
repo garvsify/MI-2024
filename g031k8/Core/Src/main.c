@@ -14,7 +14,7 @@ Potential Issues:
 #include "main.h"
 #include "main_vars.h"
 
-int main(void)
+int __attribute__((optimize("O0")))main(void)
 {
 	//SYSTEM INIT
 	System_Init();

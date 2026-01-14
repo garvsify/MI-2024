@@ -4,19 +4,19 @@ volatile enum Validate save_or_preset_mode_engaged = NO;
 
 void TIM16_callback(TIM_HandleTypeDef *htim)
 {
-	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
+	HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
 
 	Set_Oscillator_Values(&params);
 	Calculate_Next_Main_Oscillator_Values(&params, (enum Next_Values_Processing_Mode)REGULAR_MODE);
 	Write_Next_Main_Oscillator_Values_to_Delay_Line(&params, &delay_line);
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions); //this function takes ages to execute!
 
-	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
+	HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
 }
 
 void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 {
-	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
+	HAL_GPIO_WritePin(MONITOR_2_GPIO_Port, MONITOR_2_Pin, 1);
 
 	HAL_ADC_Stop_DMA(hadc); //disable ADC DMA
 	Process_ADC_Conversion_Values(&params_manual, ADCResultsDMA);
@@ -44,7 +44,7 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 		Set_Status_Bit(&statuses, Initial_ADC_Conversion_Complete);
 	}
 
-	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
+	HAL_GPIO_WritePin(MONITOR_2_GPIO_Port, MONITOR_2_Pin, 0);
 }
 
 void TIM2_ch1_IP_capture_callback(TIM_HandleTypeDef *htim){
@@ -229,7 +229,7 @@ void UART2_TX_transfer_complete_callback(UART_HandleTypeDef *huart){
 	//UART_DMA_TX_is_complete = YES;
 }
 
-void UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
+void __attribute__((optimize("O0")))UART2_RX_transfer_complete_callback(UART_HandleTypeDef *huart){
 
 	if(Is_System_Real_Time_Status_Byte(rx_buffer) == YES){
 
@@ -1103,7 +1103,7 @@ void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
 }
 
-void LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
+void __attribute__((optimize("O0")))LPTIM1_callback(LPTIM_HandleTypeDef *hlptim){
 
 	static volatile struct Tap_Tempo_Switch_States tap_tempo_switch_states = {0};
 	static volatile enum Validate preset_save_mode_is_active = NO;
@@ -1418,7 +1418,7 @@ void TIM17_callback(TIM_HandleTypeDef *htim){
 
 }
 
-void TIM14_callback(TIM_HandleTypeDef *htim){
+void __attribute__((optimize("O0")))TIM14_callback(TIM_HandleTypeDef *htim){
 
 	if(Get_Status_Bit(&statuses, LED_Pause_Timer_Is_Running) == YES){
 
