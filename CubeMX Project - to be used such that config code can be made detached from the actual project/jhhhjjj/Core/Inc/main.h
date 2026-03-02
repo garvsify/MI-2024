@@ -82,6 +82,8 @@ void Error_Handler(void);
 #define IP_CAP_GPIO_Port GPIOA
 #define MAIN_OSCILLATOR_Pin GPIO_PIN_3
 #define MAIN_OSCILLATOR_GPIO_Port GPIOB
+#define GPIO_Output_SYNC_Pin GPIO_PIN_5
+#define GPIO_Output_SYNC_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 
