@@ -44,7 +44,6 @@
 //CONSTANTS
 extern const uint16_t sine_wavetable[512];
 extern const uint16_t tri_wavetable[512];
-extern const uint16_t TIM16_prescalers[6];
 
 //VARIABLES
 volatile extern uint16_t ADCResultsDMA[5];
@@ -66,7 +65,7 @@ enum Next_Values_Processing_Mode{
 
 struct Delay_Line{
 
-	volatile uint16_t duty_delay_line_storage_array[513]; //one index larger than the number of indexes (wave samples) to allow us to 'wrap' the array into a kind of circular buffer
+	volatile uint16_t duty_delay_line_storage_array[FINAL_INDEX + 2]; //one index larger than the number of indexes (wave samples) to allow us to 'wrap' the array into a kind of circular buffer
 	volatile uint16_t duty_delay_line_start_offset; //initial value is 1st index
 	volatile uint16_t duty_delay_line_finish_offset; //initial value is 512th index (513th value)
 };
