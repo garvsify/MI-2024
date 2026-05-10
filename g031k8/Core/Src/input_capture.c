@@ -6,38 +6,43 @@ volatile uint16_t interrupt_period = 0;
 volatile uint8_t MIDI_CLK_tag = 0;
 
 //FUNCTION DEFINITIONS
+// Input_Capture_Processing
+//
+// Converts the measured input-capture period to a phase_increment value and
+// snaps the phase accumulator to the sync point.
+//
+// Derivation of phase_increment from interrupt_period_value:
+//
+//   TIM2 counts at  16 MHz / 64 (prescaler) = 250 kHz.
+//   interrupt_period = TIM2_capture >> 9  (divides by 512).
+//   N = interrupt_period << 6  =  TIM2_capture * 64 / 512
+//     = TIM2_capture / 8
+//     = (input_period_sec * 250000) / 8
+//     = input_period_sec * 16e6 / 512        [TIM16-clock ticks per LFO sample]
+//
+//   With fixed TIM16 at 16 MHz / 32 / 128 = 3906.25 Hz:
+//     fixed_ticks_per_interrupt = 32 * 128 = 4096
+//
+//   phase_increment = (fixed_ticks / N) * 2^32
+//                   = (4096 / N) * 2^32
+//                   = 2^44 / N
+//                   = 2^35 / interrupt_period_value  (since N = interrupt_period_value << 6)
+//                   = (1<<29) / interrupt_period_value  [after dividing numerator and denominator by 64]
+//
+//   No primality check or integer factorisation loop needed — the phase
+//   accumulator handles any period value exactly.
 uint8_t Input_Capture_Processing(volatile uint16_t interrupt_period_value, struct Params *params_ptr){
 
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 1);
 
 	Clear_Status_Bit(&statuses, Input_Capture_Processing_Can_Be_Started); //reset flag
 
-	//DETERMINE WHAT TO SET THE RAW_START_VALUE AND BASE_PRESCALER TO BASED ON THE I/P CAPTURE VALUE
-	//CHECK FOR PRIMALITY
-	if(isPrime(interrupt_period_value) == YES){
-
-		interrupt_period_value += 1;
-	}
-
-	//START FINDING FACTORS
-	uint32_t N = interrupt_period_value << 6; //calculate the N-value which is prescaler_meas * interrupt_period_meas. The measurement prescaler is used which is 64. (TIM2 has a prescaler of 64*512, but since we divide this value by 512, the prescaler is then just 64).
-
-	for(uint8_t i = 0; i < 129; i++){ //check from period = 264 to 128 - there will be a prescaler for every non-prime value of N
-
-		interrupt_period_value = 256 - i;
-		uint16_t remainder = N % interrupt_period_value;
-
-		if(remainder == 0){ //check if no remainder -> integer
-
-			params_ptr->raw_prescaler = N / interrupt_period_value;
-			break;
-		}
-	}
-
-	params_ptr->raw_start_value = 256 - interrupt_period_value;
+	// Compute phase_increment directly from the measured period.
+	// (1ULL<<29) keeps the intermediate 64-bit before the division.
+	params_ptr->phase_increment = (uint32_t)((1ULL << 29) / (uint32_t)interrupt_period_value);
 
 	Calculate_Next_Main_Oscillator_Values(params_ptr, (enum Next_Values_Processing_Mode)IP_CAPTURE_MODE);
-	Process_TIM16_Final_Start_Value_and_Final_Prescaler(params_ptr);
+	Process_Phase_Accumulator_Symmetry_Increments(params_ptr);
 
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
 

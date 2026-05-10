@@ -26,18 +26,17 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 
 	enum Validate first_sync_complete = Get_Status_Bit(&statuses, First_Sync_Complete);
 
-	//overwrites raw speed values if a sync has completed
+	//overwrites phase increment if a sync has completed (keeps synced speed locked)
 	if(first_sync_complete == YES){
 
-		params.raw_start_value = params_working.raw_start_value;
-		params.raw_prescaler = params_working.raw_prescaler;
+		params.phase_increment = params_working.phase_increment;
 	}
 	else{
 
-		Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(&params);
+		Process_Phase_Accumulator_Base_Increment(&params);
 	}
 
-	Process_TIM16_Final_Start_Value_and_Final_Prescaler(&params);
+	Process_Phase_Accumulator_Symmetry_Increments(&params);
 
 	//after initial conversion is complete, set the conversion complete flag - leave this after raw/final value processing rather than actually when ADC values are converted for startup routine reasons.
 	if(Get_Status_Bit(&statuses, Initial_ADC_Conversion_Complete) == NO){

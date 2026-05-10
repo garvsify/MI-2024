@@ -4,8 +4,6 @@
 //INCLUDES
 #include <stdint.h>
 
-#include "symmetry_adjustment_types.h"
-
 //CUSTOM TYPES
 
 struct Params{
@@ -20,14 +18,13 @@ struct Params{
 	volatile uint16_t index;
 	volatile uint8_t halfcycle;
 	volatile uint8_t quadrant;
-	volatile uint16_t raw_start_value;
-	volatile uint16_t final_start_value;
-	volatile uint16_t final_period;
-	volatile uint16_t final_ARR;
-	volatile uint16_t raw_prescaler;
-	volatile uint16_t final_prescaler;
-	volatile uint16_t final_prescaler_minus_one;
-	volatile enum Adjust_Prescaler_Action prescaler_adjust;
+
+	// Phase accumulator fields (replace timer-based speed/symmetry control)
+	volatile uint32_t phase_accumulator;    // current phase (0 to 2^32-1 spans one full cycle)
+	volatile uint32_t phase_increment;      // base phase step per interrupt, set from speed pot
+	volatile uint32_t phase_increment_A;    // step for Group A quadrants (LENGTHEN-when-CW)
+	volatile uint32_t phase_increment_B;    // step for Group B quadrants (SHORTEN-when-CW)
+
 	volatile uint16_t duty_delay_line_read_pointer_offset;
 };
 

@@ -44,7 +44,6 @@
 //CONSTANTS
 extern const uint16_t sine_wavetable[512];
 extern const uint16_t tri_wavetable[512];
-extern const uint16_t TIM16_prescalers[6];
 
 //VARIABLES
 volatile extern uint16_t ADCResultsDMA[5];
@@ -79,6 +78,6 @@ uint8_t Set_Oscillator_Values(struct Params* params_ptr);
 uint8_t Calculate_Next_Main_Oscillator_Values(struct Params* params_ptr, enum Next_Values_Processing_Mode mode);
 uint8_t Write_Next_Main_Oscillator_Values_to_Delay_Line(struct Params* params_ptr, struct Delay_Line* delay_line_ptr);
 uint8_t Process_ADC_Conversion_Values(struct Params* params_ptr, volatile uint16_t* ADCResultsDMA_ptr);
-uint8_t Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(struct Params* params_ptr);
+uint8_t Process_Phase_Accumulator_Base_Increment(struct Params* params_ptr);
 
 #endif

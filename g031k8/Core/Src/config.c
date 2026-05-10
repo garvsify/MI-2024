@@ -158,10 +158,15 @@ void MX_TIM16_Init(void)
   /* USER CODE BEGIN TIM16_Init 1 */
 
   /* USER CODE END TIM16_Init 1 */
+  // TIM16 — fixed-rate interrupt for the phase accumulator LFO engine.
+  // Input clock = 64 MHz / CKD_DIV4 = 16 MHz.
+  // Interrupt rate = 16 MHz / 32 / 128 = 3906.25 Hz.
+  // Prescaler and ARR must NOT be changed at runtime; speed is now controlled
+  // entirely through the phase_increment value in the params struct.
   htim16.Instance = TIM16;
-  htim16.Init.Prescaler = 0;
+  htim16.Init.Prescaler = PHASE_ACCUM_FIXED_PRESCALER_MINUS_ONE; // divides by 32
   htim16.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim16.Init.Period = 255;
+  htim16.Init.Period = PHASE_ACCUM_FIXED_ARR;                    // 127 → period = 128 counts
   htim16.Init.ClockDivision = TIM_CLOCKDIVISION_DIV4;
   htim16.Init.RepetitionCounter = 0;
   htim16.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
@@ -174,7 +179,7 @@ void MX_TIM16_Init(void)
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_TIMING;
-  sConfigOC.Pulse = 255;
+  sConfigOC.Pulse = PHASE_ACCUM_FIXED_ARR; // CCR = ARR → interrupt fires at end of each period
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCNPolarity = TIM_OCNPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;

@@ -35,8 +35,15 @@
 #define SQUARE_WAVE_TEMPO_PULSE_OFF_INDEX SQUARE_WAVE_TEMPO_APEX_INDEX + TEMPO_PULSE_LENGTH
 
 #define HIGHEST_PRESCALER_TOP_SPEED_PERIOD 129
-#define PRESCALER_DIVISORS_MAX_INDEX 5
-#define SLOWEST_SPEED_PRESCALER 1024
+
+// Phase accumulator: fixed TIM16 configuration
+// TIM16 input clock = 64 MHz / CKD_DIV4 = 16 MHz
+// Interrupt rate = 16 MHz / PHASE_ACCUM_FIXED_PRESCALER / (PHASE_ACCUM_FIXED_ARR + 1)
+//                = 16 MHz / 32 / 128 = 3906.25 Hz
+#define PHASE_ACCUM_FIXED_PRESCALER           32    // TIM16 prescaler value (divides by 32)
+#define PHASE_ACCUM_FIXED_PRESCALER_MINUS_ONE 31    // value written to PSC register
+#define PHASE_ACCUM_FIXED_ARR                 127   // TIM16 auto-reload register (period = 128 counts)
+#define PHASE_ACCUM_SHIFT                     23    // bits to right-shift phase to get 9-bit table index
 
 
 #if SINE_OR_TRIANGLE_WAVE_TEMPO_PERCEIVED_APEX_INDEX < SECOND_QUADRANT_START_INDEX

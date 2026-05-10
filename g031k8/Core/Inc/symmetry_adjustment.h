@@ -8,11 +8,14 @@
 #include "symmetry_adjustment_types.h"
 #include "oscillator.h"
 
-//CUSTOM TYPES
-
-
-//FUNCTION DECLARATIONS
-uint8_t Adjust_TIM16_Prescaler(struct Params* params_ptr);
-uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* params_ptr);
+// Process_Phase_Accumulator_Symmetry_Increments
+//
+// Computes phase_increment_A and phase_increment_B from params_ptr->phase_increment
+// and params_ptr->symmetry.
+//
+// These two increments are used by Calculate_Next_Main_Oscillator_Values to advance
+// the phase accumulator at different rates depending on which quadrant group the
+// oscillator is currently in, creating the waveform symmetry / duty-cycle effect.
+uint8_t Process_Phase_Accumulator_Symmetry_Increments(struct Params* params_ptr);
 
 #endif /* INC_SYMMETRY_ADJUSTMENT_H_ */
