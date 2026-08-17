@@ -1,87 +1,199 @@
 #include "symmetry_adjustment.h"
 
-// Process_Phase_Accumulator_Symmetry_Increments
+// ─────────────────────────────────────────────────────────────────────────────
+// SYMMETRY AS A PHASE WARP
+// ─────────────────────────────────────────────────────────────────────────────
 //
-// Computes phase_increment_A and phase_increment_B such that the overall LFO
-// frequency is EXACTLY preserved regardless of the symmetry pot position.
+// ── Why it is done this way ──────────────────────────────────────────────────
 //
-// ── Why the previous additive formula was wrong ───────────────────────────────
+// The previous implementation gave the phase accumulator two different
+// increments and picked between them according to which quadrant group the
+// oscillator was in.  That produces the right waveform, but it destroys the
+// accumulator as a measure of position in the cycle: the phase value no longer
+// advances at a constant rate, so "half of 2^32" is no longer "half a cycle in
+// time".  With nothing left that measures the cycle linearly, there was no way
+// to place the secondary oscillator at a constant phase offset.
 //
-// In the original timer-overflow design each quadrant group always had exactly
-// 256 samples, so:
+// So the two jobs are now separated:
 //
-//   T_total = 256 × (base_period + delta) + 256 × (base_period - delta)
-//           = 512 × base_period      ← delta cancels, frequency unchanged ✓
+//   phase_accumulator   uniform master phase.  Always advances by exactly
+//                       phase_increment.  2^32 == one cycle, at every speed and
+//                       every symmetry setting.  This is the linear ruler.
 //
-// In the phase accumulator the time spent in each group is INVERSELY
-// proportional to its increment (T = 0x80000000 / inc), so the additive
-// approach expands the total period by 1/(1 - (delta/base)²) — which makes
-// the LFO run slightly slower whenever symmetry is applied.
+//   Symmetry_Warp()     maps that master phase onto the shaped output phase
+//                       that actually indexes the wavetable.  All of the
+//                       symmetry distortion lives here.
 //
-// ── The correct formula: harmonic mean constraint ─────────────────────────────
+// The main oscillator reads Symmetry_Warp(master), the secondary reads
+// Symmetry_Warp(master + offset).  Because the offset is applied on the linear
+// side of the warp it is a constant fraction of the cycle - a true phase
+// offset - and because both taps go through the SAME warp, both oscillators
+// always carry exactly the same waveshape.
 //
-// Each group spans exactly half the 32-bit phase space (0x80000000).
-// For T_total = T_nominal = 2^32 / base_increment we need:
+// ── The warp ─────────────────────────────────────────────────────────────────
 //
-//   T_A + T_B = 0x80000000/inc_A + 0x80000000/inc_B = 0x100000000/base
-//   →  1/inc_A + 1/inc_B = 2/base          (harmonic mean condition)
+// The output phase space is split into groups that symmetry speeds up or slows
+// down:
 //
-// Let f_A = fraction of the cycle spent in Group A, f_B = 1 - f_A.
-//   T_A = T_nominal × f_A  →  inc_A = base / (2 × f_A) = base × 128 / (256 × f_A)
+//   SINE / TRIANGLE   Group A = phi in [0, 2^30) and [3*2^30, 2^32)
+//                               (indices 0-127 and 384-511 - the rising halves)
+//                     Group B = phi in [2^30, 3*2^30)
+//                               (indices 128-383 - the falling halves)
 //
-// Mapping the symmetry ADC value to f_A (128 = centre = f_A 0.5):
-//   f_A = (256 - symmetry) / 256
+//   SQUARE            Group A = phi in [0, 2^31)    (indices 0-255, high half)
+//                     Group B = phi in [2^31, 2^32) (indices 256-511, low half)
 //
-//   → inc_A = base × 128 / (256 - symmetry)
-//     inc_B = base × 128 / symmetry
+// Group A is given a fraction (256 - sym)/256 of the cycle TIME and Group B the
+// remaining sym/256.  Those two fractions add to exactly 1, which is why the
+// LFO frequency is untouched by the symmetry pot - frequency preservation now
+// falls out of the construction instead of relying on a cancellation.
 //
-// Frequency preservation check:
-//   T_A + T_B = 0x80000000 × (256-sym + sym) / (128 × base)
-//             = 0x80000000 × 256 / (128 × base)
-//             = 0x100000000 / base  ✓   (exact for every symmetry value)
+// Writing kA = (256 - sym)/128 and kB = sym/128, each segment's master-phase
+// width is its time fraction times 2^32, so for SINE / TRIANGLE:
 //
-// ── Quadrant group assignment ─────────────────────────────────────────────────
+//   theta in [0, b1)      ->  phi in [0, 2^30)        b1 = (256-sym) * 2^23
+//   theta in [b1, b2)     ->  phi in [2^30, 3*2^30)   b2 = 2^31 + sym * 2^23
+//   theta in [b2, 2^32)   ->  phi in [3*2^30, 2^32)
 //
-// The 32-bit phase accumulator's top two bits encode the quadrant:
+// and for SQUARE:
 //
-//   bits [31:30] = 00  →  indices   0-127  (Q=FIRST,  HC=FIRST)   \  Group A
-//   bits [31:30] = 11  →  indices 384-511  (Q=SECOND, HC=SECOND)  /
-//   bits [31:30] = 01  →  indices 128-255  (Q=SECOND, HC=FIRST)   \  Group B
-//   bits [31:30] = 10  →  indices 256-383  (Q=FIRST,  HC=SECOND)  /
+//   theta in [0, b1)      ->  phi in [0, 2^31)        b1 = (256-sym) * 2^24
+//   theta in [b1, 2^32)   ->  phi in [2^31, 2^32)
 //
-// For SQUARE mode: Group A = first halfcycle (bit31=0), Group B = second.
+// Within a segment the map is linear, with only two possible gradients:
 //
-// Convention (matching original code): Group A is SLOWER when pot is CW.
-//   CW (sym < 128):  anti_sym > sym  →  inc_A < inc_B  →  Group A slower  ✓
-//   CCW (sym > 128): anti_sym < sym  →  inc_A > inc_B  →  Group A faster  ✓
-//   Centre (sym=128): inc_A = inc_B = base                              ✓
+//   slope_A = 128 / (256 - sym)      slope_B = 128 / sym
 //
-// ── Overflow note ─────────────────────────────────────────────────────────────
-// base × 128: max base ≈ 4.23 M, × 128 ≈ 541 M < 2^32 — fits in uint32_t.
-// Guard: sym=0 (pot fully CW) would cause division by zero for inc_B;
-// the ADC produces even values (0, 2, 4 … 254) so clamp to 1 as the floor.
+// both held Q24 in warp_slope_A / warp_slope_B.  A whole warp is therefore two
+// compares, a subtract, one multiply and a shift - no division, and nothing
+// that needs to run at interrupt rate except the multiply.
+//
+// Sanity checks:
+//   sym = 128 (centre) -> slope_A = slope_B = 1.0 and b1/b2 land exactly on the
+//                         quadrant boundaries, so the warp is the identity.
+//   sym < 128          -> Group A gets more time than Group B.
+//   sym > 128          -> Group B gets more time than Group A.
+//
+// ── Overflow ─────────────────────────────────────────────────────────────────
+// sym is clamped to [SYMMETRY_MIN, SYMMETRY_MAX] = [1, 255], so:
+//   slope_A, slope_B  <= 128 << 24 == 2^31            (fits uint32_t)
+//   theta * slope     <  2^55                         (fits uint64_t)
+// and the result of each segment stays strictly below the next segment's base,
+// so the warp never wraps past 2^32.
 
-uint8_t Process_Phase_Accumulator_Symmetry_Increments(struct Params* params_ptr){
+//FUNCTION DEFINITIONS
+uint8_t Process_Symmetry_Warp_Parameters(struct Params* params_ptr){
 
-    #if SYMMETRY_ON_OR_OFF == ON
+	#if SYMMETRY_ON_OR_OFF == ON
 
-        // Clamp symmetry away from 0 to avoid division by zero on inc_B.
-        uint32_t sym      = (params_ptr->symmetry == 0U) ? 1UL : (uint32_t)params_ptr->symmetry;
-        uint32_t anti_sym = 256UL - sym;
+		uint32_t sym = (uint32_t)params_ptr->symmetry;
 
-        uint32_t base_x128 = params_ptr->phase_increment * 128UL;
+		// Both ends are degenerate - they ask one group to be crossed in zero
+		// time - so hold the value one step inside each extreme.
+		if(sym < SYMMETRY_MIN){
+			sym = SYMMETRY_MIN;
+		}
+		else if(sym > SYMMETRY_MAX){
+			sym = SYMMETRY_MAX;
+		}
 
-        params_ptr->phase_increment_A = base_x128 / anti_sym; // slower when sym < 128 (CW)
-        params_ptr->phase_increment_B = base_x128 / sym;      // faster when sym < 128 (CW)
+		params_ptr->warp_symmetry = (uint16_t)sym;
+		params_ptr->warp_slope_A  = (128UL << WARP_SLOPE_FRAC_BITS) / (256UL - sym);
+		params_ptr->warp_slope_B  = (128UL << WARP_SLOPE_FRAC_BITS) / sym;
 
-    #endif
+	#else
 
-    #if SYMMETRY_ON_OR_OFF == OFF
+		// Symmetry disabled: make the warp the identity map.
+		params_ptr->warp_symmetry = SYMMETRY_ADC_HALF_SCALE;
+		params_ptr->warp_slope_A  = (1UL << WARP_SLOPE_FRAC_BITS);
+		params_ptr->warp_slope_B  = (1UL << WARP_SLOPE_FRAC_BITS);
 
-        params_ptr->phase_increment_A = params_ptr->phase_increment;
-        params_ptr->phase_increment_B = params_ptr->phase_increment;
+	#endif
 
-    #endif
+	return 1;
+}
 
-    return 1;
+uint32_t Symmetry_Warp(uint32_t master_phase, const struct Params* params_ptr){
+
+	#if SYMMETRY_ON_OR_OFF == ON
+
+		uint32_t sym  = (uint32_t)params_ptr->warp_symmetry;
+		uint32_t anti = 256UL - sym;
+
+		if(params_ptr->waveshape == SQUARE_MODE){
+
+			uint32_t b1 = anti << 24; //master phase at the halfcycle boundary
+
+			if(master_phase < b1){
+
+				return (uint32_t)(((uint64_t)master_phase * params_ptr->warp_slope_A) >> WARP_SLOPE_FRAC_BITS);
+			}
+
+			return 0x80000000UL + (uint32_t)(((uint64_t)(master_phase - b1) * params_ptr->warp_slope_B) >> WARP_SLOPE_FRAC_BITS);
+		}
+		else{
+
+			uint32_t b1 = anti << 23;                   //master phase at the end of the 1st quadrant
+			uint32_t b2 = 0x80000000UL + (sym << 23);   //master phase at the end of the 3rd quadrant
+
+			if(master_phase < b1){
+
+				return (uint32_t)(((uint64_t)master_phase * params_ptr->warp_slope_A) >> WARP_SLOPE_FRAC_BITS);
+			}
+
+			if(master_phase < b2){
+
+				return 0x40000000UL + (uint32_t)(((uint64_t)(master_phase - b1) * params_ptr->warp_slope_B) >> WARP_SLOPE_FRAC_BITS);
+			}
+
+			return 0xC0000000UL + (uint32_t)(((uint64_t)(master_phase - b2) * params_ptr->warp_slope_A) >> WARP_SLOPE_FRAC_BITS);
+		}
+
+	#else
+
+		(void)params_ptr;
+		return master_phase;
+
+	#endif
+}
+
+uint32_t Inverse_Symmetry_Warp(uint32_t shaped_phase, const struct Params* params_ptr){
+
+	#if SYMMETRY_ON_OR_OFF == ON
+
+		// The inverse gradients are exact integers scaled by 1/128, so this
+		// direction needs no fixed-point reciprocal at all.
+		uint32_t sym  = (uint32_t)params_ptr->warp_symmetry;
+		uint32_t anti = 256UL - sym;
+
+		if(params_ptr->waveshape == SQUARE_MODE){
+
+			if(shaped_phase < 0x80000000UL){
+
+				return (uint32_t)(((uint64_t)shaped_phase * anti) >> 7);
+			}
+
+			return (anti << 24) + (uint32_t)(((uint64_t)(shaped_phase - 0x80000000UL) * sym) >> 7);
+		}
+		else{
+
+			if(shaped_phase < 0x40000000UL){
+
+				return (uint32_t)(((uint64_t)shaped_phase * anti) >> 7);
+			}
+
+			if(shaped_phase < 0xC0000000UL){
+
+				return (anti << 23) + (uint32_t)(((uint64_t)(shaped_phase - 0x40000000UL) * sym) >> 7);
+			}
+
+			return (0x80000000UL + (sym << 23)) + (uint32_t)(((uint64_t)(shaped_phase - 0xC0000000UL) * anti) >> 7);
+		}
+
+	#else
+
+		(void)params_ptr;
+		return shaped_phase;
+
+	#endif
 }

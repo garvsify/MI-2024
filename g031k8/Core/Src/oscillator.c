@@ -15,9 +15,10 @@ struct Params params = {0};
 struct Params params_manual = {0};
 struct Params params_to_be_loaded = {0};
 struct Params params_working = {0};
-struct Delay_Line delay_line = {.duty_delay_line_storage_array = 0, //one index larger than the number of indexes (wave samples) to allow us to 'wrap' the array into a kind of circular buffer - this is reinitialised to mid-scale on runtime
-								.duty_delay_line_start_offset = 1,  //initial value is 1st index - to give us space to fill index 0
-								.duty_delay_line_finish_offset = FINAL_INDEX + 1}; //initial value is 512th index, one larger than the index of the final sample
+
+//STATIC FUNCTION DECLARATIONS
+static uint16_t Wave_Sample_at_Index(uint16_t index, uint8_t waveshape);
+static uint16_t Apply_Depth(uint16_t sample, uint8_t depth);
 
 //FUNCTION DEFINITIONS
 uint8_t Start_PWM_Gen_Timer_Main_and_Secondary_Oscillators(TIM_HandleTypeDef *TIM, uint32_t PWM_TIM_channel_1, uint32_t PWM_TIM_channel_2)
@@ -48,11 +49,12 @@ uint8_t Start_Freq_Gen_Timer(void)
 }
 
 // Process_Phase_Accumulator_Base_Increment
-// Maps the speed pot value to a 32-bit phase increment for the phase accumulator.
+// Maps the speed pot value to a 32-bit phase increment for the master phase.
 //
-// The phase accumulator advances by phase_increment on every fixed TIM16 interrupt
-// (3906.25 Hz).  The top PHASE_ACCUM_SHIFT (9) bits of the 32-bit accumulator index
-// into the 512-entry wavetable, so one full cycle completes when the accumulator wraps.
+// The master phase advances by phase_increment on every fixed TIM16 interrupt
+// (3906.25 Hz) and wraps at 2^32, which is one complete LFO cycle.  Symmetry no
+// longer touches this value at all - it is applied afterwards as a warp - so
+// phase_increment alone sets the LFO frequency.
 //
 // Formula derivation:
 //   Fixed TIM16 ticks per interrupt = PHASE_ACCUM_FIXED_PRESCALER * (PHASE_ACCUM_FIXED_ARR+1)
@@ -95,63 +97,113 @@ uint8_t Set_Oscillator_Values(struct Params* params_ptr){
 	/////////////////////////////////////////////////////////////
 	//SET THE CURRENT(prev) VALUES FOR THE SECONDARY OSCILLATOR//
 	/////////////////////////////////////////////////////////////
-	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, params_ptr->duty_delayed);
+	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, params_ptr->duty_secondary);
 
 	return 1;
+}
+
+// Phase_Control_to_Master_Phase_Offset
+//
+// The phase control is 9-bit, where PHASE_POT_FULL_SCALE (512) is one whole
+// cycle.  Because it is fed from a 7-bit source (pot ADC, MIDI CC or preset)
+// shifted left by 2, it moves in steps of 4, i.e. 360/128 = 2.8125 degrees.
+//
+// Scaling it straight onto the 32-bit master phase gives:
+//     control    0  ->        0 deg   (pot fully CCW)
+//     control  508  ->   357.19 deg   (pot fully CW, one step short of wrapping
+//                                      back round to 0 deg)
+//
+// The offset is added to the MASTER phase, not to the shaped phase, so it is a
+// constant fraction of the cycle at every speed and every symmetry setting.
+uint32_t Phase_Control_to_Master_Phase_Offset(uint16_t phase_control){
+
+	uint32_t control = (uint32_t)phase_control;
+
+	if(control > PHASE_POT_CONTROL_MAX){
+		control = PHASE_POT_CONTROL_MAX;
+	}
+
+	#if PHASE_POT_REVERSED == ON
+		control = PHASE_POT_CONTROL_MAX - control;
+	#endif
+
+	return control << PHASE_OFFSET_SHIFT;
+}
+
+// Wave_Sample_at_Index
+// Raw (pre-depth) wave value for a given wavetable index.
+static uint16_t Wave_Sample_at_Index(uint16_t index, uint8_t waveshape){
+
+	uint16_t sample;
+
+	if(waveshape == TRIANGLE_MODE){
+		sample = tri_wavetable[index];
+	}
+	else if(waveshape == SINE_MODE){
+		sample = sine_wavetable[index];
+	}
+	else if(index < THIRD_QUADRANT_START_INDEX){
+		sample = PWM_DUTY_VALUE_MAX;
+	}
+	else{
+		sample = PWM_DUTY_VALUE_MIN;
+	}
+
+	return sample;
+}
+
+// Apply_Depth
+// Scales and inverts a raw wave value into the PWM duty actually driven out.
+static uint16_t Apply_Depth(uint16_t sample, uint8_t depth){
+
+	#if DEPTH_ON_OR_OFF == ON
+
+		if(depth == ((1 << DEPTH_ADC_RESOLUTION) - 1)){ //127
+
+			return PWM_DUTY_VALUE_MAX - sample;
+		}
+
+		if(depth != 0){
+
+			//duty = 1023 - sample*(depth >> 7);
+			uint32_t multiply_product = (uint32_t)sample * (uint32_t)depth;
+			return (uint16_t)(PWM_DUTY_VALUE_MAX - (multiply_product >> DEPTH_ADC_RESOLUTION));
+		}
+
+		return PWM_DUTY_VALUE_MAX; //if depth is 0, just output 1023
+
+	#else
+
+		(void)depth;
+		return sample;
+
+	#endif
 }
 
 // Calculate_Next_Main_Oscillator_Values
 //
 // REGULAR_MODE:
-//   Selects the phase increment for the current quadrant group, advances the
-//   32-bit phase accumulator (wrapping naturally), then derives index,
-//   halfcycle, and quadrant from the new phase value.
+//   Advances the UNIFORM master phase by phase_increment (wrapping naturally at
+//   2^32 = one cycle), warps it into the shaped output phase, and derives
+//   index, halfcycle and quadrant from that.
 //
-//   Symmetry group mapping (SINE / TRIANGLE):
-//     Group A (LENGTHEN-when-CW) — phase bits [31:30] are the SAME (00 or 11)
-//       → indices 0-127  (Q=FIRST,  HC=FIRST)
-//       → indices 384-511 (Q=SECOND, HC=SECOND)
-//     Group B (SHORTEN-when-CW) — phase bits [31:30] are DIFFERENT (01 or 10)
-//       → indices 128-255 (Q=SECOND, HC=FIRST)
-//       → indices 256-383 (Q=FIRST,  HC=SECOND)
+// IP_CAPTURE_MODE:
+//   Snaps to a sync point.  The sync point is defined in terms of the SHAPED
+//   phase (a wavetable index), so it is run back through the inverse warp to
+//   get the master phase that lands on it.
 //
-//   Symmetry group mapping (SQUARE):
-//     Group A — first halfcycle  (phase bit 31 = 0, indices 0-255)
-//     Group B — second halfcycle (phase bit 31 = 1, indices 256-511)
+// STARTUP_MODE:
+//   Leaves the master phase where it is (zero on a cold start) and derives the
+//   oscillator state from it.
 //
-// IP_CAPTURE_MODE / STARTUP_MODE:
-//   Sets the phase accumulator to the appropriate sync/start position.
+// In every mode the secondary oscillator is then evaluated at
+// master_phase + phase offset, through the same warp - so it is always the same
+// waveform as the main oscillator, displaced by a constant phase.
 uint8_t Calculate_Next_Main_Oscillator_Values(struct Params* params_ptr, enum Next_Values_Processing_Mode mode){
 
-	if(mode == REGULAR_MODE){
+	uint32_t master_phase;
 
-		// Select increment based on which group the current phase position is in
-		uint32_t phase = params_ptr->phase_accumulator;
-		uint32_t inc;
-
-		if(params_ptr->waveshape == SQUARE_MODE){
-			// Square: first half uses inc_A, second half uses inc_B
-			inc = (phase & 0x80000000UL) ? params_ptr->phase_increment_B
-			                              : params_ptr->phase_increment_A;
-		}
-		else{
-			// Sine / Triangle: group A when bit31 == bit30, group B otherwise
-			uint8_t b31 = (uint8_t)((phase >> 31) & 1U);
-			uint8_t b30 = (uint8_t)((phase >> 30) & 1U);
-			inc = (b31 == b30) ? params_ptr->phase_increment_A
-			                   : params_ptr->phase_increment_B;
-		}
-
-		// Advance phase accumulator (uint32_t wraps naturally at 2^32)
-		params_ptr->phase_accumulator += inc;
-		phase = params_ptr->phase_accumulator;
-
-		// Derive wavetable index (top 9 bits → 0-511) and quadrant/halfcycle
-		params_ptr->index     = (uint16_t)(phase >> PHASE_ACCUM_SHIFT);
-		params_ptr->halfcycle = (uint8_t)((phase >> 31) & 1U);
-		params_ptr->quadrant  = (uint8_t)((phase >> 30) & 1U);
-	}
-	else if(mode == IP_CAPTURE_MODE){
+	if(mode == IP_CAPTURE_MODE){
 
 		if(params_ptr->waveshape == SINE_MODE || params_ptr->waveshape == TRIANGLE_MODE){
 
@@ -166,88 +218,40 @@ uint8_t Calculate_Next_Main_Oscillator_Values(struct Params* params_ptr, enum Ne
 			params_ptr->quadrant  = CURRENT_QUADRANT_SQUARE_SYNCED;
 		}
 
-		// Snap phase accumulator to the sync index position
-		params_ptr->phase_accumulator = (uint32_t)params_ptr->index << PHASE_ACCUM_SHIFT;
+		// The sync index is a SHAPED phase; invert the warp to find the master
+		// phase that produces it, so the master stays a true linear ruler.
+		master_phase = Inverse_Symmetry_Warp((uint32_t)params_ptr->index << PHASE_ACCUM_SHIFT, params_ptr);
+		params_ptr->phase_accumulator = master_phase;
 	}
-	else if(mode == STARTUP_MODE){
+	else{
 
-		// Phase accumulator initialises to 0 (index 0, first quadrant, first halfcycle)
-		// Derive state from current accumulator value in case it has been pre-set
-		params_ptr->halfcycle = (uint8_t)((params_ptr->phase_accumulator >> 31) & 1U);
-		params_ptr->quadrant  = (uint8_t)((params_ptr->phase_accumulator >> 30) & 1U);
-	}
+		if(mode == REGULAR_MODE){
 
-	//ONCE INDEX IS SET, FIND THE DUTY VALUE
-	if(params_ptr->waveshape == TRIANGLE_MODE){
-		params_ptr->duty = tri_wavetable[params_ptr->index];
-	}
-	else if(params_ptr->waveshape == SINE_MODE){
-		params_ptr->duty = sine_wavetable[params_ptr->index];
-	}
-	else if((params_ptr->waveshape == SQUARE_MODE) && (params_ptr->index < THIRD_QUADRANT_START_INDEX)){
-		params_ptr->duty = PWM_DUTY_VALUE_MAX;
-	}
-	else if((params_ptr->waveshape == SQUARE_MODE) && (params_ptr->index >= THIRD_QUADRANT_START_INDEX)){
-		params_ptr->duty = PWM_DUTY_VALUE_MIN;
-	}
-
-	//APPLY DEPTH
-	#if DEPTH_ON_OR_OFF == 1
-
-		//Apply Depth
-		if(params_ptr->depth == ((1 << DEPTH_ADC_RESOLUTION) - 1)){ //255
-			params_ptr->duty = PWM_DUTY_VALUE_MAX - params_ptr->duty;
-		}
-		else if(params_ptr->depth != 0){
-
-			//duty = 1023 - duty*(current_depth >> 8);
-			uint32_t multiply_product = 0;
-			multiply_product = (params_ptr->duty) * (params_ptr->depth);
-			params_ptr->duty = PWM_DUTY_VALUE_MAX - (multiply_product >> DEPTH_ADC_RESOLUTION);
-		}
-		else{
-			params_ptr->duty = PWM_DUTY_VALUE_MAX; //if depth is 0, just output 1023
+			// The master phase always advances by the same amount - uint32_t
+			// wraps naturally at 2^32, which is one full cycle.
+			params_ptr->phase_accumulator += params_ptr->phase_increment;
 		}
 
-	#endif
+		master_phase = params_ptr->phase_accumulator;
 
-	//SET THE NEXT VALUE FOR THE MAIN OSCILLATOR
+		uint32_t shaped_phase = Symmetry_Warp(master_phase, params_ptr);
+
+		// Derive wavetable index (top 9 bits -> 0-511) and quadrant/halfcycle
+		params_ptr->index     = (uint16_t)(shaped_phase >> PHASE_ACCUM_SHIFT);
+		params_ptr->halfcycle = (uint8_t)((shaped_phase >> 31) & 1U);
+		params_ptr->quadrant  = (uint8_t)((shaped_phase >> 30) & 1U);
+	}
+
+	//MAIN OSCILLATOR
+	params_ptr->duty      = Apply_Depth(Wave_Sample_at_Index(params_ptr->index, params_ptr->waveshape), params_ptr->depth);
 	params_ptr->prev_duty = params_ptr->duty;
 
-	return 1;
-}
+	//SECONDARY OSCILLATOR - same wave, displaced by a constant phase offset
+	uint32_t secondary_master_phase = master_phase + Phase_Control_to_Master_Phase_Offset(params_ptr->phase_control);
+	uint32_t secondary_shaped_phase = Symmetry_Warp(secondary_master_phase, params_ptr);
+	uint16_t secondary_index        = (uint16_t)(secondary_shaped_phase >> PHASE_ACCUM_SHIFT);
 
-uint8_t Write_Next_Main_Oscillator_Values_to_Delay_Line(struct Params* params_ptr, struct Delay_Line* delay_line_ptr){
-
-	//STORE THE VALUES IN THE APPROPRIATE '0TH - 1' INDEX RELATIVE TO THE START POINTER
-		if(delay_line_ptr->duty_delay_line_start_offset != 0){
-			delay_line_ptr->duty_delay_line_storage_array[delay_line_ptr->duty_delay_line_start_offset - 1] = params_ptr->duty;
-		}
-		else{
-			delay_line_ptr->duty_delay_line_storage_array[FINAL_INDEX + 1] = params_ptr->duty;
-		}
-
-		//DECREMENT THE START AND FINISH POINTERS
-		if(delay_line_ptr->duty_delay_line_start_offset == 0){
-			delay_line_ptr->duty_delay_line_start_offset = FINAL_INDEX + 1;
-			delay_line_ptr->duty_delay_line_finish_offset = delay_line_ptr->duty_delay_line_finish_offset - 1;
-		}
-		else if(delay_line_ptr->duty_delay_line_finish_offset == 0){
-			delay_line_ptr->duty_delay_line_finish_offset = FINAL_INDEX + 1;
-			delay_line_ptr->duty_delay_line_start_offset = delay_line_ptr->duty_delay_line_start_offset - 1;
-		}
-		else{
-			delay_line_ptr->duty_delay_line_start_offset = delay_line_ptr->duty_delay_line_start_offset - 1;
-			delay_line_ptr->duty_delay_line_finish_offset = delay_line_ptr->duty_delay_line_finish_offset - 1;
-		}
-
-		//DETERMINE THE DELAYED WAVE'S VALUES
-		if(delay_line_ptr->duty_delay_line_start_offset + params_ptr->duty_delay_line_read_pointer_offset > FINAL_INDEX + 1){ //if the desired starting index falls off the end of the array
-			params_ptr->duty_delayed = *(delay_line_ptr->duty_delay_line_storage_array + (delay_line_ptr->duty_delay_line_start_offset + params_ptr->duty_delay_line_read_pointer_offset - (FINAL_INDEX + 1)));
-		}
-		else{
-			params_ptr->duty_delayed = *(delay_line_ptr->duty_delay_line_storage_array + delay_line_ptr->duty_delay_line_start_offset + params_ptr->duty_delay_line_read_pointer_offset);
-		}
+	params_ptr->duty_secondary = Apply_Depth(Wave_Sample_at_Index(secondary_index, params_ptr->waveshape), params_ptr->depth);
 
 	return 1;
 }
@@ -289,11 +293,11 @@ uint8_t Process_ADC_Conversion_Values(struct Params* params_ptr, volatile uint16
 
 	#endif
 
-	//GET DELAY LINE READ POINTER OFFSET
+	//GET PHASE
 
-	uint16_t temp_delay = ADCResultsDMA_ptr[DUTY_DELAY_LINE_READ_POINTER_OFFSET_ADC_RESULT_INDEX] >> 5; //truncate to 7-bit
-	temp_delay <<= 2; //convert to 9-bit
-	params_ptr->duty_delay_line_read_pointer_offset = temp_delay;
+	uint16_t temp_phase = ADCResultsDMA_ptr[PHASE_ADC_RESULT_INDEX] >> 5; //truncate to 7-bit
+	temp_phase <<= 2; //convert to 9-bit (512 == one full cycle == 360 degrees)
+	params_ptr->phase_control = temp_phase;
 
 	return 1;
 }

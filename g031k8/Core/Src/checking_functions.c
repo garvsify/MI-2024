@@ -76,7 +76,7 @@ uint8_t Pot_Check(volatile uint16_t* ADCResults_arr, enum Pot_Type pot_type){
 		first_measurement_ptr = &first_phase_measurement;
 		second_measurement_ptr = &second_phase_measurement;
 		measurement_num_ptr = &phase_pot_adc_measurement_num;
-		measurement_ptr = (uint16_t*)(ADCResults_arr + DUTY_DELAY_LINE_READ_POINTER_OFFSET_ADC_RESULT_INDEX);
+		measurement_ptr = (uint16_t*)(ADCResults_arr + PHASE_ADC_RESULT_INDEX);
 		tolerance = PHASE_TOLERANCE;
 		normal_fsm_ptr = &phase_fsm;
 	}

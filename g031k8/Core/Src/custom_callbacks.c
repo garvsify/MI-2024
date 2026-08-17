@@ -8,7 +8,6 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 
 	Set_Oscillator_Values(&params);
 	Calculate_Next_Main_Oscillator_Values(&params, (enum Next_Values_Processing_Mode)REGULAR_MODE);
-	Write_Next_Main_Oscillator_Values_to_Delay_Line(&params, &delay_line);
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions); //this function takes ages to execute!
 
 	HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
@@ -36,7 +35,7 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 		Process_Phase_Accumulator_Base_Increment(&params);
 	}
 
-	Process_Phase_Accumulator_Symmetry_Increments(&params);
+	Process_Symmetry_Warp_Parameters(&params);
 
 	//after initial conversion is complete, set the conversion complete flag - leave this after raw/final value processing rather than actually when ADC values are converted for startup routine reasons.
 	if(Get_Status_Bit(&statuses, Initial_ADC_Conversion_Complete) == NO){
@@ -215,7 +214,6 @@ void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
 		Set_Status_Bit(&statuses, First_Sync_Complete);
 
 		Calculate_Next_Main_Oscillator_Values(&params, (enum Next_Values_Processing_Mode)REGULAR_MODE);
-		Write_Next_Main_Oscillator_Values_to_Delay_Line(&params, &delay_line);
 		HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions); //this function takes ages to execute!
 
 	}
@@ -358,7 +356,8 @@ void __attribute__((optimize("O0")))UART2_RX_transfer_complete_callback(UART_Han
 
 				if(*rx_buffer == SYSTEM_REAL_TIME_MIDI_CLOCK){
 
-					// @TODO //WRITE CODE TO LOAD CORRECT DUTY DELAYED VALUE TO SECONDARY OSCILLATOR
+					// The secondary oscillator's value is computed alongside the main one
+					// in Calculate_Next_Main_Oscillator_Values, so it is already correct here.
 					Set_Oscillator_Values(&params_to_be_loaded);
 
 					//Give it another IP CAP edge upon sync
@@ -383,7 +382,6 @@ void __attribute__((optimize("O0")))UART2_RX_transfer_complete_callback(UART_Han
 					Set_Status_Bit(&statuses, First_Sync_Complete);
 
 					Calculate_Next_Main_Oscillator_Values(&params, (enum Next_Values_Processing_Mode)REGULAR_MODE);
-					Write_Next_Main_Oscillator_Values_to_Delay_Line(&params, &delay_line);
 					HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions); //this function takes ages to execute!
 				}
 			}
@@ -529,7 +527,8 @@ void __attribute__((optimize("O0")))UART2_RX_transfer_complete_callback(UART_Han
 
 				if(*rx_buffer == SYSTEM_REAL_TIME_MIDI_CLOCK){
 
-					// @TODO //WRITE CODE TO LOAD CORRECT DUTY DELAYED VALUE TO SECONDARY OSCILLATOR
+					// The secondary oscillator's value is computed alongside the main one
+					// in Calculate_Next_Main_Oscillator_Values, so it is already correct here.
 					Set_Oscillator_Values(&params_to_be_loaded);
 
 					//Give it another IP CAP edge upon sync
@@ -553,7 +552,6 @@ void __attribute__((optimize("O0")))UART2_RX_transfer_complete_callback(UART_Han
 					Set_Status_Bit(&statuses, First_Sync_Complete);
 
 					Calculate_Next_Main_Oscillator_Values(&params, (enum Next_Values_Processing_Mode)REGULAR_MODE);
-					Write_Next_Main_Oscillator_Values_to_Delay_Line(&params, &delay_line);
 					HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions); //this function takes ages to execute!
 				}
 			}
@@ -681,7 +679,7 @@ void __attribute__((optimize("O0")))UART2_RX_transfer_complete_callback(UART_Han
 										//Implement new channel mode
 										if(MIDI_data.MIDI_data_buffer[1] == RESET_ALL_CONTROLLERS){
 
-											Reset_All_Controllers(&params, &delay_line);
+											Reset_All_Controllers();
 											Clear_Status_Bit(&statuses, First_Sync_Complete); //important for where a synced state (via MIDI CLK, CLK IN, or TAP) is the prior state
 										}
 										else if(MIDI_data.MIDI_data_buffer[1] == LOCAL_CONTROL){
@@ -869,7 +867,7 @@ void __attribute__((optimize("O0")))UART2_RX_transfer_complete_callback(UART_Han
 										//Implement new channel mode
 										if(MIDI_data.MIDI_data_buffer[1] == RESET_ALL_CONTROLLERS){
 
-											Reset_All_Controllers(&params, &delay_line);
+											Reset_All_Controllers();
 											Clear_Status_Bit(&statuses, First_Sync_Complete); //important for where a synced state (via MIDI CLK, CLK IN, or TAP) is the prior state
 										}
 										else if(MIDI_data.MIDI_data_buffer[1] == LOCAL_CONTROL){

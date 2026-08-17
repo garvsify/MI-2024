@@ -41,8 +41,9 @@ uint8_t Input_Capture_Processing(volatile uint16_t interrupt_period_value, struc
 	// (1ULL<<29) keeps the intermediate 64-bit before the division.
 	params_ptr->phase_increment = (uint32_t)((1ULL << 29) / (uint32_t)interrupt_period_value);
 
+	// Warp parameters first: the sync snap runs through the inverse warp.
+	Process_Symmetry_Warp_Parameters(params_ptr);
 	Calculate_Next_Main_Oscillator_Values(params_ptr, (enum Next_Values_Processing_Mode)IP_CAPTURE_MODE);
-	Process_Phase_Accumulator_Symmetry_Increments(params_ptr);
 
 	//HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
 

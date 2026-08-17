@@ -406,7 +406,7 @@ uint8_t Reset_and_Stop_MIDI_Software_Timer(uint32_t *midi_counter_ptr, volatile 
 	return 1;
 }
 
-uint8_t Reset_All_Controllers(struct Params *params_ptr, struct Delay_Line* delay_line_ptr){
+uint8_t Reset_All_Controllers(void){
 
 	//Store previous states
 	waveshape_fsm.prev_state = waveshape_fsm.current_state;
