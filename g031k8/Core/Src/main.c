@@ -3,6 +3,7 @@
 
 Issues:
 
+- Preset selection via tap tempo switch is a bit funky
 
 Potential Issues:
 
