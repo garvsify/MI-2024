@@ -3,7 +3,7 @@
 
 Issues:
 
-- Preset selection via tap tempo switch is a bit funky
+- Preset selection/save not timing out
 
 Potential Issues:
 

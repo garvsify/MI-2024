@@ -1,6 +1,7 @@
 #include "custom_callbacks.h"
 
 volatile enum Validate save_or_preset_mode_engaged = NO;
+uint64_t dep = 0;
 
 void TIM16_callback(TIM_HandleTypeDef *htim)
 {
@@ -1242,6 +1243,7 @@ void __attribute__((optimize("O0")))LPTIM1_callback(LPTIM_HandleTypeDef *hlptim)
 	//CHECK IF TAP TEMPO HELD DOWN - PRESET SAVE MODE
 
 	static uint64_t depressed_num;
+	dep = depressed_num;
 	static enum Preset_Selected preset = PRESET_ONE;
 	enum LED_States led_state;
 	static enum LED_States led_state_saved;
@@ -1281,7 +1283,20 @@ void __attribute__((optimize("O0")))LPTIM1_callback(LPTIM_HandleTypeDef *hlptim)
 				}
 				else if((depressed_num >= TAP_TEMPO_SWITCH_FACTORY_RESET_COUNT_MIN) && (depressed_num < TAP_TEMPO_SWITCH_FACTORY_RESET_COUNT_MAX)){
 
-					//@TODO Factory Reset Presets and user preset used array in flash
+					//Erase Flash
+					Erase_Flash_For_Factory_Reset();
+
+					//Read 'User Preset Used' Bytes, 'Start Required Before MIDI CLK' Byte, MIDI Omni On/Off Status Bit, and MIDI Basic Channel
+					//Following an Erase, this sets misc values to factory defaults
+					Read_and_Interpret_Misc_From_Flash(MISC_FLASH_MEMORY_ADDRESS, user_presets_used_array, &statuses, &MIDI_basic_channel, NUM_PRESETS);
+
+					//Set the Converted Preset Array to the Relevant Factory/User Preset depending upon the 'User Preset Used' Byte read from Flash
+					Update_Converted_Preset_Array_with_User_or_Factory_Presets(presets_converted_array,
+																			  user_presets_used_array,
+																  	  	  	  factory_presets_array,
+																			  user_presets_array,
+																			  NUM_PRESETS);
+					Set_LED_to_State(&LED_fsm, LED_CONFIRM);
 				}
 				if(save_or_preset_mode_engaged == YES){
 
