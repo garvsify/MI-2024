@@ -3,8 +3,6 @@
 
 Issues:
 
-- Pots not able to be tweaked during preset select/preset save mode?
-
 Potential Issues:
 
 
