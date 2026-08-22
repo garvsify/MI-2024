@@ -3,7 +3,7 @@
 
 Issues:
 
-- Preset selection/save not timing out
+- Pots not able to be tweaked during preset select/preset save mode?
 
 Potential Issues:
 
@@ -82,6 +82,19 @@ int __attribute__((optimize("O0")))main(void)
 
 				Clear_Status_Bit(&statuses, LED_Pause_Timer_Is_Running);
 				led_pause_counter = 0;
+			}
+		}
+		if(Get_Status_Bit(&statuses, Tap_Tempo_Preset_Save_Select_Timer_Is_Running) == YES){
+
+			if(preset_save_select_idle_counter < PRESET_SAVE_SELECT_IDLE_COUNT){
+
+				preset_save_select_idle_counter++;
+			}
+			else{
+
+				Clear_Status_Bit(&statuses, Tap_Tempo_Preset_Save_Select_Timer_Is_Running);
+				Set_Status_Bit(&statuses, Tap_Tempo_Preset_Save_Select_Timer_Has_Timed_Out);
+				preset_save_select_idle_counter = 0;
 			}
 		}
 	}
