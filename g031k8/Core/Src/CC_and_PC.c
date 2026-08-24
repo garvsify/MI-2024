@@ -404,7 +404,6 @@ uint8_t Store_Single_Preset_In_Flash(volatile struct Preset *preset, uint8_t pre
 
 uint8_t Erase_Flash_For_Factory_Reset(void){
 
-	uint64_t misc_packed = 0;
 	uint32_t errors = 0;
 	FLASH_EraseInitTypeDef erase_config = {.TypeErase = FLASH_CR_PER, .Banks = FLASH_CR_MER1, .Page = 31, .NbPages = 1};
 	HAL_FLASH_Unlock();
