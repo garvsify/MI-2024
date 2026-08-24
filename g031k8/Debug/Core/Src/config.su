@@ -1,4 +1,5 @@
 ../Core/Src/config.c:25:6:SystemClock_Config	80	static,ignoring_inline_asm
+<<<<<<< HEAD
 ../Core/Src/config.c:68:6:MX_ADC1_Init	24	static,ignoring_inline_asm
 ../Core/Src/config.c:149:6:MX_TIM16_Init	88	static,ignoring_inline_asm
 ../Core/Src/config.c:207:6:MX_TIM2_Init	56	static,ignoring_inline_asm
@@ -13,3 +14,19 @@
 ../Core/Src/config.c:587:6:MX_GPIO_Init	72	static
 ../Core/Src/config.c:689:6:Error_Handler	0	static,ignoring_inline_asm
 ../Core/Src/config.c:699:6:System_Init	8	static
+=======
+../Core/Src/config.c:67:6:MX_ADC1_Init	24	static,ignoring_inline_asm
+../Core/Src/config.c:148:6:MX_TIM16_Init	88	static,ignoring_inline_asm
+../Core/Src/config.c:211:6:MX_TIM2_Init	56	static,ignoring_inline_asm
+../Core/Src/config.c:270:6:MX_TIM3_Init	64	static,ignoring_inline_asm
+../Core/Src/config.c:325:6:MX_TIM1_Init	120	static,ignoring_inline_asm
+../Core/Src/config.c:408:6:MX_TIM17_Init	88	static,ignoring_inline_asm
+../Core/Src/config.c:471:6:MX_LPTIM1_Init	8	static,ignoring_inline_asm
+../Core/Src/config.c:502:6:MX_TIM14_Init	40	static,ignoring_inline_asm
+../Core/Src/config.c:542:6:MX_USART2_UART_Init	8	static,ignoring_inline_asm
+../Core/Src/config.c:562:6:MX_IWDG_Init	8	static,ignoring_inline_asm
+../Core/Src/config.c:574:6:MX_DMA_Init	16	static
+../Core/Src/config.c:591:6:MX_GPIO_Init	72	static
+../Core/Src/config.c:678:6:Error_Handler	0	static,ignoring_inline_asm
+../Core/Src/config.c:688:6:System_Init	8	static
+>>>>>>> chucking-this-into-claude

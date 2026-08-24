@@ -162,6 +162,7 @@ uint8_t Update_Converted_Preset_Array_with_User_or_Factory_Presets(volatile stru
 																	volatile struct Preset **user_preset_array_ptr,
 																	uint8_t size_of_factory_and_user_arrays);
 uint8_t Update_Waveshape_with_CC_Value(volatile uint8_t *data, struct Params* params_ptr);
+//uint8_t Clear_User_Presets_Used_Array(volatile enum Validate *user_presets_used_array_ptr);
 uint8_t Update_Speed_with_CC_Value(volatile uint8_t *data, struct Params* params_ptr);
 uint8_t Update_Depth_with_CC_Value(volatile uint8_t *data, struct Params* params_ptr);
 uint8_t Update_Symmetry_with_CC_Value(volatile uint8_t *data, struct Params* params_ptr);
@@ -182,5 +183,7 @@ uint8_t Store_Params_as_User_Preset(enum Preset_Selected preset,
 
 uint8_t Store_Single_Preset_In_Flash(volatile struct Preset *preset, uint8_t preset_num);
 uint8_t Set_to_PC_Mode(enum Preset_Selected preset);
+
+uint8_t Erase_Flash_For_Factory_Reset(void);
 
 #endif /* INC_CC_AND_PC_H_ */

@@ -1,6 +1,7 @@
 #include "custom_callbacks.h"
 
 volatile enum Validate save_or_preset_mode_engaged = NO;
+uint64_t dep = 0;
 
 void TIM16_callback(TIM_HandleTypeDef *htim)
 {
@@ -8,7 +9,6 @@ void TIM16_callback(TIM_HandleTypeDef *htim)
 
 	Set_Oscillator_Values(&params);
 	Calculate_Next_Main_Oscillator_Values(&params, (enum Next_Values_Processing_Mode)REGULAR_MODE);
-	Write_Next_Main_Oscillator_Values_to_Delay_Line(&params, &delay_line);
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions); //this function takes ages to execute!
 
 	HAL_GPIO_WritePin(MONITOR_GPIO_Port, MONITOR_Pin, 0);
@@ -26,18 +26,17 @@ void ADC_DMA_conversion_complete_callback(ADC_HandleTypeDef *hadc)
 
 	enum Validate first_sync_complete = Get_Status_Bit(&statuses, First_Sync_Complete);
 
-	//overwrites raw speed values if a sync has completed
+	//overwrites phase increment if a sync has completed (keeps synced speed locked)
 	if(first_sync_complete == YES){
 
-		params.raw_start_value = params_working.raw_start_value;
-		params.raw_prescaler = params_working.raw_prescaler;
+		params.phase_increment = params_working.phase_increment;
 	}
 	else{
 
-		Process_TIM16_Raw_Start_Value_and_Raw_Prescaler(&params);
+		Process_Phase_Accumulator_Base_Increment(&params);
 	}
 
-	Process_TIM16_Final_Start_Value_and_Final_Prescaler(&params);
+	Process_Symmetry_Warp_Parameters(&params);
 
 	//after initial conversion is complete, set the conversion complete flag - leave this after raw/final value processing rather than actually when ADC values are converted for startup routine reasons.
 	if(Get_Status_Bit(&statuses, Initial_ADC_Conversion_Complete) == NO){
@@ -216,7 +215,6 @@ void TIM3_ch1_IP_capture_measurement_reelapse_callback(TIM_HandleTypeDef *htim){
 		Set_Status_Bit(&statuses, First_Sync_Complete);
 
 		Calculate_Next_Main_Oscillator_Values(&params, (enum Next_Values_Processing_Mode)REGULAR_MODE);
-		Write_Next_Main_Oscillator_Values_to_Delay_Line(&params, &delay_line);
 		HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions); //this function takes ages to execute!
 
 	}
@@ -359,7 +357,8 @@ void __attribute__((optimize("O0")))UART2_RX_transfer_complete_callback(UART_Han
 
 				if(*rx_buffer == SYSTEM_REAL_TIME_MIDI_CLOCK){
 
-					// @TODO //WRITE CODE TO LOAD CORRECT DUTY DELAYED VALUE TO SECONDARY OSCILLATOR
+					// The secondary oscillator's value is computed alongside the main one
+					// in Calculate_Next_Main_Oscillator_Values, so it is already correct here.
 					Set_Oscillator_Values(&params_to_be_loaded);
 
 					//Give it another IP CAP edge upon sync
@@ -384,7 +383,6 @@ void __attribute__((optimize("O0")))UART2_RX_transfer_complete_callback(UART_Han
 					Set_Status_Bit(&statuses, First_Sync_Complete);
 
 					Calculate_Next_Main_Oscillator_Values(&params, (enum Next_Values_Processing_Mode)REGULAR_MODE);
-					Write_Next_Main_Oscillator_Values_to_Delay_Line(&params, &delay_line);
 					HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions); //this function takes ages to execute!
 				}
 			}
@@ -530,7 +528,8 @@ void __attribute__((optimize("O0")))UART2_RX_transfer_complete_callback(UART_Han
 
 				if(*rx_buffer == SYSTEM_REAL_TIME_MIDI_CLOCK){
 
-					// @TODO //WRITE CODE TO LOAD CORRECT DUTY DELAYED VALUE TO SECONDARY OSCILLATOR
+					// The secondary oscillator's value is computed alongside the main one
+					// in Calculate_Next_Main_Oscillator_Values, so it is already correct here.
 					Set_Oscillator_Values(&params_to_be_loaded);
 
 					//Give it another IP CAP edge upon sync
@@ -554,7 +553,6 @@ void __attribute__((optimize("O0")))UART2_RX_transfer_complete_callback(UART_Han
 					Set_Status_Bit(&statuses, First_Sync_Complete);
 
 					Calculate_Next_Main_Oscillator_Values(&params, (enum Next_Values_Processing_Mode)REGULAR_MODE);
-					Write_Next_Main_Oscillator_Values_to_Delay_Line(&params, &delay_line);
 					HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCResultsDMA, (uint32_t)num_ADC_conversions); //this function takes ages to execute!
 				}
 			}
@@ -682,7 +680,7 @@ void __attribute__((optimize("O0")))UART2_RX_transfer_complete_callback(UART_Han
 										//Implement new channel mode
 										if(MIDI_data.MIDI_data_buffer[1] == RESET_ALL_CONTROLLERS){
 
-											Reset_All_Controllers(&params, &delay_line);
+											Reset_All_Controllers();
 											Clear_Status_Bit(&statuses, First_Sync_Complete); //important for where a synced state (via MIDI CLK, CLK IN, or TAP) is the prior state
 										}
 										else if(MIDI_data.MIDI_data_buffer[1] == LOCAL_CONTROL){
@@ -870,7 +868,7 @@ void __attribute__((optimize("O0")))UART2_RX_transfer_complete_callback(UART_Han
 										//Implement new channel mode
 										if(MIDI_data.MIDI_data_buffer[1] == RESET_ALL_CONTROLLERS){
 
-											Reset_All_Controllers(&params, &delay_line);
+											Reset_All_Controllers();
 											Clear_Status_Bit(&statuses, First_Sync_Complete); //important for where a synced state (via MIDI CLK, CLK IN, or TAP) is the prior state
 										}
 										else if(MIDI_data.MIDI_data_buffer[1] == LOCAL_CONTROL){
@@ -1245,6 +1243,7 @@ void __attribute__((optimize("O0")))LPTIM1_callback(LPTIM_HandleTypeDef *hlptim)
 	//CHECK IF TAP TEMPO HELD DOWN - PRESET SAVE MODE
 
 	static uint64_t depressed_num;
+	dep = depressed_num;
 	static enum Preset_Selected preset = PRESET_ONE;
 	enum LED_States led_state;
 	static enum LED_States led_state_saved;
@@ -1284,7 +1283,34 @@ void __attribute__((optimize("O0")))LPTIM1_callback(LPTIM_HandleTypeDef *hlptim)
 				}
 				else if((depressed_num >= TAP_TEMPO_SWITCH_FACTORY_RESET_COUNT_MIN) && (depressed_num < TAP_TEMPO_SWITCH_FACTORY_RESET_COUNT_MAX)){
 
-					//@TODO Factory Reset Presets and user preset used array in flash
+					//stop oscillator outputs
+					Global_Interrupt_Disable();
+					Mute_Oscillator_Outputs();
+
+					//Erase Flash
+					Erase_Flash_For_Factory_Reset();
+
+					//Read 'User Preset Used' Bytes, 'Start Required Before MIDI CLK' Byte, MIDI Omni On/Off Status Bit, and MIDI Basic Channel
+					//Following an Erase, this sets misc values to factory defaults
+					Read_and_Interpret_Misc_From_Flash(MISC_FLASH_MEMORY_ADDRESS, user_presets_used_array, &statuses, &MIDI_basic_channel, NUM_PRESETS);
+
+					//Set the Converted Preset Array to the Relevant Factory/User Preset depending upon the 'User Preset Used' Byte read from Flash
+					Update_Converted_Preset_Array_with_User_or_Factory_Presets(presets_converted_array,
+																			  user_presets_used_array,
+																  	  	  	  factory_presets_array,
+																			  user_presets_array,
+																			  NUM_PRESETS);
+
+					Set_LED_to_State(&LED_fsm, LED_CONFIRM);
+
+					//using a for loop delay as interrupts are disabled, meaning HAL_Delay won't work
+					for(size_t i = 0; i < FACTORY_RESET_COMPLETE_DELAY_COUNT; ++i){
+
+						__NOP();
+					}
+
+					//start oscillator outputs
+					Global_Interrupt_Enable();
 				}
 				if(save_or_preset_mode_engaged == YES){
 

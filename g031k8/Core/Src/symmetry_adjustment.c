@@ -1,403 +1,199 @@
 #include "symmetry_adjustment.h"
 
+// ─────────────────────────────────────────────────────────────────────────────
+// SYMMETRY AS A PHASE WARP
+// ─────────────────────────────────────────────────────────────────────────────
+//
+// ── Why it is done this way ──────────────────────────────────────────────────
+//
+// The previous implementation gave the phase accumulator two different
+// increments and picked between them according to which quadrant group the
+// oscillator was in.  That produces the right waveform, but it destroys the
+// accumulator as a measure of position in the cycle: the phase value no longer
+// advances at a constant rate, so "half of 2^32" is no longer "half a cycle in
+// time".  With nothing left that measures the cycle linearly, there was no way
+// to place the secondary oscillator at a constant phase offset.
+//
+// So the two jobs are now separated:
+//
+//   phase_accumulator   uniform master phase.  Always advances by exactly
+//                       phase_increment.  2^32 == one cycle, at every speed and
+//                       every symmetry setting.  This is the linear ruler.
+//
+//   Symmetry_Warp()     maps that master phase onto the shaped output phase
+//                       that actually indexes the wavetable.  All of the
+//                       symmetry distortion lives here.
+//
+// The main oscillator reads Symmetry_Warp(master), the secondary reads
+// Symmetry_Warp(master + offset).  Because the offset is applied on the linear
+// side of the warp it is a constant fraction of the cycle - a true phase
+// offset - and because both taps go through the SAME warp, both oscillators
+// always carry exactly the same waveshape.
+//
+// ── The warp ─────────────────────────────────────────────────────────────────
+//
+// The output phase space is split into groups that symmetry speeds up or slows
+// down:
+//
+//   SINE / TRIANGLE   Group A = phi in [0, 2^30) and [3*2^30, 2^32)
+//                               (indices 0-127 and 384-511 - the rising halves)
+//                     Group B = phi in [2^30, 3*2^30)
+//                               (indices 128-383 - the falling halves)
+//
+//   SQUARE            Group A = phi in [0, 2^31)    (indices 0-255, high half)
+//                     Group B = phi in [2^31, 2^32) (indices 256-511, low half)
+//
+// Group A is given a fraction (256 - sym)/256 of the cycle TIME and Group B the
+// remaining sym/256.  Those two fractions add to exactly 1, which is why the
+// LFO frequency is untouched by the symmetry pot - frequency preservation now
+// falls out of the construction instead of relying on a cancellation.
+//
+// Writing kA = (256 - sym)/128 and kB = sym/128, each segment's master-phase
+// width is its time fraction times 2^32, so for SINE / TRIANGLE:
+//
+//   theta in [0, b1)      ->  phi in [0, 2^30)        b1 = (256-sym) * 2^23
+//   theta in [b1, b2)     ->  phi in [2^30, 3*2^30)   b2 = 2^31 + sym * 2^23
+//   theta in [b2, 2^32)   ->  phi in [3*2^30, 2^32)
+//
+// and for SQUARE:
+//
+//   theta in [0, b1)      ->  phi in [0, 2^31)        b1 = (256-sym) * 2^24
+//   theta in [b1, 2^32)   ->  phi in [2^31, 2^32)
+//
+// Within a segment the map is linear, with only two possible gradients:
+//
+//   slope_A = 128 / (256 - sym)      slope_B = 128 / sym
+//
+// both held Q24 in warp_slope_A / warp_slope_B.  A whole warp is therefore two
+// compares, a subtract, one multiply and a shift - no division, and nothing
+// that needs to run at interrupt rate except the multiply.
+//
+// Sanity checks:
+//   sym = 128 (centre) -> slope_A = slope_B = 1.0 and b1/b2 land exactly on the
+//                         quadrant boundaries, so the warp is the identity.
+//   sym < 128          -> Group A gets more time than Group B.
+//   sym > 128          -> Group B gets more time than Group A.
+//
+// ── Overflow ─────────────────────────────────────────────────────────────────
+// sym is clamped to [SYMMETRY_MIN, SYMMETRY_MAX] = [1, 255], so:
+//   slope_A, slope_B  <= 128 << 24 == 2^31            (fits uint32_t)
+//   theta * slope     <  2^55                         (fits uint64_t)
+// and the result of each segment stays strictly below the next segment's base,
+// so the warp never wraps past 2^32.
 
-uint8_t Adjust_TIM16_Prescaler(struct Params* params_ptr){
+//FUNCTION DEFINITIONS
+uint8_t Process_Symmetry_Warp_Parameters(struct Params* params_ptr){
 
-    if(params_ptr->prescaler_adjust == MULTIPLY_BY_TWO){
-    	params_ptr->final_prescaler = params_ptr->raw_prescaler << 1;
-    }
-    else if(params_ptr->prescaler_adjust == DO_NOTHING){
-    	params_ptr->final_prescaler = params_ptr->raw_prescaler;
-    }
-    return 1;
+	#if SYMMETRY_ON_OR_OFF == ON
+
+		uint32_t sym = (uint32_t)params_ptr->symmetry;
+
+		// Both ends are degenerate - they ask one group to be crossed in zero
+		// time - so hold the value one step inside each extreme.
+		if(sym < SYMMETRY_MIN){
+			sym = SYMMETRY_MIN;
+		}
+		else if(sym > SYMMETRY_MAX){
+			sym = SYMMETRY_MAX;
+		}
+
+		params_ptr->warp_symmetry = (uint16_t)sym;
+		params_ptr->warp_slope_A  = (128UL << WARP_SLOPE_FRAC_BITS) / (256UL - sym);
+		params_ptr->warp_slope_B  = (128UL << WARP_SLOPE_FRAC_BITS) / sym;
+
+	#else
+
+		// Symmetry disabled: make the warp the identity map.
+		params_ptr->warp_symmetry = SYMMETRY_ADC_HALF_SCALE;
+		params_ptr->warp_slope_A  = (1UL << WARP_SLOPE_FRAC_BITS);
+		params_ptr->warp_slope_B  = (1UL << WARP_SLOPE_FRAC_BITS);
+
+	#endif
+
+	return 1;
 }
 
-uint8_t Process_TIM16_Final_Start_Value_and_Final_Prescaler(struct Params* params_ptr){
+uint32_t Symmetry_Warp(uint32_t master_phase, const struct Params* params_ptr){
 
-    #if SYMMETRY_ON_OR_OFF == ON
+	#if SYMMETRY_ON_OR_OFF == ON
 
-	enum TIM16_final_start_value_Oscillation_Mode TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
-			enum Symmetry_Type symmetry_type_for_halfcycle = SHORTEN;
+		uint32_t sym  = (uint32_t)params_ptr->warp_symmetry;
+		uint32_t anti = 256UL - sym;
 
-			uint8_t pot_rotation_corrected = 0;
-			enum Symmetry_Status symmetry_status = CW;
+		if(params_ptr->waveshape == SQUARE_MODE){
 
-			//DETERMINE IF CW OR CCW SYMMETRY POT ROTATION
-			if(params_ptr->symmetry < SYMMETRY_ADC_HALF_SCALE){ //adc = 0-127
-				symmetry_status = CW;
-			}
-			else{ //adc is 128-255
-				symmetry_status = CCW;
+			uint32_t b1 = anti << 24; //master phase at the halfcycle boundary
+
+			if(master_phase < b1){
+
+				return (uint32_t)(((uint64_t)master_phase * params_ptr->warp_slope_A) >> WARP_SLOPE_FRAC_BITS);
 			}
 
-			//DETERMINE WHETHER TO SHORTEN OR LENGTHEN BASED ON CURRENT INDEX AND SYMMETRY POT POSITION
-			if((params_ptr->waveshape == SINE_MODE) || (params_ptr->waveshape == TRIANGLE_MODE)){
+			return 0x80000000UL + (uint32_t)(((uint64_t)(master_phase - b1) * params_ptr->warp_slope_B) >> WARP_SLOPE_FRAC_BITS);
+		}
+		else{
 
-				if((params_ptr->halfcycle == FIRST_HALFCYCLE && params_ptr->quadrant == FIRST_QUADRANT) || (params_ptr->halfcycle == SECOND_HALFCYCLE && params_ptr->quadrant == SECOND_QUADRANT)){
+			uint32_t b1 = anti << 23;                   //master phase at the end of the 1st quadrant
+			uint32_t b2 = 0x80000000UL + (sym << 23);   //master phase at the end of the 3rd quadrant
 
-					if(symmetry_status == CW){
+			if(master_phase < b1){
 
-						symmetry_type_for_halfcycle = LENGTHEN;
-					}
-					else{
-
-						symmetry_type_for_halfcycle = SHORTEN;
-					}
-				}
-				else if((params_ptr->halfcycle == FIRST_HALFCYCLE && params_ptr->quadrant == SECOND_QUADRANT) || (params_ptr->halfcycle == SECOND_HALFCYCLE && params_ptr->quadrant == FIRST_QUADRANT)){
-
-					if(symmetry_status == CW){
-
-						symmetry_type_for_halfcycle = SHORTEN;
-					}
-					else{
-
-						symmetry_type_for_halfcycle = LENGTHEN;
-					}
-				}
-			}
-			else if(params_ptr->waveshape == SQUARE_MODE){
-
-				if(params_ptr->halfcycle == FIRST_HALFCYCLE){
-
-					if(symmetry_status == CW){
-
-						symmetry_type_for_halfcycle = LENGTHEN;
-					}
-					else{
-
-						symmetry_type_for_halfcycle = SHORTEN;
-					}
-				}
-				else{
-
-					if(symmetry_status == CW){
-
-						symmetry_type_for_halfcycle = SHORTEN;
-					}
-					else{
-
-						symmetry_type_for_halfcycle = LENGTHEN;
-					}
-				}
+				return (uint32_t)(((uint64_t)master_phase * params_ptr->warp_slope_A) >> WARP_SLOPE_FRAC_BITS);
 			}
 
-			if(symmetry_status == CW){
+			if(master_phase < b2){
 
-				pot_rotation_corrected = SYMMETRY_ADC_HALF_SCALE - 1 - params_ptr->symmetry;
-			}
-			else{ //CCW
-
-				pot_rotation_corrected = SYMMETRY_ADC_HALF_SCALE - 1 - (SYMMETRY_ADC_FULL_SCALE - params_ptr->symmetry);
+				return 0x40000000UL + (uint32_t)(((uint64_t)(master_phase - b1) * params_ptr->warp_slope_B) >> WARP_SLOPE_FRAC_BITS);
 			}
 
-			//HAVE TO BE uin16_t FOR 1ST AND 3RD VARIABLES HERE BECAUSE A uint8_t IS LIMITED TO 255!
-			uint16_t two_fifty_six_minus_TIM16_raw_start_value = 256 - params_ptr->raw_start_value;
+			return 0xC0000000UL + (uint32_t)(((uint64_t)(master_phase - b2) * params_ptr->warp_slope_A) >> WARP_SLOPE_FRAC_BITS);
+		}
 
-			//uint16_t two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC = (two_fifty_six_minus_TIM16_raw_start_value * pot_rotation_corrected);
-			//COMMENT LINE BELOW IN AND LINE ABOVE OUT TO EXPERIMENT WITH MORE EXTREME SYMMETRY ADJUSTMENT
-			uint16_t two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC = ((two_fifty_six_minus_TIM16_raw_start_value * pot_rotation_corrected) * 12) >> 3; //x(12/8) - 12/8 is the absolute maximum we can get away with
+	#else
 
-			uint16_t two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC_and_shifted_by_ADC_bits = (uint16_t)(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC >> SYMMETRY_ADC_NUM_BITS);
+		(void)params_ptr;
+		return master_phase;
 
+	#endif
+}
 
-			//HAVE TO BE uin16_t HERE BECAUSE A uint8_t IS LIMITED TO 255!
-			uint16_t manipulated_period_shorten = two_fifty_six_minus_TIM16_raw_start_value - two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC_and_shifted_by_ADC_bits; //manipulated shorten will always be less than 256
+uint32_t Inverse_Symmetry_Warp(uint32_t shaped_phase, const struct Params* params_ptr){
 
-			uint16_t manipulated_period_lengthen = two_fifty_six_minus_TIM16_raw_start_value + two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC_and_shifted_by_ADC_bits; //manipulated lengthen can be greater than 256 up to 381
+	#if SYMMETRY_ON_OR_OFF == ON
 
+		// The inverse gradients are exact integers scaled by 1/128, so this
+		// direction needs no fixed-point reciprocal at all.
+		uint32_t sym  = (uint32_t)params_ptr->warp_symmetry;
+		uint32_t anti = 256UL - sym;
 
-			if((manipulated_period_lengthen < 256) || ((manipulated_period_lengthen == 256) && (unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) == 0))){
+		if(params_ptr->waveshape == SQUARE_MODE){
 
-				if(unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) == 128){
+			if(shaped_phase < 0x80000000UL){
 
-					//remainder is 128, which means two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC_and_shifted_by_ADC_bits ends in 0.5
-
-					//manipulated_period_shorten should oscillate over the halfperiod between manipulated_period_shorten and manipulated_period_shorten - 1; //DONE
-					//manipulated_period_lengthen should oscillate over the halfperiod between manipulated_period_lengthen and manipulated_period_lengthen + 1; //DONE
-
-					if(symmetry_type_for_halfcycle == SHORTEN){
-
-						TIM16_final_start_value_oscillation_mode = OSCILLATE_DOWNWARDS;
-					}
-					else if(symmetry_type_for_halfcycle == LENGTHEN){
-
-						TIM16_final_start_value_oscillation_mode = OSCILLATE_UPWARDS;
-					}
-					params_ptr->prescaler_adjust = DO_NOTHING;
-				}
-				else if(unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) == 0){
-
-					//remainder is zero, which means both shortened and lengthened manipulated periods have no no remainder
-
-					manipulated_period_shorten = manipulated_period_shorten; //do nothing //DONE
-					manipulated_period_lengthen = manipulated_period_lengthen; //do nothing //DONE
-
-					if(symmetry_type_for_halfcycle == SHORTEN){
-						TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
-					}
-					else if(symmetry_type_for_halfcycle == LENGTHEN){
-						TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
-					}
-					params_ptr->prescaler_adjust = DO_NOTHING;
-				}
-				else if(unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) < 128){
-
-					//remainder is less than 128, which means two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC_and_shifted_by_ADC_bits ends in less than 0.5
-
-					manipulated_period_shorten = manipulated_period_shorten; //do nothing //DONE
-					manipulated_period_lengthen = manipulated_period_lengthen; //do nothing //DONE
-
-					if(symmetry_type_for_halfcycle == SHORTEN){
-						TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
-					}
-					else if(symmetry_type_for_halfcycle == LENGTHEN){
-						TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
-					}
-					params_ptr->prescaler_adjust = DO_NOTHING;
-				}
-				else if(unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) > 128){
-
-					//remainder is greater than 128, which means two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC_and_shifted_by_ADC_bits ends in more than 0.5
-
-					manipulated_period_shorten = manipulated_period_shorten - 1; //DONE
-					manipulated_period_lengthen = manipulated_period_lengthen + 1; //DONE
-
-					if(symmetry_type_for_halfcycle == SHORTEN){
-						TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
-					}
-					else if(symmetry_type_for_halfcycle == LENGTHEN){
-						TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
-					}
-					params_ptr->prescaler_adjust = DO_NOTHING;
-				}
+				return (uint32_t)(((uint64_t)shaped_phase * anti) >> 7);
 			}
 
-			else if((manipulated_period_lengthen > 256) || ((manipulated_period_lengthen == 256) && (unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) > 0))){
+			return (anti << 24) + (uint32_t)(((uint64_t)(shaped_phase - 0x80000000UL) * sym) >> 7);
+		}
+		else{
 
-				if(unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) == 128){
+			if(shaped_phase < 0x40000000UL){
 
-					manipulated_period_shorten = manipulated_period_shorten - 1; //DONE
-					//NO NEED TO CHECK IF MANIPULATED_PERIOD_SHORTEN ENDS IN 0.5 AS IN THIS SPECIFIC CONDITION, WE HAVE ELIMINATED THAT POSSIBILITY
-					manipulated_period_lengthen = manipulated_period_lengthen + 1; //DONE
-
-					if(unsigned_bitwise_modulo(manipulated_period_lengthen, 1) == 0){
-
-						manipulated_period_lengthen = manipulated_period_lengthen >> 1; //DONE
-						//DO NOT OSCILLATE BETWEEN VALUES //DONE
-						//prescaler during lengthened halfperiod should be set to half //DONE
-
-						if(symmetry_type_for_halfcycle == SHORTEN){
-							TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
-							params_ptr->prescaler_adjust = DO_NOTHING;
-						}
-						else if(symmetry_type_for_halfcycle == LENGTHEN){
-							TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
-							params_ptr->prescaler_adjust = MULTIPLY_BY_TWO;
-						}
-					}
-					else{
-
-						manipulated_period_lengthen = manipulated_period_lengthen >> 1; //DONE
-						//prescaler during lengthened halfperiod should be set to half //DONE
-						//manipulated period_lengthened should oscillate over the halfperiod between manipulated_period_lengthen and manipulated_period_lengthen + 1. //DONE
-
-						if(symmetry_type_for_halfcycle == SHORTEN){
-							TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
-							params_ptr->prescaler_adjust = DO_NOTHING;
-						}
-						else if(symmetry_type_for_halfcycle == LENGTHEN){
-							TIM16_final_start_value_oscillation_mode = OSCILLATE_UPWARDS;
-							params_ptr->prescaler_adjust = MULTIPLY_BY_TWO;
-						}
-					}
-				}
-				else if(unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) == 0){
-
-					manipulated_period_shorten = manipulated_period_shorten; //do nothing// //DONE
-
-					if(unsigned_bitwise_modulo(manipulated_period_lengthen, 1) == 0){
-
-						manipulated_period_lengthen = manipulated_period_lengthen >> 1; //DONE
-						//DO NOT OSCILLATE BETWEEN VALUES //DONE
-						//prescaler during lengthened halfperiod should be set to half //DONE
-
-						if(symmetry_type_for_halfcycle == SHORTEN){
-							TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
-							params_ptr->prescaler_adjust = DO_NOTHING;
-						}
-						else if(symmetry_type_for_halfcycle == LENGTHEN){
-							TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
-							params_ptr->prescaler_adjust = MULTIPLY_BY_TWO;
-						}
-					}
-					else{
-
-						manipulated_period_lengthen = manipulated_period_lengthen >> 1; //DONE
-						//prescaler during lengthened halfperiod should be set to half //DONE
-						//manipulated period_lengthened should oscillate over the halfperiod between manipulated_period_lengthen and manipulated_period_lengthen + 1. //DONE
-
-						if(symmetry_type_for_halfcycle == SHORTEN){
-							TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
-							params_ptr->prescaler_adjust = DO_NOTHING;
-						}
-						else if(symmetry_type_for_halfcycle == LENGTHEN){
-							TIM16_final_start_value_oscillation_mode = OSCILLATE_UPWARDS;
-							params_ptr->prescaler_adjust = MULTIPLY_BY_TWO;
-						}
-					}
-				}
-				else if(unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) < 128){
-
-					manipulated_period_shorten = manipulated_period_shorten; //do nothing// //DONE
-					//NO NEED TO CHECK IF MANIPULATED_PERIOD_SHORTEN ENDS IN 0.5 AS IN THIS SPECIFIC CONDITION, WE HAVE ELIMINATED THAT POSSIBILITY
-					manipulated_period_lengthen = manipulated_period_lengthen; //do nothing //DONE
-
-					if(unsigned_bitwise_modulo(manipulated_period_lengthen, 1) == 0){
-
-						manipulated_period_lengthen = manipulated_period_lengthen >> 1; //DONE
-						//DO NOT OSCILLATE BETWEEN VALUES //DONE
-						//prescaler during lengthened halfperiod should be set to half //DONE
-
-						if(symmetry_type_for_halfcycle == SHORTEN){
-							TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
-							params_ptr->prescaler_adjust = DO_NOTHING;
-						}
-						else if(symmetry_type_for_halfcycle == LENGTHEN){
-							TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
-							params_ptr->prescaler_adjust = MULTIPLY_BY_TWO;
-						}
-					}
-					else{
-
-						manipulated_period_lengthen = manipulated_period_lengthen >> 1; //DONE
-						//prescaler during lengthened halfperiod should be set to half //DONE
-						//manipulated period_lengthened should oscillate over the halfperiod between manipulated_period_lengthen and manipulated_period_lengthen + 1. //DONE
-
-						if(symmetry_type_for_halfcycle == SHORTEN){
-							TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
-							params_ptr->prescaler_adjust = DO_NOTHING;
-						}
-						else if(symmetry_type_for_halfcycle == LENGTHEN){
-							TIM16_final_start_value_oscillation_mode = OSCILLATE_UPWARDS;
-							params_ptr->prescaler_adjust = MULTIPLY_BY_TWO;
-						}
-					}
-				}
-				else if(unsigned_bitwise_modulo(two_fifty_six_minus_TIM16_raw_start_value_multiplied_by_PRC, 8) > 128){
-
-					manipulated_period_shorten = manipulated_period_shorten - 1; //DONE
-					//NO NEED TO CHECK IF MANIPULATED_PERIOD_SHORTEN ENDS IN 0.5 AS IN THIS SPECIFIC CONDITION, WE HAVE ELIMINATED THAT POSSIBILITY
-					manipulated_period_lengthen = manipulated_period_lengthen + 1; //DONE
-
-					if(unsigned_bitwise_modulo(manipulated_period_lengthen, 1) == 0){
-
-						manipulated_period_lengthen = manipulated_period_lengthen >> 1; //DONE
-						//DO NOT OSCILLATE BETWEEN VALUES //DONE
-						//prescaler during lengthened halfperiod should be set to half //DONE
-
-						if(symmetry_type_for_halfcycle == SHORTEN){
-							TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
-							params_ptr->prescaler_adjust = DO_NOTHING;
-						}
-						else if(symmetry_type_for_halfcycle == LENGTHEN){
-							TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
-							params_ptr->prescaler_adjust = MULTIPLY_BY_TWO;
-						}
-					}
-					else{
-
-						manipulated_period_lengthen = manipulated_period_lengthen >> 1; //DONE
-						//prescaler during lengthened halfperiod should be set to half //DONE
-						//manipulated period_lengthened should oscillate over the halfperiod between manipulated_period_lengthen and manipulated_period_lengthen + 1. //DONE
-
-						if(symmetry_type_for_halfcycle == SHORTEN){
-							TIM16_final_start_value_oscillation_mode = DO_NOT_OSCILLATE;
-							params_ptr->prescaler_adjust = DO_NOTHING;
-						}
-						else if(symmetry_type_for_halfcycle == LENGTHEN){
-							TIM16_final_start_value_oscillation_mode = OSCILLATE_UPWARDS;
-							params_ptr->prescaler_adjust = MULTIPLY_BY_TWO;
-						}
-					}
-				}
+				return (uint32_t)(((uint64_t)shaped_phase * anti) >> 7);
 			}
 
-	        //DETERMINE THE TIM16_FINAL_START_VALUE FROM MANIPULATED_PERIOD_LENGTHEN/SHORTEN CALCULATED
-	        //NOTE INVERSE RELATIONSHIP BETWEEN TIM16_FINAL_START_VALUE AND MANIPULATED_PERIOD_LENGTHEN/SHORTEN BECAUSE 256-TIM16_FINAL_START_VALUE = MANIPULATED_PERIOD_LENGTHEN/SHORTEN
-	        //ODD VALUES OF CURRENT_INDEX WILL FEATURE THE ADJUSTED(OSCILLATED) VALUE
-	        if(symmetry_type_for_halfcycle == SHORTEN){
+			if(shaped_phase < 0xC0000000UL){
 
-	            if(TIM16_final_start_value_oscillation_mode == DO_NOT_OSCILLATE){
+				return (anti << 23) + (uint32_t)(((uint64_t)(shaped_phase - 0x40000000UL) * sym) >> 7);
+			}
 
-	                params_ptr->final_start_value = 256 - manipulated_period_shorten;
-	            }
-	            else if(TIM16_final_start_value_oscillation_mode == OSCILLATE_UPWARDS){
+			return (0x80000000UL + (sym << 23)) + (uint32_t)(((uint64_t)(shaped_phase - 0xC0000000UL) * anti) >> 7);
+		}
 
-	                if(unsigned_bitwise_modulo(params_ptr->index, 1) == 0){ //if current index is even
+	#else
 
-	                    params_ptr->final_start_value = 256 - manipulated_period_shorten;
-	                }
-	                else{ //if current index is odd
+		(void)params_ptr;
+		return shaped_phase;
 
-	                    params_ptr->final_start_value = 256 - manipulated_period_shorten - 1;
-	                }
-	            }
-	            else if(TIM16_final_start_value_oscillation_mode == OSCILLATE_DOWNWARDS){
-
-	                if(unsigned_bitwise_modulo(params_ptr->index, 1) == 0){ //if current index is even
-
-	                    params_ptr->final_start_value = 256 - manipulated_period_shorten;
-	                }
-	                else{ //if current index is odd
-
-	                    params_ptr->final_start_value = 256 - manipulated_period_shorten + 1;
-	                }
-	            }
-	        }
-	        else if(symmetry_type_for_halfcycle == LENGTHEN){
-
-	            if(TIM16_final_start_value_oscillation_mode == DO_NOT_OSCILLATE){
-
-	                params_ptr->final_start_value = 256 - manipulated_period_lengthen;
-	            }
-	            else if(TIM16_final_start_value_oscillation_mode == OSCILLATE_UPWARDS){
-
-	                if(unsigned_bitwise_modulo(params_ptr->index, 1) == 0){ //if current index is even
-
-	                    params_ptr->final_start_value = 256 - manipulated_period_lengthen;
-	                }
-	                else{ //if current index is odd
-
-	                    params_ptr->final_start_value = 256 - manipulated_period_lengthen - 1;
-	                }
-	            }
-	            else if(TIM16_final_start_value_oscillation_mode == OSCILLATE_DOWNWARDS){
-
-	                if(unsigned_bitwise_modulo(params_ptr->index, 1) == 0){ //if current index is even
-
-	                    params_ptr->final_start_value = 256 - manipulated_period_lengthen;
-	                }
-	                else{ //if current index is odd
-
-	                    params_ptr->final_start_value = 256 - manipulated_period_lengthen + 1;
-	                }
-	            }
-	        }
-
-	        Adjust_TIM16_Prescaler(params_ptr);
-
-    #endif
-
-    #if SYMMETRY_ON_OR_OFF == OFF
-		params_ptr->final_start_value = params_ptr->raw_start_value;
-		params_ptr->prescaler_adjust = DO_NOTHING;
-        Adjust_TIM16_Prescaler(params_ptr);
-    #endif
-
-    params_ptr->final_period = 256 - params_ptr->final_start_value;
-    params_ptr->final_ARR = params_ptr->final_period - 1;
-    params_ptr->final_prescaler_minus_one = params_ptr->final_prescaler - 1;
-
-    return 1;
+	#endif
 }

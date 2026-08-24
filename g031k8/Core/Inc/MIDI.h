@@ -73,7 +73,7 @@ enum Validate Is_Program_Change_Data_Byte_In_Range(volatile uint8_t *PC_data, ui
 enum Validate Is_System_Real_Time_Status_Byte(volatile uint8_t *data);
 enum Validate Is_OMNI_On(volatile uint32_t *statuses_ptr);
 uint8_t Reset_and_Stop_MIDI_Software_Timer(uint32_t *midi_counter_ptr, volatile uint32_t *statuses_ptr);
-uint8_t Reset_All_Controllers();
+uint8_t Reset_All_Controllers(void);
 uint8_t Set_Local_Control();
 uint8_t Set_OMNI_Off(volatile uint32_t *statuses_ptr);
 uint8_t Set_OMNI_On(volatile uint32_t *statuses_ptr);

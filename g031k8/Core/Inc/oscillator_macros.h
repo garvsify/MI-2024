@@ -25,7 +25,7 @@
 #define SPEED_ADC_RESULT_INDEX 1
 #define DEPTH_ADC_RESULT_INDEX 2
 #define SYMMETRY_ADC_RESULT_INDEX 3
-#define DUTY_DELAY_LINE_READ_POINTER_OFFSET_ADC_RESULT_INDEX 4
+#define PHASE_ADC_RESULT_INDEX 4
 
 #define SINE_OR_TRIANGLE_WAVE_PREEMPTIVE_DELAY 50
 #define SINE_OR_TRIANGLE_WAVE_TEMPO_PERCEIVED_APEX_INDEX 384 - SINE_OR_TRIANGLE_WAVE_PREEMPTIVE_DELAY
@@ -35,8 +35,40 @@
 #define SQUARE_WAVE_TEMPO_PULSE_OFF_INDEX SQUARE_WAVE_TEMPO_APEX_INDEX + TEMPO_PULSE_LENGTH
 
 #define HIGHEST_PRESCALER_TOP_SPEED_PERIOD 129
-#define PRESCALER_DIVISORS_MAX_INDEX 5
-#define SLOWEST_SPEED_PRESCALER 1024
+
+// Phase accumulator: fixed TIM16 configuration
+// TIM16 input clock = 64 MHz / CKD_DIV4 = 16 MHz
+// Interrupt rate = 16 MHz / PHASE_ACCUM_FIXED_PRESCALER / (PHASE_ACCUM_FIXED_ARR + 1)
+//                = 16 MHz / 32 / 128 = 3906.25 Hz
+#define PHASE_ACCUM_FIXED_PRESCALER           32    // TIM16 prescaler value (divides by 32)
+#define PHASE_ACCUM_FIXED_PRESCALER_MINUS_ONE 31    // value written to PSC register
+#define PHASE_ACCUM_FIXED_ARR                 127   // TIM16 auto-reload register (period = 128 counts)
+#define PHASE_ACCUM_SHIFT                     23    // bits to right-shift phase to get 9-bit table index
+
+// ── SYMMETRY WARP ────────────────────────────────────────────────────────────
+// Fractional bits used for the two piecewise-linear warp slopes.  The largest
+// slope is 128 (symmetry at one extreme), so 128 << 24 == 2^31 still fits in a
+// uint32_t with room to spare.
+#define WARP_SLOPE_FRAC_BITS 24
+
+// Symmetry is an 8-bit control where 128 == centre == no warp.  0 and 256 are
+// both degenerate (they ask one group to be traversed in zero time), so the
+// value is clamped one step inside each end.
+#define SYMMETRY_MIN 1
+#define SYMMETRY_MAX 255
+
+// ── PHASE OFFSET (SECONDARY OSCILLATOR) ──────────────────────────────────────
+// The phase control is a 9-bit number where PHASE_POT_FULL_SCALE == 360 deg.
+// It is fed by a 7-bit source (pot ADC, MIDI CC or preset) shifted up by 2, so
+// the largest value it can actually take is PHASE_POT_CONTROL_MAX == 508,
+// i.e. 357.19 deg - one 2.81 deg step short of wrapping back to 0 deg.
+#define PHASE_POT_FULL_SCALE   (1UL << PHASE_ADC_RESOLUTION)          // 512
+#define PHASE_POT_CONTROL_MAX  (PHASE_POT_FULL_SCALE - 4UL)           // 508
+#define PHASE_OFFSET_SHIFT     (32 - PHASE_ADC_RESOLUTION)            // 23
+
+// Set to ON if the phase pot is wired so that fully CW gives the LOW ADC
+// reading.  Fully CCW must give 0 deg and fully CW must give ~360 deg.
+#define PHASE_POT_REVERSED OFF
 
 
 #if SINE_OR_TRIANGLE_WAVE_TEMPO_PERCEIVED_APEX_INDEX < SECOND_QUADRANT_START_INDEX

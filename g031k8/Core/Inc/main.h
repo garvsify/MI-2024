@@ -1,6 +1,8 @@
 #ifndef INC_MAIN_H_
 #define INC_MAIN_H_
 
+#define FACTORY_RESET_COMPLETE_DELAY_COUNT 5000000
+
 //INLCUDES
 #include <stdint.h>
 #include "config.h"

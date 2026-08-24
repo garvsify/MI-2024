@@ -1,26 +1,14 @@
 #ifndef INC_SYMMETRY_ADJUSTMENT_TYPES_H_
 #define INC_SYMMETRY_ADJUSTMENT_TYPES_H_
 
-//CUSTOM TYPES
-enum TIM16_final_start_value_Oscillation_Mode{
-	DO_NOT_OSCILLATE,
-	OSCILLATE_UPWARDS,
-	OSCILLATE_DOWNWARDS
-};
+// The oscillation-mode, prescaler-adjust, and SHORTEN/LENGTHEN types from the
+// timer-overflow implementation have been removed.  Symmetry is now a warp of
+// the uniform master phase, described by a pair of Q24 slopes
+// (warp_slope_A / warp_slope_B) computed once per ADC update.
 
 enum Symmetry_Status{
 	CW,
 	CCW
-};
-
-enum Symmetry_Type{
-	SHORTEN,
-	LENGTHEN
-};
-
-enum Adjust_Prescaler_Action{
-	DO_NOTHING,
-	MULTIPLY_BY_TWO,
 };
 
 #endif /* INC_SYMMETRY_ADJUSTMENT_TYPES_H_ */

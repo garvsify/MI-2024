@@ -59,6 +59,16 @@ uint8_t Initialise_Preset_Arrays(void){
 	return 1;
 }
 
+/*uint8_t Clear_User_Presets_Used_Array(volatile enum Validate *user_presets_used_array_ptr){
+
+	for(size_t i = 0; i < NUM_PRESETS; ++i){
+
+		user_presets_used_array_ptr[i] = (enum Validate)NO;
+	}
+
+	return 1;
+}*/
+
 uint8_t Update_Params_Based_On_Mode_Selected(void){
 
 	if(waveshape_fsm.current_state == MANUAL_MODE){
@@ -74,7 +84,7 @@ uint8_t Update_Params_Based_On_Mode_Selected(void){
 		params.symmetry = params_manual.symmetry;
 	}
 	if(phase_fsm.current_state == MANUAL_MODE){
-		params.duty_delay_line_read_pointer_offset = params_manual.duty_delay_line_read_pointer_offset;
+		params.phase_control = params_manual.phase_control;
 	}
 
 	if(waveshape_fsm.current_state == PC_MODE){
@@ -92,7 +102,6 @@ uint8_t Update_Params_Based_On_Mode_Selected(void){
 	if(phase_fsm.current_state == PC_MODE){
 		Update_Phase_with_Converted_Preset_Value(&presets_converted_array[(uint8_t)preset_selected - 1], &params);
 	}
-
 
 	if(waveshape_fsm.current_state == CC_MODE){
 		Update_Waveshape_with_CC_Value(&CC_array[WAVESHAPE_ARR], &params);
@@ -127,11 +136,20 @@ uint8_t Convert_All_Preset_Values(volatile struct Preset* preset_ptr, volatile s
 
 uint8_t Convert_All_Params_Values_for_Preset(volatile struct Params *params_ptr, volatile struct Preset* preset_ptr){
 
-	preset_ptr->waveshape = params_ptr->waveshape; //7-bit copy
+	if(params_ptr->waveshape == TRIANGLE_MODE){
+		preset_ptr->waveshape = TRIANGLE_MODE_ADC_THRESHOLD;
+	}
+	else if(params_ptr->waveshape == SINE_MODE){
+		preset_ptr->waveshape = SINE_MODE_ADC_THRESHOLD;
+	}
+	else if(params_ptr->waveshape == SQUARE_MODE){
+		preset_ptr->waveshape = SQUARE_MODE_ADC_THRESHOLD;
+	}
+
 	preset_ptr->speed = params_ptr->speed >> 3; //convert from 10-bit to 7-bit
 	preset_ptr->depth = params_ptr->depth; //7-bit copy
 	preset_ptr->symmetry = params_ptr->symmetry >> 1; //convert from 8-bit to 7-bit
-	preset_ptr->phase = params_ptr->duty_delay_line_read_pointer_offset >> 2; //convert from 9-bit to 7-bit
+	preset_ptr->phase = params_ptr->phase_control >> 2; //convert from 9-bit to 7-bit
 
 	return 1;
 }
@@ -156,14 +174,22 @@ uint8_t Update_All_with_Converted_Preset_Values(struct Preset_Converted* preset_
 
 	params_ptr->symmetry = preset_converted_ptr->symmetry;
 
-	params_ptr->duty_delay_line_read_pointer_offset = preset_converted_ptr->phase;
+	params_ptr->phase_control = preset_converted_ptr->phase;
 
 	return 1;
 }
 
 uint8_t Update_Waveshape_with_Converted_Preset_Value(volatile struct Preset_Converted* preset_converted_ptr, struct Params* params_ptr){
 
-	params_ptr->waveshape = preset_converted_ptr->waveshape;
+	if(preset_converted_ptr->waveshape <= TRIANGLE_MODE_ADC_THRESHOLD){
+		params_ptr->waveshape = TRIANGLE_MODE; //triangle wave
+	}
+	else if (preset_converted_ptr->waveshape <= SINE_MODE_ADC_THRESHOLD){
+		params_ptr->waveshape = SINE_MODE; //sine wave
+	}
+	else if (preset_converted_ptr->waveshape <= SQUARE_MODE_ADC_THRESHOLD){
+		params_ptr->waveshape = SQUARE_MODE; //square wave
+	}
 
 	return 1;
 }
@@ -191,7 +217,7 @@ uint8_t Update_Symmetry_with_Converted_Preset_Value(volatile struct Preset_Conve
 
 uint8_t Update_Phase_with_Converted_Preset_Value(volatile struct Preset_Converted* preset_converted_ptr, struct Params* params_ptr){
 
-	params_ptr->duty_delay_line_read_pointer_offset = preset_converted_ptr->phase;
+	params_ptr->phase_control = preset_converted_ptr->phase;
 
 	return 1;
 }
@@ -376,6 +402,18 @@ uint8_t Store_Single_Preset_In_Flash(volatile struct Preset *preset, uint8_t pre
 	return 1;
 }
 
+uint8_t Erase_Flash_For_Factory_Reset(void){
+
+	uint64_t misc_packed = 0;
+	uint32_t errors = 0;
+	FLASH_EraseInitTypeDef erase_config = {.TypeErase = FLASH_CR_PER, .Banks = FLASH_CR_MER1, .Page = 31, .NbPages = 1};
+	HAL_FLASH_Unlock();
+	HAL_FLASHEx_Erase(&erase_config, &errors); //all 0xF is no errors
+	HAL_FLASH_Lock();
+
+	return 1;
+}
+
 uint8_t Read_and_Interpret_Misc_From_Flash(uint32_t address_val,
 										   volatile enum Validate *user_presets_used_array_ptr,
 										   volatile uint32_t *statuses_ptr,
@@ -515,7 +553,7 @@ uint8_t Update_Phase_with_CC_Value(volatile uint8_t *data, struct Params* params
 	uint8_t phase = (uint8_t)*data;
 
 	phase <<= 2; //convert to 9-bit
-	params_ptr->duty_delay_line_read_pointer_offset = phase;
+	params_ptr->phase_control = phase;
 
 	return 1;
 }
