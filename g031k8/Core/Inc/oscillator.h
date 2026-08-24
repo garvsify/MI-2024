@@ -67,6 +67,7 @@ uint8_t Start_PWM_Gen_Timer_Main_and_Secondary_Oscillators(TIM_HandleTypeDef *TI
 uint8_t Start_Freq_Gen_Timer(void);
 
 uint8_t Set_Oscillator_Values(struct Params* params_ptr);
+uint8_t Mute_Oscillator_Outputs(void);
 uint8_t Calculate_Next_Main_Oscillator_Values(struct Params* params_ptr, enum Next_Values_Processing_Mode mode);
 uint8_t Process_ADC_Conversion_Values(struct Params* params_ptr, volatile uint16_t* ADCResultsDMA_ptr);
 uint8_t Process_Phase_Accumulator_Base_Increment(struct Params* params_ptr);

@@ -1283,6 +1283,10 @@ void __attribute__((optimize("O0")))LPTIM1_callback(LPTIM_HandleTypeDef *hlptim)
 				}
 				else if((depressed_num >= TAP_TEMPO_SWITCH_FACTORY_RESET_COUNT_MIN) && (depressed_num < TAP_TEMPO_SWITCH_FACTORY_RESET_COUNT_MAX)){
 
+					//stop oscillator outputs
+					Global_Interrupt_Disable();
+					Mute_Oscillator_Outputs();
+
 					//Erase Flash
 					Erase_Flash_For_Factory_Reset();
 
@@ -1296,7 +1300,17 @@ void __attribute__((optimize("O0")))LPTIM1_callback(LPTIM_HandleTypeDef *hlptim)
 																  	  	  	  factory_presets_array,
 																			  user_presets_array,
 																			  NUM_PRESETS);
+
 					Set_LED_to_State(&LED_fsm, LED_CONFIRM);
+
+					//using a for loop delay as interrupts are disabled, meaning HAL_Delay won't work
+					for(size_t i = 0; i < FACTORY_RESET_COMPLETE_DELAY_COUNT; ++i){
+
+						__NOP();
+					}
+
+					//start oscillator outputs
+					Global_Interrupt_Enable();
 				}
 				if(save_or_preset_mode_engaged == YES){
 

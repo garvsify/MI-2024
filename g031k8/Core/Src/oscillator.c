@@ -102,6 +102,24 @@ uint8_t Set_Oscillator_Values(struct Params* params_ptr){
 	return 1;
 }
 
+uint8_t Mute_Oscillator_Outputs(void){
+
+	// TIM16 now runs at a fixed rate - no ARR or prescaler writes needed.
+	// Only update the PWM compare registers on TIM1.
+
+	////////////////////////////////////////////////////////
+	//SET THE CURRENT(prev) VALUES FOR THE MAIN OSCILLATOR//
+	////////////////////////////////////////////////////////
+	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 0);
+
+	/////////////////////////////////////////////////////////////
+	//SET THE CURRENT(prev) VALUES FOR THE SECONDARY OSCILLATOR//
+	/////////////////////////////////////////////////////////////
+	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, 0);
+
+	return 1;
+}
+
 // Phase_Control_to_Master_Phase_Offset
 //
 // The phase control is 9-bit, where PHASE_POT_FULL_SCALE (512) is one whole
